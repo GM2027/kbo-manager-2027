@@ -168,6 +168,13 @@ import {
   integrateAmateurAndOverseasIntoDraftCandidates,
   markAmateurOrOverseasDraftedInPlace,
 } from './amateurOverseasEngine';
+import {
+  ALL_FIELD_POSITIONS,
+  ALL_HITTER_LINEUP_POSITIONS,
+  ensurePlayerPositionProficiencyInPlace,
+  getPositionProficiency,
+} from './positionEngine';
+import { getKboFaCompensationRuleForSeason } from './faCompensationEngine';
 import { allocatePermanentPlayerId } from './playerRegistry';
 import { SeededRng } from './rng';
 import { generateRegularSeasonSchedule } from './schedule';
@@ -2280,6 +2287,7 @@ export function updateRosterPlacement(
     rosterTier?: RosterTier;
     gameDayActive?: boolean;
     trainingFocus?: TrainingFocus;
+    positionTrainingTarget?: Position | null;
   }
 ): CareerSave {
   const next = cloneCareer(career);
@@ -2341,6 +2349,20 @@ export function updateRosterPlacement(
 
   if (action.trainingFocus !== undefined) {
     p.trainingFocus = action.trainingFocus;
+  }
+
+  if (action.positionTrainingTarget !== undefined) {
+    if (p.role === '타자') {
+      const target = action.positionTrainingTarget;
+      if (target && target !== p.position && ALL_FIELD_POSITIONS.includes(target)) {
+        ensurePlayerPositionProficiencyInPlace(p);
+        p.positionTrainingTarget = target;
+      } else {
+        p.positionTrainingTarget = null;
+      }
+    } else {
+      p.positionTrainingTarget = null;
+    }
   }
 
   next.updatedAt = new Date().toISOString();
@@ -2792,23 +2814,20 @@ export function setLineupSlot(
     incoming.gameDayActive = true;
   }
 
-  // Determine target fielding position: natural position or DH
+  // Determine target fielding position: explicit position, or slot's previous position / natural position / DH
   const targetPos: Position =
     position ??
     (existingIdx >= 0
       ? team.lineupPositions[playerId] ?? incoming.position
-      : oldSlotPos === 'DH'
-      ? 'DH'
-      : incoming.position);
+      : oldSlotPos ?? incoming.position);
 
-  // Enforce: fielding positions (C, 1B, 2B, 3B, SS, LF, CF, RF) must match natural position; only DH accepts any batter
-  if (targetPos !== 'DH' && targetPos !== incoming.position) {
-    throw new Error(
-      `${incoming.name} 선수는 본래 포지션(${incoming.position}) 또는 지명타자(DH)로만 선발 출전할 수 있습니다.`
-    );
+  if (!ALL_HITTER_LINEUP_POSITIONS.includes(targetPos)) {
+    throw new Error(`유효하지 않은 야수 포지션(${targetPos})입니다.`);
   }
+  ensurePlayerPositionProficiencyInPlace(incoming);
 
   // Enforce: NO duplicate positions in the starting 9 (one player per C,1B,2B,3B,SS,LF,CF,RF,DH)
+  // 주 포지션과 보조 포지션(및 비상 수비 포지션) 모두 선발 배치 가능하며, 기존 동일 포지션 선수가 있으면 자연스럽게 스왑 시도
   const conflictingId = team.lineupOrder.find((lid) => {
     if (lid === playerId) return false;
     const pos = team.lineupPositions[lid] ?? next.players[lid]?.position;
@@ -2817,24 +2836,54 @@ export function setLineupSlot(
 
   if (conflictingId) {
     const conflictPlayer = next.players[conflictingId];
-    if (targetPos === 'DH' && conflictPlayer && conflictPlayer.position !== 'DH') {
-      // Check if previous DH can safely return to their natural position without creating a duplicate
-      const natOccupied = team.lineupOrder.some((lid) => {
+    const incomingPrevPos =
+      existingIdx >= 0 ? team.lineupPositions[playerId] ?? incoming.position : oldSlotPos;
+
+    // 1) 같은 선발 9명 내부에서 포지션 맞바꾸기 (예: 3B ↔ 1B, SS ↔ 2B, 수비 ↔ DH)
+    if (
+      conflictPlayer &&
+      incomingPrevPos &&
+      incomingPrevPos !== targetPos &&
+      ALL_HITTER_LINEUP_POSITIONS.includes(incomingPrevPos)
+    ) {
+      const prevPosOccupied = team.lineupOrder.some((lid) => {
         if (lid === conflictingId || lid === playerId) return false;
         const pos = team.lineupPositions[lid] ?? next.players[lid]?.position;
-        return pos === conflictPlayer.position;
+        return pos === incomingPrevPos;
       });
-      if (!natOccupied) {
-        team.lineupPositions[conflictingId] = conflictPlayer.position;
+      if (!prevPosOccupied) {
+        team.lineupPositions[conflictingId] = incomingPrevPos;
       } else {
         throw new Error(
-          `이미 ${conflictPlayer.name} 선수가 DH로 배치되어 있고 본래 포지션(${conflictPlayer.position})도 사용 중입니다. 먼저 기존 DH 선수를 교체하거나 포지션을 비워주세요.`
+          `선발 라인업에 ${targetPos} 포지션(${conflictPlayer.name})이 이미 있습니다. 한 자리에 한 포지션만 배치할 수 있습니다.`
         );
       }
-    } else {
-      throw new Error(
-        `선발 라인업에 ${targetPos} 포지션(${conflictPlayer?.name ?? '기존 주전'})이 이미 있습니다. 한 자리에 한 포지션만 배치할 수 있습니다 (DH만 타 포지션 겸임 가능).`
-      );
+    } else if (conflictPlayer) {
+      // 2) 기존 선수의 주 포지션 또는 숙련 보조 포지션 중 비어 있는 자리로 자동 이동 시도
+      const candidateAltPositions: Position[] = (
+        [
+          conflictPlayer.position,
+          ...(conflictPlayer.secondaryPositions ?? []),
+          'DH',
+        ] as Position[]
+      ).filter((cand, idx, arr) => cand !== targetPos && arr.indexOf(cand) === idx);
+
+      const freeAltPos = candidateAltPositions.find((cand) => {
+        const occupied = team.lineupOrder.some((lid) => {
+          if (lid === conflictingId || lid === playerId) return false;
+          const pos = team.lineupPositions[lid] ?? next.players[lid]?.position;
+          return pos === cand;
+        });
+        return !occupied && (cand === 'DH' || getPositionProficiency(conflictPlayer, cand) >= 55);
+      });
+
+      if (freeAltPos) {
+        team.lineupPositions[conflictingId] = freeAltPos;
+      } else {
+        throw new Error(
+          `선발 라인업에 ${targetPos} 포지션(${conflictPlayer.name})이 이미 배치되어 있습니다. 먼저 기존 선수의 포지션을 비워주세요.`
+        );
+      }
     }
   }
 
@@ -5198,6 +5247,8 @@ export function signExternalFaPlayer(
       next.teams[fromTeam].bullpenOrder = next.teams[fromTeam].bullpenOrder.filter((id) => id !== p.id);
     }
 
+    const prevAnnualSalBeforeSign = Math.max(0.33, p.previousAnnualSalary ?? p.contract.annualSalary ?? 1.0);
+    p.previousAnnualSalary = prevAnnualSalBeforeSign;
     p.teamId = next.playerTeamId;
     p.formerTeamId = undefined;
     if (!isOwnFormerFa) {
@@ -5244,8 +5295,9 @@ export function signExternalFaPlayer(
       next.finances.krwUnpaidBillion = Number((next.finances.krwUnpaidBillion + upFrontCash).toFixed(2));
     }
 
+    const faSeasonRule = getKboFaCompensationRuleForSeason(next.season, listing.grade);
     let needsProtectionList = false;
-    if (!isOwnFormerFa && (listing.grade === 'A' || listing.grade === 'B')) {
+    if (!isOwnFormerFa && faSeasonRule.playerCompensationAllowed && (listing.grade === 'A' || listing.grade === 'B')) {
       next.pendingFaProtection = {
         signedPlayerId: p.id,
         signedPlayerName: p.name,
@@ -5253,7 +5305,7 @@ export function signExternalFaPlayer(
         faGrade: listing.grade,
         protectionLimit: listing.grade === 'A' ? 20 : 25,
         protectedIds: [],
-        cashCompBillion: listing.cashCompBillion,
+        cashCompBillion: Number((prevAnnualSalBeforeSign * faSeasonRule.cashWithPlayerRatio).toFixed(2)),
       };
       needsProtectionList = true;
     }

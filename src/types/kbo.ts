@@ -371,6 +371,14 @@ export interface Player {
   benchIdleGames?: number;
   /** 유틸리티 선수 겸업 가능 보조 수비 포지션 */
   secondaryPositions?: Position[];
+  /** 포지션별 수비 숙련도 (0~100 · 주 포지션/보조 포지션/훈련·반복 출전으로 상승) */
+  positionProficiency?: Partial<Record<Position, number>>;
+  /** 신규 수비 포지션 집중 훈련 대상 (정규/2군 훈련 주기마다 숙련도 상승, 60+ 도달 시 보조 포지션 획득) */
+  positionTrainingTarget?: Position | null;
+  /** 시즌/통산 포지션별 수비 출전 누적 경기 수 (반복 출전 숙련도 성장 추적) */
+  positionGamesPlayed?: Partial<Record<Position, number>>;
+  /** 해당 오프시즌 FA 보상선수로 이적 완료된 시즌 연도 (당해 연도 재지명 자동 보호 규정용) */
+  faCompensationTransferredSeason?: number;
   rosterTier: RosterTier;
   gameDayActive: boolean;
   /** 웨이버 영입 확정 일자 (YYYY-MM-DD · 60일간 재웨이버 금지 기준) */

@@ -9,6 +9,10 @@ import {
 } from '../types/kbo';
 import { canPlayerAppearInFirstTeam } from './developmentalEngine';
 import { buildBattingProfile, buildPitchRepertoire } from './deepFranchise';
+import {
+  computeEffectiveFieldingAtPosition,
+  getPositionProficiency,
+} from './positionEngine';
 import { SeededRng } from './rng';
 import { calcAVG, calcOPS } from './stats';
 
@@ -118,29 +122,22 @@ export function isUtilityPlayer(p: Player): boolean {
 }
 
 /**
- * 수비 포지션 호환성 점수 (주 포지션 > 자연 보조 포지션 > DH > 비상 투입)
+ * 수비 포지션 호환성 점수 (포지션별 수비 숙련도 0~100 기반)
  */
 export function getPositionFitScore(p: Player, targetPos: Position): number {
   if (p.position === targetPos) return 10;
   if (targetPos === 'DH') return 8;
+  const prof = getPositionProficiency(p, targetPos);
   if (targetPos === 'C') {
-    // Only true catchers should catch unless absolute emergency
-    return p.secondaryPositions?.includes('C') ? 7 : -25;
+    if (prof >= 60) return 7;
+    if (prof >= 45) return 2;
+    return -25;
   }
-  if (p.secondaryPositions?.includes(targetPos)) return 8;
-  if (INFIELD_POSITIONS.includes(p.position) && INFIELD_POSITIONS.includes(targetPos)) {
-    if ((p.position === 'SS' && targetPos === '2B') || (p.position === '2B' && targetPos === 'SS')) return 7;
-    if ((p.position === '3B' && targetPos === '1B') || (p.position === '3B' && targetPos === '2B')) return 6;
-    if (p.position === '2B' && targetPos === '3B') return 6;
-    return 4;
-  }
-  if (OUTFIELD_POSITIONS.includes(p.position) && OUTFIELD_POSITIONS.includes(targetPos)) {
-    if (p.position === 'CF') return 8;
-    if (targetPos === 'CF') return p.age <= 29 ? 5 : 2;
-    return 7;
-  }
-  if (p.position === 'DH' && (targetPos === '1B' || targetPos === 'LF' || targetPos === 'RF')) return 4;
-  if ((p.position === '1B' || p.position === '3B') && (targetPos === 'LF' || targetPos === 'RF')) return 3;
+  if (prof >= 80) return 9;
+  if (prof >= 70) return 8;
+  if (prof >= 60) return 7;
+  if (prof >= 48) return 5;
+  if (prof >= 35) return 2;
   return -6;
 }
 
@@ -165,16 +162,16 @@ export function getRunnerSpeedScore(p: Player): number {
 }
 
 /**
- * 수비력 점수 (대수비 투입 기준)
+ * 수비력 점수 (대수비 투입 기준 · 포지션별 수비 숙련도 및 페널티 반영)
  */
 export function getDefenseValueScore(p: Player, targetPos: Position): number {
-  let score = getPositionFitScore(p, targetPos) * 5 + 45;
-  if (p.trainingFocus === '수비') score += 12;
-  if (p.age <= 29) score += 5;
-  else if (p.age >= 35) score -= 8;
-  if (p.ability >= 72) score += 4;
-  score -= Math.round(p.fatigue * 0.18);
-  return score;
+  const eff = computeEffectiveFieldingAtPosition(p, targetPos);
+  let score = eff.effectiveFielding * 0.72 + eff.proficiency * 0.35;
+  if (p.trainingFocus === '수비') score += 8;
+  if (p.age <= 29) score += 4;
+  else if (p.age >= 35) score -= 6;
+  score -= Math.round(p.fatigue * 0.16);
+  return Math.round(score);
 }
 
 /**

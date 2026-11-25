@@ -4,9 +4,11 @@ import { REAL_KBO_BATTER_PROFILES, REAL_KBO_PITCHER_PROFILES } from '../data/kbo
 import { getLiveCareerStats, REAL_KBO_RETIRED_NUMBERS } from '../data/playerMetadata';
 import { findRealPlayerClubProfile } from '../data/realKboHistories';
 import {
+  appendPlayerTeamHistoryInPlace,
   getAwardSalaryDemandMultiplier,
   getDefendingChampionTeamId,
 } from './leagueLifeEngine';
+import { resolveFaProtectionAndCompensationSelection } from './faCompensationEngine';
 import {
   AgentPersona,
   BatterStats,
@@ -1412,23 +1414,34 @@ export function confirmFaProtectionList(
   if (!pending) {
     throw new Error('제출할 FA 보상선수 보호명단이 없습니다.');
   }
-  const uniqueProtected = new Set(protectedIds.slice(0, pending.protectionLimit));
-  uniqueProtected.add(pending.signedPlayerId);
 
-  // Eligible compensation pool: my team active/2군 domestic players excluding protected, rookies, foreign, Sangmu
-  const unprotected = Object.values(next.players)
-    .filter(
-      (p) =>
-        p.teamId === next.playerTeamId &&
-        p.category === '국내' &&
-        (p.rosterTier === '1군' || p.rosterTier === '2군') &&
-        !isMilitaryServing(p.militaryStatus) &&
-        !uniqueProtected.has(p.id)
-    )
-    .sort((a, b) => computePlayerTradeValue(b).index - computePlayerTradeValue(a).index);
+  // KBO 공식 규정: A등급 20인 / B등급 25인 보호 (당해 FA·신인·외국인·군보류·FA 보상 이적자는 자동 제외 · 보호 인원 미포함)
+  const signedPlayer = next.players[pending.signedPlayerId];
+  const prevAnnualSal = Math.max(
+    0.33,
+    signedPlayer?.previousAnnualSalary ??
+      (pending.faGrade === 'A'
+        ? pending.cashCompBillion / 2.0
+        : pending.faGrade === 'B'
+          ? pending.cashCompBillion
+          : pending.cashCompBillion / 1.5)
+  );
+  const compRes = resolveFaProtectionAndCompensationSelection(
+    next,
+    next.playerTeamId,
+    pending.fromTeamId,
+    {
+      faSeason: next.season,
+      signedPlayerId: pending.signedPlayerId,
+      grade: pending.faGrade,
+      submittedProtectedIds: protectedIds,
+      previousAnnualSalaryBillion: prevAnnualSal,
+    }
+  );
 
-  const chosen = unprotected[0] ?? null;
+  const chosen = compRes.chosenPlayer;
   let takenPlayerName: string | null = null;
+  const transferDateIso = getCurrentCareerDate(next).isoDate;
   if (chosen) {
     takenPlayerName = chosen.name;
     const oldTeam = next.teams[next.playerTeamId];
@@ -1436,35 +1449,54 @@ export function confirmFaProtectionList(
     oldTeam.benchOrder = oldTeam.benchOrder.filter((id) => id !== chosen.id);
     oldTeam.rotationOrder = oldTeam.rotationOrder.filter((id) => id !== chosen.id);
     oldTeam.bullpenOrder = oldTeam.bullpenOrder.filter((id) => id !== chosen.id);
+    delete oldTeam.lineupPositions[chosen.id];
 
     chosen.teamId = pending.fromTeamId;
     chosen.rosterTier = '1군';
     chosen.gameDayActive = true;
+    chosen.clubTenureSeasons = 1;
+    chosen.faCompensationTransferredSeason = next.season;
     reassignNonConflictingUniformNumber(next, chosen, pending.fromTeamId);
+    appendPlayerTeamHistoryInPlace(
+      chosen,
+      pending.fromTeamId,
+      next.season,
+      `${pending.signedPlayerName} FA 보상선수`,
+      {
+        transferDate: transferDateIso,
+        moveType: 'FA 보상선수',
+        fromTeamId: next.playerTeamId,
+      }
+    );
 
     const destTeam = next.teams[pending.fromTeamId];
     if (chosen.role === '투수') destTeam.bullpenOrder.push(chosen.id);
     else destTeam.benchOrder.push(chosen.id);
   }
 
-  // Pay cash compensation
-  if ((next.finances.cashBalanceBillion ?? 0) >= pending.cashCompBillion) {
+  // Pay cash compensation (보상선수 미지명 금전만 전환 시 규정상 300%/200% 반영)
+  const cashDue = compRes.finalCashCompBillion;
+  if ((next.finances.cashBalanceBillion ?? 0) >= cashDue) {
     next.finances.cashBalanceBillion = Number(
-      ((next.finances.cashBalanceBillion ?? 0) - pending.cashCompBillion).toFixed(2)
+      ((next.finances.cashBalanceBillion ?? 0) - cashDue).toFixed(2)
     );
     next.finances.seasonExpenseBillion = Number(
-      (next.finances.seasonExpenseBillion + pending.cashCompBillion).toFixed(2)
+      (next.finances.seasonExpenseBillion + cashDue).toFixed(2)
+    );
+    next.finances.compensationPaidBillion = Number(
+      ((next.finances.compensationPaidBillion ?? 0) + cashDue).toFixed(2)
     );
   }
 
   next.transactionLogs.unshift({
     id: `tx-facomp-${Date.now()}`,
-    date: `${next.season}-11-28`,
+    date: transferDateIso,
     type: '계약',
     teamId: next.playerTeamId,
-    summary: `FA ${pending.faGrade}등급 보상 완료: ${pending.fromTeamId} 구단이 ${
-      takenPlayerName ? `보상선수 ${takenPlayerName} + ` : ''
-    }보상금 ${pending.cashCompBillion.toFixed(1)}억 원 지명`,
+    summary: `FA ${pending.faGrade}등급 보상 완료: ${KBO_TEAMS[pending.fromTeamId].shortName} 구단이 ${
+      takenPlayerName ? `보상선수 ${takenPlayerName} + ` : '보상선수 없음(금전 보상) · '
+    }보상금 ${cashDue.toFixed(1)}억 원 정산`,
+    detail: `보호선수 ${compRes.protectedIds.length}/${compRes.pool.protectionLimit}명 제출 · 규정상 자동 보호(제외) ${compRes.pool.autoExempt.length}명 별도 처리`,
   });
   next.pendingFaProtection = null;
   next.updatedAt = new Date().toISOString();

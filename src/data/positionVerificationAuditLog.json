@@ -1,0 +1,5623 @@
+{
+  "version": "v25_verified_positions_and_fa_compensation",
+  "generatedAt": "2026-11-25T15:52:59.462Z",
+  "backupFile": "src/data/v24PlayerDataBackupBeforePositionPatch.json",
+  "summary": {
+    "totalPlayers": 732,
+    "hittersAudited": 353,
+    "normalizedKoreanNames": 1,
+    "verifiedRealProfiles": 246,
+    "inferredDepthProfiles": 107,
+    "multiPositionHitters": 305
+  },
+  "changes": [
+    {
+      "id": "2026-LG-62",
+      "name": "김민수",
+      "team": "LG",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 81,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "v15-0038",
+      "name": "김준태",
+      "team": "LG",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "1B": 62
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LG-27",
+      "name": "박동원",
+      "team": "LG",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 94,
+      "secondaryProficiencies": {
+        "1B": 60
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LG-63",
+      "name": "이주헌",
+      "team": "LG",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LG-6",
+      "name": "구본혁",
+      "team": "LG",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "SS",
+        "2B"
+      ],
+      "primaryProficiency": 92,
+      "secondaryProficiencies": {
+        "SS": 88,
+        "2B": 86
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LG-36",
+      "name": "김성진",
+      "team": "LG",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "1B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0043",
+      "name": "김정율",
+      "team": "LG",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "SS": 67,
+        "3B": 63
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-LG-2",
+      "name": "문보경",
+      "team": "LG",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 92,
+      "secondaryProficiencies": {
+        "1B": 84
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LG-56",
+      "name": "문정빈",
+      "team": "LG",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "3B": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LG-15",
+      "name": "손용준",
+      "team": "LG",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "2B": 76,
+        "3B": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LG-4",
+      "name": "신민재",
+      "team": "LG",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "CF",
+        "SS"
+      ],
+      "primaryProficiency": 93,
+      "secondaryProficiencies": {
+        "CF": 74,
+        "SS": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LG-23",
+      "name": "오스틴",
+      "team": "LG",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "RF"
+      ],
+      "primaryProficiency": 91,
+      "secondaryProficiencies": {
+        "RF": 70
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LG-10",
+      "name": "오지환",
+      "team": "LG",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 95,
+      "secondaryProficiencies": {
+        "2B": 76,
+        "3B": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LG-7",
+      "name": "이영빈",
+      "team": "LG",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B",
+        "1B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "2B": 78,
+        "3B": 76,
+        "1B": 70
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LG-53",
+      "name": "천성호",
+      "team": "LG",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "3B",
+        "1B",
+        "LF"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "3B": 78,
+        "1B": 74,
+        "LF": 68
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0052",
+      "name": "추세현",
+      "team": "LG",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "3B": 67
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-LG-5",
+      "name": "김주성",
+      "team": "LG",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "CF"
+      ],
+      "primaryProficiency": 82,
+      "secondaryProficiencies": {
+        "RF": 76,
+        "CF": 70
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LG-66",
+      "name": "김현종",
+      "team": "LG",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "LF": 78,
+        "RF": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LG-8",
+      "name": "문성주",
+      "team": "LG",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "CF"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "RF": 84,
+        "CF": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0056",
+      "name": "박관우",
+      "team": "LG",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "CF"
+      ],
+      "primaryProficiency": 83,
+      "secondaryProficiencies": {
+        "LF": 76,
+        "CF": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LG-17",
+      "name": "박해민",
+      "team": "LG",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 97,
+      "secondaryProficiencies": {
+        "LF": 86,
+        "RF": 84
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0058",
+      "name": "서영준",
+      "team": "LG",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "LF": 67,
+        "RF": 63
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-LG-55",
+      "name": "송찬의",
+      "team": "LG",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "3B",
+        "1B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "LF": 80,
+        "3B": 72,
+        "1B": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LG-52",
+      "name": "이재원",
+      "team": "LG",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "1B"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "RF": 78,
+        "1B": 70
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LG-3",
+      "name": "최원영",
+      "team": "LG",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "LF": 80,
+        "RF": 80
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0062",
+      "name": "함창건",
+      "team": "LG",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "CF"
+      ],
+      "primaryProficiency": 82,
+      "secondaryProficiencies": {
+        "RF": 76,
+        "CF": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LG-51",
+      "name": "홍창기",
+      "team": "LG",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "CF",
+        "LF"
+      ],
+      "primaryProficiency": 92,
+      "secondaryProficiencies": {
+        "CF": 82,
+        "LF": 84
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HH-42",
+      "name": "박상언",
+      "team": "HH",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0095",
+      "name": "이재원",
+      "team": "HH",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "1B": 62
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HH-32",
+      "name": "장규현",
+      "team": "HH",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "1B": 64
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HH-13",
+      "name": "최재훈",
+      "team": "HH",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 92,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0098",
+      "name": "허관회",
+      "team": "HH",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-HH-59",
+      "name": "허인서",
+      "team": "HH",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HH-50",
+      "name": "강백호",
+      "team": "HH",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "RF",
+        "C"
+      ],
+      "primaryProficiency": 83,
+      "secondaryProficiencies": {
+        "RF": 72,
+        "C": 64
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0101",
+      "name": "권현규",
+      "team": "HH",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "1B": 67
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-HH-8",
+      "name": "노시환",
+      "team": "HH",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 92,
+      "secondaryProficiencies": {
+        "1B": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HH-63",
+      "name": "박정현",
+      "team": "HH",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "SS",
+        "2B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "SS": 78,
+        "2B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0104",
+      "name": "배승수",
+      "team": "HH",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "2B": 76,
+        "3B": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HH-7",
+      "name": "심우준",
+      "team": "HH",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 94,
+      "secondaryProficiencies": {
+        "2B": 82,
+        "3B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HH-5",
+      "name": "이도윤",
+      "team": "HH",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "2B": 84,
+        "3B": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0107",
+      "name": "이승현",
+      "team": "HH",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B",
+        "2B"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "1B": 67,
+        "2B": 63
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "v15-0108",
+      "name": "정민규",
+      "team": "HH",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B",
+        "2B"
+      ],
+      "primaryProficiency": 83,
+      "secondaryProficiencies": {
+        "1B": 74,
+        "2B": 70
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0109",
+      "name": "채은성",
+      "team": "HH",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "RF"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "RF": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HH-3",
+      "name": "최원준",
+      "team": "HH",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "1B": 67
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "v15-0111",
+      "name": "최유빈",
+      "team": "HH",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "2B": 67,
+        "3B": 63
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "v15-0112",
+      "name": "하주석",
+      "team": "HT",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "3B",
+        "2B"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "3B": 78,
+        "2B": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0113",
+      "name": "한지윤",
+      "team": "HH",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B",
+        "C"
+      ],
+      "primaryProficiency": 83,
+      "secondaryProficiencies": {
+        "3B": 70,
+        "C": 65
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HH-95",
+      "name": "황영묵",
+      "team": "HH",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "SS": 82,
+        "3B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HH-17",
+      "name": "권광민",
+      "team": "HH",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "1B",
+        "RF"
+      ],
+      "primaryProficiency": 83,
+      "secondaryProficiencies": {
+        "1B": 74,
+        "RF": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HH-25",
+      "name": "김태연",
+      "team": "HH",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "1B",
+        "3B",
+        "LF"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "1B": 82,
+        "3B": 78,
+        "LF": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HH-51",
+      "name": "문현빈",
+      "team": "HH",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "2B",
+        "CF",
+        "3B"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "2B": 80,
+        "CF": 76,
+        "3B": 70
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0118",
+      "name": "손아섭",
+      "team": "NC",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "LF": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HH-54",
+      "name": "오재원",
+      "team": "HH",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "LF": 76,
+        "RF": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HH-33",
+      "name": "유로결",
+      "team": "HH",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "LF": 78,
+        "RF": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HH-65",
+      "name": "유민",
+      "team": "HH",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "CF"
+      ],
+      "primaryProficiency": 83,
+      "secondaryProficiencies": {
+        "RF": 78,
+        "CF": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0122",
+      "name": "이민재",
+      "team": "HH",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "CF"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "LF": 67,
+        "CF": 63
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-HH-37",
+      "name": "이원석",
+      "team": "HH",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "LF": 82,
+        "RF": 80
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HH-10",
+      "name": "이진영",
+      "team": "HH",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "RF",
+        "LF"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "RF": 84,
+        "LF": 82
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0125",
+      "name": "임종찬",
+      "team": "HH",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "CF"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "LF": 78,
+        "CF": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HH-41",
+      "name": "최인호",
+      "team": "HH",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "CF"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "RF": 80,
+        "CF": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HH-30",
+      "name": "페라자",
+      "team": "HH",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "CF"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "LF": 80,
+        "CF": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0158",
+      "name": "김규민",
+      "team": "SSG",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "v15-0159",
+      "name": "김민식",
+      "team": "SSG",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SSG-25",
+      "name": "신범수",
+      "team": "SSG",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "1B": 64
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0161",
+      "name": "이율예",
+      "team": "SSG",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SSG-56",
+      "name": "이지영",
+      "team": "SSG",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 91,
+      "secondaryProficiencies": {
+        "1B": 60
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SSG-20",
+      "name": "조형우",
+      "team": "SSG",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SSG-18",
+      "name": "고명준",
+      "team": "SSG",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "3B": 70
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SSG-5",
+      "name": "김민준",
+      "team": "SSG",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 82,
+      "secondaryProficiencies": {
+        "SS": 72,
+        "3B": 68
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0166",
+      "name": "김성현",
+      "team": "SSG",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "3B",
+        "SS"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "3B": 82,
+        "SS": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0167",
+      "name": "김수윤",
+      "team": "SSG",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 83,
+      "secondaryProficiencies": {
+        "1B": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SSG-46",
+      "name": "김요셉",
+      "team": "SSG",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 82,
+      "secondaryProficiencies": {
+        "2B": 74,
+        "3B": 68
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0169",
+      "name": "김태윤",
+      "team": "SSG",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "3B",
+        "SS"
+      ],
+      "primaryProficiency": 81,
+      "secondaryProficiencies": {
+        "3B": 72,
+        "SS": 68
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SSG-53",
+      "name": "문상준",
+      "team": "SSG",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "2B": 76,
+        "3B": 70
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SSG-2",
+      "name": "박성한",
+      "team": "SSG",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 94,
+      "secondaryProficiencies": {
+        "2B": 76,
+        "3B": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SSG-52",
+      "name": "석정우",
+      "team": "SSG",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "2B": 78,
+        "3B": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SSG-10",
+      "name": "안상현",
+      "team": "SSG",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "SS": 78,
+        "3B": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0174",
+      "name": "정준재",
+      "team": "SSG",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "SS": 74,
+        "3B": 70
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SSG-65",
+      "name": "최윤석",
+      "team": "SSG",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "2B",
+        "SS"
+      ],
+      "primaryProficiency": 82,
+      "secondaryProficiencies": {
+        "2B": 74,
+        "SS": 70
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0176",
+      "name": "최정",
+      "prevName": "최  정",
+      "team": "SSG",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 96,
+      "secondaryProficiencies": {
+        "1B": 64
+      },
+      "source": "KBO 공식 수비 출장 전수 검증",
+      "note": "KBO 대표 3루수 (원본 공백명 최  정 -> 최정 및 SS->3B 교정)"
+    },
+    {
+      "id": "v15-0177",
+      "name": "현원회",
+      "team": "SSG",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B",
+        "C"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "3B": 68,
+        "C": 62
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SSG-97",
+      "name": "홍대인",
+      "team": "SSG",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "3B": 68
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0179",
+      "name": "김성욱",
+      "team": "SSG",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "RF",
+        "LF"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "RF": 84,
+        "LF": 82
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SSG-32",
+      "name": "김재환",
+      "team": "SSG",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 80,
+      "secondaryProficiencies": {
+        "1B": 62
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0181",
+      "name": "김창평",
+      "team": "SSG",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "2B",
+        "RF",
+        "CF"
+      ],
+      "primaryProficiency": 83,
+      "secondaryProficiencies": {
+        "2B": 74,
+        "RF": 76,
+        "CF": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SSG-45",
+      "name": "류효승",
+      "team": "SSG",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "1B"
+      ],
+      "primaryProficiency": 83,
+      "secondaryProficiencies": {
+        "RF": 76,
+        "1B": 68
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0183",
+      "name": "박지환",
+      "team": "SSG",
+      "prevRawPos": "OF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "3B",
+        "SS"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "3B": 76,
+        "SS": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SSG-27",
+      "name": "에레디아",
+      "team": "SSG",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "CF",
+        "RF"
+      ],
+      "primaryProficiency": 91,
+      "secondaryProficiencies": {
+        "CF": 76,
+        "RF": 80
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SSG-37",
+      "name": "오태곤",
+      "team": "SSG",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "1B",
+        "RF",
+        "CF"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "1B": 82,
+        "RF": 80,
+        "CF": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SSG-9",
+      "name": "이승민",
+      "team": "SSG",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 83,
+      "secondaryProficiencies": {
+        "LF": 76,
+        "RF": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0187",
+      "name": "이정범",
+      "team": "KT",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 79,
+      "secondaryProficiencies": {
+        "LF": 69,
+        "RF": 65
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-SSG-63",
+      "name": "임근우",
+      "team": "SSG",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "CF"
+      ],
+      "primaryProficiency": 83,
+      "secondaryProficiencies": {
+        "LF": 76,
+        "CF": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SSG-49",
+      "name": "장재율",
+      "team": "SSG",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "CF"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "RF": 66,
+        "CF": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-SSG-15",
+      "name": "채현우",
+      "team": "SSG",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "LF": 78,
+        "RF": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0191",
+      "name": "최준우",
+      "team": "SSG",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "2B",
+        "RF"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "2B": 72,
+        "RF": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SSG-54",
+      "name": "최지훈",
+      "team": "SSG",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 95,
+      "secondaryProficiencies": {
+        "LF": 84,
+        "RF": 82
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0193",
+      "name": "하재훈",
+      "team": "SSG",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "CF"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "LF": 80,
+        "CF": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SSG-35",
+      "name": "한유섬",
+      "team": "SSG",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "LF": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SS-47",
+      "name": "강민호",
+      "team": "SS",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 93,
+      "secondaryProficiencies": {
+        "1B": 60
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SS-24",
+      "name": "김도환",
+      "team": "SS",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SS-2",
+      "name": "김재성",
+      "team": "SS",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "1B": 64
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SS-52",
+      "name": "박세혁",
+      "team": "SS",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0229",
+      "name": "박진우",
+      "team": "SS",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "v15-0230",
+      "name": "이병헌",
+      "team": "SS",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SS-46",
+      "name": "장승현",
+      "team": "SS",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-SS-30",
+      "name": "김영웅",
+      "team": "SS",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "SS",
+        "2B"
+      ],
+      "primaryProficiency": 90,
+      "secondaryProficiencies": {
+        "SS": 82,
+        "2B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SS-14",
+      "name": "김재상",
+      "team": "SS",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "SS": 78,
+        "3B": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SS-0",
+      "name": "디아즈",
+      "team": "SS",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "RF"
+      ],
+      "primaryProficiency": 93,
+      "secondaryProficiencies": {
+        "RF": 68
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SS-16",
+      "name": "류지혁",
+      "team": "SS",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "3B",
+        "1B",
+        "SS"
+      ],
+      "primaryProficiency": 91,
+      "secondaryProficiencies": {
+        "3B": 88,
+        "1B": 82,
+        "SS": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0236",
+      "name": "심재훈",
+      "team": "SS",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "SS": 78,
+        "3B": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0237",
+      "name": "양우현",
+      "team": "SS",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "SS": 76,
+        "3B": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SS-7",
+      "name": "이재현",
+      "team": "SS",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "3B",
+        "2B"
+      ],
+      "primaryProficiency": 93,
+      "secondaryProficiencies": {
+        "3B": 80,
+        "2B": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0239",
+      "name": "이창용",
+      "team": "SS",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "3B": 70
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SS-3",
+      "name": "이해승",
+      "team": "SS",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "2B": 78,
+        "3B": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SS-61",
+      "name": "전병우",
+      "team": "SS",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B",
+        "2B"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "1B": 82,
+        "2B": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SS-35",
+      "name": "차승준",
+      "team": "SS",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 83,
+      "secondaryProficiencies": {
+        "1B": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "FA2027-SS-구자욱",
+      "name": "구자욱",
+      "team": "SS",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "1B"
+      ],
+      "primaryProficiency": 91,
+      "secondaryProficiencies": {
+        "RF": 86,
+        "1B": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SS-39",
+      "name": "김성윤",
+      "team": "SS",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "CF",
+        "LF"
+      ],
+      "primaryProficiency": 92,
+      "secondaryProficiencies": {
+        "CF": 88,
+        "LF": 84
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SS-8",
+      "name": "김재혁",
+      "team": "SS",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "CF"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "RF": 66,
+        "CF": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-SS-58",
+      "name": "김지찬",
+      "team": "SS",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "2B",
+        "SS",
+        "LF"
+      ],
+      "primaryProficiency": 90,
+      "secondaryProficiencies": {
+        "2B": 84,
+        "SS": 76,
+        "LF": 82
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0247",
+      "name": "김태훈(타)",
+      "team": "SS",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "LF": 67,
+        "RF": 63
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-SS-32",
+      "name": "김헌곤",
+      "team": "SS",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "CF"
+      ],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {
+        "RF": 84,
+        "CF": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0249",
+      "name": "류승민",
+      "team": "OB",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 80,
+      "secondaryProficiencies": {
+        "LF": 70,
+        "RF": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-SS-66",
+      "name": "박승규",
+      "team": "SS",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "RF",
+        "LF"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "RF": 84,
+        "LF": 82
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SS-31",
+      "name": "윤정빈",
+      "team": "SS",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "1B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "LF": 80,
+        "1B": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0252",
+      "name": "이성규",
+      "team": "SS",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "CF",
+        "1B",
+        "3B"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "CF": 82,
+        "1B": 78,
+        "3B": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-SS-34",
+      "name": "최형우",
+      "team": "SS",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 80,
+      "secondaryProficiencies": {
+        "1B": 62
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0254",
+      "name": "함수호",
+      "team": "SS",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 79,
+      "secondaryProficiencies": {
+        "LF": 69,
+        "RF": 65
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-SS-51",
+      "name": "홍현빈",
+      "team": "SS",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "LF": 80,
+        "RF": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-NC-42",
+      "name": "김정호",
+      "team": "NC",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-NC-25",
+      "name": "김형준",
+      "team": "NC",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 93,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0288",
+      "name": "신민우",
+      "team": "NC",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-NC-22",
+      "name": "안중열",
+      "team": "NC",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0290",
+      "name": "이희성",
+      "team": "NC",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-NC-52",
+      "name": "김건",
+      "team": "NC",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "3B": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-NC-7",
+      "name": "김주원",
+      "team": "NC",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 93,
+      "secondaryProficiencies": {
+        "2B": 80,
+        "3B": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-NC-13",
+      "name": "김한별",
+      "team": "NC",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "2B": 80,
+        "3B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-NC-44",
+      "name": "김휘집",
+      "team": "NC",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "SS",
+        "1B",
+        "2B"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "SS": 84,
+        "1B": 78,
+        "2B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0295",
+      "name": "데이비슨",
+      "team": "WO",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {
+        "3B": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-NC-16",
+      "name": "도태훈",
+      "team": "NC",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B",
+        "2B"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "3B": 80,
+        "2B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-NC-2",
+      "name": "박민우",
+      "team": "NC",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS"
+      ],
+      "primaryProficiency": 93,
+      "secondaryProficiencies": {
+        "SS": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-NC-5",
+      "name": "서호철",
+      "team": "NC",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "2B",
+        "1B"
+      ],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {
+        "2B": 80,
+        "1B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-NC-9",
+      "name": "신재인",
+      "team": "NC",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 83,
+      "secondaryProficiencies": {
+        "SS": 73,
+        "3B": 69
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-NC-34",
+      "name": "오영수",
+      "team": "NC",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "3B": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-NC-6",
+      "name": "오태양",
+      "team": "NC",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "SS": 76,
+        "3B": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0302",
+      "name": "윤준혁",
+      "team": "NC",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B",
+        "2B"
+      ],
+      "primaryProficiency": 80,
+      "secondaryProficiencies": {
+        "1B": 70,
+        "2B": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-NC-14",
+      "name": "최정원",
+      "team": "NC",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "CF",
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {
+        "CF": 80,
+        "SS": 76,
+        "3B": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-NC-35",
+      "name": "한재환",
+      "team": "NC",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B",
+        "LF"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "1B": 74,
+        "LF": 70
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-NC-4",
+      "name": "허윤",
+      "team": "NC",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "3B": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-NC-10",
+      "name": "홍종표",
+      "team": "NC",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "3B",
+        "SS"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "3B": 78,
+        "SS": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0307",
+      "name": "고승완",
+      "team": "NC",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "CF"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "LF": 67,
+        "CF": 63
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-NC-49",
+      "name": "고준휘",
+      "team": "NC",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "LF": 74,
+        "RF": 70
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-NC-36",
+      "name": "권희동",
+      "team": "NC",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "CF"
+      ],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {
+        "RF": 82,
+        "CF": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-NC-37",
+      "name": "박건우",
+      "team": "NC",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "CF",
+        "LF"
+      ],
+      "primaryProficiency": 92,
+      "secondaryProficiencies": {
+        "CF": 82,
+        "LF": 84
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-NC-53",
+      "name": "박시원",
+      "team": "NC",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "CF"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "LF": 78,
+        "CF": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0312",
+      "name": "오장한",
+      "team": "NC",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 80,
+      "secondaryProficiencies": {
+        "LF": 70,
+        "RF": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-NC-55",
+      "name": "이우성",
+      "team": "NC",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "1B"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "RF": 82,
+        "1B": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-NC-23",
+      "name": "천재환",
+      "team": "NC",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 90,
+      "secondaryProficiencies": {
+        "LF": 84,
+        "RF": 82
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-NC-33",
+      "name": "한석현",
+      "team": "NC",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {
+        "LF": 82,
+        "RF": 80
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-KT-55",
+      "name": "강현우",
+      "team": "KT",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "1B": 62
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0348",
+      "name": "김민석",
+      "team": "KT",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-KT-22",
+      "name": "장성우",
+      "team": "KT",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 91,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-KT-42",
+      "name": "조대현",
+      "team": "KT",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-KT-45",
+      "name": "한승택",
+      "team": "KT",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-KT-5",
+      "name": "강민성",
+      "team": "KT",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B",
+        "2B"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "1B": 76,
+        "2B": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-KT-52",
+      "name": "권동진",
+      "team": "KT",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "2B": 82,
+        "3B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-KT-97",
+      "name": "김건휘",
+      "team": "KT",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "SS": 66,
+        "3B": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-KT-7",
+      "name": "김상수",
+      "team": "KT",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 91,
+      "secondaryProficiencies": {
+        "2B": 88,
+        "3B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-KT-9",
+      "name": "류현인",
+      "team": "KT",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "SS": 80,
+        "3B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-KT-24",
+      "name": "문상철",
+      "team": "KT",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B",
+        "LF"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "3B": 70,
+        "LF": 68
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0358",
+      "name": "안인산",
+      "team": "KT",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "3B": 67
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "v15-0359",
+      "name": "오서진",
+      "team": "KT",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "3B": 67
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-KT-4",
+      "name": "오윤석",
+      "team": "KT",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "1B",
+        "3B"
+      ],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {
+        "1B": 82,
+        "3B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-KT-6",
+      "name": "이강민",
+      "team": "KT",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "3B": 74
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "v15-0362",
+      "name": "임상우",
+      "team": "KT",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "SS": 67,
+        "3B": 63
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-KT-56",
+      "name": "장준원",
+      "team": "KT",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "3B",
+        "2B"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "3B": 80,
+        "2B": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-KT-13",
+      "name": "허경민",
+      "team": "KT",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "2B",
+        "SS"
+      ],
+      "primaryProficiency": 95,
+      "secondaryProficiencies": {
+        "2B": 78,
+        "SS": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-KT-34",
+      "name": "힐리어드",
+      "team": "KT",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "CF",
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "CF": 82,
+        "LF": 84,
+        "RF": 82
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-KT-53",
+      "name": "김민혁",
+      "team": "KT",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "CF",
+        "RF"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "CF": 80,
+        "RF": 80
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-KT-10",
+      "name": "김현수",
+      "team": "KT",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "1B",
+        "RF"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "1B": 74,
+        "RF": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-KT-27",
+      "name": "배정대",
+      "team": "KT",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 95,
+      "secondaryProficiencies": {
+        "LF": 84,
+        "RF": 82
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0369",
+      "name": "안치영",
+      "team": "KT",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 79,
+      "secondaryProficiencies": {
+        "LF": 69,
+        "RF": 65
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-KT-23",
+      "name": "안현민",
+      "team": "KT",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "CF"
+      ],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {
+        "LF": 82,
+        "CF": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-KT-67",
+      "name": "유준규",
+      "team": "KT",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "LF": 78,
+        "RF": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0372",
+      "name": "이재원",
+      "team": "KT",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "LF": 67
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-KT-33",
+      "name": "이정훈",
+      "team": "KT",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "C",
+        "1B"
+      ],
+      "primaryProficiency": 83,
+      "secondaryProficiencies": {
+        "C": 70,
+        "1B": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-KT-51",
+      "name": "장진혁",
+      "team": "KT",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "LF": 84,
+        "RF": 82
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0375",
+      "name": "최성민",
+      "team": "KT",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "CF"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "RF": 67,
+        "CF": 63
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-KT-3",
+      "name": "최원준",
+      "team": "KT",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "RF",
+        "LF",
+        "1B"
+      ],
+      "primaryProficiency": 90,
+      "secondaryProficiencies": {
+        "RF": 86,
+        "LF": 82,
+        "1B": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LT-26",
+      "name": "박재엽",
+      "team": "LT",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LT-28",
+      "name": "손성빈",
+      "team": "LT",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LT-27",
+      "name": "유강남",
+      "team": "LT",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 91,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LT-32",
+      "name": "정문혁",
+      "team": "LT",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "v15-0413",
+      "name": "정보근",
+      "team": "LT",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LT-2",
+      "name": "고승민",
+      "team": "LT",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "1B",
+        "RF",
+        "LF"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "1B": 84,
+        "RF": 78,
+        "LF": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0415",
+      "name": "김민성",
+      "team": "LT",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "2B",
+        "1B",
+        "SS"
+      ],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {
+        "2B": 82,
+        "1B": 78,
+        "SS": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LT-5",
+      "name": "김세민",
+      "team": "LT",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "2B": 78,
+        "3B": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LT-51",
+      "name": "나승엽",
+      "team": "LT",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "3B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LT-52",
+      "name": "노진혁",
+      "team": "LT",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "3B",
+        "1B"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "3B": 82,
+        "1B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LT-53",
+      "name": "박승욱",
+      "team": "LT",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "2B": 84,
+        "3B": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LT-60",
+      "name": "박찬형",
+      "team": "LT",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "2B",
+        "SS"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "2B": 78,
+        "SS": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0421",
+      "name": "이서준",
+      "team": "LT",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "2B": 67,
+        "3B": 63
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "v15-0422",
+      "name": "이태경",
+      "team": "LT",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "2B": 67,
+        "3B": 63
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "v15-0423",
+      "name": "이호준",
+      "team": "LT",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "2B": 78,
+        "3B": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LT-13",
+      "name": "전민재",
+      "team": "LT",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 91,
+      "secondaryProficiencies": {
+        "2B": 84,
+        "3B": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0425",
+      "name": "최항",
+      "team": "LT",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "3B",
+        "1B"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "3B": 78,
+        "1B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LT-25",
+      "name": "한동희",
+      "team": "LT",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 90,
+      "secondaryProficiencies": {
+        "1B": 82
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LT-6",
+      "name": "한태양",
+      "team": "LT",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "SS": 82,
+        "3B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LT-50",
+      "name": "김동혁",
+      "team": "LT",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "LF": 80,
+        "RF": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LT-64",
+      "name": "김동현",
+      "team": "LT",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF"
+      ],
+      "primaryProficiency": 79,
+      "secondaryProficiencies": {
+        "LF": 69
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-LT-95",
+      "name": "김한홀",
+      "team": "LT",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "CF"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "LF": 66,
+        "CF": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-LT-29",
+      "name": "레이예스",
+      "team": "LT",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "CF"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "LF": 86,
+        "CF": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0432",
+      "name": "손호영",
+      "team": "LT",
+      "prevRawPos": "OF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "2B",
+        "SS",
+        "LF"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "2B": 84,
+        "SS": 78,
+        "LF": 70
+      },
+      "source": "KBO 공식 수비 출장 전수 검증",
+      "note": "실제 롯데 주전 3루수/내야 멀티 (원본 OF -> 3B 교정)"
+    },
+    {
+      "id": "v15-0433",
+      "name": "신윤후",
+      "team": "LT",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 80,
+      "secondaryProficiencies": {
+        "LF": 70,
+        "RF": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-LT-91",
+      "name": "윤동희",
+      "team": "LT",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "RF",
+        "LF"
+      ],
+      "primaryProficiency": 91,
+      "secondaryProficiencies": {
+        "RF": 88,
+        "LF": 82
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LT-7",
+      "name": "장두성",
+      "team": "LT",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 90,
+      "secondaryProficiencies": {
+        "LF": 84,
+        "RF": 82
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LT-8",
+      "name": "전준우",
+      "team": "LT",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "1B",
+        "RF"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "1B": 78,
+        "RF": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LT-12",
+      "name": "조세진",
+      "team": "LT",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "CF"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "LF": 80,
+        "CF": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-LT-0",
+      "name": "황성빈",
+      "team": "LT",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 92,
+      "secondaryProficiencies": {
+        "LF": 86,
+        "RF": 82
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HT-42",
+      "name": "김태군",
+      "team": "HT",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 92,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HT-22",
+      "name": "주효상",
+      "team": "HT",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HT-25",
+      "name": "한준수",
+      "team": "HT",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "1B": 62
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HT-14",
+      "name": "김규성",
+      "team": "HT",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B",
+        "LF"
+      ],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {
+        "SS": 84,
+        "3B": 78,
+        "LF": 70
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HT-5",
+      "name": "김도영",
+      "team": "HT",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "SS"
+      ],
+      "primaryProficiency": 91,
+      "secondaryProficiencies": {
+        "SS": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HT-3",
+      "name": "김선빈",
+      "team": "HT",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS"
+      ],
+      "primaryProficiency": 92,
+      "secondaryProficiencies": {
+        "SS": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0481",
+      "name": "데일",
+      "team": "HT",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {
+        "2B": 82,
+        "3B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HT-2",
+      "name": "박민",
+      "team": "HT",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "SS",
+        "2B"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "SS": 78,
+        "2B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HT-50",
+      "name": "박상준",
+      "team": "HT",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "3B": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-HT-29",
+      "name": "변우혁",
+      "team": "HT",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "3B": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HT-56",
+      "name": "오선우",
+      "team": "HT",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "LF": 78,
+        "RF": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0486",
+      "name": "윤도현",
+      "team": "HT",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "3B",
+        "SS"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "3B": 78,
+        "SS": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HT-36",
+      "name": "이호연",
+      "team": "HT",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "3B",
+        "1B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "3B": 78,
+        "1B": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HT-12",
+      "name": "정현창",
+      "team": "HT",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "1B": 75
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-HT-23",
+      "name": "최정용",
+      "team": "HT",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "SS": 78,
+        "3B": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HT-34",
+      "name": "황대인",
+      "team": "HT",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "3B": 70
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0491",
+      "name": "고종욱",
+      "team": "HT",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF"
+      ],
+      "primaryProficiency": 81,
+      "secondaryProficiencies": {
+        "RF": 70
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HT-37",
+      "name": "김민규",
+      "team": "HT",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "LF": 74,
+        "RF": 70
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "v15-0493",
+      "name": "김석환",
+      "team": "HT",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "1B",
+        "RF"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "1B": 74,
+        "RF": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HT-27",
+      "name": "김호령",
+      "team": "HT",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 95,
+      "secondaryProficiencies": {
+        "LF": 86,
+        "RF": 84
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HT-47",
+      "name": "나성범",
+      "team": "HT",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "CF",
+        "LF"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "CF": 74,
+        "LF": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HT-15",
+      "name": "박재현",
+      "team": "HT",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "LF": 78,
+        "RF": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HT-1",
+      "name": "박정우",
+      "team": "HT",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "LF": 82,
+        "RF": 80
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-HT-8",
+      "name": "이창진",
+      "team": "HT",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "CF"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "RF": 80,
+        "CF": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0499",
+      "name": "정해원",
+      "team": "HT",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 79,
+      "secondaryProficiencies": {
+        "LF": 69,
+        "RF": 65
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-HT-26",
+      "name": "카스트로",
+      "team": "HT",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "2B",
+        "3B",
+        "CF",
+        "RF"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "2B": 82,
+        "3B": 78,
+        "CF": 76,
+        "RF": 80
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0501",
+      "name": "한승연",
+      "team": "HT",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 80,
+      "secondaryProficiencies": {
+        "LF": 70,
+        "RF": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-OB-22",
+      "name": "김기연",
+      "team": "OB",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-OB-67",
+      "name": "류현준",
+      "team": "OB",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-OB-26",
+      "name": "박민준",
+      "team": "OB",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-OB-25",
+      "name": "양의지",
+      "team": "OB",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 94,
+      "secondaryProficiencies": {
+        "1B": 62
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-OB-27",
+      "name": "윤준호",
+      "team": "OB",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-OB-23",
+      "name": "강승호",
+      "team": "OB",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "1B",
+        "3B",
+        "SS"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "1B": 82,
+        "3B": 78,
+        "SS": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-OB-11",
+      "name": "김동준",
+      "team": "OB",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "2B": 67,
+        "3B": 63
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "v15-0541",
+      "name": "김민혁",
+      "team": "OB",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "3B": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0542",
+      "name": "박계범",
+      "team": "SS",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {
+        "SS": 84,
+        "3B": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0543",
+      "name": "박준순",
+      "team": "OB",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "SS": 82,
+        "3B": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-OB-37",
+      "name": "박지훈",
+      "team": "OB",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "2B",
+        "1B"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "2B": 78,
+        "1B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-OB-7",
+      "name": "박찬호",
+      "team": "OB",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 95,
+      "secondaryProficiencies": {
+        "2B": 82,
+        "3B": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-OB-117",
+      "name": "심건보",
+      "team": "OB",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "3B": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-OB-62",
+      "name": "안재석",
+      "team": "OB",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "3B",
+        "2B"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "3B": 82,
+        "2B": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-OB-53",
+      "name": "양석환",
+      "team": "OB",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "3B": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-OB-6",
+      "name": "오명진",
+      "team": "OB",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "2B",
+        "SS"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "2B": 82,
+        "SS": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-OB-13",
+      "name": "이유찬",
+      "team": "OB",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B",
+        "LF"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "2B": 86,
+        "3B": 80,
+        "LF": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0551",
+      "name": "임종성",
+      "team": "OB",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "SS",
+        "2B"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "SS": 76,
+        "2B": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-OB-32",
+      "name": "김대한",
+      "team": "OB",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "RF",
+        "LF"
+      ],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {
+        "RF": 82,
+        "LF": 80
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-OB-2",
+      "name": "김민석",
+      "team": "OB",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "CF",
+        "RF"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "CF": 80,
+        "RF": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-OB-33",
+      "name": "김인태",
+      "team": "OB",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "LF": 80
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-OB-66",
+      "name": "김주오",
+      "team": "OB",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "RF",
+        "LF"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "RF": 78,
+        "LF": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0556",
+      "name": "신우열",
+      "team": "OB",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "LF": 67,
+        "RF": 63
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "v15-0557",
+      "name": "전다민",
+      "team": "OB",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "LF": 80,
+        "RF": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-OB-31",
+      "name": "정수빈",
+      "team": "OB",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 96,
+      "secondaryProficiencies": {
+        "LF": 86,
+        "RF": 84
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-OB-51",
+      "name": "조수행",
+      "team": "OB",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "CF",
+        "RF"
+      ],
+      "primaryProficiency": 91,
+      "secondaryProficiencies": {
+        "CF": 86,
+        "RF": 84
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0560",
+      "name": "카메론",
+      "team": "OB",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "CF",
+        "LF"
+      ],
+      "primaryProficiency": 91,
+      "secondaryProficiencies": {
+        "CF": 86,
+        "LF": 84
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0561",
+      "name": "홍성호",
+      "team": "OB",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 80,
+      "secondaryProficiencies": {
+        "LF": 70,
+        "RF": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-WO-12",
+      "name": "김건희",
+      "team": "WO",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "1B": 70
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-WO-44",
+      "name": "김동헌",
+      "team": "WO",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-WO-32",
+      "name": "김재현",
+      "team": "WO",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {},
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-WO-56",
+      "name": "박성빈",
+      "team": "WO",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 83,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-WO-23",
+      "name": "김병휘",
+      "team": "WO",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "2B": 78,
+        "3B": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-WO-10",
+      "name": "김웅빈",
+      "team": "WO",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "1B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0598",
+      "name": "김지석",
+      "team": "WO",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 80,
+      "secondaryProficiencies": {
+        "3B": 70
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-WO-1",
+      "name": "김태진",
+      "team": "WO",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "3B",
+        "SS",
+        "LF"
+      ],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {
+        "3B": 84,
+        "SS": 80,
+        "LF": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0600",
+      "name": "박한결",
+      "team": "WO",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 79,
+      "secondaryProficiencies": {
+        "3B": 69
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "v15-0601",
+      "name": "서건창",
+      "team": "WO",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "1B",
+        "3B"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "1B": 76,
+        "3B": 70
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0602",
+      "name": "송지후",
+      "team": "WO",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 80,
+      "secondaryProficiencies": {
+        "2B": 70,
+        "3B": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-WO-9",
+      "name": "안치홍",
+      "team": "WO",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "1B",
+        "3B"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "1B": 80,
+        "3B": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-WO-60",
+      "name": "양현종",
+      "team": "WO",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "3B": 67
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "2026-WO-92",
+      "name": "어준서",
+      "team": "WO",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "2B": 80,
+        "3B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-WO-93",
+      "name": "여동욱",
+      "team": "WO",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "SS",
+        "2B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "SS": 78,
+        "2B": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-WO-39",
+      "name": "염승원",
+      "team": "WO",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "SS": 78,
+        "3B": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-WO-6",
+      "name": "오선진",
+      "team": "WO",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "3B",
+        "2B"
+      ],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {
+        "3B": 84,
+        "2B": 82
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-WO-53",
+      "name": "최주환",
+      "team": "WO",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "2B": 78,
+        "3B": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-WO-38",
+      "name": "최재영",
+      "team": "WO",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "3B": 74
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "v15-0611",
+      "name": "박수종",
+      "team": "WO",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 88,
+      "secondaryProficiencies": {
+        "LF": 82,
+        "RF": 80
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-WO-57",
+      "name": "박주홍",
+      "team": "WO",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "CF"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "RF": 78,
+        "CF": 74
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-WO-43",
+      "name": "박찬혁",
+      "team": "WO",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "1B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "RF": 78,
+        "1B": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0614",
+      "name": "브룩스",
+      "team": "WO",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "1B",
+        "RF"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "1B": 80,
+        "RF": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0615",
+      "name": "이용규",
+      "team": "WO",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "LF",
+        "RF"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "LF": 84,
+        "RF": 80
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-WO-2",
+      "name": "이주형",
+      "team": "WO",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "RF",
+        "LF"
+      ],
+      "primaryProficiency": 90,
+      "secondaryProficiencies": {
+        "RF": 84,
+        "LF": 82
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-WO-36",
+      "name": "이형종",
+      "team": "WO",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "1B"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "LF": 80,
+        "1B": 70
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-WO-17",
+      "name": "임병욱",
+      "team": "WO",
+      "prevRawPos": "OF",
+      "primaryPosition": "CF",
+      "secondaryPositions": [
+        "RF",
+        "LF"
+      ],
+      "primaryProficiency": 89,
+      "secondaryProficiencies": {
+        "RF": 82,
+        "LF": 80
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "v15-0619",
+      "name": "임지열",
+      "team": "LT",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "1B",
+        "RF"
+      ],
+      "primaryProficiency": 85,
+      "secondaryProficiencies": {
+        "1B": 78,
+        "RF": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-WO-25",
+      "name": "주성원",
+      "team": "WO",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "CF"
+      ],
+      "primaryProficiency": 84,
+      "secondaryProficiencies": {
+        "LF": 78,
+        "CF": 72
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "2026-WO-27",
+      "name": "추재현",
+      "team": "WO",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "CF"
+      ],
+      "primaryProficiency": 86,
+      "secondaryProficiencies": {
+        "LF": 80,
+        "CF": 76
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "D2027-001",
+      "name": "하현승",
+      "team": "WO",
+      "prevRawPos": "TWP",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "1B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "LF": 66,
+        "1B": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-002",
+      "name": "김지우",
+      "team": "OB",
+      "prevRawPos": "TWP",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "1B"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "LF": 67,
+        "1B": 63
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-003",
+      "name": "이호민",
+      "team": "HT",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 78,
+      "secondaryProficiencies": {
+        "3B": 68
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-006",
+      "name": "박보승",
+      "team": "NC",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "CF"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "LF": 66,
+        "CF": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-011",
+      "name": "최우준",
+      "team": "WO",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {
+        "SS": 67,
+        "3B": 63
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-012",
+      "name": "설재민",
+      "team": "OB",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 79,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-014",
+      "name": "배종윤",
+      "team": "LT",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "CF"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "LF": 66,
+        "CF": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-015",
+      "name": "최지만",
+      "team": "KT",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 87,
+      "secondaryProficiencies": {
+        "3B": 60
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "D2027-016",
+      "name": "우주로",
+      "team": "NC",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "SS": 66,
+        "3B": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-023",
+      "name": "노민혁",
+      "team": "HT",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "3B": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-027",
+      "name": "황성현",
+      "team": "NC",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "CF"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "RF": 66,
+        "CF": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-030",
+      "name": "김동주",
+      "team": "LG",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-034",
+      "name": "원지우",
+      "team": "LT",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-035",
+      "name": "최민상",
+      "team": "KT",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "1B": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-036",
+      "name": "강인규",
+      "team": "NC",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "2B": 66,
+        "3B": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-037",
+      "name": "김용휘",
+      "team": "SS",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "1B": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-040",
+      "name": "김서준",
+      "team": "LG",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "2B": 66,
+        "3B": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-043",
+      "name": "김선빈",
+      "team": "HT",
+      "prevRawPos": "C",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS"
+      ],
+      "primaryProficiency": 92,
+      "secondaryProficiencies": {
+        "SS": 78
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "D2027-044",
+      "name": "임성준",
+      "team": "LT",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "SS": 66,
+        "3B": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-045",
+      "name": "김동영",
+      "team": "KT",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "1B": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-048",
+      "name": "장민제",
+      "team": "SSG",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "CF"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "RF": 66,
+        "CF": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-050",
+      "name": "김건",
+      "team": "LG",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "1B": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-051",
+      "name": "배정호",
+      "team": "WO",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "1B": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-057",
+      "name": "김우경",
+      "team": "SS",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "1B": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-058",
+      "name": "유은종",
+      "team": "SSG",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 80,
+      "secondaryProficiencies": {
+        "2B": 70,
+        "3B": 66
+      },
+      "source": "KBO 공식 수비 출장 전수 검증"
+    },
+    {
+      "id": "D2027-059",
+      "name": "김우성",
+      "team": "HH",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 77,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-062",
+      "name": "박준서",
+      "team": "OB",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "1B": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-064",
+      "name": "최수완",
+      "team": "LT",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "3B": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-065",
+      "name": "최민영",
+      "team": "KT",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-071",
+      "name": "조희성",
+      "team": "WO",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "CF"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "RF": 66,
+        "CF": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-073",
+      "name": "소재휘",
+      "team": "HT",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "3B": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-077",
+      "name": "원상윤",
+      "team": "SS",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "1B": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-080",
+      "name": "이정호",
+      "team": "LG",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "SS": 66,
+        "3B": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-082",
+      "name": "이민준",
+      "team": "OB",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "CF"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "LF": 66,
+        "CF": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-086",
+      "name": "권희재",
+      "team": "NC",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-088",
+      "name": "이시언",
+      "team": "SSG",
+      "prevRawPos": "OF",
+      "primaryPosition": "RF",
+      "secondaryPositions": [
+        "LF",
+        "CF"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "LF": 66,
+        "CF": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-092",
+      "name": "김준우",
+      "team": "OB",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "CF"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "RF": 66,
+        "CF": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-094",
+      "name": "윤승민",
+      "team": "LT",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "3B": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-095",
+      "name": "안우석",
+      "team": "KT",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "SS": 66,
+        "3B": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-097",
+      "name": "조승우",
+      "team": "SS",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-098",
+      "name": "왕지훈",
+      "team": "SSG",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-099",
+      "name": "전현동",
+      "team": "HH",
+      "prevRawPos": "IF",
+      "primaryPosition": "1B",
+      "secondaryPositions": [
+        "3B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "3B": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-100",
+      "name": "이동욱",
+      "team": "LG",
+      "prevRawPos": "IF",
+      "primaryPosition": "3B",
+      "secondaryPositions": [
+        "1B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "1B": 66
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-103",
+      "name": "유제민",
+      "team": "HT",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-105",
+      "name": "이지효",
+      "team": "KT",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "2B": 66,
+        "3B": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-106",
+      "name": "김호승",
+      "team": "NC",
+      "prevRawPos": "IF",
+      "primaryPosition": "SS",
+      "secondaryPositions": [
+        "2B",
+        "3B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "2B": 66,
+        "3B": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-107",
+      "name": "서승환",
+      "team": "SS",
+      "prevRawPos": "OF",
+      "primaryPosition": "LF",
+      "secondaryPositions": [
+        "RF",
+        "CF"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "RF": 66,
+        "CF": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-109",
+      "name": "서승운",
+      "team": "HH",
+      "prevRawPos": "IF",
+      "primaryPosition": "2B",
+      "secondaryPositions": [
+        "SS",
+        "3B"
+      ],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {
+        "SS": 66,
+        "3B": 62
+      },
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    },
+    {
+      "id": "D2027-110",
+      "name": "전율빈",
+      "team": "LG",
+      "prevRawPos": "C",
+      "primaryPosition": "C",
+      "secondaryPositions": [],
+      "primaryProficiency": 76,
+      "secondaryProficiencies": {},
+      "source": "KBO 등록 포지션·세부 수비 지표 기반 배정"
+    }
+  ]
+}

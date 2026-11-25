@@ -12,6 +12,10 @@ import {
   TeamId,
 } from '../types/kbo';
 import { recordMlbExportPlayer } from './franchiseSystems';
+import {
+  getKboFaCompensationRuleForSeason,
+  resolveFaProtectionAndCompensationSelection,
+} from './faCompensationEngine';
 import { evaluateFranchiseStar } from './franchiseStarEngine';
 import { recordLeagueAcquisitionInPlace } from './leagueAcquisitionsEngine';
 import { appendPlayerTeamHistoryInPlace } from './leagueLifeEngine';
@@ -676,6 +680,8 @@ function finalizeAiClubFaSigningInPlace(
     ((winningBid.totalBillion - signingBonus) / Math.max(1, winningBid.years)).toFixed(2)
   );
 
+  const prevAnnualSalBeforeAiSign = Math.max(0.33, p.previousAnnualSalary ?? p.contract.annualSalary ?? 1.0);
+  p.previousAnnualSalary = prevAnnualSalBeforeAiSign;
   p.teamId = newTeamId;
   p.formerTeamId = undefined;
   p.rosterTier = '1군';
@@ -728,33 +734,23 @@ function finalizeAiClubFaSigningInPlace(
     }
   }
 
-  // KBO A/B/C FA 보상 규정 적용 (외부 영입 시)
+  // KBO A/B/C FA 보상 규정 적용 (외부 영입 시 · 사용자/AI 100% 동일 규정 적용)
+  // - A등급: 20인 보호 외 1명 + 연봉 200% (또는 연봉 300%)
+  // - B등급: 25인 보호 외 1명 + 연봉 100% (또는 연봉 200%)
+  // - C등급: 보상선수 없음 · 연봉 150% 금전 보상만 처리
+  // - 자동 제외 대상(당해 FA 선수·신인·외국인/아시아쿼터·군보류·FA 보상 이적자)은 보호 인원 외 자동 보호
   let compSummary = '원소속팀 잔류 (보상 없음)';
   if (!isOriginalClub) {
+    const prevAnnualSal = prevAnnualSalBeforeAiSign;
+    const compRes = resolveFaProtectionAndCompensationSelection(career, newTeamId, fromTeamId, {
+      faSeason: career.season,
+      signedPlayerId: p.id,
+      grade: comp.grade,
+      previousAnnualSalaryBillion: prevAnnualSal,
+    });
+
     if (comp.grade === 'A' || comp.grade === 'B') {
-      // AI 영입 구단의 20인(A) / 25인(B) 보호명단 외 최상위 선수 1명 보상 지명 (프랜차이즈 스타 자동 보호)
-      const pool = Object.values(career.players)
-        .filter(
-          (pl) =>
-            pl.teamId === newTeamId &&
-            pl.id !== p.id &&
-            pl.category === '국내' &&
-            (pl.rosterTier === '1군' || pl.rosterTier === '2군') &&
-            !isMilitaryServing(pl.militaryStatus)
-        )
-        .sort((a, b) => {
-          const faA = evaluateFranchiseStar(career, a);
-          const faB = evaluateFranchiseStar(career, b);
-          const protA = faA.score >= 85 || faA.protectionTier === '프랜차이즈 스타' ? 100 : 0;
-          const protB = faB.score >= 85 || faB.protectionTier === '프랜차이즈 스타' ? 100 : 0;
-          return (
-            protB +
-            b.ability +
-            b.potential * 0.25 -
-            (protA + a.ability + a.potential * 0.25)
-          );
-        });
-      const compPlayer = pool[comp.protectionLimit];
+      const compPlayer = compRes.chosenPlayer;
       if (compPlayer) {
         if (career.teams[newTeamId]) {
           career.teams[newTeamId].lineupOrder = career.teams[newTeamId].lineupOrder.filter((id) => id !== compPlayer.id);
@@ -766,32 +762,33 @@ function finalizeAiClubFaSigningInPlace(
         compPlayer.rosterTier = '2군';
         compPlayer.gameDayActive = false;
         compPlayer.clubTenureSeasons = 1;
+        compPlayer.faCompensationTransferredSeason = career.season;
         appendPlayerTeamHistoryInPlace(compPlayer, fromTeamId, career.season, `${p.name} FA 보상선수`, {
           transferDate: signDateIso,
           moveType: 'FA 보상선수',
           fromTeamId: newTeamId,
         });
-        compSummary = `${comp.grade}등급 보상: 보호선수 ${comp.protectionLimit}인 외 ${compPlayer.name} + 보상금 ${comp.cashCompBillion}억`;
-      } else {
-        compSummary = `${comp.grade}등급 금전 보상 ${comp.cashCompBillion}억 정산`;
       }
+      compSummary = compRes.summary;
       // 만약 원소속 구단이 사용자 구단이라면 현금 보상 입금
       if (fromTeamId === career.playerTeamId && career.finances.cashBalanceBillion !== null) {
         career.finances.cashBalanceBillion = Number(
-          (career.finances.cashBalanceBillion + comp.cashCompBillion).toFixed(2)
+          (career.finances.cashBalanceBillion + compRes.finalCashCompBillion).toFixed(2)
         );
         career.finances.compensationReceivedBillion = Number(
-          ((career.finances.compensationReceivedBillion ?? 0) + comp.cashCompBillion).toFixed(2)
+          ((career.finances.compensationReceivedBillion ?? 0) + compRes.finalCashCompBillion).toFixed(2)
         );
       }
     } else {
-      compSummary = `C등급 보상금 ${comp.cashCompBillion}억 정산 (보상선수 없음)`;
+      const cRule = getKboFaCompensationRuleForSeason(career.season, 'C');
+      const cCash = Number((prevAnnualSal * cRule.cashOnlyRatio).toFixed(2));
+      compSummary = `C등급 보상금 ${cCash.toFixed(1)}억 정산 (보상선수 없음)`;
       if (fromTeamId === career.playerTeamId && career.finances.cashBalanceBillion !== null) {
         career.finances.cashBalanceBillion = Number(
-          (career.finances.cashBalanceBillion + comp.cashCompBillion).toFixed(2)
+          (career.finances.cashBalanceBillion + cCash).toFixed(2)
         );
         career.finances.compensationReceivedBillion = Number(
-          ((career.finances.compensationReceivedBillion ?? 0) + comp.cashCompBillion).toFixed(2)
+          ((career.finances.compensationReceivedBillion ?? 0) + cCash).toFixed(2)
         );
       }
     }

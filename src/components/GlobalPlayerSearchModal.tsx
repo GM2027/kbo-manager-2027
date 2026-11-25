@@ -6,6 +6,7 @@ import {
   GlobalPlayerSearchFilter,
   searchAllLeaguePlayers,
 } from '../engine/playerRegistry';
+import { formatCompactPlayerPosition } from '../engine/positionEngine';
 import { CareerSave, PlayerRole, Position, TeamId } from '../types/kbo';
 import { CountryFlag } from './CountryFlag';
 import { FuturesTeamLogo, TeamLogo } from './TeamLogo';
@@ -322,8 +323,10 @@ export const GlobalPlayerSearchModal: React.FC<GlobalPlayerSearchModalProps> = (
                         </div>
                       </td>
 
-                      <td className="py-2 px-2 font-mono-stats font-bold text-slate-700 dark:text-slate-300">
-                        {entry.position}
+                      <td className="py-2 px-2 font-mono-stats font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                        {entry.kboPlayerId && career.players[entry.kboPlayerId]
+                          ? formatCompactPlayerPosition(career.players[entry.kboPlayerId])
+                          : entry.position}
                       </td>
 
                       <td className="py-2 px-2 text-right font-mono-stats text-slate-700 dark:text-slate-300">

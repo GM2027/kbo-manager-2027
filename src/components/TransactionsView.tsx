@@ -62,6 +62,8 @@ import {
   MAX_EXTERNAL_FA_PER_CLUB,
   submitUserClubFaBid,
 } from '../engine/faCompetitionEngine';
+import { buildTeamFaProtectionPool } from '../engine/faCompensationEngine';
+import { formatCompactPlayerPosition } from '../engine/positionEngine';
 import { getMlbClubMeta, MlbTeamLogo } from './MlbTeamLogo';
 import {
   computePlayerTradeValue,
@@ -780,108 +782,152 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
             )}
           </div>
 
-          {/* Pending FA Compensation Protection Roster Panel (#27) */}
-          {career.pendingFaProtection && (
-            <div className="border border-amber-500/70 bg-amber-50/70 dark:bg-amber-950/30 rounded-md p-4 space-y-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <div className="text-sm font-black text-amber-800 dark:text-amber-300">
-                    FA {career.pendingFaProtection.faGrade}등급 보상선수 보호명단 제출 필수 ({career.pendingFaProtection.signedPlayerName} 영입)
+          {/* Pending FA Compensation Protection Roster Panel (#27 · KBO 자동 제외 규정 완전 반영) */}
+          {career.pendingFaProtection && (() => {
+            const pending = career.pendingFaProtection!;
+            const faPool = buildTeamFaProtectionPool(career, career.playerTeamId, {
+              faSeason: career.season,
+              signedPlayerId: pending.signedPlayerId,
+              grade: pending.faGrade,
+            });
+            const limit = faPool.protectionLimit;
+            const eligibleIdSet = new Set(faPool.selectableEligible.map((p) => p.id));
+            const validSelected = protectedSelection.filter((id) => eligibleIdSet.has(id));
+            return (
+              <div className="border border-amber-500/70 bg-amber-50/70 dark:bg-amber-950/30 rounded-md p-4 space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <div className="text-sm font-black text-amber-800 dark:text-amber-300">
+                      FA {pending.faGrade}등급 보상선수 보호명단 제출 필수 ({pending.signedPlayerName} 영입)
+                    </div>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-0.5">
+                      {KBO_TEAMS[pending.fromTeamId].name}에 제출할 보호선수 최대{' '}
+                      <strong>{limit}명</strong>을 선택하세요 ({faPool.ruleSummary}).
+                      <br />
+                      <span className="text-emerald-700 dark:text-emerald-400 font-semibold">
+                        당해 FA 선수·신인·외국인/아시아쿼터·군보류·FA 보상 이적자({faPool.autoExempt.length}명)는 자동 보호(제외)되어 {limit}인 정원에 포함되지 않으며 지명 대상에서 제외됩니다.
+                      </span>
+                    </p>
                   </div>
-                  <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-0.5">
-                    {KBO_TEAMS[career.pendingFaProtection.fromTeamId].name}에 제출할 보호선수 최대{' '}
-                    <strong>{career.pendingFaProtection.protectionLimit}명</strong>을 선택하세요 (제외 선수 중 최상위 1명 지명 + 보상금{' '}
-                    {career.pendingFaProtection.cashCompBillion}억 원 정산).
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const limit = career.pendingFaProtection!.protectionLimit;
-                      const autoIds = myDomestic
-                        .filter((p) => p.rosterTier === '1군' || p.rosterTier === '2군')
-                        .sort((a, b) => computePlayerTradeValue(b).index - computePlayerTradeValue(a).index)
-                        .slice(0, limit)
-                        .map((p) => p.id);
-                      setProtectedSelection(autoIds);
-                    }}
-                    className="px-2.5 py-1.5 rounded border border-amber-600/60 font-bold text-amber-800 dark:text-amber-200"
-                  >
-                    상위 {career.pendingFaProtection.protectionLimit}인 자동 채우기
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      try {
-                        const { nextCareer, backupSnapshot, takenPlayerName } = confirmFaProtectionList(
-                          career,
-                          protectedSelection
-                        );
-                        onUpdateCareer(nextCareer, backupSnapshot);
-                        setProtectedSelection([]);
-                        setNotice({
-                          type: 'ok',
-                          text: takenPlayerName
-                            ? `보호명단 제출 완료 — 상대 구단이 보상선수로 ${takenPlayerName}을(를) 지명했습니다.`
-                            : '보호명단 제출 및 금전 보상 정산이 완료되었습니다.',
-                        });
-                      } catch (err) {
-                        setNotice({ type: 'err', text: err instanceof Error ? err.message : '보호명단 오류' });
-                      }
-                    }}
-                    className="px-3.5 py-1.5 rounded bg-amber-600 hover:bg-amber-700 text-white font-bold"
-                  >
-                    보호명단 최종 제출 ({protectedSelection.length}/{career.pendingFaProtection.protectionLimit})
-                  </button>
-                </div>
-              </div>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="relative flex-1 min-w-[200px] max-w-xs">
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    type="text"
-                    value={protectionSearch}
-                    onChange={(e) => setProtectionSearch(e.target.value)}
-                    placeholder="보호명단 선수 이름·포지션 검색"
-                    className="w-full pl-8 pr-2.5 py-1 text-xs rounded border border-amber-400/60 bg-white dark:bg-slate-950"
-                  />
-                </div>
-                <span className="text-[11px] font-mono-stats text-amber-800 dark:text-amber-300 font-semibold">
-                  선택 {protectedSelection.length}/{career.pendingFaProtection.protectionLimit}명 · 전체 대상{' '}
-                  {myDomestic.filter((p) => p.rosterTier === '1군' || p.rosterTier === '2군').length}명
-                </span>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-1.5 max-h-64 overflow-y-auto overscroll-contain pr-1">
-                {myDomestic
-                  .filter((p) => p.rosterTier === '1군' || p.rosterTier === '2군')
-                  .filter((p) => matchesQuery(protectionSearch, p.name, p.position, p.rosterTier))
-                  .map((p) => {
-                    const checked = protectedSelection.includes(p.id);
-                    const limit = career.pendingFaProtection!.protectionLimit;
-                    return (
-                      <button
-                        key={p.id}
-                        type="button"
-                        onClick={() =>
-                          setProtectedSelection((prev) =>
-                            checked ? prev.filter((id) => id !== p.id) : prev.length < limit ? [...prev, p.id] : prev
-                          )
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const autoIds = faPool.selectableEligible
+                          .slice(0, limit)
+                          .map((p) => p.id);
+                        setProtectedSelection(autoIds);
+                      }}
+                      className="px-2.5 py-1.5 rounded border border-amber-600/60 font-bold text-amber-800 dark:text-amber-200"
+                    >
+                      상위 {limit}인 자동 채우기
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        try {
+                          const { nextCareer, backupSnapshot, takenPlayerName } = confirmFaProtectionList(
+                            career,
+                            validSelected
+                          );
+                          onUpdateCareer(nextCareer, backupSnapshot);
+                          setProtectedSelection([]);
+                          setNotice({
+                            type: 'ok',
+                            text: takenPlayerName
+                              ? `보호명단 제출 완료 — 상대 구단이 보상선수로 ${takenPlayerName}을(를) 지명했습니다.`
+                              : '보호명단 제출 및 금전 보상 정산이 완료되었습니다.',
+                          });
+                        } catch (err) {
+                          setNotice({ type: 'err', text: err instanceof Error ? err.message : '보호명단 오류' });
                         }
-                        className={`text-left px-2 py-1.5 rounded border text-[11px] ${
-                          checked
-                            ? 'border-indigo-600 bg-indigo-600 text-white font-bold'
-                            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900'
-                        }`}
-                      >
-                        <div className="truncate">{p.name} ({p.position})</div>
-                        <div className="text-[10px] opacity-80 font-mono-stats">OVR {p.ability} · {p.age}세</div>
-                      </button>
-                    );
-                  })}
+                      }}
+                      className="px-3.5 py-1.5 rounded bg-amber-600 hover:bg-amber-700 text-white font-bold"
+                    >
+                      보호명단 최종 제출 ({validSelected.length}/{limit})
+                    </button>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="relative flex-1 min-w-[200px] max-w-xs">
+                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="text"
+                      value={protectionSearch}
+                      onChange={(e) => setProtectionSearch(e.target.value)}
+                      placeholder="보호명단 선수 이름·포지션 검색"
+                      className="w-full pl-8 pr-2.5 py-1 text-xs rounded border border-amber-400/60 bg-white dark:bg-slate-950"
+                    />
+                  </div>
+                  <span className="text-[11px] font-mono-stats text-amber-800 dark:text-amber-300 font-semibold">
+                    보호 선택 {validSelected.length}/{limit}명 · 선택 가능 대상{' '}
+                    {faPool.selectableEligible.length}명 · 규정상 자동 보호(제외) {faPool.autoExempt.length}명
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-1.5 max-h-64 overflow-y-auto overscroll-contain pr-1">
+                  {faPool.selectableEligible
+                    .filter((p) => matchesQuery(protectionSearch, p.name, p.position, p.rosterTier))
+                    .map((p) => {
+                      const checked = validSelected.includes(p.id);
+                      return (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() =>
+                            setProtectedSelection((prev) => {
+                              const cleaned = prev.filter((id) => eligibleIdSet.has(id));
+                              return checked
+                                ? cleaned.filter((id) => id !== p.id)
+                                : cleaned.length < limit
+                                  ? [...cleaned, p.id]
+                                  : cleaned;
+                            })
+                          }
+                          className={`text-left px-2 py-1.5 rounded border text-[11px] ${
+                            checked
+                              ? 'border-indigo-600 bg-indigo-600 text-white font-bold'
+                              : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900'
+                          }`}
+                        >
+                          <div className="truncate">
+                            {p.name} ({formatCompactPlayerPosition(p, 1)})
+                          </div>
+                          <div className="text-[10px] opacity-80 font-mono-stats">
+                            OVR {p.ability}/{p.potential} · {p.age}세 · {p.rosterTier}
+                          </div>
+                        </button>
+                      );
+                    })}
+                </div>
+
+                {faPool.autoExempt.length > 0 && (
+                  <div className="pt-2 border-t border-amber-400/40 space-y-1.5">
+                    <div className="flex items-center justify-between text-[11px] font-bold text-emerald-800 dark:text-emerald-300">
+                      <span className="inline-flex items-center gap-1">
+                        <Lock className="w-3 h-3" />
+                        규정상 자동 보호(제외) 선수 ({faPool.autoExempt.length}명) — 보호 인원({limit}명) 미포함 · 보상 지명 불가
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1">
+                      {faPool.autoExempt.map((item) => (
+                        <span
+                          key={item.player.id}
+                          title={item.reason}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-emerald-500/40 bg-emerald-500/10 text-[10px] text-emerald-900 dark:text-emerald-200"
+                        >
+                          <span className="font-bold">{item.player.name}</span>
+                          <span className="opacity-75">({item.player.position})</span>
+                          <span className="px-1 py-0.2 rounded bg-emerald-600/20 font-semibold">
+                            {item.exemptCategory}
+                          </span>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Own Club Departed FA Players (자동 이탈 → 원소속 재계약 협상 · 보상 없음) */}
           {myDepartedFa.length > 0 && (

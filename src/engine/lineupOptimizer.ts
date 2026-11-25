@@ -1,4 +1,8 @@
 import { isMilitaryServing } from './militaryEngine';
+import {
+  computeEffectiveFieldingAtPosition,
+  getPositionProficiency,
+} from './positionEngine';
 import { KBO_TEAMS } from '../data/kboTeams';
 import {
   BatterStats,
@@ -140,9 +144,13 @@ function buildBatterTraits(p: Player, assignedPos: Position): BatterTraitVector 
     99
   );
   let overallBatPrior = clamp(baseEff + trainingBat + (p.hiddenTrait === '클러치히터' ? 2.5 : 0), 45, 99);
+  const effDef = computeEffectiveFieldingAtPosition(p, assignedPos);
   const defense = clamp(
-    (posDefensePrior[assignedPos] ?? 65) + (p.ability - 72) * 0.25 + trainingDefense + (assignedPos === 'DH' ? -15 : 0),
-    35,
+    (posDefensePrior[assignedPos] ?? 65) * 0.45 +
+      effDef.effectiveFielding * 0.55 +
+      trainingDefense +
+      (assignedPos === 'DH' ? -15 : 0),
+    25,
     99
   );
 
@@ -260,39 +268,113 @@ export function optimizeBattingLineup(
       return sB - sA;
     });
 
-  // Step 1: Select 8 unique fielding positions + 1 DH (zero duplicate positions guaranteed)
+  // Step 1: Multi-position optimal 9-man selection (8 unique fielding positions + 1 DH)
+  // 주 포지션 + 보조 포지션(숙련도 0~100)을 함께 평가해 상위 타자가 벤치에 밀리지 않도록 최적 수비 배치
   const starters: { player: Player; assignedPos: Position }[] = [];
-  const usedIds = new Set<string>();
-  const usedPositions = new Set<Position>();
+  const topCandidates = pool.slice(0, Math.min(13, pool.length));
+  const allSlots: Position[] = [...UNIQUE_FIELD_POSITIONS, 'DH'];
 
-  for (const fieldPos of UNIQUE_FIELD_POSITIONS) {
-    const bestAtPos = pool.find((p) => !usedIds.has(p.id) && p.position === fieldPos);
-    if (bestAtPos) {
-      starters.push({ player: bestAtPos, assignedPos: fieldPos });
-      usedIds.add(bestAtPos.id);
-      usedPositions.add(fieldPos);
+  const scorePlayerAtFieldSlot = (p: Player, slot: Position): number => {
+    const batVal = p.ability + p.form * 2.1 - Math.max(0, p.fatigue - 58) * 0.14;
+    if (slot === 'DH') {
+      // 지명타자는 순수 타격력 위주 (수비 가치가 낮은 거포 우선)
+      const defWeight = p.position === 'DH' || p.position === '1B' || p.position === 'LF' ? 2.5 : 0;
+      return batVal * 1.05 + defWeight;
+    }
+    const prof = getPositionProficiency(p, slot);
+    const eff = computeEffectiveFieldingAtPosition(p, slot);
+    // 포수 자리는 숙련도 45 미만 강력 억제
+    if (slot === 'C' && prof < 45) return -180 + batVal * 0.2;
+    const primaryBonus = p.position === slot ? 6.5 : 0;
+    const secondaryBonus = p.position !== slot && prof >= 60 ? 2.0 : 0;
+    const unfamiliarPenalty = prof < 60 ? (60 - prof) * 0.85 : 0;
+    return batVal * 1.0 + eff.effectiveFielding * 0.22 + primaryBonus + secondaryBonus - eff.penalty * 0.9 - unfamiliarPenalty;
+  };
+
+  if (topCandidates.length >= 9) {
+    // 각 수비 슬롯별 상위 후보 4명만 분기 탐색하여 빠르고 정확한 전역 최적 배치 산출
+    const slotChoices: { idx: number; score: number }[][] = allSlots.map((slot) =>
+      topCandidates
+        .map((p, idx) => ({ idx, score: scorePlayerAtFieldSlot(p, slot) }))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, Math.min(4, topCandidates.length))
+    );
+
+    let bestTotal = -1e12;
+    let bestAssign: number[] | null = null;
+    const curAssign = new Array<number>(9).fill(-1);
+    const usedCand = new Array<boolean>(topCandidates.length).fill(false);
+
+    // 남은 슬롯 최대 가능 점수(상한 가지치기)
+    const suffixMax = new Array<number>(10).fill(0);
+    for (let s = 8; s >= 0; s--) {
+      suffixMax[s] = suffixMax[s + 1] + (slotChoices[s][0]?.score ?? 0);
+    }
+
+    const dfs = (slotIdx: number, accScore: number) => {
+      if (slotIdx === 9) {
+        if (accScore > bestTotal) {
+          bestTotal = accScore;
+          bestAssign = [...curAssign];
+        }
+        return;
+      }
+      if (accScore + suffixMax[slotIdx] <= bestTotal) return;
+      for (const ch of slotChoices[slotIdx]) {
+        if (usedCand[ch.idx]) continue;
+        usedCand[ch.idx] = true;
+        curAssign[slotIdx] = ch.idx;
+        dfs(slotIdx + 1, accScore + ch.score);
+        usedCand[ch.idx] = false;
+      }
+    };
+    dfs(0, 0);
+
+    if (bestAssign) {
+      for (let s = 0; s < 9; s++) {
+        starters.push({
+          player: topCandidates[bestAssign[s]],
+          assignedPos: allSlots[s],
+        });
+      }
     }
   }
 
-  // Assign DH to the strongest remaining hitter (natural DH or any overflow position)
-  const bestDh = pool.find((p) => !usedIds.has(p.id));
-  if (bestDh && starters.length < 9) {
-    starters.push({ player: bestDh, assignedPos: 'DH' });
-    usedIds.add(bestDh.id);
-    usedPositions.add('DH');
-  }
+  // Fallback if fewer than 9 candidates or backtracking didn't complete
+  if (starters.length < 9) {
+    starters.length = 0;
+    const usedIds = new Set<string>();
+    const usedPositions = new Set<Position>();
 
-  // Fallback only if a club has fewer than 8 natural fielding positions in 1군
-  for (const p of pool) {
-    if (starters.length >= 9) break;
-    if (usedIds.has(p.id)) continue;
-    const openPos = UNIQUE_FIELD_POSITIONS.find((pos) => !usedPositions.has(pos));
-    const chosenPos: Position = !usedPositions.has(p.position)
-      ? p.position
-      : openPos ?? (!usedPositions.has('DH') ? 'DH' : p.position);
-    starters.push({ player: p, assignedPos: chosenPos });
-    usedIds.add(p.id);
-    usedPositions.add(chosenPos);
+    for (const fieldPos of UNIQUE_FIELD_POSITIONS) {
+      const bestAtPos = pool
+        .filter((p) => !usedIds.has(p.id))
+        .sort((a, b) => scorePlayerAtFieldSlot(b, fieldPos) - scorePlayerAtFieldSlot(a, fieldPos))[0];
+      if (bestAtPos && getPositionProficiency(bestAtPos, fieldPos) >= (fieldPos === 'C' ? 45 : 35)) {
+        starters.push({ player: bestAtPos, assignedPos: fieldPos });
+        usedIds.add(bestAtPos.id);
+        usedPositions.add(fieldPos);
+      }
+    }
+
+    const bestDh = pool.find((p) => !usedIds.has(p.id));
+    if (bestDh && starters.length < 9) {
+      starters.push({ player: bestDh, assignedPos: 'DH' });
+      usedIds.add(bestDh.id);
+      usedPositions.add('DH');
+    }
+
+    for (const p of pool) {
+      if (starters.length >= 9) break;
+      if (usedIds.has(p.id)) continue;
+      const openPos = UNIQUE_FIELD_POSITIONS.find((pos) => !usedPositions.has(pos));
+      const chosenPos: Position = !usedPositions.has(p.position)
+        ? p.position
+        : openPos ?? (!usedPositions.has('DH') ? 'DH' : p.position);
+      starters.push({ player: p, assignedPos: chosenPos });
+      usedIds.add(p.id);
+      usedPositions.add(chosenPos);
+    }
   }
 
   const n = starters.length;

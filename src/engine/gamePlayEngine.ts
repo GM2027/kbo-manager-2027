@@ -9,6 +9,10 @@ import {
 } from '../types/kbo';
 import { GameBatterPlan } from './batterUsageEngine';
 import { PitcherGamePlan } from './pitchingUsageEngine';
+import {
+  computeEffectiveFieldingAtPosition,
+  getPositionProficiency,
+} from './positionEngine';
 import { SeededRng } from './rng';
 
 function num(v: unknown, fallback: number): number {
@@ -389,8 +393,19 @@ function maybePinchHit(
   const candidates = batSide.benchPool.filter((b) => !batSide.removedIds.has(b.id) && !b.injury);
   if (candidates.length === 0) return;
 
-  candidates.sort((a, b) => (isBlowout ? a.age - b.age : b.ability - a.ability));
+  // 수비 이닝을 이어받아야 하므로 주/보조 포지션 숙련도와 타격력을 함께 고려해 대타 후보 선정
+  candidates.sort((a, b) => {
+    const profA = curSlot.pos === 'DH' ? 88 : getPositionProficiency(a, curSlot.pos);
+    const profB = curSlot.pos === 'DH' ? 88 : getPositionProficiency(b, curSlot.pos);
+    const penA = curSlot.pos === 'C' && profA < 45 ? -40 : profA < 45 ? -10 : 0;
+    const penB = curSlot.pos === 'C' && profB < 45 ? -40 : profB < 45 ? -10 : 0;
+    if (isBlowout) {
+      return (a.age - penA * 0.25) - (b.age - penB * 0.25);
+    }
+    return (b.ability + penB + profB * 0.08) - (a.ability + penA + profA * 0.08);
+  });
   const sub = candidates[0];
+  if (curSlot.pos === 'C' && getPositionProficiency(sub, 'C') < 45) return;
   if (isCloseClutch && sub.ability < curPlayer.ability - 2 && curPlayer.fatigue < 65) return;
 
   // 재출전 금지: 기존 타자 영구 제외, 교체 타자 타순 승계
@@ -423,26 +438,31 @@ function maybeDefensiveSub(
   if (diff < 1 || diff > 3) return;
   if (rng.next() > 0.22) return;
 
-  // 수비력이 가장 낮은 주전(DH 제외) 1명을 수비형 벤치 선수로 교체
+  // 수비력이 가장 낮은 주전(DH 제외 · 포지션 숙련도 페널티 반영) 1명을 주/보조 포지션 수비형 벤치 선수로 교체
   const fieldSlots = defSide.activeLineup.filter((s) => s.pos !== 'DH');
   fieldSlots.sort(
     (a, b) =>
-      num(a.player.v18Ratings?.batting?.fielding, a.player.ability) -
-      num(b.player.v18Ratings?.batting?.fielding, b.player.ability)
+      computeEffectiveFieldingAtPosition(a.player, a.pos).effectiveFielding -
+      computeEffectiveFieldingAtPosition(b.player, b.pos).effectiveFielding
   );
   const weakSlot = fieldSlots[0];
   if (!weakSlot) return;
 
-  const weakDef = num(weakSlot.player.v18Ratings?.batting?.fielding, weakSlot.player.ability);
+  const weakDef = computeEffectiveFieldingAtPosition(weakSlot.player, weakSlot.pos).effectiveFielding;
   const sub = defSide.benchPool
-    .filter((b) => !defSide.removedIds.has(b.id) && !b.injury && (b.position === weakSlot.pos || weakSlot.pos === 'LF' || weakSlot.pos === 'RF'))
+    .filter(
+      (b) =>
+        !defSide.removedIds.has(b.id) &&
+        !b.injury &&
+        getPositionProficiency(b, weakSlot.pos) >= (weakSlot.pos === 'C' ? 60 : 55)
+    )
     .sort(
       (a, b) =>
-        num(b.v18Ratings?.batting?.fielding, b.ability) -
-        num(a.v18Ratings?.batting?.fielding, a.ability)
+        computeEffectiveFieldingAtPosition(b, weakSlot.pos).effectiveFielding -
+        computeEffectiveFieldingAtPosition(a, weakSlot.pos).effectiveFielding
     )[0];
   if (!sub) return;
-  const subDef = num(sub.v18Ratings?.batting?.fielding, sub.ability);
+  const subDef = computeEffectiveFieldingAtPosition(sub, weakSlot.pos).effectiveFielding;
   if (subDef < weakDef + 4) return;
 
   defSide.removedIds.add(weakSlot.player.id);
@@ -549,15 +569,20 @@ export function simulateRealisticBaseballGame(
   const safeHrMult = clamp(num(weather?.hrMult, 1.0), 0.82, 1.2);
   const weatherCtrlDelta = clamp(num(weather?.pitchControlDelta, 0), -4, 4);
 
-  const getTeamAvgDefense = (side: SideRuntime): number => {
+  const getTeamDefenseMetrics = (side: SideRuntime): { avgDefense: number; errorRateMult: number } => {
     const fielders = side.activeLineup.filter((s) => s.pos !== 'DH');
-    if (fielders.length === 0) return 65;
-    return (
-      fielders.reduce(
-        (sum, s) => sum + num(s.player.v18Ratings?.batting?.fielding, num(s.player.ability, 64)),
-        0
-      ) / fielders.length
-    );
+    if (fielders.length === 0) return { avgDefense: 65, errorRateMult: 1.0 };
+    let sumDef = 0;
+    let sumErrMult = 0;
+    for (const s of fielders) {
+      const eff = computeEffectiveFieldingAtPosition(s.player, s.pos);
+      sumDef += eff.effectiveFielding;
+      sumErrMult += eff.errorRateMult;
+    }
+    return {
+      avgDefense: sumDef / fielders.length,
+      errorRateMult: sumErrMult / fielders.length,
+    };
   };
 
   const getPitcherLineById = (defSide: SideRuntime, pid: string): BoxscorePitcherLine => {
@@ -685,7 +710,9 @@ export function simulateRealisticBaseballGame(
       }
     }
 
-    const teamDefRating = getTeamAvgDefense(defSide);
+    const teamDefMetrics = getTeamDefenseMetrics(defSide);
+    const teamDefRating = teamDefMetrics.avgDefense;
+    const teamErrorMult = teamDefMetrics.errorRateMult;
     const homeFieldEdge = isHomeBatting ? 0.65 : 0;
 
     const countRunners = () => (base1 ? 1 : 0) + (base2 ? 1 : 0) + (base3 ? 1 : 0);
@@ -989,9 +1016,13 @@ export function simulateRealisticBaseballGame(
         continue;
       }
 
-      // 5) 인플레이 범타 (실책 / 땅볼·병살 / 뜬공·희생플라이)
+      // 5) 인플레이 범타 (실책 / 땅볼·병살 / 뜬공·희생플라이 · 미숙 포지션 실책 배율 반영)
       pitcherLine.PC += rng.int(1, 5);
-      const errProbOnBipOut = clamp(0.022 - (teamDefRating - 64) * 0.00035, 0.009, 0.042);
+      const errProbOnBipOut = clamp(
+        (0.022 - (teamDefRating - 64) * 0.00035) * teamErrorMult,
+        0.009,
+        0.095
+      );
 
       if (rng.next() < errProbOnBipOut) {
         // 수비 실책 출루 (비자책 진행)

@@ -62,6 +62,11 @@ import {
   isMilitaryServing,
   resolveDisplayMilitaryStatus,
 } from '../engine/militaryEngine';
+import {
+  ALL_FIELD_POSITIONS,
+  computeEffectiveFieldingAtPosition,
+  formatCompactPlayerPosition,
+} from '../engine/positionEngine';
 import { BatterStats, CareerSave, PitcherStats, Player } from '../types/kbo';
 import { CountryFlag, NationalityBadge } from './CountryFlag';
 import { MlbTeamLogo } from './MlbTeamLogo';
@@ -268,7 +273,7 @@ export const PlayerDetailModal: React.FC<PlayerDetailModalProps> = ({
                 </span>
                 <span>·</span>
                 <span>
-                  {player.position}
+                  {formatCompactPlayerPosition(player)}
                   {assignedPos !== player.position ? ` (현재 ${assignedPos} 출전)` : ''}
                   {lineupIdx >= 0 ? ` · ${lineupIdx + 1}번 타자` : ''}
                   {rotIdx >= 0 ? ` · ${rotIdx + 1}선발` : ''}
@@ -423,6 +428,83 @@ export const PlayerDetailModal: React.FC<PlayerDetailModalProps> = ({
               )}
             </div>
           </div>
+
+          {/* 공식 확인 선수 기본 프로필 (생년월일 · 신장/체중 · 투타 · 출신학교 · 입단/드래프트 · 등번호) */}
+          {player.role === '타자' && (
+            <div className="p-3 rounded border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 space-y-2">
+              <div className="flex flex-wrap items-center justify-between gap-1 text-[11px]">
+                <span className="font-bold text-slate-800 dark:text-slate-200">
+                  포지션별 수비 숙련도 (0~100) · 주 {player.position}
+                  {(player.secondaryPositions?.length ?? 0) > 0
+                    ? ` · 보조 ${player.secondaryPositions!.join('·')}`
+                    : ''}
+                </span>
+                {player.positionTrainingTarget && (
+                  <span className="px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 font-bold text-[10px]">
+                    포지션 훈련중: {player.positionTrainingTarget}
+                  </span>
+                )}
+              </div>
+              <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 font-mono-stats">
+                {ALL_FIELD_POSITIONS.map((pos) => {
+                  const eff = computeEffectiveFieldingAtPosition(player, pos);
+                  const isPrim = player.position === pos;
+                  const isSec = player.secondaryPositions?.includes(pos);
+                  const isTrain = player.positionTrainingTarget === pos;
+                  return (
+                    <div
+                      key={pos}
+                      title={`${pos}: 숙련도 ${eff.proficiency}/100 · ${eff.tierLabel}${eff.penalty > 0 ? ` (수비 -${Math.round(eff.penalty)}, 실책 x${eff.errorRateMult})` : ''}`}
+                      className={`p-1.5 rounded border text-center ${
+                        isPrim
+                          ? 'border-orange-500/70 bg-orange-500/10'
+                          : isSec
+                            ? 'border-emerald-500/50 bg-emerald-500/10'
+                            : isTrain
+                              ? 'border-indigo-500/60 bg-indigo-500/10'
+                              : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900'
+                      }`}
+                    >
+                      <div className="text-[10px] font-bold text-slate-700 dark:text-slate-200">
+                        {pos}
+                        {isPrim ? '★' : ''}
+                      </div>
+                      <div
+                        className={`text-xs font-extrabold ${
+                          eff.proficiency >= 80
+                            ? 'text-emerald-600 dark:text-emerald-400'
+                            : eff.proficiency >= 60
+                              ? 'text-sky-600 dark:text-sky-400'
+                              : eff.proficiency >= 45
+                                ? 'text-amber-600 dark:text-amber-400'
+                                : 'text-slate-400'
+                        }`}
+                      >
+                        {eff.proficiency}
+                      </div>
+                      <div className="mt-0.5 h-1 rounded bg-slate-200 dark:bg-slate-800 overflow-hidden">
+                        <div
+                          className={`h-full ${
+                            eff.proficiency >= 80
+                              ? 'bg-emerald-500'
+                              : eff.proficiency >= 60
+                                ? 'bg-sky-500'
+                                : eff.proficiency >= 45
+                                  ? 'bg-amber-500'
+                                  : 'bg-slate-400'
+                          }`}
+                          style={{ width: `${eff.proficiency}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="text-[10px] text-slate-500 dark:text-slate-400">
+                숙련도 80+ 주전급(페널티 없음) · 60~79 보조 적합 · 60 미만 미숙(수비력 페널티·실책 증가) · 반복 출전 및 포지션 훈련으로 상승
+              </div>
+            </div>
+          )}
 
           {/* 공식 확인 선수 기본 프로필 (생년월일 · 신장/체중 · 투타 · 출신학교 · 입단/드래프트 · 등번호) */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-2.5 rounded border border-slate-200 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-950/40 text-[11px]">

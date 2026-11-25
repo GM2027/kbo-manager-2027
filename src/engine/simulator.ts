@@ -10,6 +10,12 @@ import {
 } from '../data/kboTeams';
 import { enforceOvrPotInvariantInPlace } from '../data/v18Importer';
 import { simulateRealisticBaseballGame } from './gamePlayEngine';
+import { optimizeBattingLineup } from './lineupOptimizer';
+import {
+  applyPositionTrainingProgressInPlace,
+  getPositionProficiency,
+  recordPositionAppearanceAndGrowProficiencyInPlace,
+} from './positionEngine';
 import { addDaysIso } from './schedule';
 import {
   BatterStats,
@@ -333,7 +339,25 @@ export function adjustAiLineupsAndRotationByFormInPlace(career: CareerSave): voi
       return p.ability + p.form * 1.45 + opsBonus + arc * 0.65 - Math.max(0, p.fatigue - 55) * 0.12;
     };
 
-    // 1) 핫한 1군 벤치 타자 <-> 부진한 동포지션/DH 주전 교체
+    // 1) AI 감독 멀티 포지션 기반 최적 라인업 주기 재구성 + 핫한 벤치 타자 <-> 부진한 주전(주/보조 포지션·DH) 교체
+    if (round > 0 && round % 9 === 0) {
+      const opt = optimizeBattingLineup(career, tid);
+      if (opt.lineupOrder.length === 9) {
+        const starterSet = new Set(opt.lineupOrder);
+        t.lineupOrder = [...opt.lineupOrder];
+        t.lineupPositions = { ...opt.lineupPositions };
+        t.benchOrder = teamPlayers
+          .filter(
+            (p) =>
+              p.role === '타자' &&
+              p.rosterTier === '1군' &&
+              !starterSet.has(p.id)
+          )
+          .sort((a, b) => b.ability - a.ability)
+          .map((p) => p.id);
+      }
+    }
+
     const activeLineup = t.lineupOrder
       .map((id) => career.players[id])
       .filter((p): p is Player => Boolean(p && p.teamId === tid && p.rosterTier === '1군' && !p.injury));
@@ -347,7 +371,11 @@ export function adjustAiLineupsAndRotationByFormInPlace(career: CareerSave): voi
       const replaceable = activeLineup
         .filter((st) => {
           const assignedPos = t.lineupPositions[st.id] ?? st.position;
-          return assignedPos === 'DH' || assignedPos === hottestBench.position || st.position === hottestBench.position;
+          return (
+            assignedPos === 'DH' ||
+            assignedPos === hottestBench.position ||
+            getPositionProficiency(hottestBench, assignedPos) >= 60
+          );
         })
         .sort((a, b) => scoreBatter(a) - scoreBatter(b))[0];
 
@@ -1050,6 +1078,14 @@ function simulateSingleGame(
   awayPitchLines.forEach(accumulatePitcher);
   homePitchLines.forEach(accumulatePitcher);
 
+  // 경기 출전 포지션별 반복 출전 수비 숙련도 성장 반영 (주/보조/신규 포지션 출전 모두 추적)
+  for (const line of [...awayBatBox.lines, ...homeBatBox.lines]) {
+    const bp = career.players[line.playerId];
+    if (bp && bp.role === '타자' && line.position) {
+      recordPositionAppearanceAndGrowProficiencyInPlace(bp, line.position as Player['position'], !line.isSubstitute);
+    }
+  }
+
   // Update batter fatigue, bench idle streaks & playing-time morale/dissatisfaction for both clubs
   updateBatterWorkloadAndMoraleAfterGameInPlace(career, awayTeam, date, round, awayBatBox.lines, {
     isDoubleheaderGame2,
@@ -1381,6 +1417,9 @@ function runTenGameGrowthEvaluation(
   for (const teamId of TEAM_IDS) {
     const teamGames = teamGamesAfterRound.get(teamId) ?? 0;
     if (teamGames === 0 || teamGames % 10 !== 0) continue;
+
+    // 신규 포지션 집중 훈련 숙련도 성장 처리 (10경기 주기)
+    applyPositionTrainingProgressInPlace(career, teamId);
 
     const coachProf = getTeamCoachingProfile(career, teamId);
     const academyLevel = career.finances.investments?.academyLevel ?? 1;

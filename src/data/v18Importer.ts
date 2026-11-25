@@ -19,6 +19,11 @@ import {
   syncAllAgesToDateInPlace,
 } from '../engine/ageEngine';
 import { isMilitaryResolved, isMilitaryServing } from '../engine/militaryEngine';
+import {
+  ALL_FIELD_POSITIONS,
+  ensurePlayerPositionProficiencyInPlace,
+  getPositionProficiency,
+} from '../engine/positionEngine';
 import { buildVerifiedOverseasBaseline } from './amateurAndOverseasData';
 import {
   VERIFIED_SANGMU_BIRTHDATES_BY_KEY,
@@ -52,6 +57,9 @@ interface RawV18Player {
   name: string;
   team: string;
   position: string;
+  primary_position?: string;
+  secondary_positions?: string[];
+  position_proficiency?: Record<string, number>;
   jersey: string | null;
   level_2026: number | null;
   status: string;
@@ -348,35 +356,62 @@ function inferConcretePosition(
   teamId: TeamId,
   ifCounter: number,
   ofCounter: number
-): { role: '투수' | '타자'; position: Position } {
+): {
+  role: '투수' | '타자';
+  position: Position;
+  secondaryPositions?: Position[];
+  positionProficiency?: Partial<Record<Position, number>>;
+} {
   const posRaw = (raw.position || '').toUpperCase();
-  if (posRaw === 'P') {
-    return { role: '투수', position: 'SP' };
+  const explicitPrimary = raw.primary_position as Position | undefined;
+  const cleanName = /^[가-힣\s]+$/.test(raw.name) ? raw.name.replace(/\s+/g, '') : raw.name;
+
+  if (posRaw === 'P' || explicitPrimary === 'SP' || explicitPrimary === 'RP' || explicitPrimary === 'CL') {
+    return { role: '투수', position: explicitPrimary === 'RP' || explicitPrimary === 'CL' ? explicitPrimary : 'SP' };
   }
+
+  const validSec = Array.isArray(raw.secondary_positions)
+    ? (raw.secondary_positions.filter((sp): sp is Position =>
+        ALL_FIELD_POSITIONS.includes(sp as Position)
+      ) as Position[])
+    : undefined;
+  const explicitProf = raw.position_proficiency
+    ? ({ ...raw.position_proficiency } as Partial<Record<Position, number>>)
+    : undefined;
+
+  if (explicitPrimary && (ALL_FIELD_POSITIONS.includes(explicitPrimary) || explicitPrimary === 'DH')) {
+    return {
+      role: '타자',
+      position: explicitPrimary,
+      secondaryPositions: validSec?.filter((sp) => sp !== explicitPrimary),
+      positionProficiency: explicitProf,
+    };
+  }
+
   if (posRaw === 'TWP') {
     // 투타겸업(TWP): 세부 능력치 비교로 주포지션 결정
     const off = raw.game_ratings?.batting?.overall_offense ?? 0;
     const pit = raw.game_ratings?.pitching?.overall_pitching ?? 0;
     if (pit >= off) return { role: '투수', position: 'SP' };
-    return { role: '타자', position: 'RF' };
+    return { role: '타자', position: 'RF', secondaryPositions: ['LF', '1B'], positionProficiency: explicitProf };
   }
   if (posRaw === 'C') {
-    return { role: '타자', position: 'C' };
+    return { role: '타자', position: 'C', secondaryPositions: validSec, positionProficiency: explicitProf };
   }
   const teamPosMap = REAL_KBO_HITTER_POSITIONS[teamId];
-  const known = teamPosMap?.[raw.name]?.position;
+  const known = teamPosMap?.[cleanName]?.position ?? teamPosMap?.[raw.name]?.position;
   if (known) {
-    return { role: '타자', position: known };
+    return { role: '타자', position: known, secondaryPositions: validSec, positionProficiency: explicitProf };
   }
   if (posRaw === 'IF') {
     const cycle: Position[] = ['SS', '3B', '2B', '1B'];
-    return { role: '타자', position: cycle[ifCounter % cycle.length] };
+    return { role: '타자', position: cycle[ifCounter % cycle.length], secondaryPositions: validSec, positionProficiency: explicitProf };
   }
   if (posRaw === 'OF') {
     const cycle: Position[] = ['CF', 'RF', 'LF'];
-    return { role: '타자', position: cycle[ofCounter % cycle.length] };
+    return { role: '타자', position: cycle[ofCounter % cycle.length], secondaryPositions: validSec, positionProficiency: explicitProf };
   }
-  return { role: '타자', position: 'DH' };
+  return { role: '타자', position: 'DH', secondaryPositions: validSec, positionProficiency: explicitProf };
 }
 
 function estimateDomesticSalaryBillion(raw: RawV18Player, ovr: number, age: number): number {
@@ -1013,6 +1048,67 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
       career.databaseVersion = 'v24_recalibrated_prospect_potentials';
     }
 
+    // v25: KBO 10개 구단 전체 선수 주/보조 포지션 + 포지션별 수비 숙련도(0~100) 전수 검증 및 최정 3B 교정 마이그레이션
+    // - 기존 세이브의 선수 ID, 능력치(OVR/POT), 성적, 계약, 인게임 성장/훈련 숙련도는 100% 보존
+    if (career.databaseVersion !== 'v25_verified_positions_and_fa_compensation') {
+      for (const p of Object.values(career.players)) {
+        // 한글 이름 내부 공백 정규화 (예: '최  정' -> '최정')
+        if (/^[가-힣\s]+$/.test(p.name) && /\s/.test(p.name)) {
+          p.name = p.name.replace(/\s+/g, '');
+        }
+        if (p.role !== '타자') continue;
+        const src = p.v18SourceId ? V18_BY_SOURCE_ID.get(p.v18SourceId) : undefined;
+        if (src && src.primary_position && ALL_FIELD_POSITIONS.includes(src.primary_position as Position)) {
+          const verifiedPrimary = src.primary_position as Position;
+          const prevPos = p.position;
+          p.position = verifiedPrimary;
+          const verifiedSec = (src.secondary_positions ?? []).filter(
+            (sp): sp is Position => ALL_FIELD_POSITIONS.includes(sp as Position) && sp !== verifiedPrimary
+          );
+          const mergedSec = Array.from(new Set([...(p.secondaryPositions ?? []), ...verifiedSec])).filter(
+            (sp) => sp !== verifiedPrimary
+          );
+          p.secondaryPositions = mergedSec;
+
+          // 기존 훈련/출전으로 오른 숙련도가 있다면 보존(Math.max), 검증 기본 숙련도 병합
+          const nextProf: Partial<Record<Position, number>> = { ...(p.positionProficiency ?? {}) };
+          if (src.position_proficiency) {
+            for (const [k, v] of Object.entries(src.position_proficiency)) {
+              const pk = k as Position;
+              const existingVal = nextProf[pk];
+              nextProf[pk] =
+                typeof existingVal === 'number' && Number.isFinite(existingVal)
+                  ? Math.max(existingVal, v)
+                  : v;
+            }
+          }
+          p.positionProficiency = nextProf;
+
+          // 기존 세이브에서 잘못된 주 포지션(예: 최정 SS)으로 선발 배치된 경우 정정된 주 포지션으로 동기화
+          if (prevPos !== verifiedPrimary) {
+            const ts = career.teams[p.teamId];
+            if (ts && ts.lineupPositions[p.id] === prevPos) {
+              const occupied = ts.lineupOrder.some(
+                (lid) => lid !== p.id && (ts.lineupPositions[lid] ?? career.players[lid]?.position) === verifiedPrimary
+              );
+              if (!occupied) {
+                ts.lineupPositions[p.id] = verifiedPrimary;
+              }
+            }
+          }
+        }
+        ensurePlayerPositionProficiencyInPlace(p);
+      }
+      career.databaseVersion = 'v25_verified_positions_and_fa_compensation';
+    } else {
+      // 모든 세이브 로드 시 누락된 숙련도 맵만 안전 보완
+      for (const p of Object.values(career.players)) {
+        if (p.role === '타자' && !p.positionProficiency) {
+          ensurePlayerPositionProficiencyInPlace(p);
+        }
+      }
+    }
+
     // KBO 현역 선수단과 해외파 목록 간 중복 등록 상시 방지
     if (career.amateurAndOverseas?.overseasPlayers) {
       const activeKboKey = new Set<string>();
@@ -1158,7 +1254,12 @@ export function buildAll10TeamsFromV18Dataset(): {
 
     const ifIdx = ifCountByTeam[teamId] ?? 0;
     const ofIdx = ofCountByTeam[teamId] ?? 0;
-    const { role, position } = inferConcretePosition(raw, teamId, ifIdx, ofIdx);
+    const {
+      role,
+      position,
+      secondaryPositions,
+      positionProficiency,
+    } = inferConcretePosition(raw, teamId, ifIdx, ofIdx);
     if (raw.position === 'IF') ifCountByTeam[teamId] = ifIdx + 1;
     if (raw.position === 'OF') ofCountByTeam[teamId] = ofIdx + 1;
 
@@ -1364,6 +1465,8 @@ export function buildAll10TeamsFromV18Dataset(): {
       category,
       role,
       position,
+      secondaryPositions: role === '타자' ? secondaryPositions : undefined,
+      positionProficiency: role === '타자' ? positionProficiency : undefined,
       age,
       birthYear,
       birthDate,
@@ -1505,6 +1608,9 @@ export function buildAll10TeamsFromV18Dataset(): {
               : '표준',
     };
 
+    if (role === '타자') {
+      ensurePlayerPositionProficiencyInPlace(player);
+    }
     players[pid] = player;
   }
 
@@ -1600,7 +1706,7 @@ export function buildAll10TeamsFromV18Dataset(): {
       }
     }
 
-    // 주전 9명 (각 수비 포지션 C, 1B, 2B, 3B, SS, LF, CF, RF + DH 최적화)
+    // 주전 9명 (각 수비 포지션 C, 1B, 2B, 3B, SS, LF, CF, RF + DH · 멀티 포지션 숙련도 반영)
     const requiredSlots: Position[] = ['C', 'SS', 'CF', '2B', '3B', '1B', 'RF', 'LF', 'DH'];
     const lineupOrder: string[] = [];
     const lineupPositions: Record<string, Position> = {};
@@ -1608,6 +1714,14 @@ export function buildAll10TeamsFromV18Dataset(): {
 
     for (const slot of requiredSlots) {
       let chosen = hitters.find((h) => !usedHitters.has(h.id) && h.position === slot);
+      if (!chosen && slot !== 'DH') {
+        chosen = hitters
+          .filter((h) => !usedHitters.has(h.id) && getPositionProficiency(h, slot) >= (slot === 'C' ? 60 : 62))
+          .sort(
+            (a, b) =>
+              b.ability + getPositionProficiency(b, slot) * 0.25 - (a.ability + getPositionProficiency(a, slot) * 0.25)
+          )[0];
+      }
       if (!chosen) {
         chosen = hitters.find((h) => !usedHitters.has(h.id));
       }

@@ -88,6 +88,13 @@ import {
   resolveDisplayMilitaryStatus,
 } from '../engine/militaryEngine';
 import {
+  ALL_FIELD_POSITIONS,
+  ALL_HITTER_LINEUP_POSITIONS,
+  computeEffectiveFieldingAtPosition,
+  formatCompactPlayerPosition,
+  getPositionProficiency,
+} from '../engine/positionEngine';
+import {
   BatterStats,
   CareerSave,
   GmMeetingAction,
@@ -192,6 +199,7 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
       rosterTier?: RosterTier;
       gameDayActive?: boolean;
       trainingFocus?: TrainingFocus;
+      positionTrainingTarget?: Position | null;
     }
   ) => {
     try {
@@ -700,6 +708,27 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                   const pos = teamState.lineupPositions[p.id] ?? p.position;
                   const onNationalDuty = isPlayerOnNationalTeamDuty(p, career.gamesPlayed);
                   const isDhOverride = pos === 'DH' && p.position !== 'DH';
+                  const isNonPrimaryField = pos !== 'DH' && pos !== p.position;
+                  const slotEff = computeEffectiveFieldingAtPosition(p, pos);
+                  const orderedPosOptions: Position[] = [
+                    ...Array.from(
+                      new Set<Position>([
+                        pos,
+                        p.position,
+                        ...(p.secondaryPositions ?? []),
+                        'DH',
+                        ...ALL_HITTER_LINEUP_POSITIONS,
+                      ])
+                    ),
+                  ];
+                  const sortedBenchForSlot = [...benchHitters].sort((a, b) => {
+                    const profA = pos === 'DH' ? 90 : getPositionProficiency(a, pos);
+                    const profB = pos === 'DH' ? 90 : getPositionProficiency(b, pos);
+                    const qualA = profA >= 60 ? 1 : 0;
+                    const qualB = profB >= 60 ? 1 : 0;
+                    if (qualB !== qualA) return qualB - qualA;
+                    return b.ability + profB * 0.2 - (a.ability + profA * 0.2);
+                  });
                   return (
                     <div
                       key={`${p.id}-${idx}`}
@@ -724,13 +753,26 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                         <FranchiseStarIcon active={isFranchiseStarPlayer(career, p)} />
                         <PlayerForeignFlag player={p} />
                         <span
+                          title={
+                            isNonPrimaryField
+                              ? `${pos} 숙련도 ${slotEff.proficiency}/100 (${slotEff.tierLabel}${slotEff.penalty > 0 ? ` · 수비 -${Math.round(slotEff.penalty)}` : ''})`
+                              : undefined
+                          }
                           className={`text-[11px] shrink-0 ${
                             pos === 'DH'
                               ? 'font-semibold text-amber-700 dark:text-amber-400'
-                              : 'text-slate-500 font-normal'
+                              : isNonPrimaryField && slotEff.proficiency < 60
+                                ? 'font-semibold text-rose-600 dark:text-rose-400'
+                                : isNonPrimaryField
+                                  ? 'font-semibold text-sky-600 dark:text-sky-400'
+                                  : 'text-slate-500 font-normal'
                           }`}
                         >
-                          {isDhOverride ? `${p.position}→DH` : pos}
+                          {isDhOverride
+                            ? `${p.position}→DH`
+                            : isNonPrimaryField
+                              ? `${p.position}→${pos}(${slotEff.proficiency}${slotEff.proficiency < 60 ? '⚠' : ''})`
+                              : pos}
                         </span>
                         <PlayerCompactTag career={career} player={p} />
                       </button>
@@ -753,20 +795,36 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                             try {
                               setNotice(null);
                               const nextPos = e.target.value as Position;
+                              const nextEff = computeEffectiveFieldingAtPosition(p, nextPos);
                               onUpdateCareer(setLineupSlot(career, idx, p.id, nextPos));
-                              setNotice(`${p.name} 선수의 출전 포지션을 ${nextPos}(으)로 변경했습니다.`);
+                              setNotice(
+                                nextPos !== 'DH' && nextEff.proficiency < 60
+                                  ? `${p.name} 선수를 ${nextPos}(숙련도 ${nextEff.proficiency})로 배치했습니다. 미숙 포지션 수비 페널티(-${Math.round(nextEff.penalty)})가 적용됩니다.`
+                                  : `${p.name} 선수의 출전 포지션을 ${nextPos}(숙련도 ${nextEff.proficiency})로 변경했습니다.`
+                              );
                             } catch (err) {
                               setNotice(err instanceof Error ? err.message : '포지션 변경 불가');
                             }
                           }}
-                          title="본 포지션 또는 DH(지명타자) 지정 — 선발 라인업 내 포지션 중복 불가"
+                          title="주 포지션·보조 포지션·DH 및 비상 포지션 선택 (미숙 포지션은 수비 페널티 적용)"
                           className="px-1 py-0.5 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-[11px]"
                         >
-                          {Array.from(new Set<Position>([pos, p.position, 'DH'])).map((hp) => (
-                            <option key={hp} value={hp}>
-                              {hp}
-                            </option>
-                          ))}
+                          {orderedPosOptions.map((hp) => {
+                            const prof = hp === 'DH' ? 90 : getPositionProficiency(p, hp);
+                            const tag =
+                              hp === p.position
+                                ? '주'
+                                : hp === 'DH'
+                                  ? 'DH'
+                                  : prof >= 60
+                                    ? `${prof}`
+                                    : `${prof}⚠`;
+                            return (
+                              <option key={hp} value={hp}>
+                                {hp === 'DH' ? 'DH' : `${hp} (${tag})`}
+                              </option>
+                            );
+                          })}
                         </select>
                         {benchHitters.length > 0 && (
                           <select
@@ -777,9 +835,14 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                               try {
                                 setNotice(null);
                                 const rep = career.players[newId];
+                                const repEff = rep ? computeEffectiveFieldingAtPosition(rep, pos) : null;
                                 onUpdateCareer(setLineupSlot(career, idx, newId, pos));
                                 if (rep) {
-                                  setNotice(`${idx + 1}번 타순(${pos}): ${p.name} ↔ ${rep.name} 선수를 교체했습니다.`);
+                                  setNotice(
+                                    repEff && pos !== 'DH' && repEff.proficiency < 60
+                                      ? `${idx + 1}번 타순(${pos}): ${p.name} ↔ ${rep.name} 교체 완료 (숙련도 ${repEff.proficiency} · 미숙 페널티 -${Math.round(repEff.penalty)})`
+                                      : `${idx + 1}번 타순(${pos}): ${p.name} ↔ ${rep.name} 선수를 교체했습니다.`
+                                  );
                                 }
                               } catch (err) {
                                 setNotice(err instanceof Error ? err.message : '선발 교체 불가');
@@ -788,18 +851,20 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                             title={
                               pos === 'DH'
                                 ? 'DH 자리는 모든 포지션 벤치 야수로 교체 가능'
-                                : `${pos} 포지션 벤치 야수로 교체 (중복 포지션 불가)`
+                                : `${pos} 주·보조 포지션 및 벤치 야수 교체 (숙련도 60 미만은 수비 페널티)`
                             }
-                            className="px-1 py-0.5 rounded border team-accent-border bg-white dark:bg-slate-950 text-[11px] max-w-[96px]"
+                            className="px-1 py-0.5 rounded border team-accent-border bg-white dark:bg-slate-950 text-[11px] max-w-[110px]"
                           >
                             <option value="">교체▾</option>
-                            {benchHitters
-                              .filter((bh) => pos === 'DH' || bh.position === pos)
-                              .map((bh) => (
+                            {sortedBenchForSlot.map((bh) => {
+                              const prof = pos === 'DH' ? 90 : getPositionProficiency(bh, pos);
+                              const fitMark = pos === 'DH' ? '' : prof >= 60 ? `·숙${prof}` : `·숙${prof}⚠`;
+                              return (
                                 <option key={bh.id} value={bh.id}>
-                                  {bh.name}({bh.position}·{bh.ability}·{bh.form >= 0 ? `+${bh.form}` : bh.form})
+                                  {bh.name}({bh.position}{fitMark}·{bh.ability})
                                 </option>
-                              ))}
+                              );
+                            })}
                           </select>
                         )}
                         <button
@@ -847,7 +912,7 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                         <FranchiseStarIcon active={isFranchiseStarPlayer(career, bh)} />
                         <PlayerForeignFlag player={bh} />
                         <span className="text-slate-500">
-                          {bh.position} · {bh.ability} ({bh.form >= 0 ? `+${bh.form}` : bh.form})
+                          {formatCompactPlayerPosition(bh)} · {bh.ability} ({bh.form >= 0 ? `+${bh.form}` : bh.form})
                         </span>
                         <PlayerCompactTag career={career} player={bh} />
                       </button>
@@ -1590,7 +1655,21 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                           );
                         })()}
                       </td>
-                      <td className="py-1.5 px-2 whitespace-nowrap">{p.position}</td>
+                      <td
+                        className="py-1.5 px-2 whitespace-nowrap font-mono-stats"
+                        title={
+                          p.role === '타자'
+                            ? ALL_FIELD_POSITIONS.map((fp) => `${fp}:${getPositionProficiency(p, fp)}`).join(' · ')
+                            : p.position
+                        }
+                      >
+                        <span>{formatCompactPlayerPosition(p)}</span>
+                        {p.positionTrainingTarget && (
+                          <span className="ml-1 text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
+                            [훈련:{p.positionTrainingTarget}]
+                          </span>
+                        )}
+                      </td>
                       <td className="py-1.5 px-2 text-right font-mono-stats whitespace-nowrap">{p.age}세</td>
                       <td className="py-1.5 px-2 text-right font-mono-stats font-semibold whitespace-nowrap">
                         {p.ability}/{p.potential}
@@ -2072,7 +2151,7 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                     <span>
                       {KBO_TEAMS[selectedPlayer.teamId].name} ·{' '}
                       {selectedPlayer.uniformNumber !== undefined ? `No.${selectedPlayer.uniformNumber} · ` : ''}
-                      {selectedPlayer.position} · {selectedPlayer.rosterTier}
+                      {formatCompactPlayerPosition(selectedPlayer)} · {selectedPlayer.rosterTier}
                     </span>
                     <PlayerCategoryTag category={selectedPlayer.category} />
                     <NationalityBadge
@@ -2340,6 +2419,39 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                       ))}
                     </select>
                   </div>
+                  {selectedPlayer.role === '타자' && (
+                    <div className="space-y-1">
+                      <div className="font-bold flex items-center justify-between">
+                        <span>신규 수비 포지션 훈련</span>
+                        <span className="text-[10px] font-normal text-slate-400">숙련도 60+ 시 보조 포지션 획득</span>
+                      </div>
+                      <select
+                        value={selectedPlayer.positionTrainingTarget ?? ''}
+                        onChange={(e) => {
+                          const target = (e.target.value || null) as Position | null;
+                          handleRosterAction(selectedPlayer.id, {
+                            positionTrainingTarget: target,
+                          });
+                          setNotice(
+                            target
+                              ? `${selectedPlayer.name} 선수에게 [${target}] 신규 포지션 훈련을 배정했습니다.`
+                              : `${selectedPlayer.name} 선수의 신규 포지션 훈련을 해제했습니다.`
+                          );
+                        }}
+                        className="w-full px-2.5 py-1.5 rounded border border-indigo-300 dark:border-indigo-700 bg-white dark:bg-slate-950 font-semibold"
+                      >
+                        <option value="">훈련 안 함 (주 포지션 유지)</option>
+                        {ALL_FIELD_POSITIONS.filter((fp) => fp !== selectedPlayer.position).map((fp) => {
+                          const curProf = getPositionProficiency(selectedPlayer, fp);
+                          return (
+                            <option key={fp} value={fp}>
+                              {fp} 포지션 훈련 (현재 숙련도 {curProf}/100)
+                            </option>
+                          );
+                        })}
+                      </select>
+                    </div>
+                  )}
                   <div className="space-y-1">
                     <div className="font-bold">등번호 배정 · 변경 (영구결번/중복 차단)</div>
                     <div className="flex items-center gap-1.5">
@@ -2379,6 +2491,58 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                   </div>
                 </div>
               </div>
+
+              {selectedPlayer.role === '타자' && (
+                <div className="space-y-1.5">
+                  <div className="font-bold flex items-center justify-between">
+                    <span>포지션별 수비 숙련도 (0~100)</span>
+                    <span className="text-[10px] font-normal text-slate-400">
+                      80+ 주전급 · 60~79 보조 적합 · 60 미만 수비 페널티
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 font-mono-stats">
+                    {ALL_FIELD_POSITIONS.map((fp) => {
+                      const eff = computeEffectiveFieldingAtPosition(selectedPlayer, fp);
+                      const isPrim = selectedPlayer.position === fp;
+                      const isSec = selectedPlayer.secondaryPositions?.includes(fp);
+                      const isTrain = selectedPlayer.positionTrainingTarget === fp;
+                      return (
+                        <div
+                          key={fp}
+                          title={`${fp}: 숙련도 ${eff.proficiency}/100 (${eff.tierLabel}${eff.penalty > 0 ? ` · 수비 -${Math.round(eff.penalty)}` : ''})`}
+                          className={`p-1.5 rounded border text-center ${
+                            isPrim
+                              ? 'border-orange-500/70 bg-orange-500/10'
+                              : isSec
+                                ? 'border-emerald-500/50 bg-emerald-500/10'
+                                : isTrain
+                                  ? 'border-indigo-500/60 bg-indigo-500/10'
+                                  : 'border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/60'
+                          }`}
+                        >
+                          <div className="text-[10px] font-bold">
+                            {fp}
+                            {isPrim ? '★' : ''}
+                          </div>
+                          <div
+                            className={`text-xs font-extrabold ${
+                              eff.proficiency >= 80
+                                ? 'text-emerald-600 dark:text-emerald-400'
+                                : eff.proficiency >= 60
+                                  ? 'text-sky-600 dark:text-sky-400'
+                                  : eff.proficiency >= 45
+                                    ? 'text-amber-600 dark:text-amber-400'
+                                    : 'text-slate-400'
+                            }`}
+                          >
+                            {eff.proficiency}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               {selectedPlayer.role === '타자' ? (
                 <div className="space-y-1">

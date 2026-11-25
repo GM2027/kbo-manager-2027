@@ -509,6 +509,7 @@ export function ensureFranchiseState(career: CareerSave): void {
   );
   const needsDevBackfill =
     career.databaseVersion !== 'v24_recalibrated_prospect_potentials' &&
+    career.databaseVersion !== 'v25_verified_positions_and_fa_compensation' &&
     career.databaseVersion !== 'v23_go_woosuk_kbo_return' &&
     career.databaseVersion !== 'v22_verified_birthdates' &&
     career.databaseVersion !== 'v21_verified_career_histories' &&
