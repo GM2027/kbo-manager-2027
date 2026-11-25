@@ -23,6 +23,11 @@ import {
   toggleAmateurProspectWatchlist,
 } from '../engine/amateurOverseasEngine';
 import {
+  formatBirthDateDisplay,
+  getCareerCurrentIsoDate,
+  resolveAgeAtDate,
+} from '../engine/ageEngine';
+import {
   formatOverseasLeagueLabel,
   normalizeOverseasLeagueLevel,
   OVERSEAS_6_TIER_LADDER,
@@ -840,7 +845,7 @@ export const AmateurAndOverseasView: React.FC<AmateurAndOverseasViewProps> = ({
                             )}
                           </div>
                           <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono-stats">
-                            {ov.permanentId} · 만 {ov.age}세 · {ov.originCategory}
+                            {ov.permanentId} · 만 {ov.status === '은퇴' ? ov.age : resolveAgeAtDate(ov, getCareerCurrentIsoDate(career))}세 · {ov.originCategory}
                           </div>
                         </td>
                         <td className="py-2 px-2">
@@ -894,11 +899,11 @@ export const AmateurAndOverseasView: React.FC<AmateurAndOverseasViewProps> = ({
                         <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
                           {selectedOverseas.name}{' '}
                           <span className="text-xs font-mono-stats text-slate-500">
-                            ({selectedOverseas.position} · 만 {selectedOverseas.age}세)
+                            ({selectedOverseas.position} · 만 {selectedOverseas.status === '은퇴' ? selectedOverseas.age : resolveAgeAtDate(selectedOverseas, getCareerCurrentIsoDate(career))}세)
                           </span>
                         </h3>
                         <div className="text-[11px] font-mono-stats text-slate-500">
-                          고유 ID: {selectedOverseas.permanentId} · {selectedOverseas.birthYear}년생
+                          고유 ID: {selectedOverseas.permanentId} · 생년월일 {formatBirthDateDisplay(selectedOverseas.birthDate)} ({selectedOverseas.birthYear}년생)
                         </div>
                       </div>
                     </div>

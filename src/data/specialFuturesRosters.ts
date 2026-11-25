@@ -8,6 +8,7 @@ export interface SangmuRealPlayerSeed {
   role: '투수' | '타자';
   position: Position;
   pitchRole?: Player['pitchRole'];
+  birthDate?: string | null; // YYYY-MM-DD (공식 확인 생년월일, 미확인 시 null)
   age: number;
   ability: number;
   potential: number;
@@ -20,6 +21,49 @@ export interface SangmuRealPlayerSeed {
   dischargeLabel: string;
   note: string;
 }
+
+export const VERIFIED_SANGMU_BIRTHDATES_BY_KEY: Record<string, string> = {
+  '황동재|삼성': '2001-11-03',
+  '양도근|삼성': '2003-02-06',
+  '김기중|한화': '2002-11-16',
+  '이상혁|한화': '2001-09-14',
+  '최현석|SSG': '2003-10-16',
+  '박성빈|SSG': '2003-12-29',
+  '김민규|NC': '2001-09-07',
+  '김세훈|NC': '2005-04-04',
+  '박지호|두산': '2003-07-02',
+  '여동건|두산': '2005-08-04',
+  '고영우|키움': '2001-06-21',
+  '윤석원|키움': '2003-07-07',
+  '김병준|KT': '2003-07-03',
+  '김성우|LG': '2003-11-15',
+  '정해영|KIA': '2001-08-23',
+  '한재승|KIA': '2001-09-07',
+  '윤도현|KIA': '2003-05-06',
+  '이승현|삼성': '2002-05-19',
+  '심재훈|삼성': '2006-05-02',
+  '함수호|삼성': '2006-07-11',
+  '이민석|롯데': '2003-12-10',
+  '이호준|롯데': '2004-05-15',
+  '최지강|두산': '2001-09-23',
+  '원성준|키움': '2000-03-31',
+};
+
+export const VERIFIED_ULSAN_BIRTHDATES_BY_ID: Record<string, string> = {
+  'ulsan-okada': '1993-10-18',
+  'ulsan-kobayashi': '2001-06-19',
+  'ulsan-alex-hall': '1999-06-08',
+  'ulsan-kim-dogyu': '1998-07-11',
+  'ulsan-shim-jaemin': '1994-02-18',
+  'ulsan-nam-ho': '2000-07-20',
+  'ulsan-ko-hyojun': '1983-02-08',
+  'ulsan-byun-sangkwon': '1997-04-04',
+  'ulsan-ha-jaehoon': '1990-10-29',
+  'ulsan-park-sungwoong': '1999-08-20',
+  'ulsan-jo-jeyoung': '2001-02-12',
+  'ulsan-kim-suin': '1997-10-19',
+  'ulsan-choi-bosung': '1998-10-16',
+};
 
 /**
  * 2027시즌 상무 피닉스 야구단 공식 확인 복무 선수단 (총 24명)
@@ -858,6 +902,22 @@ export function buildInitialUlsanWhalesState(): UlsanWhalesState {
       scoutingNote: '선구안·주력 겸비 좌타 외야수 · 신인 드래프트 대상',
     },
   ];
+
+  for (const p of roster) {
+    const verifiedDob = VERIFIED_ULSAN_BIRTHDATES_BY_ID[p.id];
+    if (verifiedDob) {
+      p.birthDate = verifiedDob;
+      p.birthYear = Number(verifiedDob.slice(0, 4));
+      // 2027-01-01 기준 만 나이 정합화
+      const y = Number(verifiedDob.slice(0, 4));
+      const m = Number(verifiedDob.slice(5, 7));
+      const d = Number(verifiedDob.slice(8, 10));
+      p.age = 2027 - y - (m > 1 || (m === 1 && d > 1) ? 1 : 0);
+    } else {
+      p.birthDate = null;
+      p.birthYear = 2027 - p.age;
+    }
+  }
 
   return {
     managerName: '장원진',

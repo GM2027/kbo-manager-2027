@@ -1,3 +1,4 @@
+import { syncAllAgesToDateInPlace } from './ageEngine';
 import { isMilitaryServing } from './militaryEngine';
 import { DEFAULT_INVESTMENTS, TICKET_PRICE_CONFIG } from '../data/financesData';
 import { getV18EngineSkillBonus } from '../data/kboRealMetrics';
@@ -2065,6 +2066,7 @@ function simulateRegularGames(
   }
   if (seriesDate) {
     next.currentDate = seriesDate;
+    syncAllAgesToDateInPlace(next, seriesDate);
   }
   enforceOvrPotInvariantInPlace(next.players);
 
@@ -2256,6 +2258,7 @@ export function simulateNextPostseasonGame(career: CareerSave): {
   const roundNum = 1000 + psGamesCount + 1;
   const dateStr = addDaysIso(`${next.season}-10-05`, psGamesCount);
   next.currentDate = dateStr;
+  syncAllAgesToDateInPlace(next, dateStr);
 
   // Home/away assignment by series format
   let homeTeam = series.higherSeedTeam;

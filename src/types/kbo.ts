@@ -340,7 +340,7 @@ export interface Player {
   pitchRole?: '선발' | '마무리' | '셋업맨' | '필승조' | '중간계투' | '중간' | '추격조' | '롱릴리프' | '예비';
   /** 사용자가 수동 지정한 투수 보직 유지 여부 */
   pitchRoleLockedByUser?: boolean;
-  age: number; // 한국식 연 나이
+  age: number; // 게임 내 현재 날짜·생년월일 기준 만 나이
   ability: number;
   potential: number;
   abilityStatus: '확정' | '제안' | '평가대기';
@@ -1015,6 +1015,8 @@ export interface UlsanWhalesPlayer {
   id: string;
   name: string;
   age: number;
+  birthYear?: number;
+  birthDate?: string | null;
   role: PlayerRole;
   position: Position;
   pitchRole?: Player['pitchRole'];
@@ -1582,6 +1584,7 @@ export interface DraftCandidate {
   /** 영구 고유 ID (고교·대학·해외파·KBO 드래프트 전 구간 연동) */
   permanentId?: string;
   birthYear?: number;
+  birthDate?: string | null;
   /** 해외파 복귀 신청 후 자격 심사 통과 여부 */
   isOverseasReturnee?: boolean;
   overseasReturnNote?: string;
@@ -2159,6 +2162,7 @@ export interface AmateurProspect {
   permanentId: string;
   name: string;
   birthYear: number;
+  birthDate?: string | null;
   age: number;
   role: PlayerRole;
   position: Position;
@@ -2293,6 +2297,7 @@ export interface OverseasPlayerRecord {
   sourceKboPlayerId?: string;
   name: string;
   birthYear: number;
+  birthDate?: string | null;
   age: number;
   role: PlayerRole;
   position: Position;

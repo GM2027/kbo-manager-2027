@@ -1,3 +1,4 @@
+import { getCareerCurrentIsoDate, resolveAgeAtDate } from './ageEngine';
 import { isMilitaryServing } from './militaryEngine';
 import { KBO_TEAMS } from '../data/kboTeams';
 import {
@@ -220,6 +221,7 @@ export function searchAllLeaguePlayers(
   filter: GlobalPlayerSearchFilter
 ): GlobalPlayerSearchEntry[] {
   const nameCounts = getSameNameCounts(career);
+  const currentIsoDate = getCareerCurrentIsoDate(career);
   const results: GlobalPlayerSearchEntry[] = [];
   const q = filter.query.trim().toLowerCase();
 
@@ -302,7 +304,7 @@ export function searchAllLeaguePlayers(
       permanentId: p.permanentId ?? p.id,
       name: p.name,
       birthYear: p.birthYear ?? career.season - p.age,
-      age: p.age,
+      age: p.rosterTier === '은퇴' ? p.age : resolveAgeAtDate(p, currentIsoDate),
       teamId: isSangmu ? '상무' : p.teamId,
       teamLabel: isSangmu
         ? `상무 (원소속 ${KBO_TEAMS[p.teamId].shortName})`
@@ -338,8 +340,8 @@ export function searchAllLeaguePlayers(
           source: '울산',
           permanentId: `KBO-ULS-${up.id}`,
           name: up.name,
-          birthYear: career.season - up.age,
-          age: up.age,
+          birthYear: up.birthYear ?? career.season - up.age,
+          age: resolveAgeAtDate(up, currentIsoDate),
           teamId: '울산',
           teamLabel: '울산 웨일즈',
           role: up.role,
@@ -383,7 +385,7 @@ export function searchAllLeaguePlayers(
           permanentId: ov.permanentId,
           name: ov.name,
           birthYear: ov.birthYear,
-          age: ov.age,
+          age: ov.status === '은퇴' ? ov.age : resolveAgeAtDate(ov, currentIsoDate),
           teamId: '해외',
           teamLabel: `${ov.clubName} (${ov.league})`,
           role: ov.role,

@@ -303,6 +303,7 @@ export const REAL_KBO_HITTER_POSITIONS: Record<
     김상수: { position: 'SS', lineupPos: 'SS' },
     오윤석: { position: '2B', lineupPos: '2B' },
     최원준: { position: 'LF', lineupPos: 'LF' },
+    최지만: { position: '1B', lineupPos: '1B' },
   },
   키움: {
     이주형: { position: 'CF', lineupPos: 'CF' },

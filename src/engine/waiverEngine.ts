@@ -1,3 +1,4 @@
+import { syncEntityAgeInPlace } from './ageEngine';
 import { isMilitaryServing } from './militaryEngine';
 import { KBO_TEAMS, TEAM_IDS } from '../data/kboTeams';
 import { allocateTeamUniformNumber } from '../data/playerMetadata';
@@ -722,8 +723,8 @@ export function unlockUnclaimedFreeAgentsForNewSeasonInPlace(
   for (const fa of career.unclaimedFreeAgents ?? []) {
     if (fa.status === '은퇴' || fa.status === '재계약완료') continue;
 
-    // Age up unclaimed free agent smoothly with new season
-    fa.player.age += 1;
+    // Sync unclaimed free agent age from birthDate/birthYear without double-incrementing
+    syncEntityAgeInPlace(fa.player, dateIso);
 
     if (newSeason >= fa.eligibleSeason) {
       if (fa.status === '당해시즌계약금지') {

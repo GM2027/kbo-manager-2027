@@ -1,3 +1,4 @@
+import { resolveAgeAtDate, syncAllAgesToDateInPlace } from './ageEngine';
 import { isMilitaryServing } from './militaryEngine';
 import {
   buildCoachSubRatings,
@@ -1919,10 +1920,18 @@ function addDraftedCandidateToCareer(
   const pid = `${teamId}-신인-${ds.season}-${cand.id}`;
   const overallPick = (round - 1) * 10 + pickInRound;
   const isFirstRounder = round === 1;
+  const candBirthYear = cand.birthYear ?? ds.season - cand.age;
+  const candBirthDate = cand.birthDate ?? null;
+  const candResolvedAge = resolveAgeAtDate(
+    { birthDate: candBirthDate, birthYear: candBirthYear, age: cand.age },
+    next.currentDate ?? `${ds.season}-01-01`
+  );
   next.players[pid] = {
     id: pid,
+    originType: cand.isOverseasReturnee ? 'real' : 'virtual',
     permanentId: permId,
-    birthYear: cand.birthYear ?? ds.season - cand.age,
+    birthYear: candBirthYear,
+    birthDate: candBirthDate,
     firstRoundSpotlight: isFirstRounder,
     isOneClubMan: true,
     previousAnnualSalary: 0,
@@ -1948,7 +1957,7 @@ function addDraftedCandidateToCareer(
     role: cand.role,
     position: cand.position,
     pitchRole: cand.role === '투수' ? (cand.position === 'SP' ? '선발' : '중간') : undefined,
-    age: cand.age,
+    age: candResolvedAge,
     ability: cand.ability,
     potential: cand.potential,
     abilityStatus: '확정',
@@ -3954,6 +3963,8 @@ export function advanceToNextSeason(career: CareerSave): {
   const nextSeasonNum = next.season + 1;
   next.season = nextSeasonNum;
   next.currentDate = `${nextSeasonNum}-01-01`;
+  // 게임 내 현재 날짜(YYYY-01-01)와 생년월일 기준으로 전원 만 나이 재동기화 (시즌 전환 중복 증가 원천 차단)
+  syncAllAgesToDateInPlace(next, next.currentDate);
   next.draftClassYear = nextSeasonNum + 1;
   next.scheduleSource = 'PROJECTED';
   next.officialScheduleMeta = undefined;
@@ -4298,7 +4309,7 @@ export function advanceToNextSeason(career: CareerSave): {
       }
     }
 
-    p.age += 1; // 한국식 연 나이 전원 +1
+    // 나이는 syncAllAgesToDateInPlace(next, `${nextSeasonNum}-01-01`)에서 생년월일 기준으로 이미 정확 동기화됨 (중복 +1 방지)
     p.serviceYears += p.rosterTier === '1군' ? 1 : 0;
     if (p.rosterTier === '1군' || p.rosterTier === '2군') {
       p.clubTenureSeasons = getPlayerClubTenureSeasons(p) + 1;

@@ -1,3 +1,4 @@
+import { calculateKoreanFullAge } from '../engine/ageEngine';
 import { MlbClubScoutingBudget, OverseasPlayerRecord, Position } from '../types/kbo';
 
 export const KOREAN_HIGH_SCHOOLS: string[] = [
@@ -131,12 +132,16 @@ export const AMATEUR_POSITIONS: { position: Position; role: '투수' | '타자';
  * 실제 확인된 해외파 한국인 선수 기준선 (허위 과거 계약 이력 미생성 원칙 준수)
  */
 export function buildVerifiedOverseasBaseline(season: number): OverseasPlayerRecord[] {
+  const refDate = `${season}-01-01`;
+  const ageOf = (dob: string, fallbackBirthYear: number) =>
+    calculateKoreanFullAge(dob, refDate) ?? Math.max(18, season - fallbackBirthYear);
   return [
     {
       permanentId: 'KBO-OVR-0001',
       name: '이정후',
       birthYear: 1998,
-      age: season - 1998,
+      birthDate: '1998-08-20',
+      age: ageOf('1998-08-20', 1998),
       role: '타자',
       position: 'CF',
       ability: 87,
@@ -165,7 +170,8 @@ export function buildVerifiedOverseasBaseline(season: number): OverseasPlayerRec
       permanentId: 'KBO-OVR-0002',
       name: '김하성',
       birthYear: 1995,
-      age: season - 1995,
+      birthDate: '1995-10-17',
+      age: ageOf('1995-10-17', 1995),
       role: '타자',
       position: 'SS',
       ability: 85,
@@ -194,7 +200,8 @@ export function buildVerifiedOverseasBaseline(season: number): OverseasPlayerRec
       permanentId: 'KBO-OVR-0003',
       name: '김혜성',
       birthYear: 1999,
-      age: season - 1999,
+      birthDate: '1999-01-27',
+      age: ageOf('1999-01-27', 1999),
       role: '타자',
       position: '2B',
       ability: 82,
@@ -222,7 +229,8 @@ export function buildVerifiedOverseasBaseline(season: number): OverseasPlayerRec
       permanentId: 'KBO-OVR-0004',
       name: '고우석',
       birthYear: 1998,
-      age: season - 1998,
+      birthDate: '1998-08-06',
+      age: ageOf('1998-08-06', 1998),
       role: '투수',
       position: 'CL',
       ability: 80,
@@ -250,7 +258,8 @@ export function buildVerifiedOverseasBaseline(season: number): OverseasPlayerRec
       permanentId: 'KBO-OVR-0005',
       name: '배지환',
       birthYear: 1999,
-      age: season - 1999,
+      birthDate: '1999-07-26',
+      age: ageOf('1999-07-26', 1999),
       role: '타자',
       position: 'CF',
       ability: 77,
@@ -278,7 +287,8 @@ export function buildVerifiedOverseasBaseline(season: number): OverseasPlayerRec
       permanentId: 'KBO-OVR-0006',
       name: '장현석',
       birthYear: 2004,
-      age: season - 2004,
+      birthDate: '2004-03-14',
+      age: ageOf('2004-03-14', 2004),
       role: '투수',
       position: 'SP',
       ability: 71,
@@ -306,7 +316,8 @@ export function buildVerifiedOverseasBaseline(season: number): OverseasPlayerRec
       permanentId: 'KBO-OVR-0007',
       name: '심준석',
       birthYear: 2004,
-      age: season - 2004,
+      birthDate: '2004-04-09',
+      age: ageOf('2004-04-09', 2004),
       role: '투수',
       position: 'SP',
       ability: 69,
@@ -335,7 +346,8 @@ export function buildVerifiedOverseasBaseline(season: number): OverseasPlayerRec
       permanentId: 'KBO-OVR-0008',
       name: '엄형찬',
       birthYear: 2004,
-      age: season - 2004,
+      birthDate: '2004-04-24',
+      age: ageOf('2004-04-24', 2004),
       role: '타자',
       position: 'C',
       ability: 68,

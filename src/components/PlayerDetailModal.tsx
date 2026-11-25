@@ -51,6 +51,11 @@ import {
   formatRate3,
 } from '../engine/stats';
 import {
+  formatBirthDateDisplay,
+  getCareerCurrentIsoDate,
+  resolveAgeAtDate,
+} from '../engine/ageEngine';
+import {
   formatMilitaryStatusLabel,
   formatThrowsBatsKorean,
   getMilitaryBadgeToneClass,
@@ -125,6 +130,11 @@ export const PlayerDetailModal: React.FC<PlayerDetailModalProps> = ({
   const militaryLabel = formatMilitaryStatusLabel(militaryStatus, player.category);
   const militaryBadgeTone = getMilitaryBadgeToneClass(militaryStatus);
   const isServingSangmu = isMilitaryServing(player.militaryStatus);
+  const displayAge =
+    player.rosterTier === '은퇴'
+      ? player.age
+      : resolveAgeAtDate(player, getCareerCurrentIsoDate(career));
+  const birthDateDisplay = formatBirthDateDisplay(player.birthDate);
 
   const fs = player.futuresStats;
   const bStats = player.role === '타자' ? (player.stats as BatterStats) : null;
@@ -265,7 +275,7 @@ export const PlayerDetailModal: React.FC<PlayerDetailModalProps> = ({
                 </span>
                 <span>·</span>
                 <span className="font-mono-stats">
-                  만 {player.age}세{player.birthYear ? ` (${player.birthYear}년생)` : ''} · {player.rosterTier} · 연차 {player.serviceYears}년
+                  만 {displayAge}세{player.birthYear ? ` (${player.birthYear}년생)` : ''} · {player.rosterTier} · 연차 {player.serviceYears}년
                 </span>
                 {player.kboOfficialId && (
                   <>
@@ -419,7 +429,7 @@ export const PlayerDetailModal: React.FC<PlayerDetailModalProps> = ({
             <div>
               <span className="text-slate-400">생년월일: </span>
               <span className="font-mono-stats font-semibold text-slate-800 dark:text-slate-200">
-                {player.birthDate ?? '미확인'}
+                {birthDateDisplay}
               </span>
             </div>
             <div>

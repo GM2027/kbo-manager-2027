@@ -508,6 +508,8 @@ export function ensureFranchiseState(career: CareerSave): void {
       p.uniformNumber === undefined
   );
   const needsDevBackfill =
+    career.databaseVersion !== 'v22_verified_birthdates' &&
+    career.databaseVersion !== 'v21_verified_career_histories' &&
     career.databaseVersion !== 'v20_verified_player_db' &&
     career.databaseVersion !== 'v19_unified_rebalance' &&
     TEAM_IDS.some(
@@ -4441,6 +4443,7 @@ export function recordMlbExportPlayer(
         sourceKboPlayerId: player.id,
         name: player.name,
         birthYear: player.birthYear ?? next.season - player.age,
+        birthDate: player.birthDate ?? null,
         age: player.age,
         role: player.role,
         position: player.position,

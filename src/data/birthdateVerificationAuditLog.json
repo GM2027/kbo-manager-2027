@@ -1,0 +1,1104 @@
+{
+  "patchedAt": "2026-11-25T14:57:59.568Z",
+  "databaseVersion": "v22_verified_birthdates",
+  "backupFile": "src/data/v21PlayerDataBackupBeforeBirthdatePatch.json",
+  "summary": {
+    "totalPlayers": 731,
+    "verifiedBirthDateCount": 624,
+    "unverifiedBaselineCount": 0,
+    "unverifiedDraft2027Count": 107,
+    "totalFieldChanges": 120
+  },
+  "changes": [
+    {
+      "id": "2026-LG-49",
+      "name": "권우준",
+      "team": "LG",
+      "field": "birth_date",
+      "before": null,
+      "after": "2007-01-08",
+      "source": "LG 트윈스 공식 프로필 · 2026 신인 (권우준)"
+    },
+    {
+      "id": "2026-LG-43",
+      "name": "김동현",
+      "team": "LG",
+      "field": "birth_date",
+      "before": null,
+      "after": "2005-03-03",
+      "source": "LG 트윈스 공식 프로필 · 2026 신인 (김동현)"
+    },
+    {
+      "id": "v15-0007",
+      "name": "김주온",
+      "team": "LG",
+      "field": "birth_date",
+      "before": null,
+      "after": "1996-12-08",
+      "source": "KBO 공식 기록실 #65411 (김주온)"
+    },
+    {
+      "id": "v15-0010",
+      "name": "박명근",
+      "team": "LG",
+      "field": "birth_date",
+      "before": null,
+      "after": "2004-03-27",
+      "source": "KBO 공식 기록실 #53139 (박명근)"
+    },
+    {
+      "id": "v15-0012",
+      "name": "박준성",
+      "team": "LG",
+      "field": "birth_date",
+      "before": null,
+      "after": "2007-12-11",
+      "source": "LG 트윈스 공식 프로필 · 2026 신인 (박준성)"
+    },
+    {
+      "id": "v15-0020",
+      "name": "우명현",
+      "team": "LG",
+      "field": "birth_date",
+      "before": null,
+      "after": "2007-02-07",
+      "source": "LG 트윈스 공식 프로필 · 2026 신인 (우명현)"
+    },
+    {
+      "id": "v15-0026",
+      "name": "이지강",
+      "team": "LG",
+      "field": "birth_date",
+      "before": null,
+      "after": "1999-07-02",
+      "source": "KBO 공식 기록실 #69108 (이지강)"
+    },
+    {
+      "id": "v15-0028",
+      "name": "장시환",
+      "team": "LG",
+      "field": "birth_date",
+      "before": null,
+      "after": "1987-11-01",
+      "source": "KBO 공식 기록실 (장시환)"
+    },
+    {
+      "id": "2026-LG-18",
+      "name": "정우영",
+      "team": "LG",
+      "field": "birth_date",
+      "before": null,
+      "after": "1999-08-19",
+      "source": "KBO 공식 기록실 #69159 (정우영)"
+    },
+    {
+      "id": "v15-0038",
+      "name": "김준태",
+      "team": "LG",
+      "field": "birth_date",
+      "before": null,
+      "after": "1994-07-25",
+      "source": "KBO 공식 기록실 #62558 (김준태)"
+    },
+    {
+      "id": "v15-0043",
+      "name": "김정율",
+      "team": "LG",
+      "field": "birth_date",
+      "before": null,
+      "after": "1998-03-18",
+      "source": "KBO 공식 기록실 (김정율)"
+    },
+    {
+      "id": "v15-0052",
+      "name": "추세현",
+      "team": "LG",
+      "field": "birth_date",
+      "before": null,
+      "after": "2006-04-19",
+      "source": "LG 트윈스 공식 프로필 (추세현)"
+    },
+    {
+      "id": "v15-0056",
+      "name": "박관우",
+      "team": "LG",
+      "field": "birth_date",
+      "before": null,
+      "after": "2006-03-22",
+      "source": "KBO 공식 기록실 #55164 (박관우)"
+    },
+    {
+      "id": "v15-0058",
+      "name": "서영준",
+      "team": "LG",
+      "field": "birth_date",
+      "before": null,
+      "after": "2006-03-18",
+      "source": "LG 트윈스 공식 프로필 (서영준)"
+    },
+    {
+      "id": "v15-0068",
+      "name": "김민우",
+      "team": "HH",
+      "field": "birth_date",
+      "before": null,
+      "after": "1995-07-25",
+      "source": "KBO 공식 기록실 #65764 (김민우)"
+    },
+    {
+      "id": "v15-0076",
+      "name": "박준영",
+      "team": "HH",
+      "field": "birth_date",
+      "before": null,
+      "after": "2003-03-02",
+      "source": "한화 이글스 공식 프로필 (박준영 · P)"
+    },
+    {
+      "id": "v15-0077",
+      "name": "배민서",
+      "team": "HH",
+      "field": "birth_date",
+      "before": null,
+      "after": "1999-11-18",
+      "source": "KBO 공식 기록실 #69974 (배민서)"
+    },
+    {
+      "id": "v15-0081",
+      "name": "양수호",
+      "team": "HH",
+      "field": "birth_date",
+      "before": null,
+      "after": "2006-09-09",
+      "source": "한화 이글스 공식 프로필 (양수호)"
+    },
+    {
+      "id": "v15-0087",
+      "name": "정이황",
+      "team": "HH",
+      "field": "birth_date",
+      "before": null,
+      "after": "2000-03-07",
+      "source": "KBO 공식 기록실 (정이황)"
+    },
+    {
+      "id": "v15-0091",
+      "name": "한서구",
+      "team": "HH",
+      "field": "birth_date",
+      "before": null,
+      "after": "2003-12-04",
+      "source": "한화 이글스 공식 프로필 (한서구)"
+    },
+    {
+      "id": "2026-HH-42",
+      "name": "박상언",
+      "team": "HH",
+      "field": "birth_date",
+      "before": null,
+      "after": "1997-03-03",
+      "source": "KBO 공식 기록실 #66707 (박상언)"
+    },
+    {
+      "id": "v15-0098",
+      "name": "허관회",
+      "team": "HH",
+      "field": "birth_date",
+      "before": null,
+      "after": "1999-02-12",
+      "source": "KBO 공식 기록실 #69706 (허관회)"
+    },
+    {
+      "id": "v15-0101",
+      "name": "권현규",
+      "team": "HH",
+      "field": "birth_date",
+      "before": null,
+      "after": "2007-03-23",
+      "source": "한화 이글스 공식 프로필 · 2026 신인 (권현규)"
+    },
+    {
+      "id": "v15-0107",
+      "name": "이승현",
+      "team": "HH",
+      "field": "birth_date",
+      "before": null,
+      "after": "2002-07-23",
+      "source": "KBO 공식 기록실 #55712 (이승현 · 한화 IF)"
+    },
+    {
+      "id": "v15-0122",
+      "name": "이민재",
+      "team": "HH",
+      "field": "birth_date",
+      "before": null,
+      "after": "2004-03-07",
+      "source": "KBO 공식 기록실 #55710 (이민재)"
+    },
+    {
+      "id": "v15-0125",
+      "name": "임종찬",
+      "team": "HH",
+      "field": "birth_date",
+      "before": null,
+      "after": "2001-09-28",
+      "source": "KBO 공식 기록실 #50704 (임종찬)"
+    },
+    {
+      "id": "v15-0129",
+      "name": "김광현",
+      "team": "SSG",
+      "field": "birth_date",
+      "before": null,
+      "after": "1988-07-22",
+      "source": "KBO 공식 기록실 #77829 (김광현)"
+    },
+    {
+      "id": "v15-0132",
+      "name": "김성민",
+      "team": "SSG",
+      "field": "birth_date",
+      "before": null,
+      "after": "2001-04-30",
+      "source": "SSG 랜더스 공식 프로필 (김성민 · P)"
+    },
+    {
+      "id": "v15-0136",
+      "name": "박기호",
+      "team": "SSG",
+      "field": "birth_date",
+      "before": null,
+      "after": "2005-07-26",
+      "source": "KBO 공식 기록실 #54802 (박기호)"
+    },
+    {
+      "id": "v15-0138",
+      "name": "박종훈",
+      "team": "SSG",
+      "field": "birth_date",
+      "before": null,
+      "after": "1991-08-13",
+      "source": "KBO 공식 기록실 #60841 (박종훈 1991-08-13)"
+    },
+    {
+      "id": "2026-SSG-60",
+      "name": "신지환",
+      "team": "SSG",
+      "field": "birth_date",
+      "before": null,
+      "after": "2006-04-17",
+      "source": "KBO 공식 기록실 #55860 (신지환)"
+    },
+    {
+      "id": "v15-0142",
+      "name": "송영진",
+      "team": "SSG",
+      "field": "birth_date",
+      "before": null,
+      "after": "2004-05-28",
+      "source": "KBO 공식 기록실 #53898 (송영진)"
+    },
+    {
+      "id": "v15-0151",
+      "name": "조요한",
+      "team": "SSG",
+      "field": "birth_date",
+      "before": null,
+      "after": "2000-01-06",
+      "source": "KBO 공식 기록실 #51809 (조요한)"
+    },
+    {
+      "id": "v15-0152",
+      "name": "천범석",
+      "team": "SSG",
+      "field": "birth_date",
+      "before": null,
+      "after": "2006-03-06",
+      "source": "SSG 랜더스 공식 프로필 (천범석)"
+    },
+    {
+      "id": "v15-0158",
+      "name": "김규민",
+      "team": "SSG",
+      "field": "birth_date",
+      "before": null,
+      "after": "2002-08-23",
+      "source": "SSG 랜더스 공식 프로필 (김규민 · C)"
+    },
+    {
+      "id": "v15-0161",
+      "name": "이율예",
+      "team": "SSG",
+      "field": "birth_date",
+      "before": null,
+      "after": "2006-11-21",
+      "source": "KBO 공식 기록실 #55832 (이율예)"
+    },
+    {
+      "id": "v15-0167",
+      "name": "김수윤",
+      "team": "SSG",
+      "field": "birth_date",
+      "before": null,
+      "after": "1998-07-16",
+      "source": "KBO 공식 기록실 #67900 (김수윤)"
+    },
+    {
+      "id": "v15-0169",
+      "name": "김태윤",
+      "team": "SSG",
+      "field": "birth_date",
+      "before": null,
+      "after": "2003-02-28",
+      "source": "KBO 공식 기록실 #52803 (김태윤)"
+    },
+    {
+      "id": "v15-0176",
+      "name": "최  정",
+      "team": "SSG",
+      "field": "birth_date",
+      "before": null,
+      "after": "1987-02-28",
+      "source": "KBO 공식 기록실 #75847 (최정)"
+    },
+    {
+      "id": "v15-0177",
+      "name": "현원회",
+      "team": "SSG",
+      "field": "birth_date",
+      "before": null,
+      "after": "2001-07-08",
+      "source": "KBO 공식 기록실 #50840 (현원회)"
+    },
+    {
+      "id": "v15-0183",
+      "name": "박지환",
+      "team": "SSG",
+      "field": "birth_date",
+      "before": null,
+      "after": "2005-07-12",
+      "source": "KBO 공식 기록실 #54805 (박지환)"
+    },
+    {
+      "id": "2026-SSG-9",
+      "name": "이승민",
+      "team": "SSG",
+      "field": "birth_date",
+      "before": null,
+      "after": "2005-01-06",
+      "source": "KBO 공식 기록실 #54806 (이승민 · SSG OF)"
+    },
+    {
+      "id": "2026-SSG-49",
+      "name": "장재율",
+      "team": "SSG",
+      "field": "birth_date",
+      "before": null,
+      "after": "2007-09-12",
+      "source": "SSG 랜더스 공식 프로필 · 2026 신인 (장재율)"
+    },
+    {
+      "id": "v15-0193",
+      "name": "하재훈",
+      "team": "SSG",
+      "field": "birth_date",
+      "before": null,
+      "after": "1990-10-29",
+      "source": "KBO 공식 기록실 #69813 (하재훈)"
+    },
+    {
+      "id": "v15-0195",
+      "name": "김대호",
+      "team": "SS",
+      "field": "birth_date",
+      "before": null,
+      "after": "2001-10-15",
+      "source": "KBO 공식 기록실 #54401 (김대호)"
+    },
+    {
+      "id": "2026-SS-67",
+      "name": "김상호",
+      "team": "SS",
+      "field": "birth_date",
+      "before": null,
+      "after": "2006-08-18",
+      "source": "삼성 라이온즈 공식 프로필 · 2026 신인 (김상호)"
+    },
+    {
+      "id": "v15-0199",
+      "name": "김태훈(투)",
+      "team": "SS",
+      "field": "birth_date",
+      "before": null,
+      "after": "1992-03-02",
+      "source": "KBO 공식 기록실 (김태훈 · 삼성 투수)"
+    },
+    {
+      "id": "v15-0200",
+      "name": "매닝",
+      "team": "SS",
+      "field": "birth_date",
+      "before": null,
+      "after": "1998-01-28",
+      "source": "MLB/KBO 공식 프로필 (맷 매닝)"
+    },
+    {
+      "id": "v15-0210",
+      "name": "이승현(우)",
+      "team": "SS",
+      "field": "birth_date",
+      "before": null,
+      "after": "1991-11-20",
+      "source": "KBO 공식 기록실 (이승현 · 삼성 우완)"
+    },
+    {
+      "id": "v15-0211",
+      "name": "이승현(좌)",
+      "team": "SS",
+      "field": "birth_date",
+      "before": null,
+      "after": "2002-05-19",
+      "source": "KBO 공식 기록실 (이승현 · 삼성 좌완)"
+    },
+    {
+      "id": "v15-0214",
+      "name": "이호범",
+      "team": "SS",
+      "field": "birth_date",
+      "before": null,
+      "after": "2007-05-28",
+      "source": "삼성 라이온즈 공식 프로필 · 2026 신인 (이호범)"
+    },
+    {
+      "id": "v15-0215",
+      "name": "이호성",
+      "team": "SS",
+      "field": "birth_date",
+      "before": null,
+      "after": "2004-08-14",
+      "source": "KBO 공식 기록실 #53455 (이호성)"
+    },
+    {
+      "id": "v15-0218",
+      "name": "정민성",
+      "team": "SS",
+      "field": "birth_date",
+      "before": null,
+      "after": "2005-05-09",
+      "source": "KBO 공식 기록실 #54467 (정민성)"
+    },
+    {
+      "id": "v15-0222",
+      "name": "최하늘",
+      "team": "SS",
+      "field": "birth_date",
+      "before": null,
+      "after": "1999-03-26",
+      "source": "KBO 공식 기록실 #68501 (최하늘)"
+    },
+    {
+      "id": "v15-0229",
+      "name": "박진우",
+      "team": "SS",
+      "field": "birth_date",
+      "before": null,
+      "after": "2003-10-14",
+      "source": "KBO 공식 기록실 #53411 (박진우 · C)"
+    },
+    {
+      "id": "v15-0247",
+      "name": "김태훈(타)",
+      "team": "SS",
+      "field": "birth_date",
+      "before": null,
+      "after": "1996-03-31",
+      "source": "KBO 공식 기록실 (김태훈 · 삼성 외야수)"
+    },
+    {
+      "id": "v15-0257",
+      "name": "김녹원",
+      "team": "NC",
+      "field": "birth_date",
+      "before": null,
+      "after": "2003-05-17",
+      "source": "KBO 공식 기록실 #52995 (김녹원)"
+    },
+    {
+      "id": "v15-0271",
+      "name": "이세민",
+      "team": "NC",
+      "field": "birth_date",
+      "before": null,
+      "after": "2005-08-08",
+      "source": "NC 다이노스 공식 프로필 (이세민)"
+    },
+    {
+      "id": "v15-0276",
+      "name": "정구범",
+      "team": "NC",
+      "field": "birth_date",
+      "before": null,
+      "after": "2000-06-16",
+      "source": "KBO 공식 기록실 #50995 (정구범)"
+    },
+    {
+      "id": "2026-NC-47",
+      "name": "조민석",
+      "team": "NC",
+      "field": "birth_date",
+      "before": null,
+      "after": "1998-12-21",
+      "source": "KBO 공식 기록실 #52903 (조민석)"
+    },
+    {
+      "id": "v15-0288",
+      "name": "신민우",
+      "team": "NC",
+      "field": "birth_date",
+      "before": null,
+      "after": "2006-08-13",
+      "source": "NC 다이노스 공식 프로필 (신민우)"
+    },
+    {
+      "id": "v15-0307",
+      "name": "고승완",
+      "team": "NC",
+      "field": "birth_date",
+      "before": null,
+      "after": "2001-03-15",
+      "source": "KBO 공식 기록실 #54908 (고승완)"
+    },
+    {
+      "id": "v15-0316",
+      "name": "강건",
+      "team": "KT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2004-07-12",
+      "source": "KBO 공식 기록실 #53006 (강건)"
+    },
+    {
+      "id": "v15-0318",
+      "name": "고준혁",
+      "team": "KT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2005-05-29",
+      "source": "KT 위즈 공식 프로필 · 2026 신인 (고준혁)"
+    },
+    {
+      "id": "v15-0319",
+      "name": "권성준",
+      "team": "KT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2003-03-09",
+      "source": "KT 위즈 공식 프로필 (권성준)"
+    },
+    {
+      "id": "v15-0320",
+      "name": "김동현",
+      "team": "KT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2006-01-21",
+      "source": "KBO 공식 기록실 #55040 (김동현 · KT P)"
+    },
+    {
+      "id": "v15-0324",
+      "name": "박건우",
+      "team": "KT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2006-11-28",
+      "source": "KBO 공식 기록실 #55046 (박건우 · KT P)"
+    },
+    {
+      "id": "v15-0335",
+      "name": "원상현",
+      "team": "KT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2004-10-16",
+      "source": "KBO 공식 기록실 #54063 (원상현)"
+    },
+    {
+      "id": "2026-KT-64",
+      "name": "이원재",
+      "team": "KT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2003-05-07",
+      "source": "KBO 공식 기록실 (이원재)"
+    },
+    {
+      "id": "v15-0339",
+      "name": "이채호",
+      "team": "KT",
+      "field": "birth_date",
+      "before": null,
+      "after": "1998-11-23",
+      "source": "KBO 공식 기록실 #68896 (이채호)"
+    },
+    {
+      "id": "v15-0342",
+      "name": "조이현",
+      "team": "KT",
+      "field": "birth_date",
+      "before": null,
+      "after": "1995-06-27",
+      "source": "KBO 공식 기록실 #64768 (조이현)"
+    },
+    {
+      "id": "2026-KT-16",
+      "name": "최동환",
+      "team": "KT",
+      "field": "birth_date",
+      "before": null,
+      "after": "1989-09-19",
+      "source": "KBO 공식 기록실 #79140 (최동환)"
+    },
+    {
+      "id": "2026-KT-97",
+      "name": "김건휘",
+      "team": "KT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2007-09-11",
+      "source": "KT 위즈 공식 프로필 · 2026 신인 (김건휘)"
+    },
+    {
+      "id": "v15-0362",
+      "name": "임상우",
+      "team": "KT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2003-01-03",
+      "source": "KT 위즈 공식 프로필 · 2026 신인 (임상우)"
+    },
+    {
+      "id": "v15-0375",
+      "name": "최성민",
+      "team": "KT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2002-07-05",
+      "source": "KBO 공식 기록실 #51007 (최성민)"
+    },
+    {
+      "id": "v15-0379",
+      "name": "김상수",
+      "team": "LT",
+      "field": "birth_date",
+      "before": null,
+      "after": "1988-01-02",
+      "source": "KBO 공식 기록실 #76430 (김상수 · P)"
+    },
+    {
+      "id": "2026-LT-35",
+      "name": "김영준",
+      "team": "LT",
+      "field": "birth_date",
+      "before": null,
+      "after": "1999-01-12",
+      "source": "KBO 공식 기록실 (김영준 · P)"
+    },
+    {
+      "id": "v15-0386",
+      "name": "박시영",
+      "team": "LT",
+      "field": "birth_date",
+      "before": null,
+      "after": "1989-03-10",
+      "source": "KBO 공식 기록실 #60559 (박시영)"
+    },
+    {
+      "id": "v15-0389",
+      "name": "박진",
+      "team": "LT",
+      "field": "birth_date",
+      "before": null,
+      "after": "1999-04-02",
+      "source": "KBO 공식 기록실 #69594 (박진)"
+    },
+    {
+      "id": "v15-0398",
+      "name": "정성종",
+      "team": "LT",
+      "field": "birth_date",
+      "before": null,
+      "after": "1995-11-16",
+      "source": "KBO 공식 기록실 #68556 (정성종)"
+    },
+    {
+      "id": "v15-0406",
+      "name": "한현희",
+      "team": "LT",
+      "field": "birth_date",
+      "before": null,
+      "after": "1993-06-25",
+      "source": "KBO 공식 기록실 #62363 (한현희)"
+    },
+    {
+      "id": "2026-LT-32",
+      "name": "정문혁",
+      "team": "LT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2007-02-24",
+      "source": "롯데 자이언츠 공식 프로필 · 2026 신인 (정문혁)"
+    },
+    {
+      "id": "v15-0422",
+      "name": "이태경",
+      "team": "LT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2002-11-24",
+      "source": "KBO 공식 기록실 #55511 (이태경)"
+    },
+    {
+      "id": "v15-0442",
+      "name": "김대유",
+      "team": "HT",
+      "field": "birth_date",
+      "before": null,
+      "after": "1991-05-08",
+      "source": "KBO 공식 기록실 #60337 (김대유)"
+    },
+    {
+      "id": "v15-0443",
+      "name": "김도현",
+      "team": "HT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2000-09-13",
+      "source": "KBO 공식 기록실 #69745 (김도현)"
+    },
+    {
+      "id": "2026-HT-21",
+      "name": "김사윤",
+      "team": "HT",
+      "field": "birth_date",
+      "before": null,
+      "after": "1994-06-08",
+      "source": "KBO 공식 기록실 #63894 (김사윤)"
+    },
+    {
+      "id": "v15-0447",
+      "name": "김정엽",
+      "team": "HT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2006-04-18",
+      "source": "KBO 공식 기록실 #55646 (김정엽)"
+    },
+    {
+      "id": "v15-0455",
+      "name": "유지성",
+      "team": "HT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2000-11-15",
+      "source": "KBO 공식 기록실 #50604 (유지성)"
+    },
+    {
+      "id": "v15-0456",
+      "name": "윤영철",
+      "team": "HT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2004-04-20",
+      "source": "KBO 공식 기록실 #53613 (윤영철)"
+    },
+    {
+      "id": "2026-HT-19",
+      "name": "윤중현",
+      "team": "HT",
+      "field": "birth_date",
+      "before": null,
+      "after": "1995-04-25",
+      "source": "KBO 공식 기록실 #68619 (윤중현)"
+    },
+    {
+      "id": "2026-HT-66",
+      "name": "이도현",
+      "team": "HT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2005-01-07",
+      "source": "KBO 공식 기록실 #53615 (이도현)"
+    },
+    {
+      "id": "2026-HT-58",
+      "name": "이성원",
+      "team": "HT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2006-05-18",
+      "source": "KBO 공식 기록실 #55632 (이성원)"
+    },
+    {
+      "id": "v15-0461",
+      "name": "이준영",
+      "team": "HT",
+      "field": "birth_date",
+      "before": null,
+      "after": "1992-08-10",
+      "source": "KBO 공식 기록실 #65665 (이준영)"
+    },
+    {
+      "id": "v15-0464",
+      "name": "이호민",
+      "team": "HT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2006-08-26",
+      "source": "KBO 공식 기록실 #55663 (이호민 · KIA P)"
+    },
+    {
+      "id": "v15-0467",
+      "name": "정찬화",
+      "team": "HT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2006-06-10",
+      "source": "KIA 타이거즈 공식 프로필 · 2026 신인 (정찬화)"
+    },
+    {
+      "id": "2026-HT-23",
+      "name": "최정용",
+      "team": "HT",
+      "field": "birth_date",
+      "before": null,
+      "after": "1996-10-24",
+      "source": "KBO 공식 기록실 #65464 (최정용)"
+    },
+    {
+      "id": "v15-0493",
+      "name": "김석환",
+      "team": "HT",
+      "field": "birth_date",
+      "before": null,
+      "after": "1999-02-28",
+      "source": "KBO 공식 기록실 #67610 (김석환)"
+    },
+    {
+      "id": "v15-0499",
+      "name": "정해원",
+      "team": "HT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2004-05-21",
+      "source": "KBO 공식 기록실 #53659 (정해원)"
+    },
+    {
+      "id": "v15-0504",
+      "name": "김민규",
+      "team": "OB",
+      "field": "birth_date",
+      "before": null,
+      "after": "1999-05-07",
+      "source": "KBO 공식 기록실 #68200 (김민규 · 두산 P)"
+    },
+    {
+      "id": "v15-0505",
+      "name": "김유성",
+      "team": "OB",
+      "field": "birth_date",
+      "before": null,
+      "after": "2002-01-01",
+      "source": "KBO 공식 기록실 #53262 (김유성)"
+    },
+    {
+      "id": "v15-0507",
+      "name": "김지윤",
+      "team": "OB",
+      "field": "birth_date",
+      "before": null,
+      "after": "2004-01-13",
+      "source": "두산 베어스 공식 프로필 (김지윤)"
+    },
+    {
+      "id": "2026-OB-56",
+      "name": "김호준",
+      "team": "OB",
+      "field": "birth_date",
+      "before": null,
+      "after": "1998-05-17",
+      "source": "KBO 공식 기록실 #68269 (김호준)"
+    },
+    {
+      "id": "2026-OB-43",
+      "name": "이주엽",
+      "team": "OB",
+      "field": "birth_date",
+      "before": null,
+      "after": "2001-03-26",
+      "source": "KBO 공식 기록실 #50262 (이주엽)"
+    },
+    {
+      "id": "v15-0522",
+      "name": "이주호",
+      "team": "OB",
+      "field": "birth_date",
+      "before": null,
+      "after": "2006-11-21",
+      "source": "두산 베어스 공식 프로필 · 2026 신인 (이주호)"
+    },
+    {
+      "id": "2026-OB-101",
+      "name": "최우인",
+      "team": "OB",
+      "field": "birth_date",
+      "before": null,
+      "after": "2002-08-09",
+      "source": "두산 베어스 공식 프로필 (최우인)"
+    },
+    {
+      "id": "v15-0528",
+      "name": "최종인",
+      "team": "OB",
+      "field": "birth_date",
+      "before": null,
+      "after": "2001-05-01",
+      "source": "KBO 공식 기록실 #50206 (최종인)"
+    },
+    {
+      "id": "2026-OB-26",
+      "name": "박민준",
+      "team": "OB",
+      "field": "birth_date",
+      "before": null,
+      "after": "2002-10-21",
+      "source": "KBO 공식 기록실 #53204 (박민준)"
+    },
+    {
+      "id": "2026-OB-11",
+      "name": "김동준",
+      "team": "OB",
+      "field": "birth_date",
+      "before": null,
+      "after": "2002-09-04",
+      "source": "KBO 공식 기록실 #52267 (김동준)"
+    },
+    {
+      "id": "v15-0541",
+      "name": "김민혁",
+      "team": "OB",
+      "field": "birth_date",
+      "before": null,
+      "after": "1996-05-03",
+      "source": "KBO 공식 기록실 #65269 (김민혁 · 두산 IF)"
+    },
+    {
+      "id": "2026-OB-117",
+      "name": "심건보",
+      "team": "OB",
+      "field": "birth_date",
+      "before": null,
+      "after": "2003-11-16",
+      "source": "두산 베어스 공식 프로필 · 2026 신인 (심건보)"
+    },
+    {
+      "id": "2026-OB-66",
+      "name": "김주오",
+      "team": "OB",
+      "field": "birth_date",
+      "before": null,
+      "after": "2007-09-14",
+      "source": "두산 베어스 공식 프로필 · 2026 신인 (김주오)"
+    },
+    {
+      "id": "v15-0556",
+      "name": "신우열",
+      "team": "OB",
+      "field": "birth_date",
+      "before": null,
+      "after": "2001-12-30",
+      "source": "두산 베어스 공식 프로필 · 2026 신인 (신우열)"
+    },
+    {
+      "id": "v15-0571",
+      "name": "박주성",
+      "team": "WO",
+      "field": "birth_date",
+      "before": null,
+      "after": "2000-11-09",
+      "source": "KBO 공식 기록실 #69328 (박주성)"
+    },
+    {
+      "id": "2026-WO-23",
+      "name": "김병휘",
+      "team": "WO",
+      "field": "birth_date",
+      "before": null,
+      "after": "2001-02-16",
+      "source": "KBO 공식 기록실 #50304 (김병휘)"
+    },
+    {
+      "id": "v15-0615",
+      "name": "이용규",
+      "team": "WO",
+      "field": "birth_date",
+      "before": null,
+      "after": "1985-08-26",
+      "source": "KBO 공식 기록실 #74163 (이용규)"
+    },
+    {
+      "id": "2026-WO-2",
+      "name": "이주형",
+      "team": "WO",
+      "field": "birth_date",
+      "before": null,
+      "after": "2001-04-02",
+      "source": "KBO 공식 기록실 (이주형)"
+    },
+    {
+      "id": "D2027-001",
+      "name": "하현승",
+      "team": "WO",
+      "field": "birth_date",
+      "before": null,
+      "after": "2008-03-09",
+      "source": "2027 드래프트 공식 프로필 (하현승)"
+    },
+    {
+      "id": "D2027-003",
+      "name": "이호민",
+      "team": "HT",
+      "field": "birth_date",
+      "before": null,
+      "after": "2008-01-21",
+      "source": "2027 드래프트 공식 프로필 (이호민 · 경남고)"
+    },
+    {
+      "id": "D2027-015",
+      "name": "최지만",
+      "team": "KT",
+      "field": "birth_date",
+      "before": null,
+      "after": "1991-05-19",
+      "source": "MLB/KBO 공식 프로필 (최지만 1991-05-19)"
+    },
+    {
+      "id": "D2027-015",
+      "name": "최지만",
+      "team": "KT",
+      "field": "ratings_and_bio",
+      "before": {
+        "overall": 49,
+        "potential": 78
+      },
+      "after": {
+        "overall": 73,
+        "potential": 75,
+        "bats": "L",
+        "throws": "R",
+        "height_cm": 185,
+        "weight_kg": 118
+      },
+      "source": "MLB 통산 525G 67HR OPS .764 + 2026 울산 웨일즈·2027 KT 2R 15순위 공식 프로필"
+    }
+  ]
+}

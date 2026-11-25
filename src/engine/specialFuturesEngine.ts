@@ -3,7 +3,9 @@ import {
   buildInitialUlsanWhalesState,
   REAL_2026_SANGMU_PHOENIX_ROSTER,
   SangmuRealPlayerSeed,
+  VERIFIED_SANGMU_BIRTHDATES_BY_KEY,
 } from '../data/specialFuturesRosters';
+import { calculateKoreanFullAge, getCareerCurrentIsoDate, syncEntityAgeInPlace } from './ageEngine';
 import {
   CareerSave,
   DraftCandidate,
@@ -67,8 +69,18 @@ export function getCurrentInGameDate(career: CareerSave): string {
   return addDaysIso(`${career.season}-03-28`, Math.round(career.gamesPlayed * 1.25));
 }
 
-function buildSangmuPlayerFromSeed(seed: SangmuRealPlayerSeed, idx: number): Player {
+function buildSangmuPlayerFromSeed(
+  seed: SangmuRealPlayerSeed,
+  idx: number,
+  referenceIsoDate: string = '2027-01-01'
+): Player {
   const id = seed.sourcePlayerId ?? `sangmu-real-${seed.originalTeamId}-${idx + 1}`;
+  const verifiedBirthDate =
+    seed.birthDate ?? VERIFIED_SANGMU_BIRTHDATES_BY_KEY[`${seed.name}|${seed.originalTeamId}`] ?? null;
+  const birthYear = verifiedBirthDate ? Number(verifiedBirthDate.slice(0, 4)) : undefined;
+  const computedAge =
+    (verifiedBirthDate ? calculateKoreanFullAge(verifiedBirthDate, referenceIsoDate) : null) ??
+    seed.age;
   const player: Player = {
     id,
     originType: 'real',
@@ -78,8 +90,9 @@ function buildSangmuPlayerFromSeed(seed: SangmuRealPlayerSeed, idx: number): Pla
     role: seed.role,
     position: seed.position,
     pitchRole: seed.pitchRole,
-    age: seed.age,
-    birthDate: null,
+    age: computedAge,
+    birthYear,
+    birthDate: verifiedBirthDate,
     heightCm: null,
     weightKg: null,
     bats: null,
@@ -202,7 +215,7 @@ export function ensureSpecialFuturesRosters(career: CareerSave): void {
         if (wasFutures) affectedFuturesTeams.add(seed.originalTeamId);
         if (wasDev) affectedDevTeams.add(seed.originalTeamId);
       } else {
-        const created = buildSangmuPlayerFromSeed(seed, idx);
+        const created = buildSangmuPlayerFromSeed(seed, idx, getCareerCurrentIsoDate(career));
         career.players[created.id] = created;
       }
     });
@@ -833,13 +846,13 @@ export function resetUlsanWhalesForNewSeason(career: CareerSave, nextSeason: num
   ensureSpecialFuturesRosters(career);
   const uw = career.ulsanWhales!;
   uw.seasonTransfersUsed = 0;
+  const nextIso = `${nextSeason}-01-01`;
   for (const p of uw.roster) {
     if (!p.transferredToTeamId) {
-      p.age += 1;
+      syncEntityAgeInPlace(p, nextIso);
       p.futuresStats = { G: 0, AB: 0, H: 0, HR: 0, RBI: 0, outs: 0, ER: 0, SO: 0, W: 0, L: 0 };
     }
   }
   // Remove already transferred players from active roster list after recording in transferHistory
   uw.roster = uw.roster.filter((p) => !p.transferredToTeamId);
-  void nextSeason;
 }

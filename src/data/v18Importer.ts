@@ -13,7 +13,17 @@ import {
   V18EvaluationMeta,
   V18SeasonStatRecord,
 } from '../types/kbo';
+import {
+  calculateKoreanFullAge,
+  parseIsoDate,
+  syncAllAgesToDateInPlace,
+} from '../engine/ageEngine';
 import { isMilitaryResolved, isMilitaryServing } from '../engine/militaryEngine';
+import { buildVerifiedOverseasBaseline } from './amateurAndOverseasData';
+import {
+  VERIFIED_SANGMU_BIRTHDATES_BY_KEY,
+  VERIFIED_ULSAN_BIRTHDATES_BY_ID,
+} from './specialFuturesRosters';
 import { emptyBatterStats, emptyPitcherStats } from '../engine/stats';
 import { buildInitialCoachesForMode } from './coachesData';
 import {
@@ -192,26 +202,45 @@ function parseIpToOuts(ipStr?: string): number {
   return Math.round(num * 3);
 }
 
-function computeAgeFor2027(raw: RawV18Player): { age: number; birthYear: number } {
-  if (raw.birth_date && /^\d{4}/.test(raw.birth_date)) {
+function inferDrafted2027UnverifiedBirthYear(raw: RawV18Player): number {
+  const school = raw.school ?? '';
+  // 4년제 대학 졸업 예정자 (2004년생 기준)
+  if (/(연세대|고려대|성균관대|한양대|동국대|경희대|중앙대|건국대|단국대|인하대|홍익대|원광대|동의대|영남대)/.test(school)) {
+    return 2004;
+  }
+  // 2년제 전문대 졸업 예정자 (2006년생 기준)
+  if (/(과학기술대|동의과학대|동원과학기술대|강릉영동대|김포대|여주대|동강대|수성대)/.test(school)) {
+    return 2006;
+  }
+  // 고교 졸업 예정자 (2008년생 기준)
+  return 2008;
+}
+
+function computeAgeFor2027(
+  raw: RawV18Player,
+  referenceIsoDate: string = '2027-01-01'
+): { age: number; birthYear: number; birthDate: string | null } {
+  // 1) 공식 확인된 생년월일(YYYY-MM-DD)이 있으면 게임 시작 날짜(2027-01-01) 기준 정확한 만 나이 산출
+  if (raw.birth_date && parseIsoDate(raw.birth_date)) {
     const by = Number(raw.birth_date.slice(0, 4));
-    if (Number.isFinite(by) && by >= 1975 && by <= 2012) {
-      return { age: Math.max(18, Math.min(45, 2027 - by)), birthYear: by };
+    const exactAge = calculateKoreanFullAge(raw.birth_date, referenceIsoDate);
+    if (exactAge !== null) {
+      return { age: exactAge, birthYear: by, birthDate: raw.birth_date };
     }
   }
+  // 2) 미확인 2027 실제 신인: 생년월일은 임의 생성하지 않고 null('미확인') 유지, 학제 기반 출생연도만 참고
   if (raw.status === 'drafted_2027') {
-    // 2027 신인 지명자는 2027시즌 기준 만 19세(2008년생) 기본
-    return { age: 19, birthYear: 2008 };
+    const by = inferDrafted2027UnverifiedBirthYear(raw);
+    return { age: Math.max(18, 2027 - by), birthYear: by, birthDate: null };
   }
+  // 3) 기타 미확인 케이스도 임의 생년월일 생성 금지 (null 유지)
   const evalAge = raw.evaluation_v18?.age_used;
   if (typeof evalAge === 'number' && Number.isFinite(evalAge) && evalAge >= 18 && evalAge <= 46) {
-    // v18 age_used는 2026 기준 나이이므로 2027시즌 +1 반영 (최대 45)
     const age2027 = Math.min(45, Math.max(19, Math.round(evalAge) + 1));
-    return { age: age2027, birthYear: 2027 - age2027 };
+    return { age: age2027, birthYear: 2027 - age2027, birthDate: null };
   }
-  // 추정치 (레벨·능력치 기반)
   const est = raw.level_2026 === 1 ? 27 : 23;
-  return { age: est, birthYear: 2027 - est };
+  return { age: est, birthYear: 2027 - est, birthDate: null };
 }
 
 function computeRecent3YrScore(
@@ -691,6 +720,86 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
     }
     career.databaseVersion = 'v21_verified_career_histories';
   }
+
+  // v22: 전수 검증된 실제 선수 생년월일(최지만·박종훈 및 KBO 10개 구단/2군/상무/FA/해외파) + 최지만 능력치 보정 + 날짜 기준 만 나이 동기화
+  if (!career.isPreservedMaster) {
+    const needsV22Patch = career.databaseVersion !== 'v22_verified_birthdates';
+
+    if (needsV22Patch) {
+      for (const p of Object.values(career.players)) {
+        const src = p.v18SourceId ? V18_BY_SOURCE_ID.get(p.v18SourceId) : undefined;
+        if (src) {
+          if (src.birth_date && parseIsoDate(src.birth_date)) {
+            p.birthDate = src.birth_date;
+            p.birthYear = Number(src.birth_date.slice(0, 4));
+          } else if (src.status === 'drafted_2027' && !p.birthDate) {
+            p.birthDate = null;
+            p.birthYear = inferDrafted2027UnverifiedBirthYear(src);
+          }
+
+          // 최지만(D2027-015): 1991-05-19 생년월일 + 전 MLB 베테랑 실전 능력치/체격/포지션 보정
+          // (다른 모든 실존 선수의 OVR/POT/계약/성적은 절대 변경하지 않음)
+          if (src.id === 'D2027-015' && p.ability <= 58 && p.potential >= 75) {
+            p.ability = src.game_ratings.overall;
+            p.potential = src.game_ratings.potential;
+            p.position = '1B';
+            p.bats = 'L';
+            p.throws = 'R';
+            p.heightCm = 185;
+            p.weightKg = 118;
+            p.v18Ratings = {
+              overall: src.game_ratings.overall,
+              potential: src.game_ratings.potential,
+              batting: src.game_ratings.batting ?? null,
+              pitching: null,
+            };
+          }
+        } else if (p.originType === 'real' || !p.originType) {
+          // 상무 단독 시딩 선수 등 v18SourceId가 없는 실존 선수 생년월일 보정
+          const sangmuDob = VERIFIED_SANGMU_BIRTHDATES_BY_KEY[`${p.name}|${p.teamId}`];
+          if (sangmuDob && !parseIsoDate(p.birthDate)) {
+            p.birthDate = sangmuDob;
+            p.birthYear = Number(sangmuDob.slice(0, 4));
+          }
+        }
+      }
+
+      // 미영입 FA 풀 내 실존 선수 생년월일 동기화
+      for (const fa of career.unclaimedFreeAgents ?? []) {
+        const src = fa.player.v18SourceId ? V18_BY_SOURCE_ID.get(fa.player.v18SourceId) : undefined;
+        if (src?.birth_date && parseIsoDate(src.birth_date)) {
+          fa.player.birthDate = src.birth_date;
+          fa.player.birthYear = Number(src.birth_date.slice(0, 4));
+        }
+      }
+
+      // 해외 진출 선수 8명 공식 확인 생년월일 동기화
+      const verifiedOverseasById = new Map(
+        buildVerifiedOverseasBaseline(career.season).map((ov) => [ov.permanentId, ov])
+      );
+      for (const ov of career.amateurAndOverseas?.overseasPlayers ?? []) {
+        const ref = verifiedOverseasById.get(ov.permanentId);
+        if (ref?.birthDate && !parseIsoDate(ov.birthDate)) {
+          ov.birthDate = ref.birthDate;
+          ov.birthYear = Number(ref.birthDate.slice(0, 4));
+        }
+      }
+
+      // 울산 웨일즈 실존 선수 생년월일 동기화
+      for (const uw of career.ulsanWhales?.roster ?? []) {
+        const dob = VERIFIED_ULSAN_BIRTHDATES_BY_ID[uw.id];
+        if (dob && !parseIsoDate(uw.birthDate)) {
+          uw.birthDate = dob;
+          uw.birthYear = Number(dob.slice(0, 4));
+        }
+      }
+
+      career.databaseVersion = 'v22_verified_birthdates';
+    }
+
+    // 세이브 로드 시마다 현재 게임 날짜·생년월일 기준으로 전체 만 나이 일괄 동기화
+    syncAllAgesToDateInPlace(career);
+  }
 }
 
 function buildHistoricalSeasonsFromRaw(raw: RawV18Player): V18SeasonStatRecord[] {
@@ -825,7 +934,7 @@ export function buildAll10TeamsFromV18Dataset(): {
     const potential = Math.max(1, Math.min(99, Math.max(rawOvr, rawPot)));
     const ability = Math.max(1, Math.min(potential, rawOvr));
 
-    const { age, birthYear } = computeAgeFor2027(raw);
+    const { age, birthYear, birthDate } = computeAgeFor2027(raw, '2027-01-01');
     const category: Player['category'] =
       raw.foreign_slot === 'asia'
         ? '아시아쿼터'
@@ -998,7 +1107,9 @@ export function buildAll10TeamsFromV18Dataset(): {
           : raw.fa_approved_2027
             ? 'FA'
             : isDrafted2027
-              ? '2군'
+              ? ability >= 70
+                ? '1군'
+                : '2군'
               : raw.level_2026 === 1
                 ? '1군'
                 : '2군';
@@ -1022,7 +1133,7 @@ export function buildAll10TeamsFromV18Dataset(): {
       position,
       age,
       birthYear,
-      birthDate: raw.birth_date ?? null,
+      birthDate,
       heightCm: raw.height_cm ?? null,
       weightKg: raw.weight_kg ?? null,
       bats: raw.bats === 'L' || raw.bats === 'R' || raw.bats === 'S' ? raw.bats : null,

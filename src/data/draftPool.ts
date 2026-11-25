@@ -1,3 +1,4 @@
+import { calculateKoreanFullAge, generateVirtualBirthDate } from '../engine/ageEngine';
 import { SeededRng } from '../engine/rng';
 import { DraftCandidate, DraftState, Position, TeamId } from '../types/kbo';
 import { DRAFT_ORDER_2026, INITIAL_VIRTUAL_DRAFT_ORDER_2028 } from './kboTeams';
@@ -230,7 +231,11 @@ const POSITIONS_POOL: { role: '투수' | '타자'; pos: Position }[] = [
   { role: '타자', pos: 'RF' },
 ];
 
-export function generate150DraftCandidates(seed: number, includeConfirmedHanwha = false): DraftCandidate[] {
+export function generate150DraftCandidates(
+  seed: number,
+  includeConfirmedHanwha = false,
+  draftSeason = 2028
+): DraftCandidate[] {
   const rng = new SeededRng(seed);
   const confirmedById = new Map<number, ConfirmedHanwhaRookieRaw>();
   if (includeConfirmedHanwha) {
@@ -402,10 +407,17 @@ export function generate150DraftCandidates(seed: number, includeConfirmedHanwha 
         ? hiddenTraits[rng.int(0, hiddenTraits.length - 1)]
         : undefined;
 
+    // 가상 신인 전용 생년월일 생성 로직 (실제 신인 DB 로더 v18Importer와 완전 분리)
+    const birthYear = draftSeason - age;
+    const birthDate = generateVirtualBirthDate(rng, birthYear);
+    const resolvedAge = calculateKoreanFullAge(birthDate, `${draftSeason}-01-01`) ?? age;
+
     candidates.push({
       id,
       name: `${baseName}`,
-      age,
+      age: resolvedAge,
+      birthYear,
+      birthDate,
       originType,
       school,
       role: slot.role,
@@ -522,7 +534,7 @@ export function createFreshDraftState(
       : season >= 2028
         ? [...INITIAL_VIRTUAL_DRAFT_ORDER_2028]
         : [...DRAFT_ORDER_2026];
-  const candidates = generate150DraftCandidates(rng.int(1000, 99999), false);
+  const candidates = generate150DraftCandidates(rng.int(1000, 99999), false, season);
 
   return {
     season,

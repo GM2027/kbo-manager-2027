@@ -1,4 +1,5 @@
 import { buildCoachSubRatings } from '../data/coachesData';
+import { calculateKoreanFullAge, parseIsoDate } from './ageEngine';
 import { KBO_TEAMS, TEAM_IDS } from '../data/kboTeams';
 import {
   BASELINE_2026_ROOKIE_BONUS_TOP10,
@@ -1479,7 +1480,13 @@ export function processOffseasonRetiredCareersInPlace(career: CareerSave, rng: S
 
   const today = `${career.season}-01-18`;
   for (const rec of tracker) {
-    rec.age += 1;
+    const srcPlayer = career.players[rec.playerId];
+    if (srcPlayer && parseIsoDate(srcPlayer.birthDate)) {
+      const exactAge = calculateKoreanFullAge(srcPlayer.birthDate, today);
+      if (exactAge !== null) rec.age = exactAge;
+    } else if (!rec.lastUpdatedSeason || rec.lastUpdatedSeason < career.season) {
+      rec.age += 1;
+    }
     rec.lastUpdatedSeason = career.season;
 
     // 1. 코치 연수 수료 처리 (#15)

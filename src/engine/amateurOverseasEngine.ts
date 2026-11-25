@@ -25,6 +25,12 @@ import {
   TeamId,
 } from '../types/kbo';
 import {
+  calculateKoreanFullAge,
+  generateVirtualBirthDate,
+  getCareerCurrentIsoDate,
+  syncEntityAgeInPlace,
+} from './ageEngine';
+import {
   allocatePermanentPlayerId,
   ensureGlobalPlayerRegistryInPlace,
   isDuplicatePlayerIdentity,
@@ -86,8 +92,10 @@ function generateVirtualAmateurProspect(
   const schools = schoolType === '고교' ? KOREAN_HIGH_SCHOOLS : KOREAN_UNIVERSITIES;
   let name = `${rng.pick(VIRTUAL_LAST_NAMES)}${rng.pick(VIRTUAL_FIRST_NAMES)}`;
   let schoolName = rng.pick(schools);
-  const age = schoolType === '고교' ? 16 + grade : 19 + grade;
-  const birthYear = season - age;
+  const targetAge = schoolType === '고교' ? 16 + grade : 19 + grade;
+  const birthYear = season - targetAge;
+  const birthDate = generateVirtualBirthDate(rng, birthYear);
+  const age = calculateKoreanFullAge(birthDate, getCareerCurrentIsoDate(career)) ?? targetAge;
 
   // Avoid exact same (name, birthYear, school) duplicate while allowing legitimate namesakes
   let guard = 0;
@@ -174,6 +182,7 @@ function generateVirtualAmateurProspect(
     permanentId,
     name,
     birthYear,
+    birthDate,
     age,
     role,
     position,
@@ -1259,7 +1268,7 @@ export function advanceAmateurAndOverseasSeasonInPlace(
       continue; // Already entered KBO, overseas pro, or retired
     }
 
-    p.age += 1;
+    syncEntityAgeInPlace(p, isoDate);
     p.seasonG = 0;
     p.seasonStatSummary = `${newSeason} 시즌 대기`;
     p.battingLine = undefined;
@@ -1321,7 +1330,7 @@ export function advanceAmateurAndOverseasSeasonInPlace(
     if (ov.status === '은퇴' || ov.status === 'KBO복귀완료') continue;
 
     archiveOverseasSeasonByLevelInPlace(ov, newSeason);
-    ov.age += 1;
+    syncEntityAgeInPlace(ov, isoDate);
 
     // Growth / aging identical philosophy to domestic players
     if (ov.age <= 25 && ov.ability < ov.potential) {

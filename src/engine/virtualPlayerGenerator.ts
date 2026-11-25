@@ -1,5 +1,7 @@
 import { Player, Position, TeamId } from '../types/kbo';
+import { calculateKoreanFullAge, generateVirtualBirthDate } from './ageEngine';
 import { buildBattingProfile, buildHiddenTrait, buildPitchRepertoire, buildPlayerAgent } from './deepFranchise';
+import { SeededRng } from './rng';
 import { emptyBatterStats, emptyPitcherStats } from './stats';
 
 /**
@@ -29,7 +31,13 @@ export function createVirtualFuturesDepthPlayer(params: {
   const namePool = isDev ? VIRTUAL_DEV_NAMES : VIRTUAL_FUTURES_NAMES;
   const name = namePool[seq % namePool.length];
   const id = `${isDev ? 'dev-depth' : 'futures-depth'}-${teamId}-${seq}`;
-  const age = isDev ? 20 + (seq % 2) : 21 + (seq % 3);
+  const targetAge = isDev ? 20 + (seq % 2) : 21 + (seq % 3);
+  const birthYear = season - targetAge;
+  const virtualRng = new SeededRng(
+    season * 1009 + seq * 97 + teamId.charCodeAt(0) * 31 + (isDev ? 7 : 3)
+  );
+  const birthDate = generateVirtualBirthDate(virtualRng, birthYear);
+  const age = calculateKoreanFullAge(birthDate, `${season}-01-01`) ?? targetAge;
   const pos: Position = isPitcher
     ? 'RP'
     : (isDev
@@ -48,8 +56,8 @@ export function createVirtualFuturesDepthPlayer(params: {
     position: pos,
     pitchRole: isPitcher ? '중간' : undefined,
     age,
-    birthYear: season - age,
-    birthDate: null,
+    birthYear,
+    birthDate,
     heightCm: null,
     weightKg: null,
     bats: null,
