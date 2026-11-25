@@ -15,7 +15,13 @@ import {
 import { isMilitaryResolved, isMilitaryServing } from '../engine/militaryEngine';
 import { emptyBatterStats, emptyPitcherStats } from '../engine/stats';
 import { buildInitialCoachesForMode } from './coachesData';
-import { KBO_TEAMS, normalizeChampionHistory, TEAM_IDS } from './kboTeams';
+import {
+  DRAFT_ORDER_2026,
+  INITIAL_VIRTUAL_DRAFT_ORDER_2028,
+  KBO_TEAMS,
+  normalizeChampionHistory,
+  TEAM_IDS,
+} from './kboTeams';
 import { REAL_KBO_HITTER_POSITIONS, resolveRealForeignNationality } from './playerMetadata';
 import {
   BASELINE_2027_ROOKIE_BONUS_TOP10,
@@ -510,6 +516,23 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
   // 세이브 불러오기·재접속 시에도 한국시리즈 우승 기록 연도 내림차순 정렬 및 중복 제거 영구 보장
   if (career.championHistory && career.championHistory.length > 0) {
     career.championHistory = normalizeChampionHistory(career.championHistory);
+  }
+
+  // 아직 진행되지 않은 2028 최초 가상 신인 드래프트가 구버전(2025 역순)으로 저장돼 있었다면 2026 최종 순위 역순으로 안전 보정
+  // (이미 완료되었거나 지명이 진행된 드래프트 결과는 절대 변경하지 않음)
+  if (
+    !career.isPreservedMaster &&
+    career.season === 2027 &&
+    career.draftState &&
+    career.draftState.season === 2028 &&
+    !career.draftState.completed &&
+    (career.draftState.picks?.length ?? 0) === 0 &&
+    Array.isArray(career.draftState.draftOrder) &&
+    career.draftState.draftOrder.join(',') === DRAFT_ORDER_2026.join(',')
+  ) {
+    career.draftState.draftOrder = [...INITIAL_VIRTUAL_DRAFT_ORDER_2028];
+    // 기존 tradedDraftPicks를 유지한 채 새 기본 순번으로 지명권 출처를 재동기화
+    career.draftState.pickProvenance = undefined;
   }
 
   if (

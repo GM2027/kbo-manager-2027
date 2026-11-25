@@ -14,7 +14,37 @@ export const TEAM_IDS: TeamId[] = [
   '키움',
 ];
 
-// 2025 정규시즌 역순 드래프트 순서 (마스터 v4.58 확정)
+// 2026시즌 최종 순위 (1위 삼성 한국시리즈 우승 ~ 10위 키움 · 새 게임 구단 선택 화면 정렬 기준)
+export const FINAL_STANDINGS_2026_ORDER: TeamId[] = [
+  '삼성',
+  'KT',
+  'KIA',
+  'LG',
+  '두산',
+  'SSG',
+  '롯데',
+  'NC',
+  '한화',
+  '키움',
+];
+
+export const FINAL_RANK_2026: Record<TeamId, number> = {
+  삼성: 1,
+  KT: 2,
+  KIA: 3,
+  LG: 4,
+  두산: 5,
+  SSG: 6,
+  롯데: 7,
+  NC: 8,
+  한화: 9,
+  키움: 10,
+};
+
+// 최초 가상 신인 드래프트 기본 지명 순서 (2026시즌 최종 순위 역순: 키움 → 한화 → NC → 롯데 → SSG → 두산 → LG → KIA → KT → 삼성)
+export const INITIAL_VIRTUAL_DRAFT_ORDER_2028: TeamId[] = [...FINAL_STANDINGS_2026_ORDER].reverse();
+
+// 2025 정규시즌 역순 드래프트 순서 (레거시 2026 완료 드래프트 보존용)
 export const DRAFT_ORDER_2026: TeamId[] = [
   '키움',
   '두산',

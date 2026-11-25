@@ -470,7 +470,13 @@ export const DraftBoardPanel: React.FC<DraftBoardPanelProps> = ({
                 className="px-3 py-2 text-xs font-semibold rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1.5"
               >
                 <FastForward className="w-3.5 h-3.5" />
-                <span>{ds.picks.length === 0 ? '전체 자동 지명 (1~11R)' : '잔여 전체 자동 지명 (~11R)'}</span>
+                <span>
+                  {ds.picks.length === 0
+                    ? '전체 자동 지명 (1~11R)'
+                    : ds.currentRound >= 5
+                    ? '5~11R 자동 지명 완료'
+                    : '잔여 전체 자동 지명 (~11R)'}
+                </span>
               </button>
             )}
             {ds.completed && onCompletedAction}

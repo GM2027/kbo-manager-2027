@@ -54,6 +54,7 @@ import {
   recordHighSchoolDevSigning,
 } from './developmentalEngine';
 import {
+  FINAL_STANDINGS_2026_ORDER,
   FUTURES_NORTH_TEAMS,
   FUTURES_SOUTH_TEAMS,
   FUTURES_TEAM_IDS,
@@ -80,7 +81,10 @@ import {
   isMilitaryResolved,
   isMilitaryServing,
 } from './militaryEngine';
-import { appendPlayerMlbHistoryInPlace } from './leagueLifeEngine';
+import {
+  appendPlayerMlbHistoryInPlace,
+  ensureDraftPickProvenanceInPlace,
+} from './leagueLifeEngine';
 import {
   ensureSpecialFuturesRosters,
   injectUndraftedUlsanPlayersIntoDraft,
@@ -603,12 +607,64 @@ export function unlockTrophy(
   });
 }
 
-export function computeReverseDraftOrder(career: CareerSave): TeamId[] {
+/**
+ * 시즌 최종 순위(1위~10위) 계산
+ * - 포스트시즌 완료 시: 1위 한국시리즈 우승팀 → 2위 KS 준우승 → 3위 PO 패자 → 4위 준PO 패자 → 5위 WC 패자 → 6~10위 정규시즌 순위
+ * - 정규시즌 경기 미진행 시: 2026시즌 최종 순위 기준(삼성 → KT → KIA → LG → 두산 → SSG → 롯데 → NC → 한화 → 키움)
+ */
+export function computeFinalSeasonStandingsOrder(career: CareerSave): TeamId[] {
   const standings = computeStandings(career.gamesLedger);
-  if (standings.length === 10 && standings.some((r) => r.games > 0)) {
-    return [...standings].reverse().map((r) => r.teamId);
+  if (standings.length !== 10 || !standings.some((r) => r.games > 0)) {
+    return [...FINAL_STANDINGS_2026_ORDER];
   }
-  return [...TEAM_IDS].sort((a, b) => KBO_TEAMS[b].prevRank2025 - KBO_TEAMS[a].prevRank2025);
+
+  const regOrder = standings.map((r) => r.teamId);
+  const ps = career.postseason;
+  if (!ps || (!ps.champion && (!ps.seriesHistory || ps.seriesHistory.length === 0))) {
+    return regOrder;
+  }
+
+  const finalOrder: TeamId[] = [];
+  const pushUnique = (tid?: TeamId | null) => {
+    if (tid && !finalOrder.includes(tid)) finalOrder.push(tid);
+  };
+
+  const history = ps.seriesHistory ?? [];
+  const ksSeries = history.find((s) => s.round === 'KOREAN_SERIES');
+  const poSeries = history.find((s) => s.round === 'PO');
+  const semiPoSeries = history.find((s) => s.round === 'SEMI_PO');
+  const wcSeries = history.find((s) => s.round === 'WILDCARD');
+
+  const loserOf = (s?: (typeof history)[number]): TeamId | null => {
+    if (!s || !s.winnerTeam) return null;
+    return s.winnerTeam === s.higherSeedTeam ? s.lowerSeedTeam : s.higherSeedTeam;
+  };
+
+  // 1위: 한국시리즈 우승팀 (반드시 드래프트 마지막 기본 지명 순번 배정)
+  pushUnique(ps.champion ?? ksSeries?.winnerTeam ?? null);
+  // 2위: 한국시리즈 준우승팀
+  pushUnique(loserOf(ksSeries));
+  // 3위: 플레이오프 패자
+  pushUnique(loserOf(poSeries));
+  // 4위: 준플레이오프 패자
+  pushUnique(loserOf(semiPoSeries));
+  // 5위: 와일드카드 패자
+  pushUnique(loserOf(wcSeries));
+  // 6~10위 (및 포스트시즌 미완료 구단): 정규시즌 성적순
+  for (const tid of regOrder) {
+    pushUnique(tid);
+  }
+
+  return finalOrder;
+}
+
+/**
+ * 신인 드래프트 기본 지명 순서 계산 (직전 시즌 최종 순위의 역순)
+ * - 1~11라운드 모두 동일한 기본 순서를 적용 (한국시리즈 우승팀 = 10순위 마지막 기본 지명 순번)
+ * - 지명권 트레이드는 tradedDraftPicks로 별도 반영
+ */
+export function computeReverseDraftOrder(career: CareerSave): TeamId[] {
+  return [...computeFinalSeasonStandingsOrder(career)].reverse();
 }
 
 /**
@@ -2806,7 +2862,11 @@ export function advanceOffseasonStep(
   ensureFranchiseState(next);
 
   next.offseasonStep = targetStep;
-  if (!next.nextSeasonDraftOrder || next.nextSeasonDraftOrder.length !== 10) {
+  if (
+    next.postseason?.champion ||
+    !next.nextSeasonDraftOrder ||
+    next.nextSeasonDraftOrder.length !== 10
+  ) {
     next.nextSeasonDraftOrder = computeReverseDraftOrder(next);
   }
 
@@ -2835,6 +2895,7 @@ export function advanceOffseasonStep(
         nextDraftSeason
       );
       injectUndraftedUlsanPlayersIntoDraft(next, next.draftState);
+      ensureDraftPickProvenanceInPlace(next);
       const r1Order = next.draftState.round1DraftOrder ?? next.draftState.draftOrder;
       pushNews(next, {
         date: `${next.season}-11-20`,

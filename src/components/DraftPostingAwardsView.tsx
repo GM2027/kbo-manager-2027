@@ -96,7 +96,7 @@ export const DraftPostingAwardsView: React.FC<DraftPostingAwardsViewProps> = ({
         <div>
           <h2 className="text-base font-extrabold">신인 드래프트 · MLB 포스팅</h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            {career.season} 신인 지명 명단(1~11라운드) 및 7시즌 이상 MLB 포스팅 이적료 규약을 관리합니다.
+            {career.draftState.season} 신인 지명 명단(1~11라운드) 및 7시즌 이상 MLB 포스팅 이적료 규약을 관리합니다.
           </p>
         </div>
 

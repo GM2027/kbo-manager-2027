@@ -1,6 +1,6 @@
 import { SeededRng } from '../engine/rng';
 import { DraftCandidate, DraftState, Position, TeamId } from '../types/kbo';
-import { DRAFT_ORDER_2026 } from './kboTeams';
+import { DRAFT_ORDER_2026, INITIAL_VIRTUAL_DRAFT_ORDER_2028 } from './kboTeams';
 
 export interface ConfirmedHanwhaRookieRaw {
   pickNotation: string;
@@ -519,7 +519,9 @@ export function createFreshDraftState(
   const order =
     customDraftOrder && customDraftOrder.length === 10
       ? [...customDraftOrder]
-      : [...DRAFT_ORDER_2026];
+      : season >= 2028
+        ? [...INITIAL_VIRTUAL_DRAFT_ORDER_2028]
+        : [...DRAFT_ORDER_2026];
   const candidates = generate150DraftCandidates(rng.int(1000, 99999), false);
 
   return {

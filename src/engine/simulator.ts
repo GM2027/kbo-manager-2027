@@ -2616,10 +2616,8 @@ export function simulateNextPostseasonGame(career: CareerSave): {
         syncActingCaptainInPlace(next, tid, false);
       }
 
-      // #26, #32, #35, #36: Offseason 4-step initialization, Owner Grade, Reverse Draft Order & KS Trophy
-      if (!next.nextSeasonDraftOrder || next.nextSeasonDraftOrder.length !== 10) {
-        next.nextSeasonDraftOrder = computeReverseDraftOrder(next);
-      }
+      // #26, #32, #35, #36: 한국시리즈 최종 순위 확정 직후 차기 신인 드래프트 순서 자동 갱신 (KS 우승팀 = 마지막 기본 순번)
+      next.nextSeasonDraftOrder = computeReverseDraftOrder(next);
       next.offseasonStep = 'AWARDS_AND_EVAL';
       next.offseasonStep12 = 'FINAL_SETTLEMENT';
       next.completedOffseasonSteps12 = [];

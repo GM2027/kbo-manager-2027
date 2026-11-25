@@ -3901,11 +3901,13 @@ export function advanceToNextSeason(career: CareerSave): {
   ensureFranchiseState(next);
   const rng = new SeededRng(next.rngState + next.season * 31);
 
-  // #36: Compute reverse draft order from finished regular season standings BEFORE clearing gamesLedger
+  // #36: Compute reverse draft order from finished season final standings (incl. Korean Series) BEFORE clearing gamesLedger
   const reverseOrder =
-    next.nextSeasonDraftOrder && next.nextSeasonDraftOrder.length === 10
-      ? [...next.nextSeasonDraftOrder]
-      : computeReverseDraftOrder(next);
+    next.postseason?.champion
+      ? computeReverseDraftOrder(next)
+      : next.nextSeasonDraftOrder && next.nextSeasonDraftOrder.length === 10
+        ? [...next.nextSeasonDraftOrder]
+        : computeReverseDraftOrder(next);
 
   // #12: Archive completed season summary BEFORE wiping gamesLedger if not yet archived
   if (next.gamesLedger.length > 0 && !(next.seasonHistory ?? []).some((s) => s.season === next.season)) {

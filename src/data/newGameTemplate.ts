@@ -13,6 +13,7 @@ import { DEFAULT_INVESTMENTS, TEAM_STARTING_CASH_BILLION } from './financesData'
 import {
   generateVirtualForeignMarket,
   HISTORICAL_BASELINE_CHAMPIONS,
+  INITIAL_VIRTUAL_DRAFT_ORDER_2028,
   KBO_TEAMS,
 } from './kboTeams';
 import { buildReal2026SeasonHistorySummary } from './real2026SeasonArchive';
@@ -106,8 +107,8 @@ export function createNewCareer(params: {
         summary: `${teamInfo.name} 2027시즌 신임 단장 취임 (v18 DB ${v18Summary.totalPlayers}명 · 2027-01-01 개시 · 난이도: ${difficulty})`,
       },
     ],
-    // 2027 신인(110명)은 v18 DB에 이미 반영되어 있으므로 2027년 9월 실시 드래프트는 2028 신인 드래프트로 편성
-    draftState: createFreshDraftState(2028, seed),
+    // 2027 신인(110명)은 v18 DB에 이미 반영되어 있으므로 2027년 9월 실시 최초 가상 드래프트(2028)는 2026 최종 순위 역순으로 편성
+    draftState: createFreshDraftState(2028, seed, INITIAL_VIRTUAL_DRAFT_ORDER_2028),
     postingRecords: [],
     postseason: {
       active: false,

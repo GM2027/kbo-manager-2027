@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowLeft, Check, Play, Shield } from 'lucide-react';
 import { TEAM_STARTING_CASH_BILLION } from '../data/financesData';
-import { KBO_TEAMS, TEAM_IDS } from '../data/kboTeams';
+import { FINAL_RANK_2026, FINAL_STANDINGS_2026_ORDER, KBO_TEAMS } from '../data/kboTeams';
 import { TEAM_UI_THEMES } from '../data/realKboHistories';
 import { DIFFICULTY_CONFIG } from '../engine/deepFranchise';
 import { GameDifficulty, TeamId } from '../types/kbo';
@@ -20,7 +20,7 @@ export const NewGameWizard: React.FC<NewGameWizardProps> = ({
   onConfirmStart,
   onPreviewTeamColor,
 }) => {
-  const [selectedTeam, setSelectedTeam] = useState<TeamId>('LG');
+  const [selectedTeam, setSelectedTeam] = useState<TeamId>('삼성');
   const [gmName, setGmName] = useState('');
   const [difficulty, setDifficulty] = useState<GameDifficulty>('어려움');
 
@@ -73,10 +73,11 @@ export const NewGameWizard: React.FC<NewGameWizardProps> = ({
           </div>
         </div>
 
-        {/* Compact 2-column KBO 10-team Grid (v4.38 rule) */}
+        {/* Compact 2-column KBO 10-team Grid (2026시즌 최종 순위순: 삼성 → KT → KIA → LG → 두산 → SSG → 롯데 → NC → 한화 → 키움) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          {TEAM_IDS.map((tid) => {
+          {FINAL_STANDINGS_2026_ORDER.map((tid) => {
             const info = KBO_TEAMS[tid];
+            const rank2026 = FINAL_RANK_2026[tid];
             const isSelected = selectedTeam === tid;
             const startingCash = TEAM_STARTING_CASH_BILLION[tid];
             return (
@@ -110,8 +111,14 @@ export const NewGameWizard: React.FC<NewGameWizardProps> = ({
                     <div className="text-[11px] font-mono-stats font-bold text-emerald-700 dark:text-emerald-400">
                       자금 {startingCash}억
                     </div>
-                    <div className="text-[11px] font-mono-stats text-slate-500 dark:text-slate-400">
-                      25년 {info.prevRank2025}위
+                    <div
+                      className={`text-[11px] font-mono-stats ${
+                        rank2026 === 1
+                          ? 'font-bold text-amber-600 dark:text-amber-400'
+                          : 'text-slate-500 dark:text-slate-400'
+                      }`}
+                    >
+                      2026 최종 {rank2026}위{rank2026 === 1 ? ' · 우승' : ''}
                     </div>
                   </div>
                   {isSelected && (
