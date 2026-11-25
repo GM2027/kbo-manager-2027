@@ -7,6 +7,8 @@
  * - 설정값 localStorage 자동 저장 및 복원
  */
 
+import { resolvePublicAssetUrl } from '../utils/assetUrl';
+
 export type SoundEventId =
   | 'button_click'
   | 'club_select'
@@ -631,7 +633,7 @@ export class AudioManager {
         this.failedFileUrls.add(url);
         return;
       }
-      const res = await fetch(url);
+      const res = await fetch(resolvePublicAssetUrl(url));
       if (!res.ok) {
         this.failedFileUrls.add(url);
         return;

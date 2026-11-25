@@ -7,7 +7,7 @@ import {defineConfig} from 'vite';
 export default defineConfig(({command}) => {
   const base =
     process.env.VITE_BASE_PATH ??
-    (command === 'build' ? '/kbo-gm-2027/' : '/');
+    (command === 'build' ? '/kbo-manager-2027/' : '/');
   return {
     base,
     plugins: [

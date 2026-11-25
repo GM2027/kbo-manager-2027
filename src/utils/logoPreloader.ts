@@ -13,7 +13,13 @@ export function preloadAllKboTeamLogos(): void {
   if (preloadedOnce || typeof window === 'undefined' || typeof Image === 'undefined') return;
   preloadedOnce = true;
 
-  const urls: string[] = ['/logos/KBO.svg', '/logos/SM.png', '/logos/UL.png'];
+  const urls: string[] = [
+    '/logos/KBO.svg',
+    '/logos/SM.png',
+    '/logos/UL.png',
+    '/logos/kbo_korean_series_trophy.png',
+    '/logos/kbo_golden_glove.png',
+  ];
   for (const tid of TEAM_IDS) {
     const primary = KBO_TEAMS[tid]?.logoUrls?.[0];
     if (primary) urls.push(primary);
