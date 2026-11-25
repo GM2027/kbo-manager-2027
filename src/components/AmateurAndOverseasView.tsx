@@ -22,6 +22,11 @@ import {
   signEligibleKboAlumniReturnee,
   toggleAmateurProspectWatchlist,
 } from '../engine/amateurOverseasEngine';
+import {
+  formatOverseasLeagueLabel,
+  normalizeOverseasLeagueLevel,
+  OVERSEAS_6_TIER_LADDER,
+} from '../engine/overseasProgressionEngine';
 import { getCurrentCareerDate } from '../engine/salaryCapEngine';
 import {
   AmateurProspect,
@@ -57,12 +62,25 @@ const MLB_LEAGUE_TONE: Record<string, string> = {
   MLB: 'bg-indigo-600 text-white',
   AAA: 'bg-sky-600 text-white',
   AA: 'bg-teal-600 text-white',
-  'A+': 'bg-slate-600 text-white',
-  A: 'bg-slate-500 text-white',
+  'High-A': 'bg-cyan-700 text-white',
+  'Single-A': 'bg-slate-600 text-white',
+  'A+': 'bg-cyan-700 text-white',
+  A: 'bg-slate-600 text-white',
   Rookie: 'bg-amber-600 text-white',
   NPB: 'bg-rose-600 text-white',
   NPB2군: 'bg-rose-500/80 text-white',
   'FA/방출': 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300',
+};
+
+const EVENT_TYPE_TONE: Record<string, string> = {
+  MLB데뷔: 'text-indigo-700 dark:text-indigo-300 bg-indigo-500/15',
+  승격: 'text-emerald-700 dark:text-emerald-300 bg-emerald-500/15',
+  강등: 'text-rose-700 dark:text-rose-300 bg-rose-500/15',
+  재활배정: 'text-amber-700 dark:text-amber-300 bg-amber-500/15',
+  트레이드: 'text-sky-700 dark:text-sky-300 bg-sky-500/15',
+  방출: 'text-rose-700 dark:text-rose-300 bg-rose-500/15',
+  KBO복귀: 'text-orange-700 dark:text-orange-300 bg-orange-500/15',
+  은퇴: 'text-slate-600 dark:text-slate-400 bg-slate-200 dark:bg-slate-800',
 };
 
 export const AmateurAndOverseasView: React.FC<AmateurAndOverseasViewProps> = ({
@@ -75,7 +93,10 @@ export const AmateurAndOverseasView: React.FC<AmateurAndOverseasViewProps> = ({
   const [subTab, setSubTab] = useState<AmateurSubTab>(initialSubTab);
   const [schoolFilter, setSchoolFilter] = useState<'전체' | '고교' | '대학' | '관심' | '드래프트예상'>('전체');
   const [roleFilter, setRoleFilter] = useState<'전체' | '투수' | '타자'>('전체');
-  const [overseasLevelFilter, setOverseasLevelFilter] = useState<'전체' | 'MLB' | '마이너' | 'NPB' | '방출·복귀'>('전체');
+  const [overseasLevelFilter, setOverseasLevelFilter] = useState<
+    '전체' | 'MLB' | 'AAA' | 'AA' | 'High-A' | 'Single-A' | 'Rookie' | '방출·복귀'
+  >('전체');
+  const [overseasStatsTab, setOverseasStatsTab] = useState<'season' | 'career'>('season');
   const [selectedOverseasId, setSelectedOverseasId] = useState<string | null>(initialSelectedOverseasId);
 
   const state = career.amateurAndOverseas;
@@ -123,13 +144,12 @@ export const AmateurAndOverseasView: React.FC<AmateurAndOverseasViewProps> = ({
   const filteredOverseas = useMemo(() => {
     return overseasPlayers
       .filter((ov) => {
-        if (overseasLevelFilter === 'MLB') return ov.league === 'MLB';
-        if (overseasLevelFilter === '마이너') {
-          return ['AAA', 'AA', 'A+', 'A', 'Rookie'].includes(ov.league);
-        }
-        if (overseasLevelFilter === 'NPB') return ov.league === 'NPB' || ov.league === 'NPB2군';
+        const normLv = normalizeOverseasLeagueLevel(ov.league);
         if (overseasLevelFilter === '방출·복귀') {
-          return ov.league === 'FA/방출' || ov.status === '방출대기' || ov.status === '국내복귀신청';
+          return normLv === 'FA/방출' || ov.status === '방출대기' || ov.status === '국내복귀신청';
+        }
+        if (overseasLevelFilter !== '전체') {
+          return normLv === overseasLevelFilter;
         }
         return true;
       })
@@ -139,13 +159,15 @@ export const AmateurAndOverseasView: React.FC<AmateurAndOverseasViewProps> = ({
           NPB: 1,
           AAA: 2,
           AA: 3,
-          'A+': 4,
-          A: 5,
+          'High-A': 4,
+          'Single-A': 5,
           Rookie: 6,
           NPB2군: 7,
           'FA/방출': 8,
         };
-        return (lvlOrder[a.league] ?? 9) - (lvlOrder[b.league] ?? 9) || b.ability - a.ability;
+        const la = normalizeOverseasLeagueLevel(a.league);
+        const lb = normalizeOverseasLeagueLevel(b.league);
+        return (lvlOrder[la] ?? 9) - (lvlOrder[lb] ?? 9) || b.ability - a.ability;
       });
   }, [overseasPlayers, overseasLevelFilter]);
 
@@ -735,11 +757,16 @@ export const AmateurAndOverseasView: React.FC<AmateurAndOverseasViewProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           <div className="lg:col-span-7 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">
-                해외파 한국인 선수 현황 ({filteredOverseas.length}명)
-              </h3>
+              <div>
+                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                  해외파 한국인 선수 현황 ({filteredOverseas.length}명)
+                </h3>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                  MLB · AAA · AA · High-A · Single-A · Rookie 6단계 자동 시뮬레이션 (14일 주기 승격·강등 검토)
+                </p>
+              </div>
               <div className="flex flex-wrap items-center gap-1">
-                {(['전체', 'MLB', '마이너', 'NPB', '방출·복귀'] as const).map((lv) => (
+                {(['전체', 'MLB', 'AAA', 'AA', 'High-A', 'Single-A', 'Rookie', '방출·복귀'] as const).map((lv) => (
                   <button
                     key={lv}
                     type="button"
@@ -761,19 +788,20 @@ export const AmateurAndOverseasView: React.FC<AmateurAndOverseasViewProps> = ({
                 <thead className="sticky top-0 bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
                   <tr>
                     <th className="py-2 px-3">선수 / 구분</th>
-                    <th className="py-2 px-2">소속 · 레벨</th>
+                    <th className="py-2 px-2">소속팀 · 리그 등급</th>
                     <th className="py-2 px-2 text-right">OVR/POT</th>
-                    <th className="py-2 px-3">{career.season} 시즌 성적</th>
+                    <th className="py-2 px-3">{career.season} 현재 리그 성적</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {filteredOverseas.map((ov) => {
                     const isSelected = selectedOverseas?.permanentId === ov.permanentId;
+                    const normLv = formatOverseasLeagueLabel(ov.league);
                     const st = ov.currentSeasonStats;
                     const statLine =
                       ov.role === '타자'
-                        ? `${st.g}G AVG ${(st.avg ?? 0).toFixed(3)} ${st.hr ?? 0}HR ${st.rbi ?? 0}RBI OPS ${(st.ops ?? 0).toFixed(3)}`
-                        : `${st.g}G ${st.w ?? 0}승 ${st.l ?? 0}패 ERA ${(st.era ?? 0).toFixed(2)} ${(st.ip ?? 0).toFixed(1)}IP ${st.so ?? 0}K`;
+                        ? `${st.g}G AVG ${(st.avg ?? 0).toFixed(3)} OBP ${(st.obp ?? 0).toFixed(3)} OPS ${(st.ops ?? 0).toFixed(3)} ${st.hr ?? 0}HR`
+                        : `${st.g}G ERA ${(st.era ?? 0).toFixed(2)} WHIP ${(st.whip ?? 0).toFixed(2)} ${(st.ip ?? 0).toFixed(1)}IP ${st.so ?? 0}K`;
                     return (
                       <tr
                         key={ov.permanentId}
@@ -818,18 +846,20 @@ export const AmateurAndOverseasView: React.FC<AmateurAndOverseasViewProps> = ({
                         <td className="py-2 px-2">
                           <div className="flex items-center gap-1.5">
                             <span
-                              className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold font-mono-stats ${
-                                MLB_LEAGUE_TONE[ov.league] ?? 'bg-slate-600 text-white'
+                              className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold font-mono-stats shrink-0 ${
+                                MLB_LEAGUE_TONE[normLv] ?? 'bg-slate-600 text-white'
                               }`}
                             >
-                              {ov.league}
+                              {normLv}
                             </span>
-                            <span className="font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[140px]">
+                            <span className="font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[130px]">
                               {ov.clubName}
                             </span>
                           </div>
                           <div className="text-[10px] text-slate-500 mt-0.5">
-                            {ov.status} · 잔여 {ov.contractYearsRemaining}년
+                            {ov.status}
+                            {ov.rehabFromLeague ? ` (→${formatOverseasLeagueLabel(ov.rehabFromLeague)})` : ''}
+                            {' · '}잔여 {ov.contractYearsRemaining}년
                           </div>
                         </td>
                         <td className="py-2 px-2 text-right font-mono-stats font-bold">
@@ -873,8 +903,29 @@ export const AmateurAndOverseasView: React.FC<AmateurAndOverseasViewProps> = ({
                       </div>
                     </div>
                     <div className="mt-2 text-xs text-slate-600 dark:text-slate-300 space-y-0.5">
-                      <div>
-                        소속: <strong>{selectedOverseas.clubName}</strong> ({selectedOverseas.league} · {selectedOverseas.status})
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span>소속:</span>
+                        <strong>{selectedOverseas.clubName}</strong>
+                        <span
+                          className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold font-mono-stats ${
+                            MLB_LEAGUE_TONE[formatOverseasLeagueLabel(selectedOverseas.league)] ?? 'bg-slate-600 text-white'
+                          }`}
+                        >
+                          {formatOverseasLeagueLabel(selectedOverseas.league)}
+                        </span>
+                        <span>({selectedOverseas.status})</span>
+                        {selectedOverseas.rehabFromLeague && (
+                          <span className="text-[10px] font-bold text-amber-700 dark:text-amber-300">
+                            · {formatOverseasLeagueLabel(selectedOverseas.rehabFromLeague)} 복귀 재활중
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                        {selectedOverseas.contractType ?? '계약'} · 마이너 옵션{' '}
+                        <strong className="font-mono-stats text-slate-700 dark:text-slate-200">
+                          {selectedOverseas.minorOptionsRemaining ?? 0}회
+                        </strong>{' '}
+                        · 로스터 경쟁 <strong>{selectedOverseas.rosterCompetition ?? '보통'}</strong>
                       </div>
                       <div>
                         진출 경로: <strong>{selectedOverseas.originCategory}</strong>
@@ -908,65 +959,131 @@ export const AmateurAndOverseasView: React.FC<AmateurAndOverseasViewProps> = ({
                   </div>
                 </div>
 
-                {/* Year-by-year Season History */}
+                {/* Season & Career Stats Separated by League Tier */}
                 <div className="space-y-2">
-                  <div className="text-xs font-extrabold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                    <BookOpen className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
-                    <span>연도별 해외 리그 성적 (당해 시즌 포함)</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-xs font-extrabold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                      <BookOpen className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
+                      <span>
+                        {overseasStatsTab === 'season' ? '리그별 시즌 성적' : '리그별 통산 누적 성적'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 text-[10px]">
+                      <button
+                        type="button"
+                        onClick={() => setOverseasStatsTab('season')}
+                        className={`px-2 py-0.5 rounded font-bold border ${
+                          overseasStatsTab === 'season'
+                            ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-transparent'
+                            : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'
+                        }`}
+                      >
+                        시즌별
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setOverseasStatsTab('career')}
+                        className={`px-2 py-0.5 rounded font-bold border ${
+                          overseasStatsTab === 'career'
+                            ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-transparent'
+                            : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'
+                        }`}
+                      >
+                        리그별 통산
+                      </button>
+                    </div>
                   </div>
                   <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded">
-                    <table className="w-full text-[11px] text-left font-mono-stats">
-                      <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 border-b border-slate-200 dark:border-slate-800">
-                        <tr>
-                          <th className="py-1.5 px-2">연도</th>
-                          <th className="py-1.5 px-2">레벨/팀</th>
-                          <th className="py-1.5 px-2 text-right">G</th>
-                          {selectedOverseas.role === '타자' ? (
-                            <>
-                              <th className="py-1.5 px-2 text-right">AVG</th>
-                              <th className="py-1.5 px-2 text-right">HR</th>
-                              <th className="py-1.5 px-2 text-right">RBI</th>
-                              <th className="py-1.5 px-2 text-right">OPS</th>
-                            </>
-                          ) : (
-                            <>
-                              <th className="py-1.5 px-2 text-right">W-L</th>
-                              <th className="py-1.5 px-2 text-right">IP</th>
-                              <th className="py-1.5 px-2 text-right">ERA</th>
-                              <th className="py-1.5 px-2 text-right">SO</th>
-                            </>
-                          )}
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                        {[selectedOverseas.currentSeasonStats, ...selectedOverseas.seasonHistory].map((row, idx) => (
-                          <tr key={`${row.season}-${idx}`}>
-                            <td className="py-1.5 px-2 font-bold">{row.season}</td>
-                            <td className="py-1.5 px-2 font-sans truncate max-w-[120px]">
-                              {row.league} · {row.clubName}
-                            </td>
-                            <td className="py-1.5 px-2 text-right">{row.g}</td>
-                            {selectedOverseas.role === '타자' ? (
-                              <>
-                                <td className="py-1.5 px-2 text-right">{(row.avg ?? 0).toFixed(3)}</td>
-                                <td className="py-1.5 px-2 text-right">{row.hr ?? 0}</td>
-                                <td className="py-1.5 px-2 text-right">{row.rbi ?? 0}</td>
-                                <td className="py-1.5 px-2 text-right font-bold">{(row.ops ?? 0).toFixed(3)}</td>
-                              </>
-                            ) : (
-                              <>
-                                <td className="py-1.5 px-2 text-right">
-                                  {row.w ?? 0}-{row.l ?? 0}
+                    {(() => {
+                      const currentSeasonLevelRows = selectedOverseas.seasonStatsByLevel
+                        ? [...OVERSEAS_6_TIER_LADDER]
+                            .reverse()
+                            .map((lv) => selectedOverseas.seasonStatsByLevel?.[lv])
+                            .filter((r): r is NonNullable<typeof r> => Boolean(r && (r.g > 0 || normalizeOverseasLeagueLevel(r.league) === normalizeOverseasLeagueLevel(selectedOverseas.league))))
+                        : [selectedOverseas.currentSeasonStats];
+                      const seasonRows = [...currentSeasonLevelRows, ...selectedOverseas.seasonHistory];
+                      const careerRows = selectedOverseas.careerStatsByLevel
+                        ? [...OVERSEAS_6_TIER_LADDER]
+                            .reverse()
+                            .map((lv) => selectedOverseas.careerStatsByLevel?.[lv])
+                            .filter((r): r is NonNullable<typeof r> => Boolean(r && r.g > 0))
+                        : [];
+                      const displayRows = overseasStatsTab === 'season' ? seasonRows : careerRows;
+                      return (
+                        <table className="w-full text-[11px] text-left font-mono-stats">
+                          <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 border-b border-slate-200 dark:border-slate-800">
+                            <tr>
+                              {overseasStatsTab === 'season' && <th className="py-1.5 px-2">연도</th>}
+                              <th className="py-1.5 px-2">리그</th>
+                              <th className="py-1.5 px-2 text-right">G</th>
+                              {selectedOverseas.role === '타자' ? (
+                                <>
+                                  <th className="py-1.5 px-2 text-right">AVG</th>
+                                  <th className="py-1.5 px-2 text-right">OBP</th>
+                                  <th className="py-1.5 px-2 text-right">OPS</th>
+                                  <th className="py-1.5 px-2 text-right">HR</th>
+                                </>
+                              ) : (
+                                <>
+                                  <th className="py-1.5 px-2 text-right">IP</th>
+                                  <th className="py-1.5 px-2 text-right">ERA</th>
+                                  <th className="py-1.5 px-2 text-right">WHIP</th>
+                                  <th className="py-1.5 px-2 text-right">SO</th>
+                                </>
+                              )}
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                            {displayRows.length === 0 ? (
+                              <tr>
+                                <td colSpan={7} className="py-3 text-center font-sans text-slate-400">
+                                  아직 누적된 해외 리그 성적이 없습니다.
                                 </td>
-                                <td className="py-1.5 px-2 text-right">{(row.ip ?? 0).toFixed(1)}</td>
-                                <td className="py-1.5 px-2 text-right font-bold">{(row.era ?? 0).toFixed(2)}</td>
-                                <td className="py-1.5 px-2 text-right">{row.so ?? 0}</td>
-                              </>
+                              </tr>
+                            ) : (
+                              displayRows.map((row, idx) => {
+                                const lvLabel = formatOverseasLeagueLabel(row.league);
+                                return (
+                                  <tr key={`${overseasStatsTab}-${row.season}-${lvLabel}-${idx}`}>
+                                    {overseasStatsTab === 'season' && (
+                                      <td className="py-1.5 px-2 font-bold">{row.season}</td>
+                                    )}
+                                    <td className="py-1.5 px-2 font-sans whitespace-nowrap">
+                                      <span
+                                        className={`px-1 py-0.5 rounded text-[9px] font-extrabold font-mono-stats mr-1 ${
+                                          MLB_LEAGUE_TONE[lvLabel] ?? 'bg-slate-600 text-white'
+                                        }`}
+                                      >
+                                        {lvLabel}
+                                      </span>
+                                      {overseasStatsTab === 'season' && (
+                                        <span className="text-[10px] text-slate-500">{row.clubName}</span>
+                                      )}
+                                    </td>
+                                    <td className="py-1.5 px-2 text-right">{row.g}</td>
+                                    {selectedOverseas.role === '타자' ? (
+                                      <>
+                                        <td className="py-1.5 px-2 text-right">{(row.avg ?? 0).toFixed(3)}</td>
+                                        <td className="py-1.5 px-2 text-right">{(row.obp ?? 0).toFixed(3)}</td>
+                                        <td className="py-1.5 px-2 text-right font-bold">{(row.ops ?? 0).toFixed(3)}</td>
+                                        <td className="py-1.5 px-2 text-right">{row.hr ?? 0}</td>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <td className="py-1.5 px-2 text-right">{(row.ip ?? 0).toFixed(1)}</td>
+                                        <td className="py-1.5 px-2 text-right font-bold">{(row.era ?? 0).toFixed(2)}</td>
+                                        <td className="py-1.5 px-2 text-right">{(row.whip ?? 0).toFixed(2)}</td>
+                                        <td className="py-1.5 px-2 text-right">{row.so ?? 0}</td>
+                                      </>
+                                    )}
+                                  </tr>
+                                );
+                              })
                             )}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                          </tbody>
+                        </table>
+                      );
+                    })()}
                   </div>
                 </div>
 
@@ -980,7 +1097,13 @@ export const AmateurAndOverseasView: React.FC<AmateurAndOverseasViewProps> = ({
                     {selectedOverseas.transferHistory.map((ev, idx) => (
                       <div key={`${ev.date}-${idx}`} className="py-2 space-y-0.5">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="font-bold text-slate-800 dark:text-slate-200">{ev.eventType}</span>
+                          <span
+                            className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                              EVENT_TYPE_TONE[ev.eventType] ?? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                            }`}
+                          >
+                            {ev.eventType}
+                          </span>
                           <span className="font-mono-stats text-[10px] text-slate-400">{ev.date}</span>
                         </div>
                         <div className="text-[11px] text-slate-600 dark:text-slate-400">{ev.note}</div>

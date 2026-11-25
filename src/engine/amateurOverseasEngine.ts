@@ -37,11 +37,15 @@ import {
   selectAnnualTopAmateurProspectsInPlace,
 } from './leagueLifeEngine';
 import { findRealPlayerClubProfile } from '../data/realKboHistories';
+import {
+  archiveOverseasSeasonByLevelInPlace,
+  determineInitialOverseasLeague,
+  ensureOverseasProgressionFieldsInPlace,
+  processBiweeklyOverseasProgressionInPlace,
+} from './overseasProgressionEngine';
 import { SeededRng } from './rng';
 import { getCurrentCareerDate } from './salaryCapEngine';
 import { emptyBatterStats, emptyPitcherStats } from './stats';
-
-const MINOR_LADDER: OverseasLeagueLevel[] = ['Rookie', 'A', 'A+', 'AA', 'AAA', 'MLB'];
 
 function addYearsIso(isoDate: string, years: number): string {
   const [y, m, d] = isoDate.split('-').map(Number);
@@ -307,6 +311,16 @@ export function ensureAmateurAndOverseasStateInPlace(career: CareerSave): Amateu
     const clubName = mlbRec?.mlbTeam ?? 'LA 다저스';
     const isDomestic = p.category === '국내';
     if (!isDomestic) continue; // 해외파 한국인 선수 현황 관리 대상 (국내 출신 해외 진출자)
+    const annualUsdK = Math.round(((mlbRec?.guaranteedUsdMillions ?? 12) / Math.max(1, mlbRec?.contractYears ?? 3)) * 1000);
+    const startCfg = determineInitialOverseasLeague({
+      originCategory: 'KBO출신(포스팅·FA)',
+      age: p.age,
+      ability: p.ability,
+      potential: p.potential,
+      annualSalaryUsdThousands: annualUsdK,
+      guaranteedUsdMillions: mlbRec?.guaranteedUsdMillions,
+      clubName,
+    });
     state.overseasPlayers.push({
       permanentId: permId,
       sourceKboPlayerId: p.id,
@@ -319,21 +333,24 @@ export function ensureAmateurAndOverseasStateInPlace(career: CareerSave): Amateu
       potential: p.potential,
       originCategory: 'KBO출신(포스팅·FA)',
       originalKboTeamId: p.teamId,
-      league: 'MLB',
+      league: startCfg.league,
       clubName,
       contractYearsRemaining: mlbRec?.contractYears ?? 3,
-      annualSalaryUsdThousands: Math.round(((mlbRec?.guaranteedUsdMillions ?? 12) / Math.max(1, mlbRec?.contractYears ?? 3)) * 1000),
+      annualSalaryUsdThousands: annualUsdK,
+      contractType: startCfg.contractType,
+      minorOptionsRemaining: startCfg.minorOptionsRemaining,
+      rosterCompetition: startCfg.rosterCompetition,
       status: '현역',
       returnRestrictionActive: false,
       returnRestrictionNote: `KBO 출신 해외 진출 (${KBO_TEAMS[p.teamId].shortName} 원소속) — 국내 복귀 시 원소속 구단 복귀 규정 적용`,
       currentSeasonStats: {
         season: career.season,
-        league: 'MLB',
+        league: startCfg.league,
         clubName,
         g: 0,
         ...(p.role === '타자'
-          ? { avg: 0, h: 0, hr: 0, rbi: 0, sb: 0, ops: 0 }
-          : { w: 0, l: 0, era: 0, ip: 0, so: 0, hld: 0, sv: 0 }),
+          ? { pa: 0, ab: 0, avg: 0, obp: 0, h: 0, hr: 0, rbi: 0, sb: 0, ops: 0 }
+          : { w: 0, l: 0, era: 0, whip: 0, ip: 0, so: 0, hld: 0, sv: 0 }),
       },
       seasonHistory: [],
       transferHistory: [
@@ -342,14 +359,20 @@ export function ensureAmateurAndOverseasStateInPlace(career: CareerSave): Amateu
           season: mlbRec?.seasonExported ?? career.season,
           eventType: '계약',
           fromClub: KBO_TEAMS[p.teamId].name,
-          toClub: clubName,
-          note: `KBO에서 ${clubName} 진출`,
+          toClub: `${clubName} (${startCfg.league})`,
+          toLeague: startCfg.league,
+          note: `KBO에서 ${clubName} 진출 (${startCfg.league} 시작 · ${startCfg.contractType})`,
         },
       ],
-      mlbDebutSeason: mlbRec?.seasonExported ?? career.season,
+      mlbDebutSeason: startCfg.league === 'MLB' ? (mlbRec?.seasonExported ?? career.season) : undefined,
     });
     existingPermIds.add(permId);
     existingNames.add(p.name);
+  }
+
+  // 기존 세이브 포함 모든 해외파 선수 레코드를 6단계 MLB/마이너리그 구조로 무손실 보정
+  for (const ov of state.overseasPlayers) {
+    ensureOverseasProgressionFieldsInPlace(ov, career.season);
   }
 
   return state;
@@ -752,219 +775,10 @@ export function signEligibleKboAlumniReturnee(
 }
 
 // =============================================================================
-// 2. MONTHLY AUTOMATED UPDATE (OVERSEAS STATS + AMATEUR TOURNAMENTS + MLB SCOUTING)
-//    - 해외 리그 전체 경기 시뮬레이션 금지 -> 해외파 선수 월별 성적만 경량 자동 산출
-//    - 동일 월 중복 이벤트/성적 생성 차단 (lastMonthlyProcessedKey)
+// 2. BIWEEKLY & MONTHLY AUTOMATED UPDATE (OVERSEAS 6-TIER + AMATEUR TOURNAMENTS + MLB SCOUTING)
+//    - 해외 리그 전체 경기 시뮬레이션 금지 -> 해외파 선수 성적 및 6단계 승격/강등만 경량 자동 산출
+//    - 해외파 승격·강등·성적은 14일 주기로 overseasProgressionEngine에서 처리
 // =============================================================================
-
-function simulateOneMonthOverseasStatsInPlace(
-  ov: OverseasPlayerRecord,
-  rng: SeededRng,
-  monthKey: string,
-  monthNum: number,
-  isoDate: string,
-  career: CareerSave
-): void {
-  if (ov.status === '은퇴' || ov.status === 'KBO복귀완료') return;
-  if (ov.lastSimulatedMonthKey === monthKey) return;
-  ov.lastSimulatedMonthKey = monthKey;
-
-  if (ov.status === '부상자명단') {
-    ov.injuryDaysRemaining = Math.max(0, (ov.injuryDaysRemaining ?? 20) - 30);
-    if (ov.injuryDaysRemaining <= 0) {
-      ov.status = '현역';
-    } else {
-      return;
-    }
-  }
-
-  if (ov.league === 'FA/방출' || ov.status === '방출대기') {
-    // Chance an MLB/NPB club signs a released player if still strong enough
-    if (ov.ability >= 73 && ov.age <= 34 && rng.next() < 0.25) {
-      const newClub = rng.pick(MLB_30_CLUBS_SEED).clubName;
-      ov.clubName = newClub;
-      ov.league = ov.ability >= 80 ? 'MLB' : 'AAA';
-      ov.status = '현역';
-      ov.contractYearsRemaining = 1;
-      // 해외 재계약 시 복귀 자격 재검토 (종료일 재설정)
-      ov.overseasContractEndDate = undefined;
-      ov.domesticEligibleDate = undefined;
-      ov.returnRestrictionActive = false;
-      ov.returnRestrictionNote = `${newClub} 재계약 체결 — 해외 계약 종료 후 국내 복귀 자격 재검토 대상`;
-      ov.transferHistory.unshift({
-        date: isoDate,
-        season: career.season,
-        eventType: '재계약',
-        toClub: newClub,
-        note: `${newClub} (${ov.league}) 마이너/스플릿 계약 재입단 (국내 복귀 시점 재검토)`,
-      });
-      pushNewsSafe(career, {
-        date: isoDate,
-        category: 'MLB소식',
-        headline: `[해외파 이적] ${ov.name}, ${newClub}(${ov.league})과 새 계약 체결`,
-        body: `방출 후 새 팀을 찾던 ${ov.name}(${ov.position}) 선수가 ${newClub}과 계약하며 해외 도전을 이어갑니다.`,
-      });
-    }
-    return;
-  }
-
-  // Only accumulate regular baseball season months (4..9)
-  if (monthNum < 4 || monthNum > 9) return;
-
-  // Occasional short injury
-  if (rng.next() < 0.045) {
-    ov.status = '부상자명단';
-    ov.injuryDaysRemaining = rng.int(15, 45);
-    return;
-  }
-
-  const leagueDifficulty: Record<OverseasLeagueLevel, number> = {
-    MLB: 83,
-    NPB: 79,
-    AAA: 75,
-    AA: 71,
-    'A+': 67,
-    A: 63,
-    Rookie: 58,
-    NPB2군: 68,
-    'FA/방출': 70,
-  };
-  const edge = (ov.ability - (leagueDifficulty[ov.league] ?? 72)) / 12; // approx -1.5..+1.5
-  const st = ov.currentSeasonStats;
-  st.season = career.season;
-  st.league = ov.league;
-  st.clubName = ov.clubName;
-
-  if (ov.role === '타자') {
-    const addG = rng.int(18, 25);
-    const prevG = st.g ?? 0;
-    const prevH = st.h ?? 0;
-    const prevHR = st.hr ?? 0;
-    const prevRBI = st.rbi ?? 0;
-    const prevSB = st.sb ?? 0;
-
-    const ab = addG * 3.8;
-    const expectedAvg = Math.max(0.185, Math.min(0.365, 0.258 + edge * 0.036 + (rng.next() - 0.5) * 0.04));
-    const addH = Math.max(0, Math.round(ab * expectedAvg));
-    const addHR = Math.max(0, Math.round(addG * Math.max(0.03, 0.11 + edge * 0.065) * (0.6 + rng.next() * 0.8)));
-    const addRBI = Math.max(addHR, Math.round(addHR * 1.9 + addH * 0.34));
-    const addSB = Math.max(0, Math.round((ov.position === 'CF' || ov.position === 'SS' || ov.position === '2B' ? 3.2 : 1.0) * rng.next()));
-
-    st.g = prevG + addG;
-    st.h = prevH + addH;
-    st.hr = prevHR + addHR;
-    st.rbi = prevRBI + addRBI;
-    st.sb = prevSB + addSB;
-    const totalAb = Math.max(1, st.g * 3.8);
-    st.avg = Number(Math.min(0.41, st.h / totalAb).toFixed(3));
-    const slg = Math.min(0.75, st.avg + (st.hr * 2.7 + st.h * 0.22) / totalAb);
-    const obp = Math.min(0.48, st.avg + 0.068 + Math.max(0, edge * 0.015));
-    st.ops = Number((obp + slg).toFixed(3));
-  } else {
-    const isStarter = ov.position === 'SP';
-    const addG = isStarter ? rng.int(4, 5) : rng.int(8, 12);
-    const addIp = isStarter ? Number((addG * (4.8 + rng.next() * 1.4)).toFixed(1)) : Number((addG * (0.95 + rng.next() * 0.35)).toFixed(1));
-    const expectedEra = Math.max(1.85, Math.min(6.4, 3.85 - edge * 0.78 + (rng.next() - 0.5) * 0.9));
-    const prevIp = st.ip ?? 0;
-    const prevEr = ((st.era ?? 3.8) * prevIp) / 9;
-    const addEr = Math.max(0, (expectedEra * addIp) / 9);
-    const addW = Math.max(0, Math.round((isStarter ? 0.38 : 0.14) * addG * (1 + edge * 0.25) * rng.next() * 1.5));
-    const addL = Math.max(0, Math.round((isStarter ? 0.28 : 0.1) * addG * (1 - edge * 0.2) * rng.next() * 1.4));
-    const addSO = Math.max(1, Math.round(addIp * (0.85 + Math.max(0, edge) * 0.22 + rng.next() * 0.25)));
-    const addSV = !isStarter && ov.position === 'CL' ? Math.max(0, rng.int(1, 5)) : 0;
-    const addHLD = !isStarter && ov.position !== 'CL' ? Math.max(0, rng.int(1, 4)) : 0;
-
-    const totalIp = Number((prevIp + addIp).toFixed(1));
-    st.g = (st.g ?? 0) + addG;
-    st.ip = totalIp;
-    st.w = (st.w ?? 0) + addW;
-    st.l = (st.l ?? 0) + addL;
-    st.so = (st.so ?? 0) + addSO;
-    st.sv = (st.sv ?? 0) + addSV;
-    st.hld = (st.hld ?? 0) + addHLD;
-    st.era = totalIp > 0 ? Number((((prevEr + addEr) * 9) / totalIp).toFixed(2)) : 0;
-  }
-
-  // Promotion / Demotion along Rookie -> A -> A+ -> AA -> AAA -> MLB ladder
-  const idx = MINOR_LADDER.indexOf(ov.league);
-  if (idx >= 0 && idx < MINOR_LADDER.length - 1) {
-    const strongPerf =
-      ov.role === '타자'
-        ? (st.g >= 35 && (st.ops ?? 0) >= 0.845) || ov.ability >= (leagueDifficulty[ov.league] ?? 70) + 5
-        : (st.g >= 8 && (st.era ?? 5) <= 2.95) || ov.ability >= (leagueDifficulty[ov.league] ?? 70) + 5;
-    if (strongPerf && rng.next() < 0.32) {
-      const nextLevel = MINOR_LADDER[idx + 1];
-      const prevLevel = ov.league;
-      ov.league = nextLevel;
-      ov.currentSeasonStats.league = nextLevel;
-      const isMlbDebut = nextLevel === 'MLB' && !ov.mlbDebutSeason;
-      if (isMlbDebut) ov.mlbDebutSeason = career.season;
-      ov.transferHistory.unshift({
-        date: isoDate,
-        season: career.season,
-        eventType: isMlbDebut ? 'MLB데뷔' : '승격',
-        fromClub: `${ov.clubName} (${prevLevel})`,
-        toClub: `${ov.clubName} (${nextLevel})`,
-        note: isMlbDebut
-          ? `감격의 MLB 빅리그 콜업 및 데뷔! (${prevLevel} → MLB)`
-          : `마이너리그 승격 (${prevLevel} → ${nextLevel})`,
-      });
-      if (isMlbDebut || nextLevel === 'AAA') {
-        pushNewsSafe(career, {
-          date: isoDate,
-          category: 'MLB소식',
-          headline: isMlbDebut
-            ? `[MLB 데뷔] ${ov.name}(${ov.clubName}), 마침내 메이저리그 빅리그 콜업!`
-            : `[마이너 승격] ${ov.name}(${ov.clubName}), 트리플A 승격으로 빅리그 문턱 진입`,
-          body: `${ov.name}(${ov.age}세 · ${ov.position}) 선수가 ${prevLevel}에서의 맹활약을 인정받아 ${nextLevel}로 승격했습니다.`,
-          isHighlight: isMlbDebut,
-        });
-      }
-    }
-  } else if (idx > 0 && idx <= MINOR_LADDER.length - 1) {
-    // Demotion if struggling heavily
-    const weakPerf =
-      ov.role === '타자'
-        ? st.g >= 40 && (st.ops ?? 0.75) < 0.61
-        : st.g >= 10 && (st.era ?? 3.5) > 5.75;
-    if (weakPerf && rng.next() < 0.22) {
-      const lowerLevel = MINOR_LADDER[idx - 1];
-      const prevLevel = ov.league;
-      ov.league = lowerLevel;
-      ov.currentSeasonStats.league = lowerLevel;
-      ov.transferHistory.unshift({
-        date: isoDate,
-        season: career.season,
-        eventType: '강등',
-        fromClub: `${ov.clubName} (${prevLevel})`,
-        toClub: `${ov.clubName} (${lowerLevel})`,
-        note: `성적 부진으로 ${lowerLevel} 강등 조정`,
-      });
-    }
-  }
-
-  // Trade deadline (July) AI club transfer chance
-  if (monthNum === 7 && rng.next() < 0.07) {
-    const newClub = rng.pick(MLB_30_CLUBS_SEED.filter((c) => c.clubName !== ov.clubName)).clubName;
-    const oldClub = ov.clubName;
-    ov.clubName = newClub;
-    ov.currentSeasonStats.clubName = newClub;
-    ov.transferHistory.unshift({
-      date: isoDate,
-      season: career.season,
-      eventType: '트레이드',
-      fromClub: oldClub,
-      toClub: newClub,
-      note: `MLB 트레이드 마감 이적 (${oldClub} → ${newClub})`,
-    });
-    pushNewsSafe(career, {
-      date: isoDate,
-      category: 'MLB소식',
-      headline: `[해외파 트레이드] ${ov.name}, ${oldClub} → ${newClub} 이적 확정`,
-      body: `${ov.name}(${ov.league} · ${ov.position}) 선수가 구단 간 트레이드를 통해 ${newClub} 유니폼을 입게 되었습니다.`,
-    });
-  }
-}
 
 function runScheduledAmateurTournamentInPlace(
   career: CareerSave,
@@ -1167,7 +981,15 @@ function processMlbAmateurScoutingAndSigningsInPlace(
 
       // Create OverseasPlayerRecord preserving the EXACT permanentId (never duplicate!)
       if (!state.overseasPlayers.some((o) => o.permanentId === p.permanentId)) {
-        state.overseasPlayers.unshift({
+        const startCfg = determineInitialOverseasLeague({
+          originCategory: '아마추어직행',
+          age: p.age,
+          ability: p.ability,
+          potential: p.potential,
+          schoolType: p.schoolType,
+          clubName: topOffer.clubName,
+        });
+        const createdOv: OverseasPlayerRecord = {
           permanentId: p.permanentId,
           name: p.name,
           birthYear: p.birthYear,
@@ -1178,22 +1000,25 @@ function processMlbAmateurScoutingAndSigningsInPlace(
           potential: p.potential,
           originCategory: '아마추어직행',
           originalKboTeamId: null,
-          league: 'Rookie',
+          league: startCfg.league,
           clubName: topOffer.clubName,
           contractYearsRemaining: 6,
           annualSalaryUsdThousands: 75,
           signingBonusUsd: topOffer.offeredBonusUsd,
+          contractType: startCfg.contractType,
+          minorOptionsRemaining: startCfg.minorOptionsRemaining,
+          rosterCompetition: startCfg.rosterCompetition,
           status: '현역',
           returnRestrictionActive: false,
           returnRestrictionNote: `아마추어 해외 직행 (${p.schoolName} → ${topOffer.clubName}) — 해외 계약 종료 후 KBO 규약 제107조 2년 제한 적용`,
           currentSeasonStats: {
             season: career.season,
-            league: 'Rookie',
+            league: startCfg.league,
             clubName: topOffer.clubName,
             g: 0,
             ...(p.role === '타자'
-              ? { avg: 0, h: 0, hr: 0, rbi: 0, sb: 0, ops: 0 }
-              : { w: 0, l: 0, era: 0, ip: 0, so: 0, hld: 0, sv: 0 }),
+              ? { pa: 0, ab: 0, avg: 0, obp: 0, h: 0, hr: 0, rbi: 0, sb: 0, ops: 0 }
+              : { w: 0, l: 0, era: 0, whip: 0, ip: 0, so: 0, hld: 0, sv: 0 }),
           },
           seasonHistory: [],
           transferHistory: [
@@ -1202,11 +1027,14 @@ function processMlbAmateurScoutingAndSigningsInPlace(
               season: career.season,
               eventType: '계약',
               fromClub: p.schoolName,
-              toClub: topOffer.clubName,
-              note: `MLB 국제 아마추어 계약 확정 (계약금 $${topOffer.offeredBonusUsd.toLocaleString()} · 보호자 동의 완료)`,
+              toClub: `${topOffer.clubName} (${startCfg.league})`,
+              toLeague: startCfg.league,
+              note: `MLB 국제 아마추어 계약 확정 (${startCfg.league} 시작 · 계약금 $${topOffer.offeredBonusUsd.toLocaleString()})`,
             },
           ],
-        });
+        };
+        ensureOverseasProgressionFieldsInPlace(createdOv, career.season);
+        state.overseasPlayers.unshift(createdOv);
       }
 
       pushNewsSafe(career, {
@@ -1229,15 +1057,13 @@ export function processMonthlyAmateurAndOverseasInPlace(
   isoDate: string
 ): void {
   const state = ensureAmateurAndOverseasStateInPlace(career);
+  // 14일 주기 MLB/마이너리그 6단계 자동 성적·승격·강등·재활·트레이드 처리
+  processBiweeklyOverseasProgressionInPlace(career, rng, isoDate);
+
   const monthKey = isoDate.slice(0, 7); // YYYY-MM
   const monthNum = Number(isoDate.slice(5, 7)) || 4;
   if (state.lastMonthlyProcessedKey === monthKey) return;
   state.lastMonthlyProcessedKey = monthKey;
-
-  // 1) 해외파 월별 성적·승격·강등·트레이드 자동 산출
-  for (const ov of state.overseasPlayers) {
-    simulateOneMonthOverseasStatsInPlace(ov, rng, monthKey, monthNum, isoDate, career);
-  }
 
   // 2) 고교·대학 전국대회 자동 진행 및 스카우팅 갱신
   runScheduledAmateurTournamentInPlace(career, state, rng, monthNum, isoDate);
@@ -1490,13 +1316,11 @@ export function advanceAmateurAndOverseasSeasonInPlace(
   state.prospects = nextProspects;
   recomputeProjectedDraftRanksInPlace(state, newSeason);
 
-  // 3) Advance Overseas Players (archive seasonHistory, age +1, growth/decline, contracts, releases, Article 107)
+  // 3) Advance Overseas Players (archive level-separated seasonHistory, keep careerStatsByLevel, age +1, growth/decline, contracts, releases, Article 107)
   for (const ov of state.overseasPlayers) {
     if (ov.status === '은퇴' || ov.status === 'KBO복귀완료') continue;
 
-    if (ov.currentSeasonStats.g > 0) {
-      ov.seasonHistory.push({ ...ov.currentSeasonStats });
-    }
+    archiveOverseasSeasonByLevelInPlace(ov, newSeason);
     ov.age += 1;
 
     // Growth / aging identical philosophy to domestic players
@@ -1505,18 +1329,6 @@ export function advanceAmateurAndOverseasSeasonInPlace(
     } else if (ov.age >= 33) {
       ov.ability = Math.max(55, ov.ability - rng.int(1, 3));
     }
-
-    // Reset currentSeasonStats for newSeason
-    const freshStat: OverseasSeasonStatLine = {
-      season: newSeason,
-      league: ov.league,
-      clubName: ov.clubName,
-      g: 0,
-      ...(ov.role === '타자'
-        ? { avg: 0, h: 0, hr: 0, rbi: 0, sb: 0, ops: 0 }
-        : { w: 0, l: 0, era: 0, ip: 0, so: 0, hld: 0, sv: 0 }),
-    };
-    ov.currentSeasonStats = freshStat;
 
     // Retirement check
     if (ov.age >= 39 || (ov.age >= 36 && ov.ability <= 64 && rng.next() < 0.45)) {
@@ -1611,6 +1423,134 @@ export function advanceAmateurAndOverseasSeasonInPlace(
     // Re-evaluate restriction status if already released
     if (ov.overseasContractEndDate && ov.domesticEligibleDate) {
       ov.returnRestrictionActive = compareIsoDate(isoDate, ov.domesticEligibleDate) < 0;
+    }
+
+    // Automatic offseason KBO return for released KBO alumni belonging to AI clubs
+    // (user club alumni remain available for user GM decision in '국내 복귀 · 제107조')
+    if (
+      ov.status === '방출대기' &&
+      ov.originCategory !== '아마추어직행' &&
+      !ov.returnRestrictionActive &&
+      ov.originalKboTeamId &&
+      ov.originalKboTeamId !== career.playerTeamId &&
+      ov.ability >= 66 &&
+      ov.age <= 37 &&
+      rng.next() < 0.75
+    ) {
+      const returnTeamId = ov.originalKboTeamId;
+      const years = ov.age >= 34 ? 2 : 4;
+      const annualBillion = Math.max(4, Math.min(28, Number(((ov.ability - 62) * 0.85).toFixed(1))));
+      const totalBillion = Number((annualBillion * years).toFixed(1));
+      const existing = Object.values(career.players).find(
+        (p) => p.permanentId === ov.permanentId || (p.name === ov.name && p.teamId === returnTeamId)
+      );
+      if (existing) {
+        existing.teamId = returnTeamId;
+        existing.age = ov.age;
+        existing.ability = Math.max(existing.ability, ov.ability);
+        existing.rosterTier = '1군';
+        existing.gameDayActive = true;
+        existing.contract = {
+          ...existing.contract,
+          status: '확정',
+          years,
+          yearsRemaining: years,
+          startSeason: newSeason,
+          endSeason: newSeason + years - 1,
+          annualSalary: annualBillion,
+          totalValue: totalBillion,
+          note: `${newSeason} 해외파 원소속 자동 복귀 (${ov.clubName})`,
+        };
+        appendPlayerTeamHistoryInPlace(existing, returnTeamId, newSeason, '해외파 KBO 원소속 복귀');
+      } else {
+        const pid = `${returnTeamId}-RET-${ov.permanentId}`;
+        const departureSeason = ov.mlbDebutSeason ?? Math.max(2020, newSeason - 3);
+        const baseHistory: PlayerTeamHistoryEntry[] = [
+          {
+            teamLabel: KBO_TEAMS[returnTeamId].name,
+            teamId: returnTeamId,
+            league: 'KBO',
+            fromSeason: Math.max(2012, departureSeason - 5),
+            toSeason: Math.max(2012, departureSeason - 1),
+          },
+          {
+            teamLabel: ov.clubName,
+            league: '해외',
+            fromSeason: departureSeason,
+            toSeason: Math.max(departureSeason, newSeason - 1),
+            note: '해외 진출',
+          },
+          {
+            teamLabel: KBO_TEAMS[returnTeamId].name,
+            teamId: returnTeamId,
+            league: 'KBO',
+            fromSeason: newSeason,
+            note: '해외파 KBO 원소속 복귀',
+          },
+        ];
+        career.players[pid] = {
+          id: pid,
+          permanentId: ov.permanentId,
+          birthYear: ov.birthYear,
+          name: ov.name,
+          teamId: returnTeamId,
+          category: '국내',
+          nationality: '한국',
+          previousLeagueClub: ov.clubName,
+          role: ov.role,
+          position: ov.position,
+          pitchRole: ov.role === '투수' ? (ov.position === 'SP' ? '선발' : '중간계투') : undefined,
+          age: ov.age,
+          ability: ov.ability,
+          potential: ov.potential,
+          abilityStatus: '확정',
+          form: 1,
+          fatigue: 0,
+          lastPitchedRound: 0,
+          consecutiveAppearances: 0,
+          rosterTier: '1군',
+          gameDayActive: true,
+          contract: {
+            status: '확정',
+            currency: 'KRW',
+            years,
+            yearsRemaining: years,
+            startSeason: newSeason,
+            endSeason: newSeason + years - 1,
+            annualSalary: annualBillion,
+            signingBonus: Number((annualBillion * 0.4).toFixed(1)),
+            totalValue: totalBillion,
+            note: `${newSeason} 해외파 원소속 복귀 (${ov.clubName})`,
+          },
+          injury: null,
+          morale: '만족',
+          trainingFocus: null,
+          serviceYears: 7,
+          seasonRatingDelta: 0,
+          lastEvaluatedAtTeamGames: 0,
+          careerTeamHistory: baseHistory,
+          isOneClubMan: true,
+          stats: ov.role === '타자' ? emptyBatterStats(false) : emptyPitcherStats(false),
+          postseasonStats: ov.role === '타자' ? emptyBatterStats(false) : emptyPitcherStats(false),
+        };
+      }
+      ov.status = 'KBO복귀완료';
+      ov.transferHistory.unshift({
+        date: isoDate,
+        season: newSeason,
+        eventType: 'KBO복귀',
+        fromClub: ov.clubName,
+        toClub: KBO_TEAMS[returnTeamId].name,
+        note: `${KBO_TEAMS[returnTeamId].name} ${years}년 ${totalBillion}억 원 원소속 복귀 확정`,
+      });
+      pushNewsSafe(career, {
+        date: isoDate,
+        category: '이적·계약',
+        headline: `[국내 복귀 확정] ${KBO_TEAMS[returnTeamId].shortName}, 해외파 ${ov.name}과 ${years}년 ${totalBillion}억 원 복귀 계약`,
+        body: `${ov.clubName}와 결별한 ${ov.name}(${ov.age}세 · ${ov.position}) 선수가 원소속 구단 ${KBO_TEAMS[returnTeamId].name} 복귀를 확정했습니다.`,
+        teamId: returnTeamId,
+        isHighlight: true,
+      });
     }
   }
 }

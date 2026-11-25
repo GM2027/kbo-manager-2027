@@ -2223,12 +2223,16 @@ export type OverseasLeagueLevel =
   | 'MLB'
   | 'AAA'
   | 'AA'
+  | 'High-A'
+  | 'Single-A'
+  | 'Rookie'
   | 'A+'
   | 'A'
-  | 'Rookie'
   | 'NPB'
   | 'NPB2군'
   | 'FA/방출';
+
+export type OverseasCanonicalTier = 'MLB' | 'AAA' | 'AA' | 'High-A' | 'Single-A' | 'Rookie';
 
 export interface OverseasSeasonStatLine {
   season: number;
@@ -2236,18 +2240,27 @@ export interface OverseasSeasonStatLine {
   clubName: string;
   g: number;
   // Batter
+  pa?: number;
+  ab?: number;
   avg?: number;
+  obp?: number;
+  slg?: number;
   h?: number;
   hr?: number;
   rbi?: number;
+  bb?: number;
   sb?: number;
   ops?: number;
   // Pitcher
   w?: number;
   l?: number;
   era?: number;
+  whip?: number;
   ip?: number;
   so?: number;
+  er?: number;
+  hAllowed?: number;
+  bbAllowed?: number;
   hld?: number;
   sv?: number;
 }
@@ -2255,9 +2268,23 @@ export interface OverseasSeasonStatLine {
 export interface OverseasTransferEvent {
   date: string;
   season: number;
-  eventType: '계약' | '승격' | '강등' | '이적' | '트레이드' | '재계약' | '방출' | 'MLB데뷔' | '국내복귀신청' | 'KBO복귀' | '은퇴';
+  eventType:
+    | '계약'
+    | '승격'
+    | '강등'
+    | '재활배정'
+    | '이적'
+    | '트레이드'
+    | '재계약'
+    | '방출'
+    | 'MLB데뷔'
+    | '국내복귀신청'
+    | 'KBO복귀'
+    | '은퇴';
   fromClub?: string;
   toClub: string;
+  fromLeague?: OverseasLeagueLevel;
+  toLeague?: OverseasLeagueLevel;
   note: string;
 }
 
@@ -2280,7 +2307,18 @@ export interface OverseasPlayerRecord {
   contractYearsRemaining: number;
   annualSalaryUsdThousands: number;
   signingBonusUsd?: number;
-  status: '현역' | '부상자명단' | '방출대기' | '국내복귀신청' | 'KBO복귀완료' | '은퇴';
+  /** 해외 계약 유형 (메이저 보장 / 스플릿 / 마이너 / 국제 아마추어) */
+  contractType?: '메이저보장' | '스플릿' | '마이너계약' | '국제아마추어';
+  /** 마이너리그 옵션 잔여 횟수 (0~3 · 0이면 강등 시 DFA/트레이드/방출 검토) */
+  minorOptionsRemaining?: number;
+  /** 당해 시즌 옵션 소진 여부 (1시즌 1회 차감) */
+  optionUsedSeason?: number;
+  /** 소속 구단 로스터 경쟁도 (승격·강등 기준선 보정) */
+  rosterCompetition?: '여유' | '보통' | '치열';
+  /** 부상 재활 배정 정보 (복귀 대상 원 소속 리그 및 잔여 재활 경기 수) */
+  rehabFromLeague?: OverseasLeagueLevel;
+  rehabGamesRemaining?: number;
+  status: '현역' | '부상자명단' | '재활경기' | '방출대기' | '국내복귀신청' | 'KBO복귀완료' | '은퇴';
   injuryDaysRemaining?: number;
   /** 해외 계약 종료일 (ISO YYYY-MM-DD) */
   overseasContractEndDate?: string;
@@ -2300,7 +2338,17 @@ export interface OverseasPlayerRecord {
   };
   /** 동일 월 중복 시뮬레이션 방지 키 (YYYY-MM) */
   lastSimulatedMonthKey?: string;
+  /** 14일 주기 자동 승격·강등 마지막 검토일 (YYYY-MM-DD) */
+  lastEvaluatedDate?: string;
+  /** 마지막 승격·강등 이동일 (잦은 요요 이동 방지 쿨다운용) */
+  lastMovementDate?: string;
+  /** 현재 리그 체류 일수 */
+  daysAtCurrentLevel?: number;
   currentSeasonStats: OverseasSeasonStatLine;
+  /** 당해 시즌 리그 등급별 성적 분리 저장 (MLB · AAA · AA · High-A · Single-A · Rookie) */
+  seasonStatsByLevel?: Partial<Record<OverseasLeagueLevel, OverseasSeasonStatLine>>;
+  /** 통산 리그 등급별 누적 성적 분리 저장 */
+  careerStatsByLevel?: Partial<Record<OverseasLeagueLevel, OverseasSeasonStatLine>>;
   seasonHistory: OverseasSeasonStatLine[];
   transferHistory: OverseasTransferEvent[];
   mlbDebutSeason?: number;
@@ -2354,6 +2402,8 @@ export interface AmateurAndOverseasState {
   overseasAmateurSigningsBySeason: Record<number, number>;
   /** 마지막 월별 자동 처리 키 (YYYY-MM) */
   lastMonthlyProcessedKey?: string;
+  /** 마지막 14일 주기 MLB/마이너리그 승격·강등 처리 날짜 (YYYY-MM-DD) */
+  lastBiweeklyProcessedDate?: string;
   /** 매년 선정되는 고교 최대어 · 대학 최대어 · 드래프트 현장 초청 명단 */
   annualTopProspects?: AnnualTopAmateurRecord[];
 }

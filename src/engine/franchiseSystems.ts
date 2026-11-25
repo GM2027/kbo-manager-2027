@@ -45,6 +45,10 @@ import {
   integrateAmateurAndOverseasIntoDraftCandidates,
 } from './amateurOverseasEngine';
 import {
+  determineInitialOverseasLeague,
+  ensureOverseasProgressionFieldsInPlace,
+} from './overseasProgressionEngine';
+import {
   allocatePermanentPlayerId,
   ensureGlobalPlayerRegistryInPlace,
 } from './playerRegistry';
@@ -4400,25 +4404,39 @@ export function recordMlbExportPlayer(
       (o) => o.permanentId === permId || o.sourceKboPlayerId === player.id || o.name === player.name
     );
     const annualSalaryUsdThousands = Math.round((guaranteedUsdMillions / Math.max(1, years)) * 1000);
+    const startCfg = determineInitialOverseasLeague({
+      originCategory: 'KBO출신(포스팅·FA)',
+      age: player.age,
+      ability: player.ability,
+      potential: player.potential,
+      annualSalaryUsdThousands,
+      guaranteedUsdMillions,
+      clubName: mlbTeam,
+    });
     if (existing) {
-      existing.league = 'MLB';
+      existing.league = startCfg.league;
       existing.clubName = mlbTeam;
       existing.contractYearsRemaining = years;
       existing.annualSalaryUsdThousands = annualSalaryUsdThousands;
+      existing.contractType = startCfg.contractType;
+      existing.minorOptionsRemaining = startCfg.minorOptionsRemaining;
+      existing.rosterCompetition = startCfg.rosterCompetition;
       existing.status = '현역';
       existing.transferHistory = [
-        ...(existing.transferHistory ?? []),
         {
           date: dateStr,
           season: next.season,
           eventType: '계약',
           fromClub: KBO_TEAMS[fromTeamId].name,
-          toClub: mlbTeam,
-          note: `MLB ${routeLabel} ${years}년 $${guaranteedUsdMillions}M 계약`,
+          toClub: `${mlbTeam} (${startCfg.league})`,
+          toLeague: startCfg.league,
+          note: `MLB ${routeLabel} ${years}년 $${guaranteedUsdMillions}M 계약 (${startCfg.league} 시작)`,
         },
+        ...(existing.transferHistory ?? []),
       ];
+      ensureOverseasProgressionFieldsInPlace(existing, next.season);
     } else {
-      next.amateurAndOverseas.overseasPlayers.unshift({
+      const createdOv = {
         permanentId: permId,
         sourceKboPlayerId: player.id,
         name: player.name,
@@ -4428,13 +4446,16 @@ export function recordMlbExportPlayer(
         position: player.position,
         ability: player.ability,
         potential: player.potential,
-        originCategory: 'KBO출신(포스팅·FA)',
+        originCategory: 'KBO출신(포스팅·FA)' as const,
         originalKboTeamId: fromTeamId,
-        league: 'MLB',
+        league: startCfg.league,
         clubName: mlbTeam,
         contractYearsRemaining: years,
         annualSalaryUsdThousands,
-        status: '현역',
+        contractType: startCfg.contractType,
+        minorOptionsRemaining: startCfg.minorOptionsRemaining,
+        rosterCompetition: startCfg.rosterCompetition,
+        status: '현역' as const,
         returnRestrictionActive: false,
         returnRestrictionNote:
           exportRoute === '해외FA'
@@ -4442,26 +4463,29 @@ export function recordMlbExportPlayer(
             : `KBO 포스팅 MLB 진출 (${KBO_TEAMS[fromTeamId].shortName} 원소속) — 국내 복귀 시 원소속 구단 복귀 규정 적용`,
         currentSeasonStats: {
           season: next.season,
-          league: 'MLB',
+          league: startCfg.league,
           clubName: mlbTeam,
           g: 0,
           ...(player.role === '타자'
-            ? { avg: 0, h: 0, hr: 0, rbi: 0, sb: 0, ops: 0 }
-            : { w: 0, l: 0, era: 0, ip: 0, so: 0, hld: 0, sv: 0 }),
+            ? { pa: 0, ab: 0, avg: 0, obp: 0, h: 0, hr: 0, rbi: 0, sb: 0, ops: 0 }
+            : { w: 0, l: 0, era: 0, whip: 0, ip: 0, so: 0, hld: 0, sv: 0 }),
         },
         seasonHistory: [],
         transferHistory: [
           {
             date: dateStr,
             season: next.season,
-            eventType: '계약',
+            eventType: '계약' as const,
             fromClub: KBO_TEAMS[fromTeamId].name,
-            toClub: mlbTeam,
-            note: `MLB ${routeLabel} ${years}년 $${guaranteedUsdMillions}M 계약`,
+            toClub: `${mlbTeam} (${startCfg.league})`,
+            toLeague: startCfg.league,
+            note: `MLB ${routeLabel} ${years}년 $${guaranteedUsdMillions}M 계약 (${startCfg.league} 시작)`,
           },
         ],
-        mlbDebutSeason: next.season,
-      });
+        mlbDebutSeason: startCfg.league === 'MLB' ? next.season : undefined,
+      };
+      ensureOverseasProgressionFieldsInPlace(createdOv, next.season);
+      next.amateurAndOverseas.overseasPlayers.unshift(createdOv);
     }
   }
 }
