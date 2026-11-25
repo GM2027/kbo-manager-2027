@@ -508,6 +508,7 @@ export function ensureFranchiseState(career: CareerSave): void {
       p.uniformNumber === undefined
   );
   const needsDevBackfill =
+    career.databaseVersion !== 'v23_go_woosuk_kbo_return' &&
     career.databaseVersion !== 'v22_verified_birthdates' &&
     career.databaseVersion !== 'v21_verified_career_histories' &&
     career.databaseVersion !== 'v20_verified_player_db' &&

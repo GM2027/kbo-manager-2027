@@ -88,6 +88,7 @@ interface RawV18Player {
   weight_kg: number | null;
   salary_krw: number | null;
   contract_end_year: number | null;
+  previous_league_club?: string | null;
   published_contract?: {
     start_year: number | null;
     end_year: number | null;
@@ -797,6 +798,199 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
       career.databaseVersion = 'v22_verified_birthdates';
     }
 
+    // v23: 고우석 LG 트윈스 국내 복귀 등록, 해외파 전수 검증 현행화, KBO↔해외 중복 등록 차단
+    if (career.season >= 2027 && career.databaseVersion !== 'v23_go_woosuk_kbo_return') {
+      const goRaw = V18_BY_SOURCE_ID.get('2026-LG-19');
+      const existingGo = Object.values(career.players).find(
+        (p) => p.v18SourceId === '2026-LG-19' || p.kboOfficialId === '67119' || (p.name === '고우석' && p.teamId === 'LG')
+      );
+
+      if (goRaw && !existingGo) {
+        const prevOvGo = career.amateurAndOverseas?.overseasPlayers?.find(
+          (o) => o.permanentId === 'KBO-OVR-0004' || o.name === '고우석'
+        );
+        const goHist = buildHistoricalSeasonsFromRaw(goRaw);
+        const goCareerAgg = buildHistoricalCareerStats(goHist, '투수');
+        const goMerged = mergeVerifiedTeamHistory(goRaw, 'LG', findRealPlayerClubProfile('고우석', 'LG'));
+        const goAge = calculateKoreanFullAge(goRaw.birth_date, career.currentDate ?? '2027-01-01') ?? 28;
+        const goPlayer: Player = {
+          id: '2026-LG-19',
+          originType: 'real',
+          v18SourceId: '2026-LG-19',
+          kboOfficialId: '67119',
+          permanentId: prevOvGo?.permanentId ?? 'KBO-OVR-0004',
+          name: '고우석',
+          teamId: 'LG',
+          category: '국내',
+          nationality: '한국',
+          role: '투수',
+          position: 'RP',
+          pitchRole: '필승조',
+          age: goAge,
+          birthYear: 1998,
+          birthDate: '1998-08-06',
+          heightCm: 182,
+          weightKg: 90,
+          bats: 'R',
+          throws: 'R',
+          school: '충암고',
+          debutYear: 2017,
+          draftYear: 2017,
+          uniformNumber: 19,
+          militaryStatus: '예술·체육요원',
+          militaryNote: '2022 항저우 아시안게임 금메달 (예술·체육요원)',
+          ability: goRaw.game_ratings.overall,
+          potential: goRaw.game_ratings.potential,
+          abilityStatus: '확정',
+          form: 0,
+          fatigue: 0,
+          lastPitchedRound: 0,
+          consecutiveAppearances: 0,
+          rosterTier: '1군',
+          gameDayActive: true,
+          contract: {
+            status: '확정',
+            currency: 'KRW',
+            years: 1,
+            yearsRemaining: 1,
+            annualSalary: 5.0,
+            signingBonus: 0,
+            totalValue: 5.0,
+            startSeason: 2027,
+            endSeason: 2027,
+            note: '2026-09-01 LG 트윈스 국내 복귀 계약 (1년 5억 원)',
+          },
+          injury: null,
+          morale: '만족',
+          trainingFocus: null,
+          serviceYears: 8,
+          clubTenureSeasons: goMerged.clubTenureSeasons,
+          careerSeasons: 8,
+          isOneClubMan: goMerged.isOneClubMan,
+          careerTeamHistory: goMerged.history,
+          previousLeagueClub: goRaw.previous_league_club ?? undefined,
+          careerStats: goCareerAgg,
+          careerWins: goCareerAgg && 'W' in goCareerAgg ? goCareerAgg.W : 22,
+          careerSO: goCareerAgg && 'SO' in goCareerAgg ? goCareerAgg.SO : 429,
+          historicalSeasons: goHist,
+          recent3YrScore: 78,
+          seasonRatingDelta: 0,
+          lastEvaluatedAtTeamGames: 0,
+          stats: emptyPitcherStats(false),
+          postseasonStats: emptyPitcherStats(false),
+          v18Ratings: {
+            overall: goRaw.game_ratings.overall,
+            potential: goRaw.game_ratings.potential,
+            batting: null,
+            pitching: goRaw.game_ratings.pitching ?? null,
+          },
+          v18Evaluation: {
+            ...goRaw.evaluation_v18,
+            ovr: goRaw.game_ratings.overall,
+            pot: goRaw.game_ratings.potential,
+          },
+          rebalanceMeta: goRaw.rebalance_v19
+            ? {
+                prevOvr: goRaw.rebalance_v19.prev_ovr,
+                prevPot: goRaw.rebalance_v19.prev_pot,
+                newOvr: goRaw.rebalance_v19.new_ovr,
+                newPot: goRaw.rebalance_v19.new_pot,
+                ovrDelta: goRaw.rebalance_v19.ovr_delta,
+                potDelta: goRaw.rebalance_v19.pot_delta,
+                tier: goRaw.rebalance_v19.tier,
+                reason: goRaw.rebalance_v19.reason,
+              }
+            : undefined,
+          acquisitionInfo: {
+            type: '드래프트',
+            draftYear: 2017,
+            draftRound: 1,
+            draftPick: 1,
+            label: '2017 1차지명 (충암고 · 2026 해외파 복귀)',
+          },
+        };
+        career.players[goPlayer.id] = goPlayer;
+
+        const lgTeam = career.teams['LG'];
+        if (lgTeam && !lgTeam.bullpenOrder.includes(goPlayer.id) && !lgTeam.rotationOrder.includes(goPlayer.id)) {
+          // 유영찬 다음 필승조/마무리 경쟁 슬롯으로 자동 등록
+          lgTeam.bullpenOrder.splice(Math.min(1, lgTeam.bullpenOrder.length), 0, goPlayer.id);
+        }
+      }
+
+      // 기존 세이브 해외파 목록에서 고우석 제거 & 2027 실제 해외파 소속 동기화 (게임 내 이동이 없던 선수만)
+      if (career.amateurAndOverseas?.overseasPlayers) {
+        career.amateurAndOverseas.overseasPlayers = career.amateurAndOverseas.overseasPlayers.filter(
+          (ov) => ov.permanentId !== 'KBO-OVR-0004' && ov.name !== '고우석'
+        );
+        const latestBaseline = buildVerifiedOverseasBaseline(career.season);
+        const byPerm = new Map(latestBaseline.map((b) => [b.permanentId, b]));
+        const hasSong = career.amateurAndOverseas.overseasPlayers.some(
+          (o) => o.permanentId === 'KBO-OVR-0009' || o.name === '송성문'
+        );
+        const songInKbo = Object.values(career.players).some(
+          (p) => p.name === '송성문' && p.rosterTier !== '은퇴' && p.rosterTier !== '해외이적'
+        );
+        if (!hasSong && !songInKbo) {
+          const songBase = byPerm.get('KBO-OVR-0009');
+          if (songBase) career.amateurAndOverseas.overseasPlayers.push(songBase);
+        }
+        // 게임 내 2027 시즌 진행 전(gamesPlayed === 0) 세이브의 구 해외 소속팀 최신화
+        if ((career.gamesPlayed ?? 0) === 0) {
+          for (const ov of career.amateurAndOverseas.overseasPlayers) {
+            const ref = byPerm.get(ov.permanentId);
+            if (!ref) continue;
+            if (
+              (ov.permanentId === 'KBO-OVR-0002' && ov.clubName === '탬파베이 레이스') ||
+              (ov.permanentId === 'KBO-OVR-0005' && ov.clubName === '피츠버그 파이리츠') ||
+              (ov.permanentId === 'KBO-OVR-0007' && ov.clubName === '마이애미 말린스') ||
+              (ov.permanentId === 'KBO-OVR-0008' && (ov.league === 'High-A' || ov.league === 'A+'))
+            ) {
+              ov.clubName = ref.clubName;
+              ov.league = ref.league;
+              ov.status = ref.status;
+              ov.ability = ref.ability;
+              ov.potential = ref.potential;
+              ov.contractYearsRemaining = ref.contractYearsRemaining;
+              ov.annualSalaryUsdThousands = ref.annualSalaryUsdThousands;
+              ov.overseasContractEndDate = ref.overseasContractEndDate;
+              ov.domesticEligibleDate = ref.domesticEligibleDate;
+              ov.returnRestrictionActive = ref.returnRestrictionActive;
+              ov.returnRestrictionNote = ref.returnRestrictionNote;
+              ov.currentSeasonStats = { ...ref.currentSeasonStats };
+              ov.seasonHistory = ref.seasonHistory.map((s) => ({ ...s }));
+              ov.transferHistory = ref.transferHistory.map((t) => ({ ...t }));
+            }
+          }
+        }
+      }
+
+      if (career.overseasReturnPool) {
+        career.overseasReturnPool = career.overseasReturnPool.filter(
+          (c) => c.playerName !== '고우석'
+        );
+      }
+
+      career.databaseVersion = 'v23_go_woosuk_kbo_return';
+    }
+
+    // KBO 현역 선수단과 해외파 목록 간 중복 등록 상시 방지
+    if (career.amateurAndOverseas?.overseasPlayers) {
+      const activeKboKey = new Set<string>();
+      for (const p of Object.values(career.players)) {
+        if (p.rosterTier === '은퇴' || p.rosterTier === '해외이적') continue;
+        if (p.permanentId) activeKboKey.add(p.permanentId);
+        if (p.birthYear) activeKboKey.add(`${p.name}|${p.birthYear}`);
+      }
+      for (const ov of career.amateurAndOverseas.overseasPlayers) {
+        if (ov.status === 'KBO복귀완료' || ov.status === '은퇴') continue;
+        if (activeKboKey.has(ov.permanentId) || activeKboKey.has(`${ov.name}|${ov.birthYear}`)) {
+          ov.status = 'KBO복귀완료';
+          ov.league = 'FA/방출';
+        }
+      }
+    }
+
     // 세이브 로드 시마다 현재 게임 날짜·생년월일 기준으로 전체 만 나이 일괄 동기화
     syncAllAgesToDateInPlace(career);
   }
@@ -1176,6 +1370,7 @@ export function buildAll10TeamsFromV18Dataset(): {
       careerWins: role === '투수' && careerStats && 'W' in careerStats ? careerStats.W : undefined,
       careerSO: role === '투수' && careerStats && 'SO' in careerStats ? careerStats.SO : undefined,
       careerTeamHistory,
+      previousLeagueClub: raw.previous_league_club ?? undefined,
       isOneClubMan,
       uniformNumber: jerseyNum,
       nationality: resolveRealForeignNationality(raw.name, category, fm?.nationality),
@@ -1303,12 +1498,25 @@ export function buildAll10TeamsFromV18Dataset(): {
         return bScore - aScore;
       });
 
-    // 선발 5명 (스태미나/구위 높은 상위 5명)
+    // 선발 5명 (스태미나/구위 높은 상위 5명 · 전문 구원/마무리 투수는 불펜 유지)
+    const isDedicatedReliever = (p: Player): boolean => {
+      const cs = p.careerStats;
+      if (cs && 'SV' in cs) {
+        if (cs.SV >= 20) return true;
+        if (cs.G >= 30 && cs.outs / Math.max(1, cs.G) < 6) return true;
+      }
+      if (p.v18SourceId === '2026-LG-19' || p.name === '고우석' || p.name === '유영찬') {
+        return true;
+      }
+      return false;
+    };
     const starterPool = [...pitchers].sort((a, b) => {
       const aStam = a.v18Ratings?.pitching?.stamina_proxy ?? 50;
       const bStam = b.v18Ratings?.pitching?.stamina_proxy ?? 50;
-      const aVal = a.ability * 1.4 + aStam * 0.4 + (a.category !== '국내' ? 5 : 0);
-      const bVal = b.ability * 1.4 + bStam * 0.4 + (b.category !== '국내' ? 5 : 0);
+      const aRelPen = isDedicatedReliever(a) ? -48 : 0;
+      const bRelPen = isDedicatedReliever(b) ? -48 : 0;
+      const aVal = a.ability * 1.4 + aStam * 0.4 + (a.category !== '국내' ? 5 : 0) + aRelPen;
+      const bVal = b.ability * 1.4 + bStam * 0.4 + (b.category !== '국내' ? 5 : 0) + bRelPen;
       return bVal - aVal;
     });
     const rotationOrder: string[] = [];

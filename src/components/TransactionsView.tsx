@@ -1273,7 +1273,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
               <div>
                 <div className="text-sm font-extrabold">해외 리그 복귀 · 해외 직행 선수 시장</div>
                 <p className="text-[11px] text-slate-500 mt-0.5">
-                  MLB 포스팅 진출 선수(고우석 등)는 원소속 구단 우선협상권이 적용되며, 고교 졸업 후 해외 직행 선수(박효준·배지환 등)는 원소속팀이 없어 전 구단 동등 조건으로 영입할 수 있습니다.
+                  MLB 포스팅 진출 선수(김하성·이정후·송성문 등)는 원소속 구단 우선협상권이 적용되며, 고교 졸업 후 해외 직행 선수(박효준·배지환 등)는 원소속팀이 없어 전 구단 동등 조건으로 영입할 수 있습니다.
                 </p>
               </div>
               <span className="text-[11px] font-mono-stats text-slate-500">

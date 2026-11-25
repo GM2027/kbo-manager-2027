@@ -1,0 +1,79 @@
+{
+  "patchedAt": "2026-11-25T15:17:40.038Z",
+  "databaseVersion": "v23_go_woosuk_kbo_return",
+  "backupFile": "src/data/v22PlayerDataBackupBeforeOverseasReturnPatch.json",
+  "goWoosukAction": "inserted",
+  "goWoosukProfile": {
+    "id": "2026-LG-19",
+    "kboOfficialId": "67119",
+    "team": "LG",
+    "jersey": "19",
+    "birthDate": "1998-08-06",
+    "overall": 78,
+    "potential": 82,
+    "kboCareerSummary": "370G 22W 27L 140SV 11HLD 391.1IP 429SO ERA 3.08",
+    "mlbMilbSummary": "MLB 4G 1HLD ERA 9.00 / MiLB 76G 6W 4L 6SV 7HLD ERA 5.61"
+  },
+  "verifiedOverseasRosterAudit2027": [
+    {
+      "name": "고우석",
+      "prev": "마이애미 말린스 (AAA)",
+      "next": "LG 트윈스 (KBO 1군 · 해외파 목록 제거)",
+      "status": "KBO복귀완료"
+    },
+    {
+      "name": "김하성",
+      "prev": "탬파베이 레이스 (MLB)",
+      "next": "디트로이트 타이거스 (MLB · 1년 $5M)",
+      "status": "해외현역"
+    },
+    {
+      "name": "이정후",
+      "prev": "샌프란시스코 자이언츠 (MLB)",
+      "next": "샌프란시스코 자이언츠 (MLB)",
+      "status": "해외현역"
+    },
+    {
+      "name": "김혜성",
+      "prev": "LA 다저스 (MLB)",
+      "next": "LA 다저스 (MLB)",
+      "status": "해외현역"
+    },
+    {
+      "name": "송성문",
+      "prev": "미등록 (포스팅 진출)",
+      "next": "샌디에이고 파드리스 (MLB · 4년 $15M)",
+      "status": "해외현역"
+    },
+    {
+      "name": "배지환",
+      "prev": "피츠버그 파이리츠 (AAA)",
+      "next": "밀워키 브루어스 (AAA · NYM 경유)",
+      "status": "해외현역"
+    },
+    {
+      "name": "엄형찬",
+      "prev": "캔자스시티 로열스 (High-A)",
+      "next": "캔자스시티 로열스 (AA 승격)",
+      "status": "해외현역"
+    },
+    {
+      "name": "장현석",
+      "prev": "LA 다저스 (High-A)",
+      "next": "LA 다저스 (High-A)",
+      "status": "해외현역"
+    },
+    {
+      "name": "심준석",
+      "prev": "마이애미 말린스 (Single-A)",
+      "next": "FA/방출 (마이애미·뉴욕 메츠 방출 · 제107조 2년 제한)",
+      "status": "방출대기"
+    },
+    {
+      "name": "최지만",
+      "prev": "울산 웨일즈 / MLB",
+      "next": "KT 위즈 (KBO 1군 · 2027 2R 15순위)",
+      "status": "KBO복귀완료"
+    }
+  ]
+}

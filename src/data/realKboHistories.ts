@@ -1019,7 +1019,9 @@ export const REAL_KBO_CAREER_HISTORIES: RealPlayerClubProfile[] = [
     history: [
       { teamLabel: '넥센 / 키움 히어로즈', teamId: '키움', league: 'KBO', fromSeason: 2014, toSeason: 2020, note: '골든글러브 유격수 3연패' },
       { teamLabel: '샌디에이고 파드리스', league: 'MLB', mlbTeamName: 'San Diego Padres', fromSeason: 2021, toSeason: 2024, note: '2023 NL 유틸리티 골드글러브 수상' },
-      { teamLabel: '탬파베이 레이스', league: 'MLB', mlbTeamName: 'Tampa Bay Rays', fromSeason: 2025, toSeason: 2026, note: 'MLB FA 계약' },
+      { teamLabel: '탬파베이 레이스', league: 'MLB', mlbTeamName: 'Tampa Bay Rays', fromSeason: 2025, toSeason: 2025, note: 'MLB FA 계약' },
+      { teamLabel: '애틀랜타 브레이브스', league: 'MLB', mlbTeamName: 'Atlanta Braves', fromSeason: 2026, toSeason: 2026, note: 'MLB 1년 계약' },
+      { teamLabel: '디트로이트 타이거스', league: 'MLB', mlbTeamName: 'Detroit Tigers', fromSeason: 2027, note: 'MLB FA 이적 계약' },
     ],
   },
   {
@@ -1030,19 +1032,21 @@ export const REAL_KBO_CAREER_HISTORIES: RealPlayerClubProfile[] = [
     franchiseIconBonus: 14,
     history: [
       { teamLabel: '넥센 / 키움 히어로즈', teamId: '키움', league: 'KBO', fromSeason: 2017, toSeason: 2024, note: '골든글러브 4연속 수상' },
-      { teamLabel: 'LA 다저스', league: 'MLB', mlbTeamName: 'Los Angeles Dodgers', fromSeason: 2025, toSeason: 2026, note: 'MLB 포스팅 진출' },
+      { teamLabel: 'LA 다저스', league: 'MLB', mlbTeamName: 'Los Angeles Dodgers', fromSeason: 2025, note: 'MLB 포스팅 진출' },
     ],
   },
   {
     name: '고우석',
     expectedTeamId: 'LG',
     isOneClubMan: true,
-    clubTenure2026: 7,
-    franchiseIconBonus: 12,
+    clubTenure2026: 8,
+    franchiseIconBonus: 14,
     history: [
       { teamLabel: 'LG 트윈스', teamId: 'LG', league: 'KBO', fromSeason: 2017, toSeason: 2023, note: '2022 세이브왕 · 2023 통합우승 마무리' },
       { teamLabel: '샌디에이고 파드리스', league: 'MLB', mlbTeamName: 'San Diego Padres', fromSeason: 2024, toSeason: 2024, note: 'MLB 포스팅 계약' },
-      { teamLabel: '마이애미 말린스', league: 'MLB', mlbTeamName: 'Miami Marlins', fromSeason: 2024, toSeason: 2025, note: 'MLB 트레이드 이적' },
+      { teamLabel: '마이애미 말린스', league: 'MLB', mlbTeamName: 'Miami Marlins', fromSeason: 2024, toSeason: 2025, note: 'MLB 트레이드 이적 · 마이너리그' },
+      { teamLabel: '디트로이트 / 미네소타 트윈스', league: 'MLB', mlbTeamName: 'Minnesota Twins', fromSeason: 2026, toSeason: 2026, note: 'MLB 빅리그 데뷔 (4G 1HLD ERA 9.00)' },
+      { teamLabel: 'LG 트윈스', teamId: 'LG', league: 'KBO', fromSeason: 2026, transferDate: '2026-09-01', moveType: '해외파 복귀', note: '2026-09-01 친정팀 LG 복귀 (16G ERA 1.57)' },
     ],
   },
   {
@@ -1052,6 +1056,8 @@ export const REAL_KBO_CAREER_HISTORIES: RealPlayerClubProfile[] = [
     franchiseIconBonus: 2,
     history: [
       { teamLabel: '피츠버그 파이리츠', league: 'MLB', mlbTeamName: 'Pittsburgh Pirates', fromSeason: 2022, toSeason: 2025, note: 'MLB 빅리그 통산 4시즌' },
+      { teamLabel: '뉴욕 메츠', league: 'MLB', mlbTeamName: 'New York Mets', fromSeason: 2026, toSeason: 2026, note: '웨이버 이적 (AAA 시러큐스)' },
+      { teamLabel: '밀워키 브루어스', league: 'MLB', mlbTeamName: 'Milwaukee Brewers', fromSeason: 2026, note: '밀워키 합류' },
     ],
   },
   {

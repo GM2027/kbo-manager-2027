@@ -111,6 +111,10 @@ export const AmateurAndOverseasView: React.FC<AmateurAndOverseasViewProps> = ({
   const tournaments = state?.tournamentResults ?? [];
   const mlbBudgets = state?.mlbClubBudgets ?? [];
   const overseasPlayers = state?.overseasPlayers ?? [];
+  const activeOverseasPlayers = useMemo(
+    () => overseasPlayers.filter((ov) => ov.status !== 'KBO복귀완료'),
+    [overseasPlayers]
+  );
   const signedThisSeasonCount = state?.overseasAmateurSigningsBySeason?.[career.season] ?? 0;
 
   const prospectById = useMemo(() => {
@@ -147,7 +151,7 @@ export const AmateurAndOverseasView: React.FC<AmateurAndOverseasViewProps> = ({
   );
 
   const filteredOverseas = useMemo(() => {
-    return overseasPlayers
+    return activeOverseasPlayers
       .filter((ov) => {
         const normLv = normalizeOverseasLeagueLevel(ov.league);
         if (overseasLevelFilter === '방출·복귀') {
@@ -174,15 +178,15 @@ export const AmateurAndOverseasView: React.FC<AmateurAndOverseasViewProps> = ({
         const lb = normalizeOverseasLeagueLevel(b.league);
         return (lvlOrder[la] ?? 9) - (lvlOrder[lb] ?? 9) || b.ability - a.ability;
       });
-  }, [overseasPlayers, overseasLevelFilter]);
+  }, [activeOverseasPlayers, overseasLevelFilter]);
 
   const selectedOverseas: OverseasPlayerRecord | null = useMemo(() => {
     if (selectedOverseasId) {
-      const found = overseasPlayers.find((o) => o.permanentId === selectedOverseasId);
+      const found = activeOverseasPlayers.find((o) => o.permanentId === selectedOverseasId);
       if (found) return found;
     }
-    return filteredOverseas[0] ?? overseasPlayers[0] ?? null;
-  }, [selectedOverseasId, overseasPlayers, filteredOverseas]);
+    return filteredOverseas[0] ?? activeOverseasPlayers[0] ?? null;
+  }, [selectedOverseasId, activeOverseasPlayers, filteredOverseas]);
 
   const returnAudits = useMemo(() => {
     return overseasPlayers
@@ -260,7 +264,7 @@ export const AmateurAndOverseasView: React.FC<AmateurAndOverseasViewProps> = ({
                 { id: 'prospects', label: `고교·대학 유망주 (${prospects.length})` },
                 { id: 'tournaments', label: `아마추어 대회 (${tournaments.length})` },
                 { id: 'mlb_scouting', label: `해외 스카우팅 (${mlbInterestedProspects.length})` },
-                { id: 'overseas', label: `해외파 현황 (${overseasPlayers.length})` },
+                { id: 'overseas', label: `해외파 현황 (${activeOverseasPlayers.length})` },
                 { id: 'return_107', label: `국내 복귀 · 제107조` },
               ] as const
             ).map((t) => (

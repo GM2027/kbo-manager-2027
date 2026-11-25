@@ -714,18 +714,25 @@ export function ensureDeepFranchiseState(career: CareerSave): void {
     };
   }
 
-  // #10: Hydrate overseas return candidates & normalize real KBO parent club rules
+  // #10: Hydrate overseas return candidates & remove any players already active in KBO (prevent KBO/overseas duplicates)
+  const activeKboPlayerNames = new Set(
+    Object.values(career.players)
+      .filter((p) => p.rosterTier !== '은퇴' && p.rosterTier !== '해외이적')
+      .map((p) => p.name)
+  );
   if (!career.overseasReturnPool) {
-    career.overseasReturnPool = buildInitialOverseasReturnPool(career.season);
+    career.overseasReturnPool = buildInitialOverseasReturnPool(career.season).filter(
+      (c) => !activeKboPlayerNames.has(c.playerName)
+    );
   } else {
+    career.overseasReturnPool = career.overseasReturnPool.filter(
+      (cand) => cand.signed || !activeKboPlayerNames.has(cand.playerName)
+    );
     for (const cand of career.overseasReturnPool) {
       if (cand.signed) continue;
       if (cand.playerName === '박효준' || cand.playerName === '배지환') {
         cand.originalKboTeamId = null;
         cand.returnPath = '해외직행(원소속없음)';
-      } else if (cand.playerName === '고우석') {
-        cand.originalKboTeamId = 'LG';
-        cand.returnPath = '포스팅·임의탈퇴복귀';
       }
     }
   }
@@ -740,21 +747,6 @@ export function ensureDeepFranchiseState(career: CareerSave): void {
 function buildInitialOverseasReturnPool(season: number): OverseasReturnCandidate[] {
   return [
     {
-      id: `ovr-ret-1-${season}`,
-      playerName: '고우석',
-      originalKboTeamId: 'LG',
-      returnPath: '포스팅·임의탈퇴복귀',
-      role: '투수',
-      position: 'CL',
-      age: 28 + Math.max(0, season - 2026),
-      ability: 84,
-      potential: 86,
-      overseasClub: 'MLB 마이애미 산하 AAA',
-      overseasSummary: 'LG 트윈스 MLB 포스팅 진출 후 KBO 복귀 타진 (원소속팀 LG 우선협상권 적용)',
-      demandedYears: 4,
-      demandedTotalBillion: 56,
-    },
-    {
       id: `ovr-ret-2-${season}`,
       playerName: '박효준',
       originalKboTeamId: null,
@@ -762,12 +754,12 @@ function buildInitialOverseasReturnPool(season: number): OverseasReturnCandidate
       role: '타자',
       position: '2B',
       age: 30 + Math.max(0, season - 2026),
-      ability: 79,
-      potential: 81,
-      overseasClub: '미국 독립리그 · AAA',
+      ability: 76,
+      potential: 78,
+      overseasClub: '미국 독립리그 · 마이너 FA',
       overseasSummary: '고교 졸업 후 MLB 직행 · KBO 원소속 구단 없음 (전 구단 동등 조건 영입 가능)',
       demandedYears: 3,
-      demandedTotalBillion: 24,
+      demandedTotalBillion: 20,
     },
     {
       id: `ovr-ret-3-${season}`,
@@ -777,12 +769,12 @@ function buildInitialOverseasReturnPool(season: number): OverseasReturnCandidate
       role: '타자',
       position: 'CF',
       age: 27 + Math.max(0, season - 2026),
-      ability: 82,
-      potential: 85,
-      overseasClub: 'MLB 피츠버그 · AAA 인디애나폴리스',
+      ability: 76,
+      potential: 80,
+      overseasClub: 'MLB 밀워키 브루어스 · AAA',
       overseasSummary: '고교 졸업 후 MLB 직행 · KBO 원소속 구단 없음 (최상위 주루·컨택 리드오프)',
       demandedYears: 4,
-      demandedTotalBillion: 48,
+      demandedTotalBillion: 38,
     },
   ];
 }
