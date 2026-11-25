@@ -1,0 +1,23 @@
+{
+  "players": 731,
+  "basis_counts": {
+    "legacy_or_reserve_projection": 49,
+    "recent_source_records": 572,
+    "draft_rank_projection": 110
+  },
+  "confidence_counts": {
+    "low": 370,
+    "medium": 240,
+    "high": 121
+  },
+  "ovr_changed": 619,
+  "pot_changed": 695,
+  "three_seasons": 311,
+  "duplicate_source_ids_excluded": 0,
+  "source_snapshot": {
+    "updatedAt": "2026-11-25 09:11",
+    "season": 2026,
+    "source": "KBO 공식 홈페이지 (koreabaseball.com)"
+  },
+  "limitations": "No new live official verification; draft and age inherited; missing futures/amateur/overseas; two-way players without records draft estimate; no roster changes; game ratings only."
+}

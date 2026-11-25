@@ -1,0 +1,805 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  html {
+    font-family: 'Plus Jakarta Sans', 'Noto Sans KR', system-ui, -apple-system, sans-serif;
+  }
+
+  .font-mono-stats {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+:root {
+  --team-primary: #ea580c;
+  --team-primary-rgb: 234, 88, 12;
+  --team-secondary: #1e1b18;
+  --team-on-primary: #ffffff;
+  --team-banner-from: #fc4e00;
+  --team-banner-to: #1e1b18;
+}
+
+.dark {
+  --team-primary: var(--team-primary-dark, #fb923c);
+  --team-primary-rgb: var(--team-primary-rgb-dark, 251, 146, 60);
+}
+
+.team-accent-bg {
+  background-color: var(--team-primary);
+  color: var(--team-on-primary);
+}
+
+.team-accent-text {
+  color: var(--team-primary);
+}
+
+.team-accent-soft {
+  background-color: rgba(var(--team-primary-rgb), 0.12);
+  color: var(--team-primary);
+  border-color: rgba(var(--team-primary-rgb), 0.28);
+}
+
+.team-accent-border {
+  border-color: rgba(var(--team-primary-rgb), 0.35);
+}
+
+.team-banner-grad {
+  background: linear-gradient(120deg, var(--team-banner-from) 0%, var(--team-banner-to) 100%);
+  color: #ffffff;
+}
+
+.team-accent-btn {
+  background-color: var(--team-primary);
+  color: var(--team-on-primary);
+  transition: filter 150ms ease, opacity 150ms ease, transform 150ms ease;
+}
+
+.team-accent-btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.team-accent-badge {
+  background-color: rgba(var(--team-primary-rgb), 0.14);
+  color: var(--team-primary);
+  border: 1px solid rgba(var(--team-primary-rgb), 0.35);
+}
+
+.team-accent-outline {
+  border: 1px solid rgba(var(--team-primary-rgb), 0.55);
+  background-color: rgba(var(--team-primary-rgb), 0.08);
+  color: var(--team-primary);
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.team-accent-outline:hover:not(:disabled) {
+  background-color: var(--team-primary);
+  color: var(--team-on-primary);
+  border-color: var(--team-primary);
+}
+
+.team-accent-surface {
+  background-color: rgba(var(--team-primary-rgb), 0.06);
+  border-color: rgba(var(--team-primary-rgb), 0.35);
+}
+
+.team-accent-row {
+  background-color: rgba(var(--team-primary-rgb), 0.10);
+}
+
+.team-accent-hover-border:hover {
+  border-color: rgba(var(--team-primary-rgb), 0.6);
+}
+
+.team-accent-hover-text:hover {
+  color: var(--team-primary);
+}
+
+.kbo-gala-stage {
+  background:
+    radial-gradient(ellipse 80% 55% at 50% 0%, rgba(245, 197, 66, 0.22), transparent 65%),
+    radial-gradient(ellipse 60% 45% at 85% 20%, rgba(56, 189, 248, 0.1), transparent 60%),
+    linear-gradient(155deg, #090d1a 0%, #10192e 48%, #070b14 100%);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* KBO 시상식 애니메이션 (GPU 합성 속성 transform/opacity/filter 전용) */
+@keyframes awardCardEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes awardSpotlightSweep {
+  0% {
+    transform: translateX(-120%) skewX(-18deg);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.45;
+  }
+  100% {
+    transform: translateX(240%) skewX(-18deg);
+    opacity: 0;
+  }
+}
+
+@keyframes awardTrophyFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    filter: drop-shadow(0 4px 10px rgba(245, 158, 11, 0.28));
+  }
+  50% {
+    transform: translateY(-4px) scale(1.04);
+    filter: drop-shadow(0 10px 18px rgba(245, 158, 11, 0.45));
+  }
+}
+
+@keyframes awardConfettiFall {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -18px, 0) rotate(0deg);
+  }
+  15% {
+    opacity: 0.95;
+  }
+  85% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--confetti-drift, 18px), 160px, 0) rotate(320deg);
+  }
+}
+
+@keyframes awardVoteBarGrow {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+.animate-award-enter {
+  animation: awardCardEnter 460ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-award-spotlight {
+  animation: awardSpotlightSweep 2.4s cubic-bezier(0.16, 1, 0.3, 1) 1 forwards;
+}
+
+.animate-award-trophy {
+  animation: awardTrophyFloat 2.8s ease-in-out infinite;
+}
+
+.animate-award-confetti {
+  animation: awardConfettiFall var(--confetti-duration, 2.6s) cubic-bezier(0.22, 0.61, 0.36, 1) var(--confetti-delay, 0s) infinite;
+}
+
+.animate-award-vote-bar {
+  transform-origin: left center;
+  animation: awardVoteBarGrow 700ms cubic-bezier(0.16, 1, 0.3, 1) 180ms both;
+}
+
+/* =========================================================================
+   10개 KBO 구단 실제 로고 인트로 애니메이션 (로고 자체 무변형 · 주변 효과만 적용)
+   ========================================================================= */
+@keyframes clubLogoEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.84);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes clubTextReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes clubProgressFill {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes clubOrbitCW {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes clubOrbitCCW {
+  0% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes clubShockwave {
+  0% {
+    opacity: 0.85;
+    transform: scale(0.75);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.65);
+  }
+}
+
+@keyframes clubWaveRipple {
+  0% {
+    opacity: 0.72;
+    transform: scale(0.82) translateY(8px);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(1.18) translateY(-4px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.55) translateY(4px);
+  }
+}
+
+@keyframes clubFlamePulse {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(0.95);
+    filter: blur(16px);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.16);
+    filter: blur(22px);
+  }
+}
+
+@keyframes clubSlashSweep {
+  0% {
+    opacity: 0;
+    transform: translateX(-140%) rotate(-24deg);
+  }
+  35% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(140%) rotate(-24deg);
+  }
+}
+
+@keyframes clubStarburst {
+  0% {
+    opacity: 0.3;
+    transform: rotate(0deg) scale(0.92);
+  }
+  50% {
+    opacity: 0.85;
+    transform: rotate(90deg) scale(1.08);
+  }
+  100% {
+    opacity: 0.35;
+    transform: rotate(180deg) scale(0.96);
+  }
+}
+
+.club-intro-logo-frame {
+  animation: clubLogoEnter 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.club-intro-text-reveal {
+  animation: clubTextReveal 480ms cubic-bezier(0.16, 1, 0.3, 1) 200ms both;
+}
+
+.club-intro-progress {
+  transform-origin: left center;
+  animation: clubProgressFill 2.05s linear both;
+}
+
+.club-intro-aura-back,
+.club-intro-ring-outer,
+.club-intro-ring-inner,
+.club-intro-sweep {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  pointer-events: none;
+}
+
+.club-intro-aura-back {
+  inset: 14%;
+  background: radial-gradient(circle, var(--club-glow) 0%, transparent 70%);
+  filter: blur(18px);
+}
+
+/* 1. LG 트윈스: 트윈 크림슨 이중 궤도 회전 + 스포트라이트 */
+.club-intro-lg .club-intro-ring-outer {
+  inset: 4%;
+  border: 2px dashed rgba(195, 4, 82, 0.78);
+  animation: clubOrbitCW 4.2s linear infinite;
+}
+.club-intro-lg .club-intro-ring-inner {
+  inset: 13%;
+  border: 2px solid rgba(255, 255, 255, 0.32);
+  border-top-color: #c30452;
+  animation: clubOrbitCCW 2.4s linear infinite;
+}
+.club-intro-lg .club-intro-sweep {
+  inset: 10%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  animation: clubSlashSweep 1.6s ease-out 1 both;
+}
+
+/* 2. 한화 이글스: 태양 불꽃 펄스 + 상승 광채 링 */
+.club-intro-hanwha .club-intro-aura-back {
+  animation: clubFlamePulse 1.35s ease-in-out infinite;
+}
+.club-intro-hanwha .club-intro-ring-outer {
+  inset: 6%;
+  border: 3px solid rgba(252, 78, 0, 0.85);
+  animation: clubShockwave 1.5s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+.club-intro-hanwha .club-intro-ring-inner {
+  inset: 12%;
+  border: 2px solid rgba(251, 191, 36, 0.65);
+  border-bottom-color: transparent;
+  animation: clubOrbitCW 2.2s linear infinite;
+}
+
+/* 3. KIA 타이거즈: 타이거 크림슨 슬래시 빔 + 강렬한 충격파 */
+.club-intro-kia .club-intro-ring-outer {
+  inset: 5%;
+  border: 3px solid rgba(234, 0, 41, 0.9);
+  animation: clubShockwave 1.15s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+.club-intro-kia .club-intro-ring-inner {
+  inset: 11%;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  animation: clubShockwave 1.15s cubic-bezier(0.16, 1, 0.3, 1) 0.45s infinite;
+}
+.club-intro-kia .club-intro-sweep {
+  inset: 0;
+  border-radius: 0;
+  background: linear-gradient(90deg, transparent 20%, rgba(234, 0, 41, 0.52) 50%, transparent 80%);
+  animation: clubSlashSweep 1.2s ease-out 1 both;
+}
+
+/* 4. 삼성 라이온즈: 블루 크라운 스타버스트 회전광 */
+.club-intro-samsung .club-intro-ring-outer {
+  inset: 3%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(56, 189, 248, 0.55) 0deg 20deg,
+    transparent 20deg 60deg,
+    rgba(7, 76, 161, 0.7) 60deg 80deg,
+    transparent 80deg 120deg,
+    rgba(56, 189, 248, 0.55) 120deg 140deg,
+    transparent 140deg 180deg,
+    rgba(7, 76, 161, 0.7) 180deg 200deg,
+    transparent 200deg 240deg,
+    rgba(56, 189, 248, 0.55) 240deg 260deg,
+    transparent 260deg 300deg,
+    rgba(7, 76, 161, 0.7) 300deg 320deg,
+    transparent 320deg 360deg
+  );
+  -webkit-mask: radial-gradient(circle, transparent 58%, #000 60%);
+  mask: radial-gradient(circle, transparent 58%, #000 60%);
+  animation: clubStarburst 2.2s ease-in-out infinite;
+}
+.club-intro-samsung .club-intro-ring-inner {
+  inset: 12%;
+  border: 2px solid rgba(125, 211, 252, 0.7);
+  animation: clubOrbitCW 3.4s linear infinite;
+}
+
+/* 5. 두산 베어스: 미드나잇 네이비 헤비 충격파 + 레드 링 */
+.club-intro-doosan .club-intro-ring-outer {
+  inset: 5%;
+  border: 4px solid rgba(237, 28, 36, 0.85);
+  animation: clubShockwave 1.3s ease-out infinite;
+}
+.club-intro-doosan .club-intro-ring-inner {
+  inset: 10%;
+  border: 3px solid rgba(255, 255, 255, 0.55);
+  border-left-color: transparent;
+  border-right-color: transparent;
+  animation: clubOrbitCCW 2.1s linear infinite;
+}
+
+/* 6. 롯데 자이언츠: 부산 바다 파도 리플 링 + 항해 비콘 */
+.club-intro-lotte .club-intro-ring-outer {
+  inset: 6%;
+  border: 3px solid rgba(56, 189, 248, 0.65);
+  animation: clubWaveRipple 1.6s ease-out infinite;
+}
+.club-intro-lotte .club-intro-ring-inner {
+  inset: 12%;
+  border: 3px solid rgba(208, 15, 49, 0.85);
+  animation: clubWaveRipple 1.6s ease-out 0.55s infinite;
+}
+
+/* 7. SSG 랜더스: 우주 착륙 워프 링 + 골드 혜성 궤도 */
+.club-intro-ssg .club-intro-ring-outer {
+  inset: 3%;
+  border: 2px solid rgba(250, 204, 21, 0.78);
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  animation: clubOrbitCW 1.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.club-intro-ssg .club-intro-ring-inner {
+  inset: 10%;
+  border: 3px solid rgba(206, 14, 45, 0.85);
+  animation: clubShockwave 1.5s ease-out infinite;
+}
+
+/* 8. KT 위즈: 매직 레드 볼텍스 오라 + 고속 역회전 마법진 */
+.club-intro-kt .club-intro-ring-outer {
+  inset: 4%;
+  border: 2px dotted rgba(235, 28, 36, 0.92);
+  animation: clubOrbitCW 2.8s linear infinite;
+}
+.club-intro-kt .club-intro-ring-inner {
+  inset: 11%;
+  border: 2px dashed rgba(255, 255, 255, 0.6);
+  animation: clubOrbitCCW 1.8s linear infinite;
+}
+.club-intro-kt .club-intro-aura-back {
+  animation: clubFlamePulse 1.1s ease-in-out infinite;
+}
+
+/* 9. NC 다이노스: 다이노스 골드 지진 충격파 + 네이비-골드 궤도 */
+.club-intro-nc .club-intro-ring-outer {
+  inset: 5%;
+  border: 3px solid rgba(199, 160, 82, 0.88);
+  animation: clubShockwave 1.45s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+.club-intro-nc .club-intro-ring-inner {
+  inset: 12%;
+  border: 2px solid rgba(56, 189, 248, 0.55);
+  border-top-color: #c7a052;
+  animation: clubOrbitCW 2.5s linear infinite;
+}
+
+/* 10. 키움 히어로즈: 버건디 영웅 실드 광선 + 동심원 펄스 */
+.club-intro-kiwoom .club-intro-ring-outer {
+  inset: 4%;
+  background: conic-gradient(
+    from 15deg,
+    rgba(225, 29, 72, 0.55) 0deg 30deg,
+    transparent 30deg 90deg,
+    rgba(255, 255, 255, 0.32) 90deg 120deg,
+    transparent 120deg 180deg,
+    rgba(225, 29, 72, 0.55) 180deg 210deg,
+    transparent 210deg 270deg,
+    rgba(255, 255, 255, 0.32) 270deg 300deg,
+    transparent 300deg 360deg
+  );
+  -webkit-mask: radial-gradient(circle, transparent 60%, #000 62%);
+  mask: radial-gradient(circle, transparent 60%, #000 62%);
+  animation: clubOrbitCW 3.6s linear infinite;
+}
+.club-intro-kiwoom .club-intro-ring-inner {
+  inset: 11%;
+  border: 3px solid rgba(225, 29, 72, 0.85);
+  animation: clubShockwave 1.4s ease-out infinite;
+}
+
+/* =========================================================================
+   KBO GM 9종 이벤트 애니메이션 (순수 CSS/SVG, GPU 합성 속성 전용)
+   ========================================================================= */
+@keyframes kboFloodlightOn {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.35);
+  }
+  28% {
+    opacity: 0.92;
+    transform: scaleY(1);
+  }
+  42% {
+    opacity: 0.55;
+  }
+  65% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.85;
+    transform: scaleY(1.04);
+  }
+}
+
+@keyframes kboContractZoom {
+  0% {
+    opacity: 0;
+    transform: scale(0.72) translateY(22px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes kboStampSlam {
+  0% {
+    opacity: 0;
+    transform: scale(2.6) rotate(-22deg);
+  }
+  58% {
+    opacity: 1;
+    transform: scale(0.92) rotate(-11deg);
+  }
+  78% {
+    transform: scale(1.05) rotate(-12deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-11deg);
+  }
+}
+
+@keyframes kboSlideLeftIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-80px) scale(0.86);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes kboSlideRightIn {
+  0% {
+    opacity: 0;
+    transform: translateX(80px) scale(0.86);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes kboCurtainDarken {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes kboKsConfetti {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -10vh, 0) rotate(0deg);
+  }
+  12% {
+    opacity: 0.95;
+  }
+  88% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--ks-drift, 32px), 108vh, 0) rotate(540deg);
+  }
+}
+
+@keyframes kboKsRaySpin {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  100% {
+    transform: rotate(360deg) scale(1.05);
+  }
+}
+
+@keyframes kboKsFlash {
+  0%, 100% {
+    opacity: 0.25;
+  }
+  30% {
+    opacity: 0.85;
+  }
+  60% {
+    opacity: 0.35;
+  }
+  80% {
+    opacity: 0.78;
+  }
+}
+
+@keyframes kboKsWave {
+  0% {
+    transform: translateX(-18%) scaleY(0.94);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateX(12%) scaleY(1.08);
+    opacity: 0.78;
+  }
+  100% {
+    transform: translateX(-18%) scaleY(0.94);
+    opacity: 0.4;
+  }
+}
+
+@keyframes kboKsBurst {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.85);
+  }
+}
+
+@keyframes kboKsStreak {
+  0% {
+    opacity: 0;
+    transform: translateX(-130%) skewX(-24deg);
+  }
+  35% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(140%) skewX(-24deg);
+  }
+}
+
+@keyframes kboProgressBar {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes kboYearOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-76px) scale(0.8);
+  }
+}
+
+@keyframes kboYearIn {
+  0% {
+    opacity: 0;
+    transform: translateY(76px) scale(0.82);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.kbo-anim-floodlight {
+  transform-origin: top center;
+  animation: kboFloodlightOn 1.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.kbo-anim-contract-zoom {
+  animation: kboContractZoom 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.kbo-anim-stamp {
+  animation: kboStampSlam 460ms cubic-bezier(0.22, 1, 0.36, 1) 420ms both;
+}
+
+.kbo-anim-slide-left {
+  animation: kboSlideLeftIn 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.kbo-anim-slide-right {
+  animation: kboSlideRightIn 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.kbo-anim-darken {
+  animation: kboCurtainDarken 550ms ease-out both;
+}
+
+.kbo-anim-ks-confetti {
+  animation: kboKsConfetti var(--ks-dur, 2.7s) cubic-bezier(0.2, 0.65, 0.35, 1) var(--ks-delay, 0s) infinite;
+}
+
+.kbo-anim-ks-spin {
+  animation: kboKsRaySpin 7s linear infinite;
+}
+
+.kbo-anim-ks-flash {
+  animation: kboKsFlash 1.5s ease-in-out infinite;
+}
+
+.kbo-anim-ks-wave {
+  animation: kboKsWave 2.2s ease-in-out infinite;
+}
+
+.kbo-anim-ks-burst {
+  animation: kboKsBurst 1.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.kbo-anim-ks-streak {
+  animation: kboKsStreak 1.55s ease-out infinite;
+}
+
+.kbo-anim-progress {
+  transform-origin: left center;
+  animation: kboProgressBar var(--anim-ms, 2600ms) linear both;
+}
+
+.kbo-anim-year-out {
+  animation: kboYearOut 620ms cubic-bezier(0.22, 1, 0.36, 1) 360ms both;
+}
+
+.kbo-anim-year-in {
+  animation: kboYearIn 680ms cubic-bezier(0.22, 1, 0.36, 1) 520ms both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-award-enter,
+  .animate-award-spotlight,
+  .animate-award-trophy,
+  .animate-award-confetti,
+  .animate-award-vote-bar,
+  .club-intro-logo-frame,
+  .club-intro-text-reveal,
+  .club-intro-progress,
+  .club-intro-aura-back,
+  .club-intro-ring-outer,
+  .club-intro-ring-inner,
+  .club-intro-sweep,
+  .kbo-anim-floodlight,
+  .kbo-anim-contract-zoom,
+  .kbo-anim-stamp,
+  .kbo-anim-slide-left,
+  .kbo-anim-slide-right,
+  .kbo-anim-darken,
+  .kbo-anim-ks-confetti,
+  .kbo-anim-ks-spin,
+  .kbo-anim-ks-flash,
+  .kbo-anim-ks-wave,
+  .kbo-anim-ks-burst,
+  .kbo-anim-ks-streak,
+  .kbo-anim-progress,
+  .kbo-anim-year-out,
+  .kbo-anim-year-in {
+    animation: none !important;
+  }
+}
+
+

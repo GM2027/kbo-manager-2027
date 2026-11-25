@@ -1,0 +1,15 @@
+{
+  "new_version": "v4.60.30",
+  "original_master_preserved_exact_prefix": true,
+  "original_master_bytes": 181284,
+  "new_master_bytes": 183151,
+  "master_sha256": "08a7bb0d090d7b7a0e46c1aed7b5ddf6b11c52b2a644cf2e3dcc35326243933f",
+  "archive_preserved": "KBO_GM_v4.60.29_9개구단_소급개인기록_81팀경기.json",
+  "team_count": 9,
+  "mapped_players": 153,
+  "simulated_game_records": 81,
+  "games_and_financials_modified": false,
+  "zip_test_passed": true,
+  "zip_sha256": "4fe193217ee07e9feb89cf9ec3609517e1206d1834004deebdcfef98c793a84c",
+  "source_url": "https://www.newshim.kr/news/view/1065619018581225"
+}

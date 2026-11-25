@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build & test outputs
+build/
+dist/
+coverage/
+
+# Environment variables & API keys (never commit secrets)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Personal career saves & manual backups
+saves/
+backups/
+*save*.json
+*career*.json
+*backup*.json
+*.local.json
+
+# AI Studio local workspace cache
+.aistudio/
+
+# OS & editor artifacts
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+.vscode/
+.idea/

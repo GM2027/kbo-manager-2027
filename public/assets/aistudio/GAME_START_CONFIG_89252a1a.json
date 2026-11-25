@@ -1,0 +1,51 @@
+{
+  "appTitle": "KBO GM 2026",
+  "bootScreen": "TITLE",
+  "defaultAction": "NONE",
+  "buttons": [
+    "NEW_GAME",
+    "CONTINUE",
+    "IMPORT_SAVE",
+    "SETTINGS"
+  ],
+  "newGame": {
+    "season": 2026,
+    "teams": [
+      "LG 트윈스",
+      "한화 이글스",
+      "SSG 랜더스",
+      "삼성 라이온즈",
+      "NC 다이노스",
+      "KT 위즈",
+      "롯데 자이언츠",
+      "KIA 타이거즈",
+      "두산 베어스",
+      "키움 히어로즈"
+    ],
+    "initialWins": 0,
+    "initialLosses": 0,
+    "initialGamesPlayed": 0,
+    "mode": "ISOLATED_NEW_CAREER",
+    "flow": [
+      "INTRO",
+      "STAFF",
+      "ROSTER_ANALYSIS",
+      "REINFORCEMENT",
+      "SPECIAL_DRAFT",
+      "OPENING_ROSTER",
+      "REGULAR_SEASON"
+    ]
+  },
+  "continue": {
+    "bundledExistingSave": "CURRENT_STATE.json",
+    "version": "v4.60.30",
+    "careerLabel": "한화 이글스 2026 · 6승 3패 · 9/144",
+    "activateOnlyOnUserClick": true
+  },
+  "dataRules": {
+    "neverOverwriteOriginalMaster": true,
+    "separateCareerIds": true,
+    "neverAutoPlayOnBoot": true,
+    "noInferredTransactions": true
+  }
+}

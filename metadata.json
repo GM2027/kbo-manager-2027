@@ -1,0 +1,6 @@
+{
+  "name": "KBO GM 2026",
+  "description": "실제 KBO 구단과 선수를 기반으로 2026 시즌을 운영하는 한국 프로야구 단장 시뮬레이션 웹게임",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

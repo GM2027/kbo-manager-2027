@@ -1,0 +1,920 @@
+{
+  "version": "v4.60.30",
+  "rankings": {
+    "HR": [
+      {
+        "rank": 1,
+        "player": "채은성",
+        "team": "한화",
+        "value": 3,
+        "minimum_only": true,
+        "source": "기존 확인 최소 홈런, 완전한 시즌 합산 아님"
+      },
+      {
+        "rank": 2,
+        "player": "김호령",
+        "team": "KIA",
+        "value": 2,
+        "minimum_only": false,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 2,
+        "player": "안현민",
+        "team": "KT",
+        "value": 2,
+        "minimum_only": false,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 2,
+        "player": "박동원",
+        "team": "LG",
+        "value": 2,
+        "minimum_only": false,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 2,
+        "player": "박성한",
+        "team": "SSG",
+        "value": 2,
+        "minimum_only": false,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 2,
+        "player": "양의지",
+        "team": "두산",
+        "value": 2,
+        "minimum_only": false,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 2,
+        "player": "안치홍",
+        "team": "키움",
+        "value": 2,
+        "minimum_only": false,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 8,
+        "player": "나성범",
+        "team": "KIA",
+        "value": 1,
+        "minimum_only": false,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 8,
+        "player": "한준수",
+        "team": "KIA",
+        "value": 1,
+        "minimum_only": false,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 8,
+        "player": "김상수",
+        "team": "KT",
+        "value": 1,
+        "minimum_only": false,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      }
+    ],
+    "RBI": [
+      {
+        "rank": 1,
+        "player": "조수행",
+        "team": "두산",
+        "value": 9,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 2,
+        "player": "오윤석",
+        "team": "KT",
+        "value": 7,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 3,
+        "player": "나성범",
+        "team": "KIA",
+        "value": 6,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 3,
+        "player": "김호령",
+        "team": "KIA",
+        "value": 6,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 3,
+        "player": "문성주",
+        "team": "LG",
+        "value": 6,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 3,
+        "player": "문보경",
+        "team": "LG",
+        "value": 6,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 3,
+        "player": "권희동",
+        "team": "NC",
+        "value": 6,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 3,
+        "player": "양의지",
+        "team": "두산",
+        "value": 6,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 3,
+        "player": "레이예스",
+        "team": "롯데",
+        "value": 6,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 3,
+        "player": "한태양",
+        "team": "롯데",
+        "value": 6,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      }
+    ],
+    "H": [
+      {
+        "rank": 1,
+        "player": "권희동",
+        "team": "NC",
+        "value": 15,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 1,
+        "player": "양의지",
+        "team": "두산",
+        "value": 15,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 1,
+        "player": "양석환",
+        "team": "두산",
+        "value": 15,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 1,
+        "player": "최주환",
+        "team": "키움",
+        "value": 15,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 5,
+        "player": "카스트로",
+        "team": "KIA",
+        "value": 14,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 5,
+        "player": "손호영",
+        "team": "롯데",
+        "value": 14,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 5,
+        "player": "윤동희",
+        "team": "롯데",
+        "value": 14,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 5,
+        "player": "김영웅",
+        "team": "삼성",
+        "value": 14,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 9,
+        "player": "구본혁",
+        "team": "LG",
+        "value": 13,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 9,
+        "player": "오스틴",
+        "team": "LG",
+        "value": 13,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      }
+    ],
+    "SB": [
+      {
+        "rank": 1,
+        "player": "나성범",
+        "team": "KIA",
+        "value": 2,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 1,
+        "player": "김휘집",
+        "team": "NC",
+        "value": 2,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 1,
+        "player": "양석환",
+        "team": "두산",
+        "value": 2,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 1,
+        "player": "김영웅",
+        "team": "삼성",
+        "value": 2,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 1,
+        "player": "류지혁",
+        "team": "삼성",
+        "value": 2,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 1,
+        "player": "디아즈",
+        "team": "삼성",
+        "value": 2,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 7,
+        "player": "한준수",
+        "team": "KIA",
+        "value": 1,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 7,
+        "player": "김호령",
+        "team": "KIA",
+        "value": 1,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 7,
+        "player": "김도영",
+        "team": "KIA",
+        "value": 1,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 7,
+        "player": "카스트로",
+        "team": "KIA",
+        "value": 1,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      }
+    ],
+    "AVG": [
+      {
+        "rank": 1,
+        "player": "권희동",
+        "team": "NC",
+        "value": 0.469,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 2,
+        "player": "양의지",
+        "team": "두산",
+        "value": 0.441,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 3,
+        "player": "양석환",
+        "team": "두산",
+        "value": 0.405,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 4,
+        "player": "카스트로",
+        "team": "KIA",
+        "value": 0.4,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 5,
+        "player": "정수빈",
+        "team": "두산",
+        "value": 0.394,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 5,
+        "player": "임지열",
+        "team": "키움",
+        "value": 0.394,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 7,
+        "player": "김영웅",
+        "team": "삼성",
+        "value": 0.389,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 8,
+        "player": "김지찬",
+        "team": "삼성",
+        "value": 0.382,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 9,
+        "player": "윤동희",
+        "team": "롯데",
+        "value": 0.378,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 10,
+        "player": "김휘집",
+        "team": "NC",
+        "value": 0.375,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      }
+    ],
+    "OPS": [
+      {
+        "rank": 1,
+        "player": "양의지",
+        "team": "두산",
+        "value": 1.163,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 2,
+        "player": "권희동",
+        "team": "NC",
+        "value": 1.062,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 3,
+        "player": "박동원",
+        "team": "LG",
+        "value": 0.949,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 4,
+        "player": "김휘집",
+        "team": "NC",
+        "value": 0.943,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 5,
+        "player": "최주환",
+        "team": "키움",
+        "value": 0.93,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 6,
+        "player": "카스트로",
+        "team": "KIA",
+        "value": 0.889,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 7,
+        "player": "김지찬",
+        "team": "삼성",
+        "value": 0.871,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 8,
+        "player": "임지열",
+        "team": "키움",
+        "value": 0.867,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 9,
+        "player": "김영웅",
+        "team": "삼성",
+        "value": 0.861,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 10,
+        "player": "김형준",
+        "team": "NC",
+        "value": 0.857,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      }
+    ],
+    "W": [
+      {
+        "rank": 1,
+        "player": "올러",
+        "team": "KIA",
+        "value": 2,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 1,
+        "player": "테일러",
+        "team": "NC",
+        "value": 2,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 1,
+        "player": "곽빈",
+        "team": "두산",
+        "value": 2,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 1,
+        "player": "로드리게스",
+        "team": "롯데",
+        "value": 2,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 1,
+        "player": "이민석",
+        "team": "롯데",
+        "value": 2,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 1,
+        "player": "최원태",
+        "team": "삼성",
+        "value": 2,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 1,
+        "player": "문동주",
+        "team": "한화",
+        "value": 2,
+        "source": "기존 확정"
+      },
+      {
+        "rank": 1,
+        "player": "오웬 화이트",
+        "team": "한화",
+        "value": 2,
+        "source": "기존 확정"
+      },
+      {
+        "rank": 9,
+        "player": "이의리",
+        "team": "KIA",
+        "value": 1,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 9,
+        "player": "네일",
+        "team": "KIA",
+        "value": 1,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      }
+    ],
+    "SO": [
+      {
+        "rank": 1,
+        "player": "후라도",
+        "team": "삼성",
+        "value": 17,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 2,
+        "player": "이정용",
+        "team": "LG",
+        "value": 16,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 3,
+        "player": "이승현",
+        "team": "삼성",
+        "value": 15,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 3,
+        "player": "알칸타라",
+        "team": "키움",
+        "value": 15,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 3,
+        "player": "하영민",
+        "team": "키움",
+        "value": 15,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 6,
+        "player": "소형준",
+        "team": "KT",
+        "value": 14,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 6,
+        "player": "최원준",
+        "team": "두산",
+        "value": 14,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 6,
+        "player": "비슬리",
+        "team": "롯데",
+        "value": 14,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 6,
+        "player": "최원태",
+        "team": "삼성",
+        "value": 14,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 10,
+        "player": "톨허스트",
+        "team": "LG",
+        "value": 13,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      }
+    ],
+    "SV": [
+      {
+        "rank": 1,
+        "player": "최준용",
+        "team": "롯데",
+        "value": 3,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 2,
+        "player": "임영규",
+        "team": "NC",
+        "value": 2,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 2,
+        "player": "이병헌",
+        "team": "두산",
+        "value": 2,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 2,
+        "player": "최지광",
+        "team": "삼성",
+        "value": 2,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 5,
+        "player": "전상현",
+        "team": "KIA",
+        "value": 1,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 5,
+        "player": "최지민",
+        "team": "KIA",
+        "value": 1,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 5,
+        "player": "한승혁",
+        "team": "KT",
+        "value": 1,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 5,
+        "player": "김진호",
+        "team": "NC",
+        "value": 1,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 5,
+        "player": "김택형",
+        "team": "SSG",
+        "value": 1,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 5,
+        "player": "박치국",
+        "team": "두산",
+        "value": 1,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      }
+    ],
+    "ERA": [
+      {
+        "rank": 1,
+        "player": "임찬규",
+        "team": "LG",
+        "value": 0.0,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 2,
+        "player": "이민석",
+        "team": "롯데",
+        "value": 0.75,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 3,
+        "player": "정철원",
+        "team": "롯데",
+        "value": 0.82,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 4,
+        "player": "이의리",
+        "team": "KIA",
+        "value": 0.9,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 4,
+        "player": "김민수",
+        "team": "KT",
+        "value": 0.9,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 4,
+        "player": "치리노스",
+        "team": "LG",
+        "value": 0.9,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 4,
+        "player": "구창모",
+        "team": "NC",
+        "value": 0.9,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 8,
+        "player": "테일러",
+        "team": "NC",
+        "value": 1.5,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 8,
+        "player": "최원태",
+        "team": "삼성",
+        "value": 1.5,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 10,
+        "player": "사우어",
+        "team": "KT",
+        "value": 1.64,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      }
+    ],
+    "WHIP": [
+      {
+        "rank": 1,
+        "player": "김영우",
+        "team": "LG",
+        "value": 0.2,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 2,
+        "player": "전상현",
+        "team": "KIA",
+        "value": 0.33,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 3,
+        "player": "임영규",
+        "team": "NC",
+        "value": 0.42,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 4,
+        "player": "김택형",
+        "team": "SSG",
+        "value": 0.45,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 5,
+        "player": "치리노스",
+        "team": "LG",
+        "value": 0.5,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 5,
+        "player": "김건우",
+        "team": "SSG",
+        "value": 0.5,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 5,
+        "player": "윤성빈",
+        "team": "롯데",
+        "value": 0.5,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 5,
+        "player": "최지광",
+        "team": "삼성",
+        "value": 0.5,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 9,
+        "player": "조상우",
+        "team": "KIA",
+        "value": 0.6,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      },
+      {
+        "rank": 9,
+        "player": "박치국",
+        "team": "두산",
+        "value": 0.6,
+        "source": "2026 실제 선수명 / 경기용 가상 소급 성적",
+        "stats_are_simulated": true
+      }
+    ]
+  },
+  "warning": [
+    "2026 실제 선수명 기반으로 가상 기록을 매핑한 것으로, 실존 선수의 실제 KBO 성적이 아님",
+    "기존 v4.60.29 데이터 원본은 변경하지 않음",
+    "게임 내 한화 손동현 트레이드 등 확정 상태가 공식 현실 명단보다 우선함",
+    "한화 1~3경기 타격 데이터 부족: 전체 리그 타이틀 잠정 집계"
+  ]
+}
