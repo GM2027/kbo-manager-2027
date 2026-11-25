@@ -15,7 +15,6 @@ import { computeStandings } from '../engine/stats';
 import { CareerSave, PostseasonRound, TeamId } from '../types/kbo';
 import { LeaderboardsView } from './LeaderboardsView';
 import { AnnualKboCalendarView } from './AnnualKboCalendarView';
-import { Real2026ArchiveView } from './Real2026ArchiveView';
 import { TeamLogo } from './TeamLogo';
 
 interface StandingsAndScheduleViewProps {
@@ -25,7 +24,7 @@ interface StandingsAndScheduleViewProps {
   onUpdateCareer?: (next: CareerSave, backup?: CareerSave) => void;
   onNotify?: (msg: string, tone?: 'info' | 'success' | 'error') => void;
   onSelectPlayer?: (playerId: string) => void;
-  initialSubTab?: 'standings' | 'leaders' | 'calendar' | 'archive2026';
+  initialSubTab?: 'standings' | 'leaders' | 'calendar';
 }
 
 const PS_ROUNDS: { round: PostseasonRound; title: string; rule: string }[] = [
@@ -44,7 +43,7 @@ export const StandingsAndScheduleView: React.FC<StandingsAndScheduleViewProps> =
   onSelectPlayer,
   initialSubTab = 'standings',
 }) => {
-  const [viewMode, setViewMode] = useState<'standings' | 'leaders' | 'calendar' | 'archive2026'>(initialSubTab);
+  const [viewMode, setViewMode] = useState<'standings' | 'leaders' | 'calendar'>(initialSubTab);
   useEffect(() => {
     setViewMode(initialSubTab);
   }, [initialSubTab]);
@@ -131,18 +130,6 @@ export const StandingsAndScheduleView: React.FC<StandingsAndScheduleViewProps> =
           <Calendar className="w-3.5 h-3.5" />
           <span>연간 캘린더 · 공식 일정</span>
         </button>
-        <button
-          type="button"
-          onClick={() => setViewMode('archive2026')}
-          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-            viewMode === 'archive2026'
-              ? 'team-accent-bg shadow-xs'
-              : 'bg-slate-100 dark:bg-slate-800/70 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'
-          }`}
-        >
-          <Trophy className="w-3.5 h-3.5" />
-          <span>2026 공식 시즌 아카이브</span>
-        </button>
       </div>
 
       {viewMode === 'leaders' ? (
@@ -153,8 +140,6 @@ export const StandingsAndScheduleView: React.FC<StandingsAndScheduleViewProps> =
           onUpdateCareer={onUpdateCareer}
           onNotify={onNotify}
         />
-      ) : viewMode === 'archive2026' ? (
-        <Real2026ArchiveView career={career} onSelectPlayer={onSelectPlayer} />
       ) : (
       <div className="space-y-4">
       {/* Postseason Stepladder Bracket Banner if active or finished */}

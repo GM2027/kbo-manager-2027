@@ -47,7 +47,6 @@ import {
   PlayerCompactTag,
   PlayerForeignFlag,
 } from './PlayerStatusCompact';
-import { Real2026ArchiveView } from './Real2026ArchiveView';
 import { FuturesTeamLogo, TeamLogo } from './TeamLogo';
 
 interface LeagueHubViewProps {
@@ -76,7 +75,7 @@ export const LeagueHubView: React.FC<LeagueHubViewProps> = ({
   const [retireNote, setRetireNote] = useState('');
   const [ulsanFilter, setUlsanFilter] = useState<'ALL' | 'FOREIGN' | 'DRAFTED' | 'UNDRAFTED'>('ALL');
   const [sangmuScope, setSangmuScope] = useState<'ALL' | 'MINE'>('ALL');
-  const [historySubTab, setHistorySubTab] = useState<'overview' | 'archive2026' | 'uniforms' | 'rookies'>('overview');
+  const [historySubTab, setHistorySubTab] = useState<'overview' | 'uniforms' | 'rookies'>('overview');
   const rookieSeasons = useMemo(() => {
     const keys = Object.keys(career.rookieBonusRankingsBySeason ?? {})
       .map(Number)
@@ -1054,7 +1053,6 @@ export const LeagueHubView: React.FC<LeagueHubViewProps> = ({
           <div className="flex flex-wrap items-center gap-1.5 border-b border-slate-200 dark:border-slate-800 pb-3">
             {[
               { id: 'overview' as const, label: '트로피 · 역사 · 영구결번 · 규정', icon: BookOpen },
-              { id: 'archive2026' as const, label: '2026 공식 시즌 아카이브', icon: Trophy },
               { id: 'uniforms' as const, label: '신규 유니폼 · 우승 보상', icon: Shirt },
               { id: 'rookies' as const, label: '신인 계약금 TOP 10', icon: Crown },
             ].map((tab) => {
@@ -1077,10 +1075,6 @@ export const LeagueHubView: React.FC<LeagueHubViewProps> = ({
               );
             })}
           </div>
-
-          {historySubTab === 'archive2026' && (
-            <Real2026ArchiveView career={career} onSelectPlayer={onSelectPlayer} />
-          )}
 
           {historySubTab === 'uniforms' && (
             <div className="space-y-5">
