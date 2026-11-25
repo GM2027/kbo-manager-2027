@@ -188,9 +188,8 @@ export const KBO_TEAMS: Record<TeamId, TeamInfo> = {
     accentColor: '#F59E0B',
     emblemCode: 'SSG',
     logoUrls: [
-      '/logos/hd/SK.png',
-      '/logos/SK.png',
-      'https://6ptotvmi5753.edge.naverncp.com/KBO_IMAGE/emblem/regular/2026/emblem_SK.png',
+      '/logos/hd/SK.png?v=2027ssg',
+      '/logos/SK.png?v=2027ssg',
     ],
     prevRank2025: 3,
   },
