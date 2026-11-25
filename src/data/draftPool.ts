@@ -321,9 +321,11 @@ export function generate150DraftCandidates(
     const collegeReadyBoost = originType === '대학' ? 3 : originType === '독립리그' ? 2 : 0;
     const ability = Math.max(39, Math.min(57, Math.round(38 + tierScore * 15 + collegeReadyBoost)));
 
+    // Unified KBO prospect potential scale (identical to existing KBO prospects):
+    // 초특급 88~93 (극소수 1~1.5%), 특급 80~87 (1R급), 상위권 73~82 (2~3R급), 일반 63~75 (4R~11R)
     let potential: number;
     if (id <= 8 && elite90PotCount < 2 && rng.next() < 0.16) {
-      potential = rng.int(90, 92);
+      potential = rng.int(88, 93);
       elite90PotCount += 1;
     } else if (id <= 12) {
       potential = rng.int(80, 87);
@@ -331,11 +333,11 @@ export function generate150DraftCandidates(
       potential = rng.int(73, 81);
     } else {
       potential = Math.round(
-        ability + (originType === '고졸' ? 20 : originType === '대학' ? 14 : 11) + rng.next() * 10
+        ability + (originType === '고졸' ? 20 : originType === '대학' ? 14 : 11) + rng.next() * 9
       );
-      potential = Math.min(78, Math.max(ability + 8, potential));
+      potential = Math.min(75, Math.max(63, Math.max(ability + 8, potential)));
     }
-    potential = Math.max(ability + 6, Math.min(92, potential));
+    potential = Math.max(ability + 6, Math.min(93, potential));
 
     const composite = potential * 0.62 + ability * 0.38;
     const scoutGrade: DraftCandidate['scoutGrade'] =

@@ -974,6 +974,45 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
       career.databaseVersion = 'v23_go_woosuk_kbo_return';
     }
 
+    // v24: 기존 유망주 및 2군 젊은 선수 잠재력(POT) 통일 척도 재평가 마이그레이션
+    // - 기존 세이브의 선수 ID·현재 오버롤·성적·계약·인게임 성장을 모두 보존하면서 과소평가된 잠재력만 상향 보정
+    if (career.season >= 2027 && career.databaseVersion !== 'v24_recalibrated_prospect_potentials') {
+      for (const p of Object.values(career.players)) {
+        if (p.rosterTier === '은퇴' || p.category !== '국내') continue;
+        const src = p.v18SourceId ? V18_BY_SOURCE_ID.get(p.v18SourceId) : undefined;
+        if (!src || src.status === 'drafted_2027') continue;
+        const verifiedPot = Math.round(Number(src.game_ratings?.potential ?? p.potential));
+        // 게임 내 하락/성장이 크게 누적되지 않은 젊은 유망주(만 26세 이하)의 과소평가 POT만 안전 보정
+        if (p.age <= 26 && verifiedPot > p.potential) {
+          p.potential = Math.max(p.ability, Math.min(95, verifiedPot));
+          if (p.v18Ratings) {
+            p.v18Ratings.potential = p.potential;
+          }
+          if (p.v18Evaluation) {
+            p.v18Evaluation.pot = p.potential;
+            p.v18Evaluation.potential_range = [p.ability, p.potential];
+          }
+          if (src.rebalance_v19) {
+            p.rebalanceMeta = {
+              prevOvr: src.rebalance_v19.prev_ovr,
+              prevPot: src.rebalance_v19.prev_pot,
+              newOvr: p.ability,
+              newPot: p.potential,
+              ovrDelta: 0,
+              potDelta: p.potential - src.rebalance_v19.prev_pot,
+              tier: src.rebalance_v19.tier,
+              reason: src.rebalance_v19.reason,
+            };
+          }
+        }
+        // 누락된 드래프트 메타데이터 보완
+        if (!p.draftYear && src.draft_year) {
+          p.draftYear = src.draft_year;
+        }
+      }
+      career.databaseVersion = 'v24_recalibrated_prospect_potentials';
+    }
+
     // KBO 현역 선수단과 해외파 목록 간 중복 등록 상시 방지
     if (career.amateurAndOverseas?.overseasPlayers) {
       const activeKboKey = new Set<string>();
