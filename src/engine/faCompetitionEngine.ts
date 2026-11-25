@@ -683,10 +683,19 @@ function finalizeAiClubFaSigningInPlace(
   p.signedAsFaSeason = career.season;
   p.morale = '만족';
   p.dissatisfaction = Math.min(p.dissatisfaction ?? 15, 18);
+  const signDateIso = getCurrentCareerDate(career).isoDate;
   if (!isOriginalClub) {
     p.clubTenureSeasons = 1;
-    appendPlayerTeamHistoryInPlace(p, newTeamId, career.season, `${career.season} FA 이적`);
+    appendPlayerTeamHistoryInPlace(p, newTeamId, career.season, `${career.season} FA 이적`, {
+      transferDate: signDateIso,
+      moveType: 'FA 이적',
+      fromTeamId,
+    });
     state.externalSigningsByTeam[newTeamId] = (state.externalSigningsByTeam[newTeamId] ?? 0) + 1;
+  } else {
+    p.releasedAfter2026 = undefined;
+    p.releaseDate = undefined;
+    p.releaseNote = undefined;
   }
 
   p.contract = {
@@ -757,7 +766,11 @@ function finalizeAiClubFaSigningInPlace(
         compPlayer.rosterTier = '2군';
         compPlayer.gameDayActive = false;
         compPlayer.clubTenureSeasons = 1;
-        appendPlayerTeamHistoryInPlace(compPlayer, fromTeamId, career.season, `${p.name} FA 보상선수`);
+        appendPlayerTeamHistoryInPlace(compPlayer, fromTeamId, career.season, `${p.name} FA 보상선수`, {
+          transferDate: signDateIso,
+          moveType: 'FA 보상선수',
+          fromTeamId: newTeamId,
+        });
         compSummary = `${comp.grade}등급 보상: 보호선수 ${comp.protectionLimit}인 외 ${compPlayer.name} + 보상금 ${comp.cashCompBillion}억`;
       } else {
         compSummary = `${comp.grade}등급 금전 보상 ${comp.cashCompBillion}억 정산`;

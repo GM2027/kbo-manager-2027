@@ -1,0 +1,1061 @@
+{
+  "generatedAt": "2026-11-25",
+  "databaseVersion": "v21_verified_career_histories",
+  "backupFile": "src/data/v20PlayerDataBackupBeforeCareerPatch.json",
+  "summary": {
+    "totalPlayersAudited": 731,
+    "clubTransfersUpdated": 10,
+    "faSigned2027Updated": 4,
+    "retired2026Updated": 7,
+    "released2026Updated": 29,
+    "splitSeasonRecordsUpdated": 4,
+    "totalOneClubMen": 552,
+    "totalMultiClubOrForeign": 179,
+    "totalAuditEntries": 60
+  },
+  "changes": [
+    {
+      "id": "v15-0007",
+      "name": "김주온",
+      "kbo_player_id": "65411",
+      "prevTeam": "LG",
+      "newTeam": "LG",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": false,
+      "clubTenure2027": 3,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (LG 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "SK 와이번스 / SSG 랜더스(2015~2023)",
+        "LG 트윈스(2024~2026)"
+      ]
+    },
+    {
+      "id": "v15-0028",
+      "name": "장시환",
+      "kbo_player_id": null,
+      "prevTeam": "LG",
+      "newTeam": "LG",
+      "statusAfter": "은퇴",
+      "isOneClubMan": true,
+      "clubTenure2027": 1,
+      "changes": [
+        "2026 은퇴 반영 (2026-10 LG 재계약 불가 통보 후 현역 은퇴)"
+      ],
+      "historySummary": [
+        "LG 트윈스(2026~2026)"
+      ]
+    },
+    {
+      "id": "2026-LG-62",
+      "name": "김민수",
+      "kbo_player_id": "64793",
+      "prevTeam": "LG",
+      "newTeam": "LG",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": false,
+      "clubTenure2027": 1,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (LG 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "삼성 라이온즈(2014~2024)",
+        "LG 트윈스(2026~2026)"
+      ]
+    },
+    {
+      "id": "v15-0038",
+      "name": "김준태",
+      "kbo_player_id": "62558",
+      "prevTeam": "LG",
+      "newTeam": "LG",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": false,
+      "clubTenure2027": 2,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (LG 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "롯데 자이언츠(2012~2020)",
+        "KT 위즈(2021~2024)",
+        "LG 트윈스(2025~2026)"
+      ]
+    },
+    {
+      "id": "v15-0043",
+      "name": "김정율",
+      "kbo_player_id": null,
+      "prevTeam": "LG",
+      "newTeam": "LG",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": true,
+      "clubTenure2027": 10,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (LG 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "LG 트윈스(2017~2026)"
+      ]
+    },
+    {
+      "id": "v15-0095",
+      "name": "이재원",
+      "kbo_player_id": "76812",
+      "prevTeam": "한화",
+      "newTeam": "한화",
+      "statusAfter": "은퇴",
+      "isOneClubMan": false,
+      "clubTenure2027": 3,
+      "changes": [
+        "2026 은퇴 반영 (2026-11 현역 은퇴 (한화 1군 배터리코치 선임))"
+      ],
+      "historySummary": [
+        "SK 와이번스 / SSG 랜더스(2006~2023)",
+        "한화 이글스(2024~2026)"
+      ]
+    },
+    {
+      "id": "v15-0098",
+      "name": "허관회",
+      "kbo_player_id": "69706",
+      "prevTeam": "한화",
+      "newTeam": "한화",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": true,
+      "clubTenure2027": 8,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (한화 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "한화 이글스(2019~2026)"
+      ]
+    },
+    {
+      "id": "2026-HH-50",
+      "name": "강백호",
+      "kbo_player_id": "68050",
+      "prevTeam": "한화",
+      "newTeam": "한화",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 2,
+      "changes": [
+        "이적 이력·날짜 정밀 보강 (한화 이글스 공식 발표 (2025-11-20 FA 4년 100억))"
+      ],
+      "historySummary": [
+        "KT 위즈(2018~2025)",
+        "한화 이글스(2026~현재 · 2025-11-20)"
+      ]
+    },
+    {
+      "id": "v15-0112",
+      "name": "하주석",
+      "kbo_player_id": "62700",
+      "prevTeam": "한화",
+      "newTeam": "KIA",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 2,
+      "changes": [
+        "2026시즌 중 이적 표기(한화→KIA)",
+        "소속팀 변경(한화→KIA): 2026-07-23 하주석↔이형범 1:1 트레이드로 한화→KIA 이적 (원클럽맨 해제)"
+      ],
+      "historySummary": [
+        "한화 이글스(2012~2026)",
+        "KIA 타이거즈(2026~현재 · 2026-07-23)"
+      ]
+    },
+    {
+      "id": "v15-0118",
+      "name": "손아섭",
+      "kbo_player_id": "77532",
+      "prevTeam": "한화",
+      "newTeam": "NC",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 5,
+      "changes": [
+        "2025시즌 구단별 분할 성적 분리(NC 76G / 한화 35G)",
+        "소속팀 변경(한화→NC): 2025-07-31 NC→한화 트레이드 → 2026-04-14 한화→두산 트레이드 → 2026-10-19 두산 방출 → 2026-10-27 NC 다이노스 복귀 계약(연봉 5,000만 원)"
+      ],
+      "historySummary": [
+        "롯데 자이언츠(2007~2021 · 2007-01-01)",
+        "NC 다이노스(2022~2025 · 2021-12-24)",
+        "한화 이글스(2025~2026 · 2025-07-31)",
+        "두산 베어스(2026~2026 · 2026-04-14)",
+        "NC 다이노스(2027~현재 · 2026-10-27)"
+      ]
+    },
+    {
+      "id": "v15-0132",
+      "name": "김성민",
+      "kbo_player_id": null,
+      "prevTeam": "SSG",
+      "newTeam": "SSG",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": true,
+      "clubTenure2027": 1,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (SSG 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "SSG 랜더스(2026~2026)"
+      ]
+    },
+    {
+      "id": "2026-SSG-42",
+      "name": "문승원",
+      "kbo_player_id": "62869",
+      "prevTeam": "SSG",
+      "newTeam": "SSG",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": true,
+      "clubTenure2027": 16,
+      "changes": [
+        "2027 FA 공식 잔류 확정 (2027 FA 잔류 확정 (2+1년 최대 15억 · 계약금 5억 / 연봉 총 7.5억 / 옵션 2.5억))"
+      ],
+      "historySummary": [
+        "SK 와이번스 / SSG 랜더스(2012~현재)"
+      ]
+    },
+    {
+      "id": "v15-0138",
+      "name": "박종훈",
+      "kbo_player_id": "60841",
+      "prevTeam": "SSG",
+      "newTeam": "SSG",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": true,
+      "clubTenure2027": 17,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (SSG 상호 합의 계약 해지 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "SK 와이번스 / SSG 랜더스(2010~2026)"
+      ]
+    },
+    {
+      "id": "v15-0159",
+      "name": "김민식",
+      "kbo_player_id": "62864",
+      "prevTeam": "SSG",
+      "newTeam": "SSG",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": false,
+      "clubTenure2027": 10,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (SSG 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "SK 와이번스(2012~2016)",
+        "KIA 타이거즈(2017~2021)",
+        "SSG 랜더스(2022~2026)"
+      ]
+    },
+    {
+      "id": "v15-0169",
+      "name": "김태윤",
+      "kbo_player_id": "52803",
+      "prevTeam": "SSG",
+      "newTeam": "SSG",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": true,
+      "clubTenure2027": 5,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (SSG 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "SSG 랜더스(2022~2026)"
+      ]
+    },
+    {
+      "id": "2026-SSG-52",
+      "name": "석정우",
+      "kbo_player_id": "52804",
+      "prevTeam": "SSG",
+      "newTeam": "SSG",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": true,
+      "clubTenure2027": 5,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (SSG 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "SSG 랜더스(2022~2026)"
+      ]
+    },
+    {
+      "id": "2026-SSG-32",
+      "name": "김재환",
+      "kbo_player_id": "78224",
+      "prevTeam": "SSG",
+      "newTeam": "SSG",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 2,
+      "changes": [
+        "이적 이력·날짜 정밀 보강 (SSG 랜더스 공식 발표 (2025-12-05 자유계약 2년 22억))"
+      ],
+      "historySummary": [
+        "두산 베어스(2008~2025)",
+        "SSG 랜더스(2026~현재 · 2025-12-05)"
+      ]
+    },
+    {
+      "id": "v15-0181",
+      "name": "김창평",
+      "kbo_player_id": "69825",
+      "prevTeam": "SSG",
+      "newTeam": "SSG",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": true,
+      "clubTenure2027": 8,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (SSG 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "SK 와이번스 / SSG 랜더스(2019~2026)"
+      ]
+    },
+    {
+      "id": "2026-SSG-45",
+      "name": "류효승",
+      "kbo_player_id": "50868",
+      "prevTeam": "SSG",
+      "newTeam": "SSG",
+      "statusAfter": "은퇴",
+      "isOneClubMan": true,
+      "clubTenure2027": 7,
+      "changes": [
+        "2026 은퇴 반영 (2026-10 SSG 재계약 불가 후 현역 은퇴)"
+      ],
+      "historySummary": [
+        "SK 와이번스 / SSG 랜더스(2020~2026)"
+      ]
+    },
+    {
+      "id": "2026-SSG-37",
+      "name": "오태곤",
+      "kbo_player_id": "60558",
+      "prevTeam": "SSG",
+      "newTeam": "SSG",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 8,
+      "changes": [
+        "2027 FA 공식 잔류 확정 (2027 FA 잔류 확정 (3년 최대 11억 · 계약금 2억 / 연봉 총 7.4억 / 옵션 1.6억))"
+      ],
+      "historySummary": [
+        "롯데 자이언츠(2011~2016)",
+        "KT 위즈(2017~2019)",
+        "SK 와이번스 / SSG 랜더스(2020~현재)"
+      ]
+    },
+    {
+      "id": "v15-0187",
+      "name": "이정범",
+      "kbo_player_id": "67807",
+      "prevTeam": "SSG",
+      "newTeam": "KT",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 2,
+      "changes": [
+        "소속팀 변경(SSG→KT): 2026년 6월 말 SSG 웨이버 공시 → 2026년 7월 초 KT 위즈 클레임 이적"
+      ],
+      "historySummary": [
+        "SK 와이번스 / SSG 랜더스(2017~2026)",
+        "KT 위즈(2026~현재 · 2026-07-02)"
+      ]
+    },
+    {
+      "id": "2026-SSG-54",
+      "name": "최지훈",
+      "kbo_player_id": "50854",
+      "prevTeam": "SSG",
+      "newTeam": "SSG",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": true,
+      "clubTenure2027": 8,
+      "changes": [
+        "2027 FA 공식 잔류 확정 (2027 FA 잔류 확정 (4년 최대 67억 · 계약금 38억 / 연봉 총 20억 / 옵션 9억))"
+      ],
+      "historySummary": [
+        "SK 와이번스 / SSG 랜더스(2020~현재)"
+      ]
+    },
+    {
+      "id": "v15-0206",
+      "name": "양현",
+      "kbo_player_id": "61268",
+      "prevTeam": "삼성",
+      "newTeam": "삼성",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": false,
+      "clubTenure2027": 3,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (삼성 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "두산 베어스(2011~2015)",
+        "넥센 / 키움 히어로즈(2018~2023)",
+        "삼성 라이온즈(2024~2026)"
+      ]
+    },
+    {
+      "id": "2026-SS-38",
+      "name": "임기영",
+      "kbo_player_id": "62754",
+      "prevTeam": "삼성",
+      "newTeam": "삼성",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 2,
+      "changes": [
+        "이적 이력·날짜 정밀 보강 (KBO 공식 기록실)"
+      ],
+      "historySummary": [
+        "한화 이글스(2012~2014)",
+        "KIA 타이거즈(2015~2025)",
+        "삼성 라이온즈(2026~현재)"
+      ]
+    },
+    {
+      "id": "v15-0223",
+      "name": "홍원표",
+      "kbo_player_id": "50430",
+      "prevTeam": "삼성",
+      "newTeam": "삼성",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": true,
+      "clubTenure2027": 7,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (삼성 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "삼성 라이온즈(2020~2026)"
+      ]
+    },
+    {
+      "id": "v15-0249",
+      "name": "류승민",
+      "kbo_player_id": "53404",
+      "prevTeam": "삼성",
+      "newTeam": "두산",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 2,
+      "changes": [
+        "소속팀 변경(삼성→두산): 2026-05-06 박계범↔류승민 1:1 트레이드로 삼성→두산 이적"
+      ],
+      "historySummary": [
+        "삼성 라이온즈(2023~2026)",
+        "두산 베어스(2026~현재 · 2026-05-06)"
+      ]
+    },
+    {
+      "id": "2026-SS-34",
+      "name": "최형우",
+      "kbo_player_id": "72443",
+      "prevTeam": "삼성",
+      "newTeam": "삼성",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 17,
+      "changes": [
+        "이적 이력·날짜 정밀 보강 (삼성 라이온즈 공식 발표 (2025-11 FA 계약))"
+      ],
+      "historySummary": [
+        "삼성 라이온즈(2002~2016)",
+        "KIA 타이거즈(2017~2025 · 2016-11-24)",
+        "삼성 라이온즈(2026~현재 · 2025-11-25)"
+      ]
+    },
+    {
+      "id": "2026-SS-51",
+      "name": "홍현빈",
+      "kbo_player_id": "67005",
+      "prevTeam": "삼성",
+      "newTeam": "삼성",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": false,
+      "clubTenure2027": 2,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (삼성 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "KT 위즈(2017~2024)",
+        "삼성 라이온즈(2025~2026)"
+      ]
+    },
+    {
+      "id": "v15-0276",
+      "name": "정구범",
+      "kbo_player_id": "50995",
+      "prevTeam": "NC",
+      "newTeam": "NC",
+      "statusAfter": "은퇴",
+      "isOneClubMan": true,
+      "clubTenure2027": 7,
+      "changes": [
+        "2026 은퇴 반영 (2026-10 어깨 부상으로 현역 은퇴)"
+      ],
+      "historySummary": [
+        "NC 다이노스(2020~2026)"
+      ]
+    },
+    {
+      "id": "v15-0295",
+      "name": "데이비슨",
+      "kbo_player_id": "54944",
+      "prevTeam": "NC",
+      "newTeam": "키움",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 2,
+      "changes": [
+        "2026시즌 중 이적 표기(NC→키움)",
+        "소속팀 변경(NC→키움): 2026년 7월 NC 웨이버 공시 → 키움 클레임 이적 및 시즌 종료 후 키움 재계약"
+      ],
+      "historySummary": [
+        "애리조나 다이아몬드백스(2013~2013)",
+        "시카고 화이트삭스(2016~2018)",
+        "신시내티 레즈(2020~2020)",
+        "애리조나 다이아몬드백스(2022~2022)",
+        "애슬레틱스(2022~2022)",
+        "히로시마 도요 카프(2023~2023)",
+        "NC 다이노스(2024~2026)",
+        "키움 히어로즈(2026~현재 · 2026-07-10)"
+      ]
+    },
+    {
+      "id": "v15-0342",
+      "name": "조이현",
+      "kbo_player_id": "64768",
+      "prevTeam": "KT",
+      "newTeam": "KT",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": false,
+      "clubTenure2027": 4,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (KT 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "한화 이글스(2014~2015)",
+        "SK 와이번스 / SSG 랜더스(2019~2021)",
+        "KT 위즈(2023~2026)"
+      ]
+    },
+    {
+      "id": "2026-KT-16",
+      "name": "최동환",
+      "kbo_player_id": "79140",
+      "prevTeam": "KT",
+      "newTeam": "KT",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": false,
+      "clubTenure2027": 2,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (KT 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "LG 트윈스(2009~2024)",
+        "KT 위즈(2025~2026)"
+      ]
+    },
+    {
+      "id": "2026-KT-24",
+      "name": "문상철",
+      "kbo_player_id": "64007",
+      "prevTeam": "KT",
+      "newTeam": "KT",
+      "statusAfter": "은퇴",
+      "isOneClubMan": true,
+      "clubTenure2027": 13,
+      "changes": [
+        "2026 은퇴 반영 (2026시즌 종료 후 현역 은퇴)"
+      ],
+      "historySummary": [
+        "KT 위즈(2014~2026)"
+      ]
+    },
+    {
+      "id": "2026-KT-10",
+      "name": "김현수",
+      "kbo_player_id": "76290",
+      "prevTeam": "KT",
+      "newTeam": "KT",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 2,
+      "changes": [
+        "이적 이력·날짜 정밀 보강 (KT 위즈 공식 발표 (2025-11 FA 3년 50억))"
+      ],
+      "historySummary": [
+        "두산 베어스(2006~2015)",
+        "볼티모어 오리올스(2016~2017)",
+        "필라델피아 필리스(2017~2017)",
+        "LG 트윈스(2018~2025)",
+        "KT 위즈(2026~현재 · 2025-11-26)"
+      ]
+    },
+    {
+      "id": "2026-KT-3",
+      "name": "최원준",
+      "kbo_player_id": "66606",
+      "prevTeam": "KT",
+      "newTeam": "KT",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 2,
+      "changes": [
+        "2025시즌 중 이적 표기(KIA→NC)",
+        "이적 이력·날짜 정밀 보강 (KBO 공식 공시 (2025-07-28 트레이드 · 2025-11 FA 이적))"
+      ],
+      "historySummary": [
+        "KIA 타이거즈(2016~2025)",
+        "NC 다이노스(2025~2025 · 2025-07-28)",
+        "KT 위즈(2026~현재 · 2025-11-25)"
+      ]
+    },
+    {
+      "id": "v15-0398",
+      "name": "정성종",
+      "kbo_player_id": "68556",
+      "prevTeam": "롯데",
+      "newTeam": "롯데",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": true,
+      "clubTenure2027": 9,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (롯데 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "롯데 자이언츠(2018~2026)"
+      ]
+    },
+    {
+      "id": "v15-0399",
+      "name": "정철원",
+      "kbo_player_id": "68242",
+      "prevTeam": "롯데",
+      "newTeam": "키움",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 1,
+      "changes": [
+        "소속팀 변경(롯데→키움): 2026-11-20 정철원↔임지열 1:1 트레이드로 롯데→키움 이적"
+      ],
+      "historySummary": [
+        "두산 베어스(2018~2024)",
+        "롯데 자이언츠(2025~2026)",
+        "키움 히어로즈(2027~현재 · 2026-11-20)"
+      ]
+    },
+    {
+      "id": "v15-0404",
+      "name": "최충연",
+      "kbo_player_id": "66451",
+      "prevTeam": "롯데",
+      "newTeam": "롯데",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": false,
+      "clubTenure2027": 1,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (롯데 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "삼성 라이온즈(2016~2025)",
+        "롯데 자이언츠(2026~2026)"
+      ]
+    },
+    {
+      "id": "v15-0442",
+      "name": "김대유",
+      "kbo_player_id": "60337",
+      "prevTeam": "KIA",
+      "newTeam": "KIA",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": false,
+      "clubTenure2027": 4,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (KIA 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "SK 와이번스(2010~2017)",
+        "KT 위즈(2019~2019)",
+        "LG 트윈스(2020~2022)",
+        "KIA 타이거즈(2023~2026)"
+      ]
+    },
+    {
+      "id": "2026-HT-49",
+      "name": "김범수",
+      "kbo_player_id": "65769",
+      "prevTeam": "KIA",
+      "newTeam": "KIA",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 2,
+      "changes": [
+        "이적 이력·날짜 정밀 보강 (KBO 공식 기록실)"
+      ],
+      "historySummary": [
+        "한화 이글스(2015~2025)",
+        "KIA 타이거즈(2026~현재)"
+      ]
+    },
+    {
+      "id": "2026-HT-21",
+      "name": "김사윤",
+      "kbo_player_id": "63894",
+      "prevTeam": "KIA",
+      "newTeam": "KIA",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": false,
+      "clubTenure2027": 5,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (KIA 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "SK 와이번스 / SSG 랜더스(2013~2021)",
+        "KIA 타이거즈(2022~2026)"
+      ]
+    },
+    {
+      "id": "2026-HT-19",
+      "name": "윤중현",
+      "kbo_player_id": "68619",
+      "prevTeam": "KIA",
+      "newTeam": "KIA",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": true,
+      "clubTenure2027": 9,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (KIA 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "KIA 타이거즈(2018~2026)"
+      ]
+    },
+    {
+      "id": "v15-0463",
+      "name": "이형범",
+      "kbo_player_id": "62951",
+      "prevTeam": "KIA",
+      "newTeam": "한화",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 2,
+      "changes": [
+        "소속팀 변경(KIA→한화): 2026-07-23 하주석↔이형범 1:1 트레이드로 KIA→한화 이적"
+      ],
+      "historySummary": [
+        "NC 다이노스(2012~2018)",
+        "두산 베어스(2019~2023)",
+        "KIA 타이거즈(2024~2026)",
+        "한화 이글스(2026~현재 · 2026-07-23)"
+      ]
+    },
+    {
+      "id": "v15-0472",
+      "name": "홍건희",
+      "kbo_player_id": "61643",
+      "prevTeam": "KIA",
+      "newTeam": "KIA",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": false,
+      "clubTenure2027": 10,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (KIA 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "KIA 타이거즈(2011~2019)",
+        "두산 베어스(2020~2025)",
+        "KIA 타이거즈(2026~2026)"
+      ]
+    },
+    {
+      "id": "v15-0491",
+      "name": "고종욱",
+      "kbo_player_id": "61353",
+      "prevTeam": "KIA",
+      "newTeam": "KIA",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": false,
+      "clubTenure2027": 5,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (KIA 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "넥센 히어로즈(2011~2018)",
+        "SK 와이번스 / SSG 랜더스(2019~2021)",
+        "KIA 타이거즈(2022~2026)"
+      ]
+    },
+    {
+      "id": "2026-HT-8",
+      "name": "이창진",
+      "kbo_player_id": "64560",
+      "prevTeam": "KIA",
+      "newTeam": "KIA",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": false,
+      "clubTenure2027": 9,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (KIA 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "롯데 자이언츠(2014~2014)",
+        "KT 위즈(2015~2015)",
+        "KIA 타이거즈(2018~2026)"
+      ]
+    },
+    {
+      "id": "v15-0503",
+      "name": "김명신",
+      "kbo_player_id": "67246",
+      "prevTeam": "두산",
+      "newTeam": "두산",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": true,
+      "clubTenure2027": 10,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (두산 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "두산 베어스(2017~2026)"
+      ]
+    },
+    {
+      "id": "v15-0507",
+      "name": "김지윤",
+      "kbo_player_id": null,
+      "prevTeam": "두산",
+      "newTeam": "두산",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": true,
+      "clubTenure2027": 1,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (두산 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "두산 베어스(2026~2026)"
+      ]
+    },
+    {
+      "id": "v15-0517",
+      "name": "이교훈",
+      "kbo_player_id": "69205",
+      "prevTeam": "두산",
+      "newTeam": "한화",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 2,
+      "changes": [
+        "소속팀 변경(두산→한화): 2026-04-14 손아섭↔이교훈(+현금 1.5억) 트레이드로 두산→한화 이적"
+      ],
+      "historySummary": [
+        "두산 베어스(2019~2026)",
+        "한화 이글스(2026~현재 · 2026-04-14)"
+      ]
+    },
+    {
+      "id": "2026-OB-25",
+      "name": "양의지",
+      "kbo_player_id": "76232",
+      "prevTeam": "두산",
+      "newTeam": "두산",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 18,
+      "changes": [
+        "2027 FA 공식 잔류 확정 (2027 FA 잔류 확정 (2년 최대 55억 · 계약금 40억 / 연봉 총 10억 / 옵션 5억))"
+      ],
+      "historySummary": [
+        "두산 베어스(2006~2018)",
+        "NC 다이노스(2019~2022)",
+        "두산 베어스(2023~현재)"
+      ]
+    },
+    {
+      "id": "v15-0541",
+      "name": "김민혁",
+      "kbo_player_id": "65269",
+      "prevTeam": "두산",
+      "newTeam": "두산",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": true,
+      "clubTenure2027": 12,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (두산 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "두산 베어스(2015~2026)"
+      ]
+    },
+    {
+      "id": "v15-0542",
+      "name": "박계범",
+      "kbo_player_id": "64468",
+      "prevTeam": "두산",
+      "newTeam": "삼성",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 9,
+      "changes": [
+        "소속팀 변경(두산→삼성): 2026-05-06 박계범↔류승민 1:1 트레이드로 두산→삼성 복귀"
+      ],
+      "historySummary": [
+        "삼성 라이온즈(2014~2020)",
+        "두산 베어스(2021~2026)",
+        "삼성 라이온즈(2026~현재 · 2026-05-06)"
+      ]
+    },
+    {
+      "id": "2026-OB-7",
+      "name": "박찬호",
+      "kbo_player_id": "64646",
+      "prevTeam": "두산",
+      "newTeam": "두산",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 2,
+      "changes": [
+        "이적 이력·날짜 정밀 보강 (두산 베어스 공식 발표 (2025-11-18 FA 4년 80억))"
+      ],
+      "historySummary": [
+        "KIA 타이거즈(2014~2025)",
+        "두산 베어스(2026~현재 · 2025-11-18)"
+      ]
+    },
+    {
+      "id": "v15-0571",
+      "name": "박주성",
+      "kbo_player_id": "69328",
+      "prevTeam": "키움",
+      "newTeam": "키움",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": true,
+      "clubTenure2027": 8,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (키움 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "키움 히어로즈(2019~2026)"
+      ]
+    },
+    {
+      "id": "2026-WO-23",
+      "name": "김병휘",
+      "kbo_player_id": "50304",
+      "prevTeam": "키움",
+      "newTeam": "키움",
+      "statusAfter": "방출(자유계약)",
+      "isOneClubMan": true,
+      "clubTenure2027": 7,
+      "changes": [
+        "2026 시즌 종료 방출 반영 (키움 재계약 불가 (방출 · 자유계약))"
+      ],
+      "historySummary": [
+        "키움 히어로즈(2020~2026)"
+      ]
+    },
+    {
+      "id": "v15-0601",
+      "name": "서건창",
+      "kbo_player_id": "78168",
+      "prevTeam": "키움",
+      "newTeam": "키움",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 12,
+      "changes": [
+        "이적 이력·날짜 정밀 보강 (KBO 공식 기록실)"
+      ],
+      "historySummary": [
+        "LG 트윈스(2008~2008)",
+        "넥센 / 키움 히어로즈(2012~2021)",
+        "LG 트윈스(2021~2023)",
+        "KIA 타이거즈(2024~2025)",
+        "키움 히어로즈(2026~현재)"
+      ]
+    },
+    {
+      "id": "2026-WO-9",
+      "name": "안치홍",
+      "kbo_player_id": "79608",
+      "prevTeam": "키움",
+      "newTeam": "키움",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 2,
+      "changes": [
+        "이적 이력·날짜 정밀 보강 (KBO 2차 드래프트 공식 결과 (2025-11-19 전체 1순위))"
+      ],
+      "historySummary": [
+        "KIA 타이거즈(2009~2019)",
+        "롯데 자이언츠(2020~2023)",
+        "한화 이글스(2024~2025)",
+        "키움 히어로즈(2026~현재 · 2025-11-19)"
+      ]
+    },
+    {
+      "id": "2026-WO-6",
+      "name": "오선진",
+      "kbo_player_id": "78756",
+      "prevTeam": "키움",
+      "newTeam": "키움",
+      "statusAfter": "은퇴",
+      "isOneClubMan": false,
+      "clubTenure2027": 2,
+      "changes": [
+        "2026 은퇴 반영 (2026시즌 종료 후 현역 은퇴)"
+      ],
+      "historySummary": [
+        "한화 이글스(2008~2020)",
+        "삼성 라이온즈(2021~2022)",
+        "한화 이글스(2023~2023)",
+        "롯데 자이언츠(2024~2024)",
+        "키움 히어로즈(2025~2026)"
+      ]
+    },
+    {
+      "id": "v15-0615",
+      "name": "이용규",
+      "kbo_player_id": "74163",
+      "prevTeam": "키움",
+      "newTeam": "키움",
+      "statusAfter": "은퇴",
+      "isOneClubMan": false,
+      "clubTenure2027": 6,
+      "changes": [
+        "2026 은퇴 반영 (2026-06 키움 히어로즈 은퇴)"
+      ],
+      "historySummary": [
+        "LG 트윈스(2004~2004)",
+        "KIA 타이거즈(2005~2013)",
+        "한화 이글스(2014~2020)",
+        "키움 히어로즈(2021~2026)"
+      ]
+    },
+    {
+      "id": "v15-0619",
+      "name": "임지열",
+      "kbo_player_id": "64340",
+      "prevTeam": "키움",
+      "newTeam": "롯데",
+      "statusAfter": "현역 소속",
+      "isOneClubMan": false,
+      "clubTenure2027": 1,
+      "changes": [
+        "소속팀 변경(키움→롯데): 2026-11-20 임지열↔정철원 1:1 트레이드로 키움→롯데 이적 (원클럽맨 해제)"
+      ],
+      "historySummary": [
+        "넥센 / 키움 히어로즈(2014~2026)",
+        "롯데 자이언츠(2027~현재 · 2026-11-20)"
+      ]
+    }
+  ]
+}

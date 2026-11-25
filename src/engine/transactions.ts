@@ -1723,10 +1723,15 @@ export function executeTradeProposal(
     applyFranchiseStarTransferConsequencesInPlace(next, p, fromTeam, toTeam, '트레이드');
 
     // 기존 계약(contract) 및 누적/시즌 기록(stats, careerStats)은 단장 승인 트레이드 시 100% 그대로 유지!
+    const tradeDateIso = getCurrentCareerDate(next).isoDate;
     p.teamId = toTeam;
     p.clubTenureSeasons = 1;
     p.tradeRequested = false;
-    appendPlayerTeamHistoryInPlace(p, toTeam, next.season, `${fromTeam}→${toTeam} 트레이드`);
+    appendPlayerTeamHistoryInPlace(p, toTeam, next.season, `${fromTeam}→${toTeam} 트레이드`, {
+      transferDate: tradeDateIso,
+      moveType: '트레이드',
+      fromTeamId: fromTeam,
+    });
 
     // 기존 구단에서 샐러리캡 프랜차이즈 예외 선수로 지정되어 있었다면 자동 해제 (별도 관리 정합성 유지)
     if (next.competitiveBalance?.clubs?.[fromTeam]?.exceptionPlayerId === pid) {
@@ -4421,7 +4426,17 @@ export function advanceToNextSeason(career: CareerSave): {
       p.teamId = destTeam;
       p.formerTeamId = undefined;
       p.clubTenureSeasons = stayedOriginal ? getPlayerClubTenureSeasons(p) + 1 : 1;
-      appendPlayerTeamHistoryInPlace(p, destTeam, nextSeasonNum, stayedOriginal ? 'FA 잔류' : 'FA 이적');
+      appendPlayerTeamHistoryInPlace(
+        p,
+        destTeam,
+        nextSeasonNum,
+        stayedOriginal ? 'FA 잔류' : 'FA 이적',
+        {
+          transferDate: `${nextSeasonNum}-01-15`,
+          moveType: stayedOriginal ? 'FA 잔류' : 'FA 이적',
+          fromTeamId: originTeam,
+        }
+      );
       markReleasedPlayerSignedInPlace(next, p.id, destTeam, `${KBO_TEAMS[destTeam].name} FA 계약`);
       p.rosterTier = p.ability >= 70 ? '1군' : '2군';
       p.gameDayActive = p.rosterTier === '1군';

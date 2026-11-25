@@ -282,20 +282,26 @@ export function appendPlayerMlbHistoryInPlace(
 }
 
 /**
- * 선수 이적 시 통산 소속 구단 이력 업데이트 + 원클럽맨 여부 자동 갱신 (#1, #11)
+ * 선수 이적 시 통산 소속 구단 이력 업데이트 + 이적 날짜/유형 기록 + 원클럽맨 여부 자동 갱신 (#1, #11)
  */
 export function appendPlayerTeamHistoryInPlace(
   player: Player,
   newTeamId: TeamId,
   season: number,
-  note?: string
+  note?: string,
+  options?: {
+    transferDate?: string;
+    moveType?: string;
+    fromTeamId?: TeamId;
+  }
 ): void {
+  const prevTeamId = options?.fromTeamId ?? player.teamId;
   if (!player.careerTeamHistory || player.careerTeamHistory.length === 0) {
     const startYear = Math.max(2005, season - Math.max(0, player.serviceYears || 0));
     player.careerTeamHistory = [
       {
-        teamLabel: KBO_TEAMS[player.teamId]?.name ?? player.teamId,
-        teamId: player.teamId,
+        teamLabel: KBO_TEAMS[prevTeamId]?.name ?? prevTeamId,
+        teamId: prevTeamId,
         league: 'KBO',
         fromSeason: startYear,
       },
@@ -303,24 +309,69 @@ export function appendPlayerTeamHistoryInPlace(
   }
   const last = player.careerTeamHistory[player.careerTeamHistory.length - 1];
   if (last && last.teamId === newTeamId && !last.toSeason) {
+    if (note && !last.note) last.note = note;
     return;
   }
   if (last && !last.toSeason) {
     last.toSeason = isMlbHistoryEntry(last) ? Math.max(last.fromSeason, season - 1) : season;
+    if (options?.transferDate) {
+      last.endDate = options.transferDate;
+    }
   }
   player.careerTeamHistory.push({
     teamLabel: KBO_TEAMS[newTeamId]?.name ?? newTeamId,
     teamId: newTeamId,
     league: 'KBO',
     fromSeason: season,
+    transferDate: options?.transferDate,
+    moveType: options?.moveType,
     note,
   });
+
+  player.teamHistoryChangedInGame = true;
+  player.releasedAfter2026 = undefined;
+  player.releaseDate = undefined;
+  player.releaseNote = undefined;
 
   // 타 KBO 구단 소속 이력이 2개 이상이면 원클럽맨 해제 (MLB 진출 후 원소속 복귀는 KBO 원클럽맨 유지)
   const distinctKboTeams = new Set(
     player.careerTeamHistory.map((h) => h.teamId).filter((t): t is TeamId => Boolean(t))
   );
   player.isOneClubMan = player.category === '국내' && distinctKboTeams.size <= 1;
+}
+
+/**
+ * 선수 방출·웨이버 공시 시 현재 소속 구단 활동 기간을 종료 처리하고 게임 내 이동 이력을 기록
+ */
+export function recordPlayerReleaseHistoryInPlace(
+  player: Player,
+  fromTeamId: TeamId,
+  season: number,
+  dateIso: string,
+  note?: string
+): void {
+  if (!player.careerTeamHistory || player.careerTeamHistory.length === 0) {
+    const startYear = Math.max(2005, season - Math.max(0, player.serviceYears || 0));
+    player.careerTeamHistory = [
+      {
+        teamLabel: KBO_TEAMS[fromTeamId]?.name ?? fromTeamId,
+        teamId: fromTeamId,
+        league: 'KBO',
+        fromSeason: startYear,
+        toSeason: season,
+        endDate: dateIso,
+        note: note ?? `${dateIso} 방출`,
+      },
+    ];
+  } else {
+    const last = player.careerTeamHistory[player.careerTeamHistory.length - 1];
+    if (last && !last.toSeason) {
+      last.toSeason = season;
+      last.endDate = dateIso;
+      last.note = last.note ? `${last.note} · ${note ?? `${dateIso} 방출`}` : (note ?? `${dateIso} 방출`);
+    }
+  }
+  player.teamHistoryChangedInGame = true;
 }
 
 /**
@@ -373,6 +424,68 @@ export function buildInitialPlayerTeamHistory(
       isOneClubMan: realProfile.isOneClubMan,
       clubTenure2026: realProfile.clubTenure2026,
     };
+  }
+
+  // historicalSeasons에 과거 소속 구단 기록이 있으면 현재 구단으로 덮어쓰지 않고 연도별 이력을 분리 복원
+  if (player.historicalSeasons && player.historicalSeasons.length > 0) {
+    const asc = [...player.historicalSeasons].sort(
+      (a, b) => a.season - b.season || (a.stintOrder ?? 1) - (b.stintOrder ?? 1)
+    );
+    const derived: PlayerTeamHistoryEntry[] = [];
+    for (const rec of asc) {
+      if (!rec.team) continue;
+      const parts = String(rec.team).split('→').map((s) => s.trim());
+      for (const rawT of parts) {
+        const fid: TeamId | undefined =
+          rawT === 'SK'
+            ? 'SSG'
+            : rawT === '넥센'
+              ? '키움'
+              : (KBO_TEAMS[rawT as TeamId]?.id ?? undefined);
+        if (!fid) continue;
+        const last = derived[derived.length - 1];
+        if (last && last.teamId === fid) {
+          last.toSeason = Math.max(last.toSeason ?? rec.season, rec.season);
+        } else {
+          derived.push({
+            teamLabel: KBO_TEAMS[fid].name,
+            teamId: fid,
+            league: 'KBO',
+            fromSeason: rec.season,
+            toSeason: rec.season,
+          });
+        }
+      }
+    }
+    if (derived.length > 0) {
+      const last = derived[derived.length - 1];
+      if (
+        last.teamId === player.teamId &&
+        player.rosterTier !== '은퇴' &&
+        !player.releasedAfter2026
+      ) {
+        last.toSeason = undefined;
+      } else if (
+        last.teamId !== player.teamId &&
+        player.rosterTier !== '은퇴' &&
+        !player.releasedAfter2026
+      ) {
+        derived.push({
+          teamLabel: KBO_TEAMS[player.teamId]?.name ?? player.teamId,
+          teamId: player.teamId,
+          league: 'KBO',
+          fromSeason: season,
+          moveType: '이적',
+        });
+      }
+      const distinctKbo = new Set(
+        derived.map((h) => h.teamId).filter((t): t is TeamId => Boolean(t))
+      );
+      return {
+        history: derived,
+        isOneClubMan: player.category === '국내' && distinctKbo.size <= 1,
+      };
+    }
   }
 
   const startSeason =

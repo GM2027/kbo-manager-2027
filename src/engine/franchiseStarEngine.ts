@@ -73,7 +73,6 @@ const PROTECTED_FRANCHISE_ICONS: Record<string, { teamId: TeamId; minScore: numb
   원태인: { teamId: '삼성', minScore: 95 },
   김혜성: { teamId: '키움', minScore: 93 },
   오지환: { teamId: 'LG', minScore: 96 },
-  김현수: { teamId: 'LG', minScore: 94 },
   양의지: { teamId: '두산', minScore: 96 },
   정수빈: { teamId: '두산', minScore: 95 },
   강민호: { teamId: '삼성', minScore: 94 },
@@ -107,12 +106,23 @@ export function evaluateFranchiseStar(
       : tenureSeasons;
 
   const isCaptain = career.teams[player.teamId]?.leadership?.captainPlayerId === player.id;
+  const distinctHistoryClubs = new Set(
+    (player.careerTeamHistory ?? [])
+      .map((h) => h.teamId)
+      .filter((t): t is TeamId => Boolean(t))
+  );
   const isOneClub =
-    player.isOneClubMan !== undefined
-      ? player.isOneClubMan
-      : realProfile
-      ? realProfile.isOneClubMan
-      : player.category === '국내' && player.acquisitionInfo?.type !== 'FA/트레이드';
+    player.category !== '국내'
+      ? false
+      : distinctHistoryClubs.size > 1
+        ? false
+        : player.isOneClubMan !== undefined
+          ? player.isOneClubMan
+          : realProfile && (!realProfile.expectedTeamId || realProfile.expectedTeamId === player.teamId)
+            ? realProfile.isOneClubMan
+            : distinctHistoryClubs.size === 1 &&
+              distinctHistoryClubs.has(player.teamId) &&
+              player.acquisitionInfo?.type !== 'FA/트레이드';
   const domesticHomegrownBonus = isOneClub && player.category === '국내' ? 6 : 0;
   const realIconBonus =
     realProfile && (!realProfile.expectedTeamId || realProfile.expectedTeamId === player.teamId)

@@ -40,8 +40,8 @@ export function createNewCareer(params: {
   const created: CareerSave = {
     careerId: `career_${teamId}_${Date.now()}`,
     label: `${teamInfo.name} 2027 · 새 커리어`,
-    version: 'v20.2027',
-    databaseVersion: 'v20_verified_player_db',
+    version: 'v21.2027',
+    databaseVersion: 'v21_verified_career_histories',
     lockedHistoricalSeasons: [2026],
     isPreservedMaster: false,
     isArchived: false,

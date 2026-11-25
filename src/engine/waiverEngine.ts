@@ -13,6 +13,7 @@ import { recordLeagueAcquisitionInPlace } from './leagueAcquisitionsEngine';
 import {
   appendPlayerTeamHistoryInPlace,
   markReleasedPlayerSignedInPlace,
+  recordPlayerReleaseHistoryInPlace,
   recordReleasedPlayerInPlace,
 } from './leagueLifeEngine';
 import { SeededRng } from './rng';
@@ -184,12 +185,19 @@ export function waiveDomesticPlayerInPlace(
     }
   }
 
-  // 공시 즉시 선수단에서 제외
+  // 공시 즉시 선수단에서 제외 및 통산 소속팀 이력에 방출 반영
   const t = career.teams[teamId];
   p.rosterTier = '제외후보';
   p.gameDayActive = false;
   p.contract.status = '만료';
   p.contract.yearsRemaining = 0;
+  recordPlayerReleaseHistoryInPlace(
+    p,
+    teamId,
+    career.season,
+    dateIso,
+    options?.reason ?? `${KBO_TEAMS[teamId].shortName} 웨이버 공시(방출)`
+  );
 
   t.lineupOrder = t.lineupOrder.filter((id) => id !== p.id);
   t.benchOrder = t.benchOrder.filter((id) => id !== p.id);
@@ -311,7 +319,12 @@ export function awardWaiverPlayerToTeamInPlace(
     basePlayer,
     winningTeamId,
     career.season,
-    `웨이버 영입 (이적료 300만 원 · 계약 승계)`
+    `웨이버 영입 (이적료 300만 원 · 계약 승계)`,
+    {
+      transferDate: resolveDateIso,
+      moveType: '웨이버 클레임',
+      fromTeamId: item.fromTeamId,
+    }
   );
   career.players[targetId] = basePlayer;
 
@@ -816,7 +829,12 @@ export function signUnclaimedFreeAgentInPlace(
     signed,
     signingTeamId,
     career.season,
-    fa.independentClubName ? `${fa.independentClubName} → KBO 복귀` : '자유계약선수 영입'
+    fa.independentClubName ? `${fa.independentClubName} → KBO 복귀` : '자유계약선수 영입',
+    {
+      transferDate: dateIso,
+      moveType: '자유계약',
+      fromTeamId: fa.formerTeamId,
+    }
   );
   career.players[targetId] = signed;
 

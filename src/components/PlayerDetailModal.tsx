@@ -193,6 +193,11 @@ export const PlayerDetailModal: React.FC<PlayerDetailModalProps> = ({
                     은퇴
                   </span>
                 )}
+                {player.releasedAfter2026 && player.rosterTier === 'FA' && (
+                  <span className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/40">
+                    방출 (자유계약)
+                  </span>
+                )}
                 {player.isOneClubMan && (
                   <span className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/40">
                     원클럽맨
@@ -245,7 +250,11 @@ export const PlayerDetailModal: React.FC<PlayerDetailModalProps> = ({
 
               <div className="text-xs text-slate-600 dark:text-slate-400 mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
                 <span className="font-semibold text-slate-800 dark:text-slate-200">
-                  {teamInfo?.name ?? player.teamId}
+                  {player.releasedAfter2026 && player.rosterTier === 'FA'
+                    ? `무소속 · 전 ${teamInfo?.shortName ?? player.teamId} (방출)`
+                    : player.rosterTier === '은퇴'
+                      ? `은퇴 · 최종 ${teamInfo?.name ?? player.teamId}`
+                      : (teamInfo?.name ?? player.teamId)}
                 </span>
                 <span>·</span>
                 <span>
@@ -583,13 +592,28 @@ export const PlayerDetailModal: React.FC<PlayerDetailModalProps> = ({
                             .replace(/^MLB\s+/i, '')
                         : h.teamLabel || h.teamId || '미상';
 
+                      const transferTag =
+                        h.transferDate && h.moveType && h.moveType !== '입단'
+                          ? `${h.transferDate} ${h.moveType}`
+                          : h.moveType && h.moveType !== '입단'
+                            ? h.moveType
+                            : undefined;
+                      const detailTitle = [
+                        `${cleanLabel} (${seasonRange})`,
+                        transferTag,
+                        h.endDate ? `종료 ${h.endDate}` : undefined,
+                        h.note,
+                      ]
+                        .filter(Boolean)
+                        .join(' · ');
+
                       return (
                         <React.Fragment key={`${h.teamId ?? h.mlbTeamName ?? h.teamLabel}-${h.fromSeason}-${idx}`}>
                           {idx > 0 && <span className="text-slate-400 font-bold">→</span>}
                           {isMlb ? (
                             <span
                               className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-sky-500/40 bg-sky-500/10 dark:bg-sky-950/60 text-sky-900 dark:text-sky-100"
-                              title={h.note ? `MLB · ${cleanLabel} (${seasonRange}) — ${h.note}` : `MLB · ${cleanLabel} (${seasonRange})`}
+                              title={`MLB · ${detailTitle}`}
                             >
                               <MlbTeamLogo teamName={h.mlbTeamName ?? cleanLabel} size="xs" />
                               <span className="text-[9px] font-black tracking-tight px-1 py-px rounded bg-sky-700 text-white leading-none">
@@ -603,18 +627,23 @@ export const PlayerDetailModal: React.FC<PlayerDetailModalProps> = ({
                           ) : h.teamId ? (
                             <span
                               className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 bg-slate-100/90 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200"
-                              title={h.note ? `${cleanLabel} (${seasonRange}) — ${h.note}` : `${cleanLabel} (${seasonRange})`}
+                              title={detailTitle}
                             >
                               <TeamLogo teamId={h.teamId} size="xs" />
                               <span className="font-semibold">{cleanLabel}</span>
                               <span className="font-mono-stats text-slate-600 dark:text-slate-400">
                                 ({seasonRange})
                               </span>
+                              {transferTag && (
+                                <span className="text-[9px] font-mono-stats text-indigo-600 dark:text-indigo-300">
+                                  · {transferTag}
+                                </span>
+                              )}
                             </span>
                           ) : (
                             <span
                               className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-emerald-500/35 bg-emerald-500/10 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200"
-                              title={h.note ? `${cleanLabel} (${seasonRange}) — ${h.note}` : `${cleanLabel} (${seasonRange})`}
+                              title={detailTitle}
                             >
                               <span className="text-[9px] font-extrabold px-1 py-px rounded bg-emerald-700 text-white leading-none">
                                 {h.league ?? '해외'}
@@ -752,7 +781,7 @@ export const PlayerDetailModal: React.FC<PlayerDetailModalProps> = ({
                   <div className="space-y-1.5">
                     <div className="flex flex-wrap items-center justify-between gap-1 text-[10px] font-bold text-slate-600 dark:text-slate-300">
                       <span>
-                        KBO 연도별 공식 성적 ({player.historicalSeasons.length}시즌 보존 · 2027 시즌은 0부터 시작)
+                        KBO 연도별 공식 성적 ({new Set(player.historicalSeasons.map((h) => h.season)).size}시즌 · {player.historicalSeasons.length}건 보존 · 2027 시즌은 0부터 시작)
                       </span>
                       {player.kboOfficialId && (
                         <span className="font-mono-stats text-blue-600 dark:text-blue-400">
@@ -806,8 +835,30 @@ export const PlayerDetailModal: React.FC<PlayerDetailModalProps> = ({
                               <td className="py-1 px-1.5 text-left font-bold text-slate-800 dark:text-slate-200">
                                 {hs.season}
                               </td>
-                              <td className="py-1 px-1.5 text-left font-sans text-slate-600 dark:text-slate-300">
-                                {hs.team ?? teamInfo?.shortName}
+                              <td
+                                className="py-1 px-1.5 text-left font-sans text-slate-600 dark:text-slate-300 whitespace-nowrap"
+                                title={hs.transferNote ?? undefined}
+                              >
+                                {(() => {
+                                  if (hs.team) return hs.team;
+                                  const matchedHist = (player.careerTeamHistory ?? []).find(
+                                    (h) =>
+                                      h.teamId &&
+                                      h.fromSeason <= hs.season &&
+                                      (h.toSeason === undefined || h.toSeason >= hs.season)
+                                  );
+                                  return matchedHist?.teamId
+                                    ? KBO_TEAMS[matchedHist.teamId].shortName
+                                    : '미확인';
+                                })()}
+                                {hs.transferNote && (
+                                  <span
+                                    className="ml-1 text-[9px] text-indigo-600 dark:text-indigo-400"
+                                    title={hs.transferNote}
+                                  >
+                                    ⓘ
+                                  </span>
+                                )}
                               </td>
                               {player.role === '타자' ? (
                                 <>

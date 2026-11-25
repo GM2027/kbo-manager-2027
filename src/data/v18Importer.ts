@@ -6,6 +6,7 @@ import {
   Coach,
   MilitaryStatus,
   Player,
+  PlayerTeamHistoryEntry,
   Position,
   TeamId,
   TeamState,
@@ -90,7 +91,24 @@ interface RawV18Player {
     source?: string;
   } | null;
   retired_after_2026?: boolean;
+  retired_date?: string;
   retired_note?: string;
+  released_after_2026?: boolean;
+  release_date?: string;
+  release_note?: string;
+  fa_signed_2027?: {
+    years: number;
+    totalBillion: number;
+    annualBillion: number;
+    signingBonusBillion: number;
+    endYear: number;
+    signedDate: string;
+    note: string;
+    source?: string;
+  } | null;
+  verified_team_history?: PlayerTeamHistoryEntry[];
+  verified_one_club_man?: boolean;
+  verified_club_tenure_2027?: number;
   military_verified?: {
     status: MilitaryStatus;
     note?: string;
@@ -242,9 +260,10 @@ function buildHistoricalCareerStats(
   role: '투수' | '타자'
 ): CareerBatterStats | CareerPitcherStats | undefined {
   if (!records || records.length === 0) return undefined;
+  const distinctSeasonCount = new Set(records.map((r) => r.season)).size;
   if (role === '타자') {
     const agg: CareerBatterStats = {
-      seasons: records.length,
+      seasons: distinctSeasonCount,
       G: 0,
       AB: 0,
       H: 0,
@@ -267,7 +286,7 @@ function buildHistoricalCareerStats(
     return agg;
   }
   const agg: CareerPitcherStats = {
-    seasons: records.length,
+    seasons: distinctSeasonCount,
     G: 0,
     outs: 0,
     W: 0,
@@ -538,10 +557,220 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
   if (
     !career.isPreservedMaster &&
     career.season >= 2027 &&
-    career.databaseVersion === 'v19_unified_rebalance'
+    career.databaseVersion !== 'v21_verified_career_histories'
   ) {
-    career.databaseVersion = 'v20_verified_player_db';
+    const prePatchChangedIds = new Set<string>();
+    for (const p of Object.values(career.players)) {
+      const src = p.v18SourceId ? V18_BY_SOURCE_ID.get(p.v18SourceId) : undefined;
+      if (!src) continue;
+      const verifiedTeamId: TeamId = V18_TEAM_MAP[src.team] ?? p.teamId;
+      const realHist = findRealPlayerClubProfile(src.name, verifiedTeamId);
+      const nextHistorical = buildHistoricalSeasonsFromRaw(src);
+      const nextAgg = buildHistoricalCareerStats(nextHistorical, p.role);
+
+      // 과거 시즌 공식 성적(분할 시즌 포함)과 통산 기준선 동기화 (현재 진행 중 2027+ 성적 p.stats는 보존)
+      p.historicalSeasons = nextHistorical;
+      if (nextAgg) {
+        p.careerStats = nextAgg;
+        if (p.role === '타자' && 'HR' in nextAgg) {
+          p.careerHits = nextAgg.H;
+          p.careerHR = nextAgg.HR;
+        } else if (p.role === '투수' && 'W' in nextAgg) {
+          p.careerWins = nextAgg.W;
+          p.careerSO = nextAgg.SO;
+        }
+      }
+
+      // 게임 내 가상 이적(트레이드·FA·방출)이 이미 발생한 선수는 가상 이동을 100% 보존
+      const hasInGameMove =
+        Boolean(p.teamHistoryChangedInGame) ||
+        Boolean(
+          p.careerTeamHistory?.some(
+            (h) =>
+              h.fromSeason >= 2027 &&
+              Boolean(h.note) &&
+              /(트레이드|FA 이적|웨이버 영입|자유계약선수 영입|보상선수)/.test(h.note ?? '') &&
+              !/(2026-10-27|2026-11-20)/.test(h.note ?? '')
+          )
+        );
+
+      const { history: verifiedHist, isOneClubMan, clubTenureSeasons } = mergeVerifiedTeamHistory(
+        src,
+        verifiedTeamId,
+        realHist
+      );
+
+      if (hasInGameMove) {
+        // 과거(<=2026) 이력만 정밀 교정하고 게임 내 2027+ 가상 이적 내역은 뒤에 보존
+        const inGameEntries = (p.careerTeamHistory ?? []).filter((h) => h.fromSeason >= 2027);
+        if (inGameEntries.length > 0) {
+          const basePast = verifiedHist.filter((h) => h.fromSeason <= 2026).map((h) => ({ ...h }));
+          const lastPast = basePast[basePast.length - 1];
+          if (lastPast && !lastPast.toSeason) {
+            lastPast.toSeason = 2026;
+          }
+          p.careerTeamHistory = [...basePast, ...inGameEntries];
+          const distinctClubs = new Set(
+            p.careerTeamHistory.map((h) => h.teamId).filter((t): t is TeamId => Boolean(t))
+          );
+          p.isOneClubMan = p.category === '국내' && distinctClubs.size <= 1;
+        }
+        continue;
+      }
+
+      // 게임 내 가상 이동이 없는 실존 선수: 검증된 2026-11-25 소속 구단·이력·원클럽맨·방출·은퇴·FA 확정 반영
+      p.careerTeamHistory = verifiedHist;
+      p.isOneClubMan = isOneClubMan;
+      p.clubTenureSeasons = clubTenureSeasons;
+
+      if (career.season === 2027) {
+        if (p.teamId !== verifiedTeamId && !src.released_after_2026 && !src.retired_after_2026) {
+          prePatchChangedIds.add(p.id);
+          const oldTeam = career.teams[p.teamId];
+          if (oldTeam) {
+            oldTeam.lineupOrder = oldTeam.lineupOrder.filter((id) => id !== p.id);
+            oldTeam.benchOrder = oldTeam.benchOrder.filter((id) => id !== p.id);
+            oldTeam.rotationOrder = oldTeam.rotationOrder.filter((id) => id !== p.id);
+            oldTeam.bullpenOrder = oldTeam.bullpenOrder.filter((id) => id !== p.id);
+          }
+          p.teamId = verifiedTeamId;
+        }
+        if (src.retired_after_2026 && p.rosterTier !== '은퇴') {
+          prePatchChangedIds.add(p.id);
+          p.rosterTier = '은퇴';
+          p.gameDayActive = false;
+        } else if (src.released_after_2026 && p.rosterTier !== 'FA' && p.rosterTier !== '은퇴') {
+          prePatchChangedIds.add(p.id);
+          p.formerTeamId = verifiedTeamId;
+          p.rosterTier = 'FA';
+          p.gameDayActive = false;
+          p.releasedAfter2026 = true;
+          p.releaseDate = src.release_date;
+          p.releaseNote = src.release_note;
+          p.contract.status = '만료';
+          p.contract.yearsRemaining = 0;
+          p.contract.note = src.release_note ?? '2026시즌 종료 후 재계약 불가 (방출 · 자유계약)';
+        } else if (src.fa_signed_2027 && p.rosterTier === 'FA') {
+          const fs = src.fa_signed_2027;
+          p.rosterTier = '1군';
+          p.gameDayActive = true;
+          p.faApproved2027Grade = undefined;
+          p.formerTeamId = undefined;
+          p.contract = {
+            status: '확정',
+            currency: 'KRW',
+            years: fs.years,
+            yearsRemaining: fs.years,
+            annualSalary: fs.annualBillion,
+            signingBonus: fs.signingBonusBillion,
+            totalValue: fs.totalBillion,
+            startSeason: 2027,
+            endSeason: fs.endYear,
+            isFAEligible: false,
+            faGrade: null,
+            note: fs.note,
+          };
+        }
+      }
+    }
+
+    // 방출·은퇴·이적 처리된 선수를 구단 라인업/로테이션에서 정리
+    if (prePatchChangedIds.size > 0) {
+      for (const tid of TEAM_IDS) {
+        const ts = career.teams[tid];
+        if (!ts) continue;
+        const keepValid = (id: string) => {
+          const pl = career.players[id];
+          return Boolean(pl && pl.teamId === tid && pl.rosterTier === '1군');
+        };
+        ts.lineupOrder = ts.lineupOrder.filter(keepValid);
+        ts.benchOrder = ts.benchOrder.filter(keepValid);
+        ts.rotationOrder = ts.rotationOrder.filter(keepValid);
+        ts.bullpenOrder = ts.bullpenOrder.filter(keepValid);
+      }
+    }
+    career.databaseVersion = 'v21_verified_career_histories';
   }
+}
+
+function buildHistoricalSeasonsFromRaw(raw: RawV18Player): V18SeasonStatRecord[] {
+  const rawCareerByYear =
+    raw.career_by_year && raw.career_by_year.length > 0
+      ? raw.career_by_year
+      : (raw.evaluation_v18?.records ?? []);
+  const dedup = new Map<string, V18SeasonStatRecord>();
+  for (const rec of rawCareerByYear) {
+    if (typeof rec.season !== 'number' || !Number.isFinite(rec.season)) continue;
+    const key = `${rec.season}__${rec.team ?? ''}__${rec.stintOrder ?? 1}`;
+    if (!dedup.has(key)) {
+      dedup.set(key, { ...rec });
+    }
+  }
+  return Array.from(dedup.values()).sort(
+    (a, b) => b.season - a.season || (b.stintOrder ?? 1) - (a.stintOrder ?? 1)
+  );
+}
+
+function mergeVerifiedTeamHistory(
+  raw: RawV18Player,
+  teamId: TeamId,
+  realHist: ReturnType<typeof findRealPlayerClubProfile>
+): { history: PlayerTeamHistoryEntry[]; isOneClubMan: boolean; clubTenureSeasons: number } {
+  const isDomestic = !raw.foreign_slot;
+  const isDrafted2027 = raw.status === 'drafted_2027';
+
+  let history: PlayerTeamHistoryEntry[] =
+    raw.verified_team_history && raw.verified_team_history.length > 0
+      ? raw.verified_team_history.map((h) => ({ ...h }))
+      : realHist
+        ? realHist.history.map((h) => ({ ...h }))
+        : [
+            {
+              teamLabel: KBO_TEAMS[teamId]?.name ?? teamId,
+              teamId,
+              league: 'KBO',
+              fromSeason: raw.draft_year ?? raw.debut_year ?? (isDrafted2027 ? 2027 : 2026),
+            },
+          ];
+
+  // verified_team_history에 MLB/NPB 이력이 빠져 있고 realHist에 공식 해외 경력이 있으면 비파괴 병합
+  if (realHist && raw.verified_team_history && raw.verified_team_history.length > 0) {
+    const hasOverseasInVerified = history.some((h) => h.league === 'MLB' || h.league === 'NPB' || Boolean(h.mlbTeamName));
+    const overseasEntries = realHist.history.filter(
+      (h) => h.league === 'MLB' || h.league === 'NPB' || Boolean(h.mlbTeamName)
+    );
+    if (!hasOverseasInVerified && overseasEntries.length > 0) {
+      // KBO 복귀자(류현진·김광현·양현종·김현수 등)는 realHist의 연대순 정렬을 우선 보존
+      const merged = [...history, ...overseasEntries.map((h) => ({ ...h }))].sort(
+        (a, b) => a.fromSeason - b.fromSeason || (a.toSeason ?? 9999) - (b.toSeason ?? 9999)
+      );
+      history = merged;
+    }
+  }
+
+  const distinctKboClubs = new Set<TeamId>();
+  for (const h of history) {
+    if (h.teamId) distinctKboClubs.add(h.teamId);
+  }
+  if (!raw.retired_after_2026 && !raw.released_after_2026) {
+    distinctKboClubs.add(teamId);
+  }
+
+  const isOneClubMan =
+    typeof raw.verified_one_club_man === 'boolean'
+      ? raw.verified_one_club_man
+      : isDomestic && distinctKboClubs.size <= 1;
+
+  const clubTenureSeasons =
+    typeof raw.verified_club_tenure_2027 === 'number'
+      ? raw.verified_club_tenure_2027
+      : isDrafted2027
+        ? 0
+        : realHist && (!realHist.expectedTeamId || realHist.expectedTeamId === teamId)
+          ? realHist.clubTenure2026 + 1
+          : 1;
+
+  return { history, isOneClubMan, clubTenureSeasons };
 }
 
 /**
@@ -608,18 +837,8 @@ export function buildAll10TeamsFromV18Dataset(): {
     if (isDrafted2027) drafted2027Count += 1;
     if (raw.fa_approved_2027) faApproved2027Count += 1;
 
-    // 연도별 공식 과거 성적 (2006~2026, 시즌 중복 제거 및 최신순 정렬)
-    const rawCareerByYear =
-      raw.career_by_year && raw.career_by_year.length > 0
-        ? raw.career_by_year
-        : (raw.evaluation_v18?.records ?? []);
-    const seasonDedup = new Map<number, V18SeasonStatRecord>();
-    for (const rec of rawCareerByYear) {
-      if (typeof rec.season === 'number' && Number.isFinite(rec.season) && !seasonDedup.has(rec.season)) {
-        seasonDedup.set(rec.season, rec);
-      }
-    }
-    const historicalSeasons = Array.from(seasonDedup.values()).sort((a, b) => b.season - a.season);
+    // 연도별 공식 과거 성적 (2006~2026, 같은 시즌 다구단 분할 성적 보존 및 최신순 정렬)
+    const historicalSeasons = buildHistoricalSeasonsFromRaw(raw);
     const recent3Records = historicalSeasons.filter((r) => r.season >= 2024 && r.season <= 2026);
     const recent3YrScore = computeRecent3YrScore(
       recent3Records.length > 0 ? recent3Records : (raw.evaluation_v18?.records ?? []),
@@ -627,26 +846,21 @@ export function buildAll10TeamsFromV18Dataset(): {
       ability
     );
 
-    // 실제 KBO 통산/프랜차이즈 메타데이터 연동 (류현진, 구자욱, 김광현, 최정, 양현종 등 원소속/통산 기록 유지)
+    // 실제 KBO 통산 소속팀 이력·원클럽맨·구단 근속 연수 (현재 소속과 과거 이력 분리 관리)
     const realHist = findRealPlayerClubProfile(raw.name, teamId);
     const v18CareerAgg = buildHistoricalCareerStats(historicalSeasons, role);
+    const mergedCareer = mergeVerifiedTeamHistory(raw, teamId, realHist);
 
     const careerStats: CareerBatterStats | CareerPitcherStats | undefined = v18CareerAgg;
-    let careerSeasons = Math.max(
+    const distinctHistoricalYears = new Set(historicalSeasons.map((h) => h.season)).size;
+    const careerSeasons = Math.max(
       isDrafted2027 ? 0 : 1,
-      historicalSeasons.length,
-      Math.max(0, age - 20)
+      distinctHistoricalYears,
+      mergedCareer.clubTenureSeasons
     );
-    let clubTenureSeasons = isDrafted2027 ? 0 : Math.max(1, Math.min(careerSeasons, Math.max(1, age - 21)));
-    let isOneClubMan = isDrafted2027 ? true : undefined;
-    let careerTeamHistory: Player['careerTeamHistory'] = undefined;
-
-    if (realHist) {
-      careerSeasons = Math.max(careerSeasons, realHist.clubTenure2026 + 1);
-      clubTenureSeasons = Math.max(clubTenureSeasons, realHist.clubTenure2026 + 1);
-      isOneClubMan = realHist.isOneClubMan;
-      careerTeamHistory = realHist.history.map((h) => ({ ...h }));
-    }
+    const clubTenureSeasons = mergedCareer.clubTenureSeasons;
+    const isOneClubMan = mergedCareer.isOneClubMan;
+    const careerTeamHistory: Player['careerTeamHistory'] = mergedCareer.history;
 
     // 계약 정보 구성 (2027 최저연봉 3,300만 원 적용 · 공식 확인 외국인 보수 반영 · 미발표 FA 계약은 협상 대기 유지)
     const fm = raw.foreign_meta_2026;
@@ -689,6 +903,38 @@ export function buildAll10TeamsFromV18Dataset(): {
         startSeason: 2027,
         endSeason: 2027,
         note: '2027 아시아쿼터 선수 계약 ($200,000 상한 준수)',
+      };
+    } else if (raw.fa_signed_2027) {
+      const fs = raw.fa_signed_2027;
+      contract = {
+        status: '확정',
+        currency: 'KRW',
+        years: fs.years,
+        yearsRemaining: fs.years,
+        annualSalary: fs.annualBillion,
+        signingBonus: fs.signingBonusBillion,
+        totalValue: fs.totalBillion,
+        startSeason: 2027,
+        endSeason: fs.endYear,
+        isFAEligible: false,
+        faGrade: null,
+        note: fs.note,
+      };
+    } else if (raw.released_after_2026) {
+      const annual = estimateDomesticSalaryBillion(raw, ability, age);
+      contract = {
+        status: '만료',
+        currency: 'KRW',
+        years: 0,
+        yearsRemaining: 0,
+        annualSalary: annual,
+        signingBonus: 0,
+        totalValue: 0,
+        startSeason: 2027,
+        endSeason: 2026,
+        isFAEligible: false,
+        faGrade: null,
+        note: raw.release_note ?? '2026시즌 종료 후 재계약 불가 (방출 · 자유계약)',
       };
     } else {
       const annual = estimateDomesticSalaryBillion(raw, ability, age);
@@ -742,17 +988,20 @@ export function buildAll10TeamsFromV18Dataset(): {
         : (milVer?.status ?? '미확인');
     const isServingMilitary = isMilitaryServing(verifiedMilStatus);
     const isRetired2026 = Boolean(raw.retired_after_2026);
+    const isReleased2026 = Boolean(raw.released_after_2026) && !isRetired2026;
     const initialRosterTier: Player['rosterTier'] = isRetired2026
       ? '은퇴'
-      : isServingMilitary
-        ? '대기'
-        : raw.fa_approved_2027
-          ? 'FA'
-          : isDrafted2027
-            ? '2군'
-            : raw.level_2026 === 1
-              ? '1군'
-              : '2군';
+      : isReleased2026
+        ? 'FA'
+        : isServingMilitary
+          ? '대기'
+          : raw.fa_approved_2027
+            ? 'FA'
+            : isDrafted2027
+              ? '2군'
+              : raw.level_2026 === 1
+                ? '1군'
+                : '2군';
 
     const player: Player = {
       id: pid,
@@ -764,7 +1013,10 @@ export function buildAll10TeamsFromV18Dataset(): {
       awardHonors: awardHonors2026,
       name: raw.name,
       teamId,
-      formerTeamId: raw.fa_approved_2027 ? teamId : undefined,
+      formerTeamId: raw.fa_approved_2027 || isReleased2026 ? teamId : undefined,
+      releasedAfter2026: isReleased2026 || undefined,
+      releaseDate: raw.release_date,
+      releaseNote: raw.release_note,
       category,
       role,
       position,

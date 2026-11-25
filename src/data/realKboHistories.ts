@@ -116,12 +116,14 @@ export const REAL_KBO_CAREER_HISTORIES: RealPlayerClubProfile[] = [
   },
   {
     name: '최형우',
+    expectedTeamId: '삼성',
     isOneClubMan: false,
-    clubTenure2026: 10,
-    franchiseIconBonus: 14,
+    clubTenure2026: 16,
+    franchiseIconBonus: 16,
     history: [
       { teamLabel: '삼성 라이온즈', teamId: '삼성', fromSeason: 2002, toSeason: 2016, note: '2002 2차 6R · 삼성 왕조 4번타자' },
-      { teamLabel: 'KIA 타이거즈', teamId: 'KIA', fromSeason: 2017, note: 'FA 이적 · KIA 통합우승 주역' },
+      { teamLabel: 'KIA 타이거즈', teamId: 'KIA', fromSeason: 2017, toSeason: 2025, transferDate: '2016-11-24', moveType: 'FA 이적', note: 'FA 이적 · KIA 통합우승 주역' },
+      { teamLabel: '삼성 라이온즈', teamId: '삼성', fromSeason: 2026, transferDate: '2025-11-25', moveType: 'FA 이적', note: 'FA 2년 계약 친정 삼성 복귀' },
     ],
   },
   {
@@ -167,11 +169,13 @@ export const REAL_KBO_CAREER_HISTORIES: RealPlayerClubProfile[] = [
   },
   {
     name: '박찬호',
-    isOneClubMan: true,
-    clubTenure2026: 13,
-    franchiseIconBonus: 10,
+    expectedTeamId: '두산',
+    isOneClubMan: false,
+    clubTenure2026: 1,
+    franchiseIconBonus: 4,
     history: [
-      { teamLabel: 'KIA 타이거즈', teamId: 'KIA', fromSeason: 2014 },
+      { teamLabel: 'KIA 타이거즈', teamId: 'KIA', fromSeason: 2014, toSeason: 2025, moveType: '입단', note: '2014 2차 5R 지명' },
+      { teamLabel: '두산 베어스', teamId: '두산', fromSeason: 2026, transferDate: '2025-11-18', moveType: 'FA 이적', note: 'FA 4년 최대 80억 이적' },
     ],
   },
   {
@@ -262,25 +266,29 @@ export const REAL_KBO_CAREER_HISTORIES: RealPlayerClubProfile[] = [
   },
   {
     name: '안치홍',
-    expectedTeamId: '한화',
+    expectedTeamId: '키움',
     isOneClubMan: false,
-    clubTenure2026: 3,
+    clubTenure2026: 1,
     franchiseIconBonus: 2,
     history: [
       { teamLabel: 'KIA 타이거즈', teamId: 'KIA', fromSeason: 2009, toSeason: 2019 },
       { teamLabel: '롯데 자이언츠', teamId: '롯데', fromSeason: 2020, toSeason: 2023 },
-      { teamLabel: '한화 이글스', teamId: '한화', fromSeason: 2024, note: 'FA 이적' },
+      { teamLabel: '한화 이글스', teamId: '한화', fromSeason: 2024, toSeason: 2025, moveType: 'FA 이적', note: 'FA 이적' },
+      { teamLabel: '키움 히어로즈', teamId: '키움', fromSeason: 2026, transferDate: '2025-11-19', moveType: '2차 드래프트', note: '2차 드래프트 1R 전체 1순위 이적' },
     ],
   },
   {
     name: '손아섭',
+    expectedTeamId: 'NC',
     isOneClubMan: false,
-    clubTenure2026: 2,
+    clubTenure2026: 4,
     franchiseIconBonus: 5,
     history: [
-      { teamLabel: '롯데 자이언츠', teamId: '롯데', fromSeason: 2007, toSeason: 2021, note: 'KBO 통산 최다 안타' },
-      { teamLabel: 'NC 다이노스', teamId: 'NC', fromSeason: 2022, toSeason: 2025, note: 'FA 이적' },
-      { teamLabel: '한화 이글스', teamId: '한화', fromSeason: 2025, note: '트레이드 이적' },
+      { teamLabel: '롯데 자이언츠', teamId: '롯데', fromSeason: 2007, toSeason: 2021, moveType: '입단', note: '2007 2차 4R · KBO 통산 최다 안타' },
+      { teamLabel: 'NC 다이노스', teamId: 'NC', fromSeason: 2022, toSeason: 2025, transferDate: '2021-12-24', endDate: '2025-07-31', moveType: 'FA 이적', note: 'FA 4년 계약 이적' },
+      { teamLabel: '한화 이글스', teamId: '한화', fromSeason: 2025, toSeason: 2026, transferDate: '2025-07-31', endDate: '2026-04-14', moveType: '트레이드', note: '2025-07-31 트레이드 이적 · 2026-02 FA 잔류' },
+      { teamLabel: '두산 베어스', teamId: '두산', fromSeason: 2026, toSeason: 2026, transferDate: '2026-04-14', endDate: '2026-10-19', moveType: '트레이드', note: '2026-04-14 트레이드 이적 · 2026-10-19 방출' },
+      { teamLabel: 'NC 다이노스', teamId: 'NC', fromSeason: 2027, transferDate: '2026-10-27', moveType: '자유계약', note: '2026-10-27 친정 NC 복귀 (연봉 5,000만 원)' },
     ],
   },
   {
@@ -370,14 +378,16 @@ export const REAL_KBO_CAREER_HISTORIES: RealPlayerClubProfile[] = [
   },
   {
     name: '김현수',
+    expectedTeamId: 'KT',
     isOneClubMan: false,
-    clubTenure2026: 9,
-    franchiseIconBonus: 12,
+    clubTenure2026: 1,
+    franchiseIconBonus: 6,
     history: [
       { teamLabel: '두산 베어스', teamId: '두산', league: 'KBO', fromSeason: 2006, toSeason: 2015, note: '타격기계 · 육성선수 신화' },
       { teamLabel: '볼티모어 오리올스', league: 'MLB', mlbTeamName: 'Baltimore Orioles', fromSeason: 2016, toSeason: 2017, note: 'MLB FA 계약 진출' },
       { teamLabel: '필라델피아 필리스', league: 'MLB', mlbTeamName: 'Philadelphia Phillies', fromSeason: 2017, toSeason: 2017, note: '시즌 중 MLB 트레이드 이적' },
-      { teamLabel: 'LG 트윈스', teamId: 'LG', league: 'KBO', fromSeason: 2018, note: 'FA 입단 · 통합우승 주장' },
+      { teamLabel: 'LG 트윈스', teamId: 'LG', league: 'KBO', fromSeason: 2018, toSeason: 2025, moveType: 'FA 이적', note: 'FA 입단 · 통합우승 주장' },
+      { teamLabel: 'KT 위즈', teamId: 'KT', league: 'KBO', fromSeason: 2026, transferDate: '2025-11-26', moveType: 'FA 이적', note: 'FA 3년 총액 50억 이적' },
     ],
   },
   {
@@ -571,12 +581,13 @@ export const REAL_KBO_CAREER_HISTORIES: RealPlayerClubProfile[] = [
   },
   {
     name: '김재환',
-    expectedTeamId: '두산',
-    isOneClubMan: true,
-    clubTenure2026: 19,
-    franchiseIconBonus: 17,
+    expectedTeamId: 'SSG',
+    isOneClubMan: false,
+    clubTenure2026: 1,
+    franchiseIconBonus: 4,
     history: [
-      { teamLabel: '두산 베어스', teamId: '두산', fromSeason: 2008, note: '2018 정규시즌 MVP · 원클럽맨' },
+      { teamLabel: '두산 베어스', teamId: '두산', fromSeason: 2008, toSeason: 2025, note: '2018 정규시즌 MVP' },
+      { teamLabel: 'SSG 랜더스', teamId: 'SSG', fromSeason: 2026, transferDate: '2025-12-05', moveType: '자유계약', note: '자유계약 2년 22억 이적' },
     ],
   },
   {
@@ -612,13 +623,14 @@ export const REAL_KBO_CAREER_HISTORIES: RealPlayerClubProfile[] = [
   },
   {
     name: '홍건희',
-    expectedTeamId: '두산',
+    expectedTeamId: 'KIA',
     isOneClubMan: false,
-    clubTenure2026: 7,
-    franchiseIconBonus: 4,
+    clubTenure2026: 1,
+    franchiseIconBonus: 2,
     history: [
       { teamLabel: 'KIA 타이거즈', teamId: 'KIA', fromSeason: 2011, toSeason: 2020 },
-      { teamLabel: '두산 베어스', teamId: '두산', fromSeason: 2020, note: '트레이드 이적' },
+      { teamLabel: '두산 베어스', teamId: '두산', fromSeason: 2020, toSeason: 2025, moveType: '트레이드', note: '트레이드 이적' },
+      { teamLabel: 'KIA 타이거즈', teamId: 'KIA', fromSeason: 2026, toSeason: 2026, endDate: '2026-10-23', moveType: '자유계약', note: '2026 친정 복귀 · 2026-10-23 재계약 불가(방출)' },
     ],
   },
 
@@ -635,11 +647,13 @@ export const REAL_KBO_CAREER_HISTORIES: RealPlayerClubProfile[] = [
   },
   {
     name: '강백호',
-    isOneClubMan: true,
-    clubTenure2026: 9,
-    franchiseIconBonus: 16,
+    expectedTeamId: '한화',
+    isOneClubMan: false,
+    clubTenure2026: 1,
+    franchiseIconBonus: 5,
     history: [
-      { teamLabel: 'KT 위즈', teamId: 'KT', fromSeason: 2018, note: '2018 2차 1R 전체 1번 · 신인왕' },
+      { teamLabel: 'KT 위즈', teamId: 'KT', fromSeason: 2018, toSeason: 2025, moveType: '입단', note: '2018 2차 1R 전체 1번 · 신인왕' },
+      { teamLabel: '한화 이글스', teamId: '한화', fromSeason: 2026, transferDate: '2025-11-20', moveType: 'FA 이적', note: 'FA 4년 100억 이적' },
     ],
   },
   {
@@ -890,13 +904,14 @@ export const REAL_KBO_CAREER_HISTORIES: RealPlayerClubProfile[] = [
   },
   {
     name: '이용찬',
-    expectedTeamId: 'NC',
+    expectedTeamId: '두산',
     isOneClubMan: false,
-    clubTenure2026: 6,
-    franchiseIconBonus: 4,
+    clubTenure2026: 14,
+    franchiseIconBonus: 5,
     history: [
       { teamLabel: '두산 베어스', teamId: '두산', fromSeason: 2007, toSeason: 2020 },
-      { teamLabel: 'NC 다이노스', teamId: 'NC', fromSeason: 2021, note: 'FA 이적' },
+      { teamLabel: 'NC 다이노스', teamId: 'NC', fromSeason: 2021, toSeason: 2025, moveType: 'FA 이적', note: 'FA 이적' },
+      { teamLabel: '두산 베어스', teamId: '두산', fromSeason: 2026, moveType: '2차 드래프트', note: '친정 복귀' },
     ],
   },
 
@@ -1176,10 +1191,10 @@ export const REAL_KBO_CAREER_HISTORIES: RealPlayerClubProfile[] = [
   {
     name: '맷 데이비슨',
     aliases: ['데이비슨'],
-    expectedTeamId: 'NC',
+    expectedTeamId: '키움',
     isOneClubMan: false,
-    clubTenure2026: 3,
-    franchiseIconBonus: 3,
+    clubTenure2026: 1,
+    franchiseIconBonus: 2,
     history: [
       { teamLabel: '애리조나 다이아몬드백스', league: 'MLB', mlbTeamName: 'Arizona Diamondbacks', fromSeason: 2013, toSeason: 2013 },
       { teamLabel: '시카고 화이트삭스', league: 'MLB', mlbTeamName: 'Chicago White Sox', fromSeason: 2016, toSeason: 2018 },
@@ -1187,7 +1202,8 @@ export const REAL_KBO_CAREER_HISTORIES: RealPlayerClubProfile[] = [
       { teamLabel: '애리조나 다이아몬드백스', league: 'MLB', mlbTeamName: 'Arizona Diamondbacks', fromSeason: 2022, toSeason: 2022 },
       { teamLabel: '애슬레틱스', league: 'MLB', mlbTeamName: 'Athletics', fromSeason: 2022, toSeason: 2022 },
       { teamLabel: '히로시마 도요 카프', league: 'NPB', fromSeason: 2023, toSeason: 2023 },
-      { teamLabel: 'NC 다이노스', teamId: 'NC', league: 'KBO', fromSeason: 2024, note: '2024 홈런왕' },
+      { teamLabel: 'NC 다이노스', teamId: 'NC', league: 'KBO', fromSeason: 2024, toSeason: 2026, endDate: '2026-07-05', note: '2024 홈런왕 · 2026-07 웨이버 공시' },
+      { teamLabel: '키움 히어로즈', teamId: '키움', league: 'KBO', fromSeason: 2026, transferDate: '2026-07-10', moveType: '웨이버 클레임', note: '2026-07 웨이버 클레임 이적 · 2027 재계약' },
     ],
   },
   {

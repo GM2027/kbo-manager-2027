@@ -19,6 +19,8 @@ backups/
 *save*.json
 *career*.json
 *backup*.json
+*Backup*.json
+!src/data/careerHistoryAuditLog.json
 *.local.json
 
 # AI Studio local workspace cache

@@ -241,6 +241,10 @@ export interface V18SeasonStatRecord {
   season: number;
   playerId?: string | null;
   team?: string | null;
+  /** 같은 시즌 다구단 분할 성적 순서 (1: 전반/이적 전, 2: 후반/이적 후) */
+  stintOrder?: number;
+  /** 시즌 중 이적·분할 기록 메모 */
+  transferNote?: string;
   G?: number;
   PA?: number;
   AB?: number;
@@ -504,6 +508,12 @@ export interface Player {
   growthCurveProfile?: PlayerGrowthCurveProfile;
   /** v18 재보정 DB 고유 원본 ID (중복 ID 방지 및 2024~2026 기록 연동) */
   v18SourceId?: string;
+  /** 게임 내 가상 트레이드·FA·방출·웨이버 이력이 발생했는지 추적 (세이브 마이그레이션 시 가상 이적 보존용) */
+  teamHistoryChangedInGame?: boolean;
+  /** 2026시즌 종료 후 실제 방출(재계약 불가 · 미계약 자유계약 신분) 여부 */
+  releasedAfter2026?: boolean;
+  releaseDate?: string;
+  releaseNote?: string;
   /** KBO 공식 홈페이지 선수 고유 ID (예: 류현진 '76715', 김도영 '52605') */
   kboOfficialId?: string;
   /** 2026 퓨처스리그 공식 확인 성적 (미확인 선수는 null 유지 · 임의 생성 금지) */
@@ -570,6 +580,12 @@ export interface PlayerTeamHistoryEntry {
   mlbTeamName?: string;
   fromSeason: number;
   toSeason?: number;
+  /** 공식 이적·입단 날짜 (YYYY-MM-DD) */
+  transferDate?: string;
+  /** 해당 구단 퇴단·이적·방출 날짜 (YYYY-MM-DD) */
+  endDate?: string;
+  /** 이동 유형 (입단 · 트레이드 · FA 이적 · 2차 드래프트 · 웨이버 클레임 · 자유계약 · 방출 등) */
+  moveType?: string;
   note?: string;
 }
 
