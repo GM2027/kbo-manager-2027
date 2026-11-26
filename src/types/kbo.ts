@@ -3207,6 +3207,27 @@ export interface PreGameEditorStore {
   history: EditorChangeLogEntry[];
 }
 
+export interface LockedGameLineupSlot {
+  playerId: string;
+  position: Position;
+  battingOrder: number; // 1..9
+}
+
+export interface LockedGameLineupPlan {
+  season: number;
+  round: number;
+  date: string;
+  isPostseason: boolean;
+  awayTeam: TeamId;
+  homeTeam: TeamId;
+  awayStarterId: string;
+  homeStarterId: string;
+  awayStarterUsageType: '정규선발' | '대체선발' | '임시선발' | '오프너';
+  homeStarterUsageType: '정규선발' | '대체선발' | '임시선발' | '오프너';
+  awayLineup: LockedGameLineupSlot[];
+  homeLineup: LockedGameLineupSlot[];
+}
+
 export interface AppSettings {
   theme: 'dark' | 'light';
   showDetailedColumnsByDefault: boolean;

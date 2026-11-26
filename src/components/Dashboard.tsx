@@ -66,7 +66,7 @@ import { acknowledgeChampionEvent } from '../engine/transactions';
 import { getRookieDraftScheduleInfo } from '../engine/calendarEngine';
 import { getCurrentCareerDate, getDraftPickingTeamForSlot } from '../engine/salaryCapEngine';
 import { CareerSummaryItem, saveCareer } from '../storage/careerStorage';
-import { AppSettings, CareerSave, GameRecord, OffseasonStep, TeamId } from '../types/kbo';
+import { AppSettings, CareerSave, GameRecord, LockedGameLineupPlan, OffseasonStep, TeamId } from '../types/kbo';
 import { AnalyticsCenterView } from './AnalyticsCenterView';
 import { GameEventAnimationPayload, GameEventAnimations } from './GameEventAnimations';
 import { LeagueAcquisitionsView } from './LeagueAcquisitionsView';
@@ -88,6 +88,7 @@ import {
 } from './PlayerStatusCompact';
 import { PlayerDetailModal } from './PlayerDetailModal';
 import { PostseasonView } from './PostseasonView';
+import { PreGameAnalysisView } from './PreGameAnalysisView';
 import { RosterLineupView } from './RosterLineupView';
 import { SeriesProgressModal } from './SeriesProgressModal';
 import { SeriesReportView } from './SeriesReportView';
@@ -123,6 +124,7 @@ import {
 
 type NavTab =
   | 'home'
+  | 'pregame'
   | 'report'
   | 'news'
   | 'postseason'
@@ -196,6 +198,7 @@ const NAV_GROUPS: NavGroupItem[] = [
     icon: CalendarDays,
     defaultTab: 'standings',
     tabs: [
+      { id: 'pregame', label: '경기 전 전력 분석', icon: ClipboardCheck },
       { id: 'standings', label: '순위 · 일정 · 타이틀', icon: Award },
       { id: 'report', label: '경기 결과 리포트', icon: BarChart3 },
       { id: 'postseason', label: '포스트시즌 중계실', icon: Crown },
@@ -345,6 +348,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [draftFocusNonce, setDraftFocusNonce] = useState(0);
   const [soundModalOpen, setSoundModalOpen] = useState(false);
   const [audioSettings, setAudioSettings] = useState<AudioSettings>(() => audioManager.getSettings());
+  const [pendingMatchMode, setPendingMatchMode] = useState<'game' | 'series' | 'postseason'>('game');
+  const [returnToPreGame, setReturnToPreGame] = useState(false);
 
   useEffect(() => {
     return audioManager.subscribe((next) => setAudioSettings(next));
@@ -711,11 +716,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
   ].includes(career.phase);
 
   const runRegularGameNow = useCallback(
-    (sourceCareer: CareerSave) => {
+    (sourceCareer: CareerSave, lockedPlan?: LockedGameLineupPlan) => {
       try {
         setActionError(null);
+        setReturnToPreGame(false);
         const wasDraftLocked = getRookieDraftScheduleInfo(sourceCareer).isLockedBeforeDate;
-        const { nextCareer, backupSnapshot } = simulateNextRegularGame(sourceCareer);
+        const { nextCareer, backupSnapshot } = simulateNextRegularGame(sourceCareer, { lockedPlan });
         const didDraftJustOpen =
           wasDraftLocked && getRookieDraftScheduleInfo(nextCareer).isOpen;
         applyCareerUpdate(nextCareer, backupSnapshot);
@@ -737,11 +743,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
   );
 
   const runRegularSeriesNow = useCallback(
-    (sourceCareer: CareerSave) => {
+    (sourceCareer: CareerSave, lockedPlan?: LockedGameLineupPlan) => {
       try {
         setActionError(null);
+        setReturnToPreGame(false);
         const wasDraftLocked = getRookieDraftScheduleInfo(sourceCareer).isLockedBeforeDate;
-        const { nextCareer, backupSnapshot } = simulateNextRegularSeries(sourceCareer);
+        const { nextCareer, backupSnapshot } = simulateNextRegularSeries(sourceCareer, { lockedPlan });
         const didDraftJustOpen =
           wasDraftLocked && getRookieDraftScheduleInfo(nextCareer).isOpen;
         applyCareerUpdate(nextCareer, backupSnapshot);
@@ -762,11 +769,30 @@ export const Dashboard: React.FC<DashboardProps> = ({
     [applyCareerUpdate, setActiveTab]
   );
 
+  const openPreGameAnalysis = useCallback(
+    (mode: 'game' | 'series' | 'postseason') => {
+      setActionError(null);
+      setReturnToPreGame(false);
+      setPendingMatchMode(mode);
+      setActiveTab('pregame');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    [setActiveTab]
+  );
+
   const handleSimulateNextGame = () => {
+    if (career.phase === 'REGULAR_SEASON' && career.gamesPlayed < career.totalRegularGames) {
+      openPreGameAnalysis('game');
+      return;
+    }
     runRegularGameNow(career);
   };
 
   const handleSimulateNextSeries = () => {
+    if (career.phase === 'REGULAR_SEASON' && career.gamesPlayed < career.totalRegularGames) {
+      openPreGameAnalysis('series');
+      return;
+    }
     runRegularSeriesNow(career);
   };
 
@@ -791,29 +817,47 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const offseasonReadiness = useMemo(() => getOffseason8StepReadiness(career), [career]);
   const isAwardsCeremonyPending = career.pendingAwardsCeremonySeason === career.season;
 
+  const runPostseasonGameNow = useCallback(
+    (sourceCareer: CareerSave, lockedPlan?: LockedGameLineupPlan) => {
+      try {
+        setActionError(null);
+        setReturnToPreGame(false);
+        const { nextCareer, backupSnapshot } = simulateNextPostseasonGame(sourceCareer, { lockedPlan });
+        applyCareerUpdate(nextCareer, backupSnapshot);
+        const latestPsGame = nextCareer.lastSeriesReport?.allGamesInWindow?.[0];
+        if (latestPsGame) {
+          setMatchAnimState({
+            title: nextCareer.lastSeriesReport?.title || `${nextCareer.season} 포스트시즌 경기 결과`,
+            games: [latestPsGame],
+          });
+        }
+        if (
+          nextCareer.phase === 'OFFSEASON' &&
+          nextCareer.pendingAwardsCeremonySeason === nextCareer.season
+        ) {
+          setActiveTab('awards');
+        } else {
+          setActiveTab('postseason');
+        }
+      } catch (err) {
+        setActionError(err instanceof Error ? err.message : '포스트시즌 진행 오류');
+      }
+    },
+    [applyCareerUpdate, setActiveTab]
+  );
+
   const handleSimulatePostseason = () => {
-    try {
-      setActionError(null);
-      const { nextCareer, backupSnapshot } = simulateNextPostseasonGame(career);
-      applyCareerUpdate(nextCareer, backupSnapshot);
-      const latestPsGame = nextCareer.lastSeriesReport?.allGamesInWindow?.[0];
-      if (latestPsGame) {
-        setMatchAnimState({
-          title: nextCareer.lastSeriesReport?.title || `${nextCareer.season} 포스트시즌 경기 결과`,
-          games: [latestPsGame],
-        });
-      }
-      if (
-        nextCareer.phase === 'OFFSEASON' &&
-        nextCareer.pendingAwardsCeremonySeason === nextCareer.season
-      ) {
-        setActiveTab('awards');
-      } else {
-        setActiveTab('postseason');
-      }
-    } catch (err) {
-      setActionError(err instanceof Error ? err.message : '포스트시즌 진행 오류');
+    const curPs = career.postseason.currentSeries;
+    if (
+      career.phase === 'POSTSEASON' &&
+      curPs &&
+      !curPs.winnerTeam &&
+      (curPs.higherSeedTeam === career.playerTeamId || curPs.lowerSeedTeam === career.playerTeamId)
+    ) {
+      openPreGameAnalysis('postseason');
+      return;
     }
+    runPostseasonGameNow(career);
   };
 
   const handleAcknowledgeChampion = () => {
@@ -2620,6 +2664,29 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </div>
           )}
 
+          {activeTab === 'pregame' && (
+            <PreGameAnalysisView
+              career={career}
+              pendingMode={pendingMatchMode}
+              onStartSingleGame={(lockedPlan) => {
+                if (career.phase === 'POSTSEASON') runPostseasonGameNow(career, lockedPlan);
+                else runRegularGameNow(career, lockedPlan);
+              }}
+              onStartSeries={(lockedPlan) => runRegularSeriesNow(career, lockedPlan)}
+              onSkipAnalysis={(lockedPlan) => {
+                if (career.phase === 'POSTSEASON') runPostseasonGameNow(career, lockedPlan);
+                else if (pendingMatchMode === 'series') runRegularSeriesNow(career, lockedPlan);
+                else runRegularGameNow(career, lockedPlan);
+              }}
+              onEditMyLineup={() => {
+                setReturnToPreGame(true);
+                setActiveTab('roster');
+              }}
+              onSelectPlayer={setSelectedPlayerId}
+              onBackToHome={() => setActiveTab('home')}
+            />
+          )}
+
           {activeTab === 'report' && (
             <SeriesReportView
               career={career}
@@ -2687,11 +2754,37 @@ export const Dashboard: React.FC<DashboardProps> = ({
           )}
 
           {activeTab === 'roster' && (
-            <RosterLineupView
-              career={career}
-              onUpdateCareer={applyCareerUpdate}
-              onSelectPlayer={setSelectedPlayerId}
-            />
+            <div className="space-y-3">
+              {returnToPreGame && (
+                <div
+                  data-testid="return-to-pregame-banner"
+                  className="px-4 py-3 rounded-lg border-2 team-accent-border team-accent-soft flex flex-wrap items-center justify-between gap-2 text-xs shadow-sm"
+                >
+                  <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <ClipboardCheck className="w-4 h-4 team-accent-text shrink-0" />
+                    <span>
+                      경기 전 라인업 수정 모드 — 타순·선발 로테이션을 수정한 뒤 전력 분석 화면으로 복귀하면 실제 출전 라인업에 즉시 반영됩니다.
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    data-testid="return-to-pregame-btn"
+                    onClick={() => {
+                      setReturnToPreGame(false);
+                      setActiveTab('pregame');
+                    }}
+                    className="px-3.5 py-1.5 rounded-lg team-accent-btn font-black whitespace-nowrap cursor-pointer"
+                  >
+                    수정 완료 · 전력 분석으로 돌아가기 →
+                  </button>
+                </div>
+              )}
+              <RosterLineupView
+                career={career}
+                onUpdateCareer={applyCareerUpdate}
+                onSelectPlayer={setSelectedPlayerId}
+              />
+            </div>
           )}
 
           {activeTab === 'contracts' && (

@@ -39,6 +39,8 @@ import {
   InjuryLog,
   InjurySeverity,
   KeyPerformer,
+  LockedGameLineupPlan,
+  LockedGameLineupSlot,
   PitcherStats,
   Player,
   PlayerGrowthCurveProfile,
@@ -77,6 +79,8 @@ import {
 import {
   buildRealisticGameLineupAndBench,
   evaluateBatterCompetitionAndMoraleInPlace,
+  GameBatterPlan,
+  GameStarterSlot,
   simulateInningByInningBattingBox,
   updateBatterWorkloadAndMoraleAfterGameInPlace,
 } from './batterUsageEngine';
@@ -679,6 +683,90 @@ export function verifyGameBoxscoreIntegrity(game: GameRecord): { valid: boolean;
   return { valid: issues.length === 0, issues };
 }
 
+function buildBatterPlanFromLockedSlots(
+  career: CareerSave,
+  teamId: TeamId,
+  lockedSlots: LockedGameLineupSlot[],
+  isPostseason: boolean,
+  isOnNationalDuty: (p: Player) => boolean
+): GameBatterPlan | null {
+  if (!lockedSlots || lockedSlots.length !== 9) return null;
+  const starters: GameStarterSlot[] = [];
+  const usedIds = new Set<string>();
+
+  for (let i = 0; i < lockedSlots.length; i++) {
+    const slot = lockedSlots[i];
+    const p = career.players[slot.playerId];
+    if (
+      !p ||
+      p.teamId !== teamId ||
+      p.role !== '타자' ||
+      p.injury ||
+      !canPlayerAppearInFirstTeam(p) ||
+      isOnNationalDuty(p) ||
+      (isPostseason && p.postseasonIneligibleSeason === career.season) ||
+      usedIds.has(p.id)
+    ) {
+      return null;
+    }
+    starters.push({
+      player: p,
+      position: slot.position,
+      battingOrder: i + 1,
+    });
+    usedIds.add(p.id);
+  }
+
+  const bench = Object.values(career.players)
+    .filter(
+      (p) =>
+        p.teamId === teamId &&
+        p.role === '타자' &&
+        p.rosterTier === '1군' &&
+        !usedIds.has(p.id) &&
+        !p.injury &&
+        canPlayerAppearInFirstTeam(p) &&
+        !isOnNationalDuty(p) &&
+        !(isPostseason && p.postseasonIneligibleSeason === career.season)
+    )
+    .sort((a, b) => b.ability + b.form * 1.5 - (a.ability + a.form * 1.5));
+
+  return {
+    starters,
+    bench,
+    rotationNotes: [],
+  };
+}
+
+function applyLockedStarterOverride(
+  career: CareerSave,
+  teamId: TeamId,
+  plan: PitcherGamePlan,
+  lockedStarterId: string,
+  lockedUsageType: PitcherGamePlan['starterUsageType']
+): PitcherGamePlan {
+  if (plan.starter.id === lockedStarterId) return plan;
+  const lockedSp = career.players[lockedStarterId];
+  if (
+    !lockedSp ||
+    lockedSp.teamId !== teamId ||
+    lockedSp.role !== '투수' ||
+    lockedSp.injury ||
+    lockedSp.rosterTier === '은퇴' ||
+    lockedSp.rosterTier === '해외이적' ||
+    lockedSp.rosterTier === 'FA'
+  ) {
+    return plan;
+  }
+  const nextRelievers = plan.relievers.filter((r) => r.id !== lockedSp.id);
+  return {
+    ...plan,
+    starter: lockedSp,
+    starterUsageType: lockedUsageType,
+    relievers: nextRelievers,
+  };
+}
+
 function simulateSingleGame(
   career: CareerSave,
   rng: SeededRng,
@@ -690,6 +778,7 @@ function simulateSingleGame(
     isPostseason: boolean;
     postseasonRound?: CareerSave['postseason']['currentRound'];
     isDoubleheaderGame2?: boolean;
+    lockedPlan?: LockedGameLineupPlan;
   }
 ): {
   game: GameRecord;
@@ -703,9 +792,18 @@ function simulateSingleGame(
     isPostseason,
     postseasonRound,
     isDoubleheaderGame2 = false,
+    lockedPlan,
   } = params;
   ensureSeasonPlayerArcsInPlace(career);
-  const awayPitchPlan = getTeamPitchingPlan(
+  const useLocked =
+    Boolean(lockedPlan) &&
+    lockedPlan!.round === round &&
+    lockedPlan!.awayTeam === awayTeam &&
+    lockedPlan!.homeTeam === homeTeam &&
+    lockedPlan!.isPostseason === isPostseason &&
+    !isDoubleheaderGame2;
+
+  let awayPitchPlan = getTeamPitchingPlan(
     career,
     awayTeam,
     round,
@@ -713,7 +811,7 @@ function simulateSingleGame(
     isPostseason,
     isDoubleheaderGame2
   );
-  const homePitchPlan = getTeamPitchingPlan(
+  let homePitchPlan = getTeamPitchingPlan(
     career,
     homeTeam,
     round,
@@ -721,52 +819,81 @@ function simulateSingleGame(
     isPostseason,
     isDoubleheaderGame2
   );
+  if (useLocked && lockedPlan) {
+    awayPitchPlan = applyLockedStarterOverride(
+      career,
+      awayTeam,
+      awayPitchPlan,
+      lockedPlan.awayStarterId,
+      lockedPlan.awayStarterUsageType
+    );
+    homePitchPlan = applyLockedStarterOverride(
+      career,
+      homeTeam,
+      homePitchPlan,
+      lockedPlan.homeStarterId,
+      lockedPlan.homeStarterUsageType
+    );
+  }
   const onNtDutyForGame = (p: Player) =>
     !isPostseason && isPlayerOnNationalTeamDuty(p, career.gamesPlayed);
-  const awayBatPlan = buildRealisticGameLineupAndBench(
-    career,
-    awayTeam,
-    homeTeam,
-    homePitchPlan.starter,
-    round,
-    {
-      isPostseason,
-      isDoubleheaderGame2,
-      isOnNationalDuty: onNtDutyForGame,
-      getPerfDelta: (p) =>
-        computePlayerGameDayPerformanceDelta(
-          career,
-          p,
-          homeTeam,
-          homePitchPlan.starter,
-          false,
-          round
-        ),
-      rng,
-    }
-  );
-  const homeBatPlan = buildRealisticGameLineupAndBench(
-    career,
-    homeTeam,
-    awayTeam,
-    awayPitchPlan.starter,
-    round,
-    {
-      isPostseason,
-      isDoubleheaderGame2,
-      isOnNationalDuty: onNtDutyForGame,
-      getPerfDelta: (p) =>
-        computePlayerGameDayPerformanceDelta(
-          career,
-          p,
-          awayTeam,
-          awayPitchPlan.starter,
-          true,
-          round
-        ),
-      rng,
-    }
-  );
+  const awayLockedBatPlan =
+    useLocked && lockedPlan
+      ? buildBatterPlanFromLockedSlots(career, awayTeam, lockedPlan.awayLineup, isPostseason, onNtDutyForGame)
+      : null;
+  const homeLockedBatPlan =
+    useLocked && lockedPlan
+      ? buildBatterPlanFromLockedSlots(career, homeTeam, lockedPlan.homeLineup, isPostseason, onNtDutyForGame)
+      : null;
+
+  const awayBatPlan =
+    awayLockedBatPlan ??
+    buildRealisticGameLineupAndBench(
+      career,
+      awayTeam,
+      homeTeam,
+      homePitchPlan.starter,
+      round,
+      {
+        isPostseason,
+        isDoubleheaderGame2,
+        isOnNationalDuty: onNtDutyForGame,
+        getPerfDelta: (p) =>
+          computePlayerGameDayPerformanceDelta(
+            career,
+            p,
+            homeTeam,
+            homePitchPlan.starter,
+            false,
+            round
+          ),
+        rng,
+      }
+    );
+  const homeBatPlan =
+    homeLockedBatPlan ??
+    buildRealisticGameLineupAndBench(
+      career,
+      homeTeam,
+      awayTeam,
+      awayPitchPlan.starter,
+      round,
+      {
+        isPostseason,
+        isDoubleheaderGame2,
+        isOnNationalDuty: onNtDutyForGame,
+        getPerfDelta: (p) =>
+          computePlayerGameDayPerformanceDelta(
+            career,
+            p,
+            awayTeam,
+            awayPitchPlan.starter,
+            true,
+            round
+          ),
+        rng,
+      }
+    );
   const awayLineup = awayBatPlan.starters.map((s) => s.player);
   const homeLineup = homeBatPlan.starters.map((s) => s.player);
 
@@ -1648,7 +1775,8 @@ function runTenGameGrowthEvaluation(
 
 function simulateRegularGames(
   career: CareerSave,
-  maxGamesToRun: 1 | 3
+  maxGamesToRun: 1 | 3,
+  options?: { lockedPlan?: LockedGameLineupPlan }
 ): {
   nextCareer: CareerSave;
   backupSnapshot: CareerSave;
@@ -1820,6 +1948,7 @@ function simulateRegularGames(
         homeTeam: matchup.home,
         isPostseason: false,
         isDoubleheaderGame2: dhGameNo === 2,
+        lockedPlan: offset === startOffset ? options?.lockedPlan : undefined,
       });
 
       if (isDh && dhGameNo) {
@@ -2313,27 +2442,36 @@ function simulateRegularGames(
 /**
  * Simulates strictly ONE regular-season 3-game series (or remaining games of current series) across all 10 teams.
  */
-export function simulateNextRegularSeries(career: CareerSave): {
+export function simulateNextRegularSeries(
+  career: CareerSave,
+  options?: { lockedPlan?: LockedGameLineupPlan }
+): {
   nextCareer: CareerSave;
   backupSnapshot: CareerSave;
 } {
-  return simulateRegularGames(career, 3);
+  return simulateRegularGames(career, 3, options);
 }
 
 /**
  * #7: Simulates strictly ONE regular-season game (1 round across all 10 teams).
  */
-export function simulateNextRegularGame(career: CareerSave): {
+export function simulateNextRegularGame(
+  career: CareerSave,
+  options?: { lockedPlan?: LockedGameLineupPlan }
+): {
   nextCareer: CareerSave;
   backupSnapshot: CareerSave;
 } {
-  return simulateRegularGames(career, 1);
+  return simulateRegularGames(career, 1, options);
 }
 
 /**
  * Simulates strictly ONE postseason game per user click (v4.60.17).
  */
-export function simulateNextPostseasonGame(career: CareerSave): {
+export function simulateNextPostseasonGame(
+  career: CareerSave,
+  options?: { lockedPlan?: LockedGameLineupPlan }
+): {
   nextCareer: CareerSave;
   backupSnapshot: CareerSave;
 } {
@@ -2380,6 +2518,7 @@ export function simulateNextPostseasonGame(career: CareerSave): {
     homeTeam,
     isPostseason: true,
     postseasonRound: series.round,
+    lockedPlan: options?.lockedPlan,
   });
 
   next.gamesLedger.push(res.game);
