@@ -203,16 +203,17 @@ export function classifyPlayerFaCompensationStatus(
     };
   }
 
-  // 3) 군보류(상무/현역 군 복무 중) 선수 자동 보호
+  // 3) 군보류(상무/현역 군 복무 중) 선수 자동 보호 (입대 시 자동 제외 · 전역 복귀 시 자동 해제)
   if (
     isMilitaryServing(p.militaryStatus) ||
     p.rosterTier === '대기'
   ) {
+    const dischargeHint = p.militaryDischargeDate ? ` · 전역 예정 ${p.militaryDischargeDate}` : '';
     return {
       player: p,
       status: 'AUTO_EXEMPT',
       exemptCategory: '군보류선수',
-      reason: `군보류·복무중 선수 (KBO 규정 자동 제외)`,
+      reason: `군보류·복무중 선수 (KBO 규정 자동 제외${dischargeHint})`,
     };
   }
 

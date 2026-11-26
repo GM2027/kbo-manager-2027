@@ -1,7 +1,7 @@
 {
-  "version": "v25_verified_positions_and_fa_compensation",
+  "version": "v26_feedback_roles_military_fa",
   "generatedFrom": "KBO_GM_2027_v18_recalibrated.json",
-  "playerCount": 732,
+  "playerCount": 737,
   "officialRosterCount": 622,
   "draftCandidates2027": 110,
   "players": [
@@ -329,7 +329,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 8,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-LG-49",
@@ -420,7 +421,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LG-37",
@@ -894,7 +896,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-LG-43",
@@ -985,7 +988,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LG-12",
@@ -1293,7 +1297,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 12,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LG-67",
@@ -1322,7 +1327,7 @@
           "stuff": 74,
           "control": 70,
           "hr_prevention": 77,
-          "stamina_proxy": 57,
+          "stamina_proxy": 54,
           "run_prevention": 77,
           "traffic_control": 72,
           "clutch": 74,
@@ -1472,7 +1477,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "v15-0006",
@@ -1812,7 +1818,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0007",
@@ -2082,7 +2089,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0008",
@@ -2111,7 +2119,7 @@
           "stuff": 71,
           "control": 73,
           "hr_prevention": 71,
-          "stamina_proxy": 59,
+          "stamina_proxy": 54,
           "run_prevention": 72,
           "traffic_control": 72,
           "clutch": 76,
@@ -2517,8 +2525,9 @@
       ],
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 6,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-LG-45",
@@ -2547,7 +2556,7 @@
           "stuff": 57,
           "control": 64,
           "hr_prevention": 58,
-          "stamina_proxy": 56,
+          "stamina_proxy": 54,
           "run_prevention": 60,
           "traffic_control": 58,
           "clutch": 62,
@@ -2757,7 +2766,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 7,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "v15-0010",
@@ -2958,7 +2968,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 5,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-LG-58",
@@ -3137,7 +3148,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "롱릴리프"
     },
     {
       "id": "v15-0012",
@@ -3228,7 +3240,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LG-25",
@@ -3502,7 +3515,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 15,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0014",
@@ -3775,7 +3789,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 7,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LG-34",
@@ -4033,7 +4048,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 10,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LG-29",
@@ -4062,7 +4078,7 @@
           "stuff": 79,
           "control": 73,
           "hr_prevention": 81,
-          "stamina_proxy": 68,
+          "stamina_proxy": 54,
           "run_prevention": 81,
           "traffic_control": 75,
           "clutch": 78,
@@ -4347,8 +4363,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 11,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "CL",
+      "secondary_positions": [],
+      "pitch_role": "마무리"
     },
     {
       "id": "v15-0017",
@@ -4565,7 +4582,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 7,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-LG-65",
@@ -4703,7 +4721,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LG-20",
@@ -4949,7 +4968,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "v15-0020",
@@ -5040,7 +5060,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0021",
@@ -5227,7 +5248,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0022",
@@ -5465,8 +5487,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 8,
-      "primary_position": "RP",
-      "secondary_positions": []
+      "primary_position": "CL",
+      "secondary_positions": [],
+      "pitch_role": "마무리"
     },
     {
       "id": "v15-0023",
@@ -5603,7 +5626,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 8,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LG-21",
@@ -5954,7 +5978,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 17,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0025",
@@ -6208,7 +6233,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 9,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "롱릴리프"
     },
     {
       "id": "v15-0026",
@@ -6237,7 +6263,7 @@
           "stuff": 61,
           "control": 57,
           "hr_prevention": 64,
-          "stamina_proxy": 56,
+          "stamina_proxy": 54,
           "run_prevention": 60,
           "traffic_control": 58,
           "clutch": 62,
@@ -6428,7 +6454,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 9,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LG-1",
@@ -6857,7 +6884,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 17,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0028",
@@ -6979,7 +7007,7 @@
           "stuff": 66,
           "control": 68,
           "hr_prevention": 69,
-          "stamina_proxy": 58,
+          "stamina_proxy": 57,
           "run_prevention": 69,
           "traffic_control": 65,
           "clutch": 68,
@@ -7373,8 +7401,9 @@
       ],
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 3,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "롱릴리프"
     },
     {
       "id": "2026-LG-18",
@@ -7651,7 +7680,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 9,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LG-38",
@@ -7807,7 +7837,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 6,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LG-48",
@@ -7945,7 +7976,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 7,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0033",
@@ -8132,8 +8164,9 @@
       ],
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 3,
-      "primary_position": "RP",
-      "secondary_positions": []
+      "primary_position": "SP",
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0034",
@@ -8313,7 +8346,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 3,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-LG-30",
@@ -8493,7 +8527,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 3,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-LG-11",
@@ -8929,7 +8964,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 7,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LG-62",
@@ -15716,7 +15752,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-HH-55",
@@ -15971,7 +16008,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 8,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0066",
@@ -16150,7 +16188,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-HH-46",
@@ -16328,7 +16367,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0068",
@@ -16640,7 +16680,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 13,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-HH-40",
@@ -16778,7 +16819,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 8,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-HH-44",
@@ -16807,7 +16849,7 @@
           "stuff": 71,
           "control": 40,
           "hr_prevention": 65,
-          "stamina_proxy": 55,
+          "stamina_proxy": 54,
           "run_prevention": 59,
           "traffic_control": 53,
           "clutch": 61,
@@ -17016,8 +17058,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 5,
-      "primary_position": "RP",
-      "secondary_positions": []
+      "primary_position": "CL",
+      "secondary_positions": [],
+      "pitch_role": "마무리"
     },
     {
       "id": "2026-HH-38",
@@ -17046,7 +17089,7 @@
           "stuff": 60,
           "control": 46,
           "hr_prevention": 57,
-          "stamina_proxy": 56,
+          "stamina_proxy": 54,
           "run_prevention": 56,
           "traffic_control": 52,
           "clutch": 58,
@@ -17291,7 +17334,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 15,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0072",
@@ -17644,7 +17688,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 22,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0073",
@@ -17901,7 +17946,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 6,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "FA2027-HH-박상원",
@@ -17930,7 +17976,7 @@
           "stuff": 75,
           "control": 73,
           "hr_prevention": 74,
-          "stamina_proxy": 59,
+          "stamina_proxy": 54,
           "run_prevention": 70,
           "traffic_control": 72,
           "clutch": 70,
@@ -18241,8 +18287,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 11,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "v15-0075",
@@ -18380,7 +18427,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 5,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0076",
@@ -18470,7 +18518,8 @@
       "draft_year": 2022,
       "draft_method": "2차 1라운드",
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0077",
@@ -18694,7 +18743,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0078",
@@ -19072,7 +19122,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 3,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0079",
@@ -19101,7 +19152,7 @@
           "stuff": 61,
           "control": 68,
           "hr_prevention": 67,
-          "stamina_proxy": 58,
+          "stamina_proxy": 60,
           "run_prevention": 65,
           "traffic_control": 66,
           "clutch": 67,
@@ -19211,7 +19262,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0080",
@@ -19350,7 +19402,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0081",
@@ -19440,7 +19493,8 @@
       "draft_year": 2026,
       "draft_method": "4라운드",
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-HH-48",
@@ -19619,7 +19673,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0083",
@@ -19854,7 +19909,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 9,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-HH-27",
@@ -19883,7 +19939,7 @@
           "stuff": 57,
           "control": 64,
           "hr_prevention": 67,
-          "stamina_proxy": 58,
+          "stamina_proxy": 54,
           "run_prevention": 64,
           "traffic_control": 61,
           "clutch": 64,
@@ -20171,8 +20227,9 @@
       ],
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 6,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-HH-18",
@@ -20201,7 +20258,7 @@
           "stuff": 55,
           "control": 57,
           "hr_prevention": 61,
-          "stamina_proxy": 56,
+          "stamina_proxy": 54,
           "run_prevention": 53,
           "traffic_control": 52,
           "clutch": 56,
@@ -20475,7 +20532,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-HH-61",
@@ -20504,7 +20562,7 @@
           "stuff": 77,
           "control": 48,
           "hr_prevention": 58,
-          "stamina_proxy": 56,
+          "stamina_proxy": 54,
           "run_prevention": 52,
           "traffic_control": 53,
           "clutch": 57,
@@ -20654,7 +20712,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0087",
@@ -20745,7 +20804,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 9,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-HH-57",
@@ -20774,7 +20834,7 @@
           "stuff": 69,
           "control": 65,
           "hr_prevention": 68,
-          "stamina_proxy": 58,
+          "stamina_proxy": 54,
           "run_prevention": 66,
           "traffic_control": 61,
           "clutch": 66,
@@ -20964,8 +21024,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 4,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-HH-66",
@@ -21238,7 +21299,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 7,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0090",
@@ -21376,7 +21438,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0091",
@@ -21467,7 +21530,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 5,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-HH-24",
@@ -21606,7 +21670,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-HH-29",
@@ -21635,7 +21700,7 @@
           "stuff": 67,
           "control": 49,
           "hr_prevention": 59,
-          "stamina_proxy": 60,
+          "stamina_proxy": 57,
           "run_prevention": 56,
           "traffic_control": 53,
           "clutch": 59,
@@ -21825,8 +21890,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 4,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "롱릴리프"
     },
     {
       "id": "2026-HH-42",
@@ -30631,7 +30697,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 7,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0129",
@@ -31085,7 +31152,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 21,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0130",
@@ -31114,7 +31182,7 @@
           "stuff": 86,
           "control": 78,
           "hr_prevention": 83,
-          "stamina_proxy": 61,
+          "stamina_proxy": 54,
           "run_prevention": 83,
           "traffic_control": 80,
           "clutch": 84,
@@ -31405,8 +31473,9 @@
       ],
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 3,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-SSG-40",
@@ -31544,7 +31613,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0132",
@@ -31637,7 +31707,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 1,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-SSG-43",
@@ -31997,7 +32068,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 10,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0134",
@@ -32026,7 +32098,7 @@
           "stuff": 74,
           "control": 75,
           "hr_prevention": 72,
-          "stamina_proxy": 60,
+          "stamina_proxy": 53,
           "run_prevention": 79,
           "traffic_control": 78,
           "clutch": 80,
@@ -32571,8 +32643,9 @@
       ],
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 6,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-SSG-42",
@@ -32601,7 +32674,7 @@
           "stuff": 60,
           "control": 65,
           "hr_prevention": 66,
-          "stamina_proxy": 63,
+          "stamina_proxy": 54,
           "run_prevention": 69,
           "traffic_control": 67,
           "clutch": 68,
@@ -32998,8 +33071,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 16,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "v15-0136",
@@ -33140,7 +33214,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-SSG-57",
@@ -33169,7 +33244,7 @@
           "stuff": 58,
           "control": 55,
           "hr_prevention": 58,
-          "stamina_proxy": 55,
+          "stamina_proxy": 54,
           "run_prevention": 56,
           "traffic_control": 56,
           "clutch": 59,
@@ -33379,7 +33454,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 8,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0138",
@@ -33408,7 +33484,7 @@
           "stuff": 49,
           "control": 40,
           "hr_prevention": 45,
-          "stamina_proxy": 58,
+          "stamina_proxy": 60,
           "run_prevention": 42,
           "traffic_control": 45,
           "clutch": 48,
@@ -33775,7 +33851,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 17,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0139",
@@ -34010,7 +34087,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 9,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0140",
@@ -34408,7 +34486,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 17,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-SSG-60",
@@ -34549,7 +34628,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0142",
@@ -34735,9 +34815,14 @@
       "draft_rank_label": "전체 15순위",
       "debut_year": 2023,
       "military_verified": {
-        "status": "미확인",
-        "note": "병역 이행 여부 공식 미확인 (임의 입대 이벤트 제외)",
-        "source": "미확인 (임의 입력 방지)"
+        "status": "복무 중",
+        "enlist_date": "2026-04-27",
+        "discharge_date": "2027-10-26",
+        "enlisted_season": 2026,
+        "return_season": 2027,
+        "return_round": 144,
+        "note": "상무 피닉스 야구단 복무 중 (2026-04-27 입대 · 2027-10-26 전역 예정 · 군보류)",
+        "source": "국군체육부대(상무) 2026년 4월 27일 최종 합격·입대 공식 발표"
       },
       "verified_team_history": [
         {
@@ -34750,7 +34835,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 5,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-SSG-16",
@@ -35042,7 +35128,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 14,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0144",
@@ -35240,7 +35327,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 6,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-SSG-92",
@@ -35269,7 +35357,7 @@
           "stuff": 71,
           "control": 65,
           "hr_prevention": 70,
-          "stamina_proxy": 61,
+          "stamina_proxy": 54,
           "run_prevention": 68,
           "traffic_control": 68,
           "clutch": 72,
@@ -35478,8 +35566,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 5,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "v15-0146",
@@ -35635,7 +35724,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 6,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0147",
@@ -35852,7 +35942,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 7,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-SSG-28",
@@ -35881,7 +35972,7 @@
           "stuff": 76,
           "control": 58,
           "hr_prevention": 61,
-          "stamina_proxy": 58,
+          "stamina_proxy": 54,
           "run_prevention": 62,
           "traffic_control": 64,
           "clutch": 64,
@@ -36049,8 +36140,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 6,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0149",
@@ -36326,7 +36418,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 12,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-SSG-19",
@@ -36355,7 +36448,7 @@
           "stuff": 97,
           "control": 86,
           "hr_prevention": 90,
-          "stamina_proxy": 59,
+          "stamina_proxy": 52,
           "run_prevention": 96,
           "traffic_control": 96,
           "clutch": 95,
@@ -36564,8 +36657,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 7,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "CL",
+      "secondary_positions": [],
+      "pitch_role": "마무리"
     },
     {
       "id": "v15-0151",
@@ -36696,7 +36790,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 7,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0152",
@@ -36787,7 +36882,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-SSG-30",
@@ -37083,7 +37179,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 10,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-SSG-34",
@@ -37340,7 +37437,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 10,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0155",
@@ -37474,7 +37572,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0156",
@@ -37613,7 +37712,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0157",
@@ -37793,7 +37893,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 3,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0158",
@@ -37871,9 +37972,14 @@
       "draft_method": "10라운드",
       "draft_rank_label": "전체 100순위",
       "military_verified": {
-        "status": "미확인",
-        "note": "병역 이행 여부 공식 미확인 (임의 입대 이벤트 제외)",
-        "source": "미확인 (임의 입력 방지)"
+        "status": "복무 중",
+        "enlist_date": "2026-04-27",
+        "discharge_date": "2027-10-26",
+        "enlisted_season": 2026,
+        "return_season": 2027,
+        "return_round": 144,
+        "note": "상무 피닉스 야구단 복무 중 (2026-04-27 입대 · 2027-10-26 전역 예정 · 군보류)",
+        "source": "국군체육부대(상무) 2026년 4월 27일 최종 합격·입대 공식 발표"
       },
       "verified_team_history": [
         {
@@ -38650,9 +38756,14 @@
       "draft_rank_label": "전체 8순위",
       "debut_year": 2025,
       "military_verified": {
-        "status": "미확인",
-        "note": "병역 이행 여부 공식 미확인 (임의 입대 이벤트 제외)",
-        "source": "미확인 (임의 입력 방지)"
+        "status": "복무 중",
+        "enlist_date": "2026-04-27",
+        "discharge_date": "2027-10-26",
+        "enlisted_season": 2026,
+        "return_season": 2027,
+        "return_round": 144,
+        "note": "상무 피닉스 야구단 복무 중 (2026-04-27 입대 · 2027-10-26 전역 예정 · 군보류)",
+        "source": "국군체육부대(상무) 2026년 4월 27일 최종 합격·입대 공식 발표"
       },
       "verified_team_history": [
         {
@@ -44224,9 +44335,14 @@
       },
       "school": null,
       "military_verified": {
-        "status": "미확인",
-        "note": "병역 이행 여부 공식 미확인 (임의 입대 이벤트 제외)",
-        "source": "미확인 (임의 입력 방지)"
+        "status": "복무 중",
+        "enlist_date": "2026-04-27",
+        "discharge_date": "2027-10-26",
+        "enlisted_season": 2026,
+        "return_season": 2027,
+        "return_round": 144,
+        "note": "상무 피닉스 야구단 복무 중 (2026-04-27 입대 · 2027-10-26 전역 예정 · 군보류)",
+        "source": "국군체육부대(상무) 2026년 4월 27일 최종 합격·입대 공식 발표"
       },
       "verified_team_history": [
         {
@@ -47259,7 +47375,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0196",
@@ -47514,7 +47631,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 10,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-SS-67",
@@ -47605,7 +47723,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-SS-62",
@@ -47634,7 +47753,7 @@
           "stuff": 82,
           "control": 82,
           "hr_prevention": 78,
-          "stamina_proxy": 60,
+          "stamina_proxy": 53,
           "run_prevention": 82,
           "traffic_control": 86,
           "clutch": 85,
@@ -48003,8 +48122,9 @@
       ],
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 4,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "CL",
+      "secondary_positions": [],
+      "pitch_role": "마무리"
     },
     {
       "id": "v15-0199",
@@ -48092,7 +48212,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0200",
@@ -48185,7 +48306,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0201",
@@ -48319,7 +48441,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0202",
@@ -48411,7 +48534,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-SS-55",
@@ -48440,7 +48564,7 @@
           "stuff": 79,
           "control": 54,
           "hr_prevention": 74,
-          "stamina_proxy": 56,
+          "stamina_proxy": 54,
           "run_prevention": 80,
           "traffic_control": 66,
           "clutch": 75,
@@ -48593,7 +48717,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-SS-29",
@@ -49117,7 +49242,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 21,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-SS-42",
@@ -49394,7 +49520,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 10,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0206",
@@ -49785,7 +49912,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-SS-18",
@@ -50109,7 +50237,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 9,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0208",
@@ -50329,7 +50458,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-SS-28",
@@ -50358,7 +50488,7 @@
           "stuff": 73,
           "control": 69,
           "hr_prevention": 74,
-          "stamina_proxy": 60,
+          "stamina_proxy": 54,
           "run_prevention": 76,
           "traffic_control": 73,
           "clutch": 79,
@@ -50608,8 +50738,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 8,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "v15-0210",
@@ -50697,7 +50828,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0211",
@@ -50787,7 +50919,8 @@
       "draft_year": 2021,
       "draft_method": "1차지명",
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0212",
@@ -51083,7 +51216,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 15,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-SS-17",
@@ -51303,7 +51437,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 7,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0214",
@@ -51394,7 +51529,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0215",
@@ -51423,7 +51559,7 @@
           "stuff": 63,
           "control": 49,
           "hr_prevention": 53,
-          "stamina_proxy": 57,
+          "stamina_proxy": 54,
           "run_prevention": 46,
           "traffic_control": 49,
           "clutch": 52,
@@ -51595,7 +51731,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 5,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-SS-38",
@@ -51624,7 +51761,7 @@
           "stuff": 52,
           "control": 64,
           "hr_prevention": 54,
-          "stamina_proxy": 56,
+          "stamina_proxy": 54,
           "run_prevention": 49,
           "traffic_control": 52,
           "clutch": 54,
@@ -52026,7 +52163,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-SS-60",
@@ -52055,7 +52193,7 @@
           "stuff": 64,
           "control": 67,
           "hr_prevention": 61,
-          "stamina_proxy": 63,
+          "stamina_proxy": 57,
           "run_prevention": 66,
           "traffic_control": 67,
           "clutch": 66,
@@ -52166,8 +52304,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "롱릴리프"
     },
     {
       "id": "v15-0218",
@@ -52308,7 +52447,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0219",
@@ -52446,7 +52586,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0220",
@@ -52834,7 +52975,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 3,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0221",
@@ -53127,7 +53269,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 11,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "v15-0222",
@@ -53332,7 +53475,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 6,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0223",
@@ -53595,7 +53739,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 7,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-SS-75",
@@ -53845,7 +53990,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 3,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-SS-47",
@@ -62571,7 +62717,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 13,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0257",
@@ -62600,7 +62747,7 @@
           "stuff": 42,
           "control": 40,
           "hr_prevention": 50,
-          "stamina_proxy": 58,
+          "stamina_proxy": 60,
           "run_prevention": 42,
           "traffic_control": 44,
           "clutch": 49,
@@ -62712,7 +62859,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 6,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0258",
@@ -63027,7 +63175,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 10,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-NC-21",
@@ -63330,7 +63479,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "v15-0260",
@@ -63359,7 +63509,7 @@
           "stuff": 65,
           "control": 40,
           "hr_prevention": 64,
-          "stamina_proxy": 57,
+          "stamina_proxy": 54,
           "run_prevention": 58,
           "traffic_control": 52,
           "clutch": 64,
@@ -63626,7 +63776,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 11,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "v15-0261",
@@ -63861,7 +64012,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 8,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "롱릴리프"
     },
     {
       "id": "2026-NC-69",
@@ -64040,7 +64192,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0263",
@@ -64069,7 +64222,7 @@
           "stuff": 58,
           "control": 54,
           "hr_prevention": 54,
-          "stamina_proxy": 55,
+          "stamina_proxy": 54,
           "run_prevention": 49,
           "traffic_control": 52,
           "clutch": 54,
@@ -64336,7 +64489,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 13,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0264",
@@ -64365,7 +64519,7 @@
           "stuff": 43,
           "control": 40,
           "hr_prevention": 42,
-          "stamina_proxy": 58,
+          "stamina_proxy": 60,
           "run_prevention": 42,
           "traffic_control": 40,
           "clutch": 42,
@@ -64556,7 +64710,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 5,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-NC-56",
@@ -64694,7 +64849,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 9,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-NC-61",
@@ -64723,7 +64879,7 @@
           "stuff": 69,
           "control": 61,
           "hr_prevention": 68,
-          "stamina_proxy": 56,
+          "stamina_proxy": 54,
           "run_prevention": 65,
           "traffic_control": 66,
           "clutch": 70,
@@ -65028,7 +65184,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 14,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-NC-46",
@@ -65248,7 +65405,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0268",
@@ -65544,7 +65702,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 10,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-NC-43",
@@ -65764,7 +65923,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 5,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0270",
@@ -65902,7 +66062,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "롱릴리프"
     },
     {
       "id": "v15-0271",
@@ -65993,7 +66154,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-NC-51",
@@ -66407,7 +66569,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 15,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-NC-40",
@@ -66586,7 +66749,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 6,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-NC-30",
@@ -66958,7 +67122,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 15,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0275",
@@ -67156,7 +67321,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 6,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "v15-0276",
@@ -67321,7 +67487,7 @@
           "stuff": 58,
           "control": 53,
           "hr_prevention": 65,
-          "stamina_proxy": 60,
+          "stamina_proxy": 54,
           "run_prevention": 56,
           "traffic_control": 57,
           "clutch": 60,
@@ -67568,8 +67734,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 9,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-NC-47",
@@ -67748,7 +67915,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 6,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0279",
@@ -68082,7 +68250,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 12,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-NC-67",
@@ -68111,7 +68280,7 @@
           "stuff": 61,
           "control": 56,
           "hr_prevention": 61,
-          "stamina_proxy": 63,
+          "stamina_proxy": 54,
           "run_prevention": 62,
           "traffic_control": 61,
           "clutch": 50,
@@ -68219,8 +68388,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0281",
@@ -68440,7 +68610,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-NC-29",
@@ -68702,7 +68873,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 6,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0283",
@@ -68877,7 +69049,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 3,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0284",
@@ -69016,7 +69189,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-NC-11",
@@ -69150,7 +69324,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-NC-42",
@@ -76862,7 +77037,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 5,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-KT-1",
@@ -77225,7 +77401,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 14,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0318",
@@ -77316,7 +77493,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0319",
@@ -77407,7 +77585,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 6,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0320",
@@ -77548,7 +77727,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-KT-26",
@@ -77577,7 +77757,7 @@
           "stuff": 62,
           "control": 63,
           "hr_prevention": 63,
-          "stamina_proxy": 58,
+          "stamina_proxy": 54,
           "run_prevention": 58,
           "traffic_control": 60,
           "clutch": 61,
@@ -77925,8 +78105,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 13,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-KT-61",
@@ -78086,7 +78267,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 5,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0323",
@@ -78370,7 +78552,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0324",
@@ -78511,7 +78694,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-KT-60",
@@ -78540,7 +78724,7 @@
           "stuff": 93,
           "control": 82,
           "hr_prevention": 82,
-          "stamina_proxy": 61,
+          "stamina_proxy": 54,
           "run_prevention": 91,
           "traffic_control": 86,
           "clutch": 90,
@@ -78770,8 +78954,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 6,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "CL",
+      "secondary_positions": [],
+      "pitch_role": "마무리"
     },
     {
       "id": "2026-KT-66",
@@ -78909,7 +79094,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-KT-19",
@@ -78938,7 +79124,7 @@
           "stuff": 69,
           "control": 62,
           "hr_prevention": 72,
-          "stamina_proxy": 58,
+          "stamina_proxy": 60,
           "run_prevention": 72,
           "traffic_control": 64,
           "clutch": 69,
@@ -79224,7 +79410,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 13,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0328",
@@ -79253,7 +79440,7 @@
           "stuff": 78,
           "control": 83,
           "hr_prevention": 81,
-          "stamina_proxy": 58,
+          "stamina_proxy": 60,
           "run_prevention": 82,
           "traffic_control": 77,
           "clutch": 78,
@@ -79363,7 +79550,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0329",
@@ -79502,7 +79690,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-KT-30",
@@ -79800,7 +79989,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 8,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0331",
@@ -79829,7 +80019,7 @@
           "stuff": 73,
           "control": 74,
           "hr_prevention": 72,
-          "stamina_proxy": 59,
+          "stamina_proxy": 54,
           "run_prevention": 75,
           "traffic_control": 74,
           "clutch": 73,
@@ -80079,8 +80269,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 9,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-KT-11",
@@ -80109,7 +80300,7 @@
           "stuff": 70,
           "control": 66,
           "hr_prevention": 66,
-          "stamina_proxy": 62,
+          "stamina_proxy": 54,
           "run_prevention": 59,
           "traffic_control": 61,
           "clutch": 67,
@@ -80216,8 +80407,9 @@
       ],
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-KT-47",
@@ -80522,7 +80714,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 3,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-KT-12",
@@ -80551,7 +80744,7 @@
           "stuff": 65,
           "control": 88,
           "hr_prevention": 78,
-          "stamina_proxy": 55,
+          "stamina_proxy": 54,
           "run_prevention": 82,
           "traffic_control": 80,
           "clutch": 77,
@@ -81101,7 +81294,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "v15-0335",
@@ -81130,7 +81324,7 @@
           "stuff": 57,
           "control": 48,
           "hr_prevention": 56,
-          "stamina_proxy": 59,
+          "stamina_proxy": 54,
           "run_prevention": 49,
           "traffic_control": 47,
           "clutch": 54,
@@ -81282,8 +81476,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 4,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-KT-37",
@@ -81579,7 +81774,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 9,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-KT-64",
@@ -81669,7 +81865,8 @@
       "draft_year": 2022,
       "draft_method": "2차 2라운드",
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0338",
@@ -81905,7 +82102,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 11,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0339",
@@ -82151,7 +82349,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 6,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0340",
@@ -82416,7 +82615,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0341",
@@ -82676,7 +82876,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 9,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "v15-0342",
@@ -82991,7 +83192,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-KT-38",
@@ -83020,7 +83222,7 @@
           "stuff": 50,
           "control": 66,
           "hr_prevention": 64,
-          "stamina_proxy": 57,
+          "stamina_proxy": 54,
           "run_prevention": 61,
           "traffic_control": 61,
           "clutch": 62,
@@ -83384,7 +83586,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 13,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-KT-16",
@@ -83804,7 +84007,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "FA2027-KT-한승혁",
@@ -83833,7 +84037,7 @@
           "stuff": 71,
           "control": 56,
           "hr_prevention": 67,
-          "stamina_proxy": 56,
+          "stamina_proxy": 54,
           "run_prevention": 63,
           "traffic_control": 59,
           "clutch": 64,
@@ -84038,7 +84242,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-KT-2",
@@ -84301,7 +84506,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 7,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-KT-55",
@@ -92114,7 +92320,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 15,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0378",
@@ -92143,7 +92350,7 @@
           "stuff": 52,
           "control": 59,
           "hr_prevention": 65,
-          "stamina_proxy": 55,
+          "stamina_proxy": 54,
           "run_prevention": 64,
           "traffic_control": 59,
           "clutch": 63,
@@ -92352,7 +92559,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 13,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0379",
@@ -92381,7 +92589,7 @@
           "stuff": 60,
           "control": 61,
           "hr_prevention": 64,
-          "stamina_proxy": 58,
+          "stamina_proxy": 54,
           "run_prevention": 58,
           "traffic_control": 58,
           "clutch": 61,
@@ -92788,8 +92996,9 @@
       ],
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 5,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LT-35",
@@ -92877,7 +93086,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LT-34",
@@ -92906,7 +93116,7 @@
           "stuff": 77,
           "control": 70,
           "hr_prevention": 77,
-          "stamina_proxy": 59,
+          "stamina_proxy": 54,
           "run_prevention": 76,
           "traffic_control": 73,
           "clutch": 78,
@@ -93267,8 +93477,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 16,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "v15-0382",
@@ -93545,7 +93756,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 7,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0383",
@@ -93818,7 +94030,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 7,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-LT-21",
@@ -94215,7 +94428,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 14,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-LT-41",
@@ -94421,7 +94635,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0386",
@@ -94769,7 +94984,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 16,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LT-36",
@@ -94798,7 +95014,7 @@
           "stuff": 86,
           "control": 62,
           "hr_prevention": 78,
-          "stamina_proxy": 59,
+          "stamina_proxy": 54,
           "run_prevention": 79,
           "traffic_control": 79,
           "clutch": 77,
@@ -94906,8 +95122,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-LT-58",
@@ -95127,7 +95344,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0389",
@@ -95156,7 +95374,7 @@
           "stuff": 60,
           "control": 70,
           "hr_prevention": 64,
-          "stamina_proxy": 60,
+          "stamina_proxy": 54,
           "run_prevention": 62,
           "traffic_control": 64,
           "clutch": 64,
@@ -95346,8 +95564,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 9,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LT-59",
@@ -95586,7 +95805,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 7,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LT-67",
@@ -95724,7 +95944,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0392",
@@ -95863,7 +96084,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0393",
@@ -96139,7 +96361,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 11,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0394",
@@ -96401,7 +96624,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 6,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-LT-40",
@@ -96580,7 +96804,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LT-54",
@@ -96718,7 +96943,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0397",
@@ -96875,7 +97101,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 5,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0398",
@@ -97116,7 +97343,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 9,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0399",
@@ -97145,7 +97373,7 @@
           "stuff": 60,
           "control": 53,
           "hr_prevention": 61,
-          "stamina_proxy": 55,
+          "stamina_proxy": 54,
           "run_prevention": 53,
           "traffic_control": 54,
           "clutch": 57,
@@ -97396,7 +97624,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 1,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0400",
@@ -97616,7 +97845,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0401",
@@ -97755,7 +97985,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0402",
@@ -98017,7 +98248,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 6,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LT-56",
@@ -98046,7 +98278,7 @@
           "stuff": 77,
           "control": 68,
           "hr_prevention": 73,
-          "stamina_proxy": 58,
+          "stamina_proxy": 54,
           "run_prevention": 71,
           "traffic_control": 70,
           "clutch": 71,
@@ -98311,8 +98543,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 8,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "CL",
+      "secondary_positions": [],
+      "pitch_role": "마무리"
     },
     {
       "id": "v15-0404",
@@ -98616,7 +98849,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 1,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0405",
@@ -98750,7 +98984,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0406",
@@ -99148,7 +99383,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 5,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LT-17",
@@ -99177,7 +99413,7 @@
           "stuff": 58,
           "control": 55,
           "hr_prevention": 64,
-          "stamina_proxy": 56,
+          "stamina_proxy": 54,
           "run_prevention": 58,
           "traffic_control": 59,
           "clutch": 60,
@@ -99371,7 +99607,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LT-38",
@@ -99610,7 +99847,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 8,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-LT-26",
@@ -107632,7 +107870,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 5,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "v15-0440",
@@ -107980,7 +108219,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 5,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "롱릴리프"
     },
     {
       "id": "v15-0441",
@@ -108275,7 +108515,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 9,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0442",
@@ -108616,7 +108857,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0443",
@@ -108881,7 +109123,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 6,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-HT-49",
@@ -109287,7 +109530,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-HT-21",
@@ -109516,7 +109760,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 5,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0446",
@@ -109545,7 +109790,7 @@
           "stuff": 51,
           "control": 51,
           "hr_prevention": 56,
-          "stamina_proxy": 57,
+          "stamina_proxy": 54,
           "run_prevention": 47,
           "traffic_control": 49,
           "clutch": 52,
@@ -109780,7 +110025,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0447",
@@ -109921,7 +110167,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-HT-10",
@@ -109950,7 +110197,7 @@
           "stuff": 56,
           "control": 61,
           "hr_prevention": 60,
-          "stamina_proxy": 58,
+          "stamina_proxy": 60,
           "run_prevention": 60,
           "traffic_control": 59,
           "clutch": 62,
@@ -110100,7 +110347,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0449",
@@ -110316,7 +110564,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0450",
@@ -110406,7 +110655,8 @@
       "draft_year": 2026,
       "draft_method": "2라운드",
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0451",
@@ -110627,7 +110877,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 4,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-HT-65",
@@ -110656,7 +110907,7 @@
           "stuff": 72,
           "control": 83,
           "hr_prevention": 81,
-          "stamina_proxy": 58,
+          "stamina_proxy": 54,
           "run_prevention": 85,
           "traffic_control": 83,
           "clutch": 80,
@@ -110805,8 +111056,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 4,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "CL",
+      "secondary_positions": [],
+      "pitch_role": "마무리"
     },
     {
       "id": "2026-HT-54",
@@ -111335,7 +111587,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 21,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-HT-33",
@@ -111515,7 +111768,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 3,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0455",
@@ -111697,7 +111951,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 8,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0456",
@@ -111726,7 +111981,7 @@
           "stuff": 58,
           "control": 51,
           "hr_prevention": 61,
-          "stamina_proxy": 58,
+          "stamina_proxy": 60,
           "run_prevention": 57,
           "traffic_control": 55,
           "clutch": 59,
@@ -111898,7 +112153,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 5,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-HT-19",
@@ -112142,7 +112398,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 9,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-HT-66",
@@ -112283,7 +112540,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 5,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-HT-58",
@@ -112424,7 +112682,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-HT-48",
@@ -112700,7 +112959,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 7,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "롱릴리프"
     },
     {
       "id": "v15-0461",
@@ -112996,7 +113256,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 13,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-HT-44",
@@ -113223,7 +113484,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0463",
@@ -113622,7 +113884,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0464",
@@ -113763,7 +114026,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0465",
@@ -114002,7 +114266,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 8,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-HT-51",
@@ -114031,7 +114296,7 @@
           "stuff": 81,
           "control": 91,
           "hr_prevention": 85,
-          "stamina_proxy": 58,
+          "stamina_proxy": 54,
           "run_prevention": 90,
           "traffic_control": 92,
           "clutch": 89,
@@ -114354,8 +114619,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 12,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "v15-0467",
@@ -114446,7 +114712,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-HT-62",
@@ -114475,7 +114742,7 @@
           "stuff": 75,
           "control": 73,
           "hr_prevention": 69,
-          "stamina_proxy": 57,
+          "stamina_proxy": 53,
           "run_prevention": 68,
           "traffic_control": 69,
           "clutch": 69,
@@ -114745,8 +115012,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 8,
-      "primary_position": "RP",
-      "secondary_positions": []
+      "primary_position": "CL",
+      "secondary_positions": [],
+      "pitch_role": "마무리"
     },
     {
       "id": "2026-HT-11",
@@ -114775,7 +115043,7 @@
           "stuff": 72,
           "control": 72,
           "hr_prevention": 76,
-          "stamina_proxy": 59,
+          "stamina_proxy": 54,
           "run_prevention": 78,
           "traffic_control": 73,
           "clutch": 79,
@@ -115129,8 +115397,9 @@
       ],
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 3,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-HT-39",
@@ -115159,7 +115428,7 @@
           "stuff": 49,
           "control": 40,
           "hr_prevention": 48,
-          "stamina_proxy": 55,
+          "stamina_proxy": 54,
           "run_prevention": 42,
           "traffic_control": 40,
           "clutch": 47,
@@ -115388,7 +115657,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 6,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-HT-55",
@@ -115658,7 +115928,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0472",
@@ -116087,7 +116358,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 10,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-HT-67",
@@ -116273,7 +116545,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-HT-41",
@@ -116512,7 +116785,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 6,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-HT-42",
@@ -124032,7 +124306,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 10,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0503",
@@ -124352,7 +124627,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 10,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0504",
@@ -124629,7 +124905,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 10,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0505",
@@ -124830,7 +125107,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 5,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-OB-16",
@@ -124859,7 +125137,7 @@
           "stuff": 43,
           "control": 45,
           "hr_prevention": 53,
-          "stamina_proxy": 55,
+          "stamina_proxy": 54,
           "run_prevention": 42,
           "traffic_control": 40,
           "clutch": 42,
@@ -125094,7 +125372,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 5,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "v15-0507",
@@ -125187,7 +125466,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 1,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-OB-63",
@@ -125216,7 +125496,7 @@
           "stuff": 97,
           "control": 77,
           "hr_prevention": 84,
-          "stamina_proxy": 59,
+          "stamina_proxy": 54,
           "run_prevention": 91,
           "traffic_control": 87,
           "clutch": 86,
@@ -125406,8 +125686,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 4,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-OB-95",
@@ -125585,7 +125866,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-OB-56",
@@ -125785,7 +126067,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 10,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0511",
@@ -126098,7 +126381,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 10,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "롱릴리프"
     },
     {
       "id": "v15-0512",
@@ -126465,7 +126749,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 7,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-OB-1",
@@ -126494,7 +126779,7 @@
           "stuff": 69,
           "control": 70,
           "hr_prevention": 68,
-          "stamina_proxy": 57,
+          "stamina_proxy": 54,
           "run_prevention": 64,
           "traffic_control": 63,
           "clutch": 65,
@@ -126825,7 +127110,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 11,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "v15-0514",
@@ -126963,7 +127249,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0515",
@@ -127142,7 +127429,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-OB-65",
@@ -127321,7 +127609,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 6,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0517",
@@ -127592,7 +127881,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-OB-29",
@@ -127621,7 +127911,7 @@
           "stuff": 62,
           "control": 56,
           "hr_prevention": 64,
-          "stamina_proxy": 55,
+          "stamina_proxy": 54,
           "run_prevention": 60,
           "traffic_control": 56,
           "clutch": 62,
@@ -127849,7 +128139,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 6,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "2026-OB-50",
@@ -127878,7 +128169,7 @@
           "stuff": 91,
           "control": 71,
           "hr_prevention": 83,
-          "stamina_proxy": 61,
+          "stamina_proxy": 54,
           "run_prevention": 83,
           "traffic_control": 79,
           "clutch": 80,
@@ -128205,8 +128496,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 12,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "CL",
+      "secondary_positions": [],
+      "pitch_role": "마무리"
     },
     {
       "id": "2026-OB-45",
@@ -128724,7 +129016,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 16,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-OB-43",
@@ -128859,7 +129152,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 8,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0522",
@@ -128950,7 +129244,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-OB-39",
@@ -129125,7 +129420,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 3,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-OB-68",
@@ -129304,7 +129600,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-OB-28",
@@ -129581,7 +129878,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 7,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-OB-101",
@@ -129671,7 +129969,8 @@
       "draft_year": 2021,
       "draft_method": "8라운드",
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0527",
@@ -129700,7 +129999,7 @@
           "stuff": 59,
           "control": 68,
           "hr_prevention": 66,
-          "stamina_proxy": 64,
+          "stamina_proxy": 57,
           "run_prevention": 69,
           "traffic_control": 70,
           "clutch": 68,
@@ -130003,8 +130302,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 11,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "롱릴리프"
     },
     {
       "id": "v15-0528",
@@ -130186,7 +130486,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 8,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-OB-15",
@@ -130324,7 +130625,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0530",
@@ -130544,7 +130846,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 5,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0531",
@@ -130806,7 +131109,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 6,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0532",
@@ -130940,7 +131244,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0533",
@@ -131079,7 +131384,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-OB-22",
@@ -138486,7 +138792,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 5,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-WO-49",
@@ -138515,7 +138822,7 @@
           "stuff": 46,
           "control": 48,
           "hr_prevention": 54,
-          "stamina_proxy": 58,
+          "stamina_proxy": 54,
           "run_prevention": 49,
           "traffic_control": 51,
           "clutch": 53,
@@ -138819,8 +139126,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 10,
-      "primary_position": "SP",
-      "secondary_positions": []
+      "primary_position": "RP",
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-WO-8",
@@ -139135,7 +139443,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 11,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-WO-21",
@@ -139269,7 +139578,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "v15-0566",
@@ -139488,8 +139798,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 4,
-      "primary_position": "RP",
-      "secondary_positions": []
+      "primary_position": "SP",
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-WO-19",
@@ -139709,7 +140020,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 4,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0568",
@@ -139964,7 +140276,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 11,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0569",
@@ -140184,7 +140497,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 5,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-WO-94",
@@ -140213,7 +140527,7 @@
           "stuff": 48,
           "control": 40,
           "hr_prevention": 59,
-          "stamina_proxy": 56,
+          "stamina_proxy": 54,
           "run_prevention": 45,
           "traffic_control": 45,
           "clutch": 51,
@@ -140363,7 +140677,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "v15-0571",
@@ -140583,8 +140898,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 8,
-      "primary_position": "RP",
-      "secondary_positions": []
+      "primary_position": "SP",
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-WO-18",
@@ -140722,7 +141038,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-WO-37",
@@ -140751,7 +141068,7 @@
           "stuff": 57,
           "control": 58,
           "hr_prevention": 59,
-          "stamina_proxy": 56,
+          "stamina_proxy": 54,
           "run_prevention": 64,
           "traffic_control": 61,
           "clutch": 64,
@@ -140860,7 +141177,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-WO-40",
@@ -141220,7 +141538,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0575",
@@ -141384,7 +141703,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0576",
@@ -141635,7 +141955,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 10,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0577",
@@ -141927,7 +142248,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 3,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0578",
@@ -142230,7 +142552,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 4,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0579",
@@ -142259,7 +142582,7 @@
           "stuff": 65,
           "control": 82,
           "hr_prevention": 68,
-          "stamina_proxy": 58,
+          "stamina_proxy": 60,
           "run_prevention": 64,
           "traffic_control": 64,
           "clutch": 67,
@@ -142369,7 +142692,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0580",
@@ -142398,7 +142722,7 @@
           "stuff": 56,
           "control": 59,
           "hr_prevention": 62,
-          "stamina_proxy": 56,
+          "stamina_proxy": 54,
           "run_prevention": 51,
           "traffic_control": 54,
           "clutch": 56,
@@ -142767,7 +143091,8 @@
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 5,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "필승조"
     },
     {
       "id": "v15-0581",
@@ -142796,7 +143121,7 @@
           "stuff": 76,
           "control": 69,
           "hr_prevention": 67,
-          "stamina_proxy": 57,
+          "stamina_proxy": 54,
           "run_prevention": 64,
           "traffic_control": 62,
           "clutch": 66,
@@ -142905,8 +143230,9 @@
       ],
       "verified_one_club_man": false,
       "verified_club_tenure_2027": 2,
-      "primary_position": "RP",
-      "secondary_positions": []
+      "primary_position": "CL",
+      "secondary_positions": [],
+      "pitch_role": "마무리"
     },
     {
       "id": "2026-WO-95",
@@ -143150,7 +143476,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 6,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-WO-42",
@@ -143328,7 +143655,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-WO-66",
@@ -143466,7 +143794,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-WO-69",
@@ -143645,7 +143974,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "v15-0586",
@@ -143674,7 +144004,7 @@
           "stuff": 46,
           "control": 40,
           "hr_prevention": 55,
-          "stamina_proxy": 57,
+          "stamina_proxy": 60,
           "run_prevention": 48,
           "traffic_control": 42,
           "clutch": 52,
@@ -143864,8 +144194,9 @@
       ],
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 4,
-      "primary_position": "RP",
-      "secondary_positions": []
+      "primary_position": "SP",
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-WO-45",
@@ -144003,7 +144334,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 2,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-WO-64",
@@ -144182,7 +144514,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0589",
@@ -144211,7 +144544,7 @@
           "stuff": 42,
           "control": 40,
           "hr_prevention": 43,
-          "stamina_proxy": 57,
+          "stamina_proxy": 54,
           "run_prevention": 42,
           "traffic_control": 40,
           "clutch": 42,
@@ -144361,7 +144694,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 3,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "2026-WO-20",
@@ -144390,7 +144724,7 @@
           "stuff": 57,
           "control": 61,
           "hr_prevention": 57,
-          "stamina_proxy": 57,
+          "stamina_proxy": 54,
           "run_prevention": 57,
           "traffic_control": 59,
           "clutch": 60,
@@ -144657,7 +144991,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 9,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "v15-0591",
@@ -145010,7 +145345,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 14,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "2026-WO-12",
@@ -153602,7 +153938,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-005",
@@ -153695,7 +154032,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-006",
@@ -153897,7 +154235,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "D2027-008",
@@ -153990,7 +154329,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-009",
@@ -154083,7 +154423,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "D2027-010",
@@ -154176,7 +154517,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-011",
@@ -154484,7 +154826,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-014",
@@ -154903,7 +155246,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-018",
@@ -154996,7 +155340,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-019",
@@ -155089,7 +155434,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-020",
@@ -155182,7 +155528,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "D2027-021",
@@ -155275,7 +155622,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-022",
@@ -155368,7 +155716,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-023",
@@ -155569,7 +155918,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "D2027-025",
@@ -155662,7 +156012,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-026",
@@ -155755,7 +156106,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-027",
@@ -155957,7 +156309,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-029",
@@ -156050,7 +156403,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-030",
@@ -156249,7 +156603,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-032",
@@ -156342,7 +156697,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-033",
@@ -156435,7 +156791,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-034",
@@ -156959,7 +157316,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-039",
@@ -157052,7 +157410,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "SP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "선발"
     },
     {
       "id": "D2027-040",
@@ -157254,7 +157613,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-042",
@@ -157347,7 +157707,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-043",
@@ -157765,7 +158126,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-047",
@@ -157858,7 +158220,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-048",
@@ -158060,7 +158423,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-050",
@@ -158369,7 +158733,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-053",
@@ -158462,7 +158827,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-054",
@@ -158555,7 +158921,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-055",
@@ -158648,7 +159015,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-056",
@@ -158741,7 +159109,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-057",
@@ -159157,7 +159526,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-061",
@@ -159250,7 +159620,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-062",
@@ -159451,7 +159822,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-064",
@@ -159758,7 +160130,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-067",
@@ -159851,7 +160224,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-068",
@@ -159944,7 +160318,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-069",
@@ -160037,7 +160412,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-070",
@@ -160130,7 +160506,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-071",
@@ -160332,7 +160709,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-073",
@@ -160533,7 +160911,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-075",
@@ -160626,7 +161005,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-076",
@@ -160719,7 +161099,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-077",
@@ -160920,7 +161301,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-079",
@@ -161013,7 +161395,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-080",
@@ -161215,7 +161598,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-082",
@@ -161417,7 +161801,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-084",
@@ -161510,7 +161895,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-085",
@@ -161603,7 +161989,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-086",
@@ -161802,7 +162189,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-088",
@@ -162004,7 +162392,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-090",
@@ -162097,7 +162486,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-091",
@@ -162190,7 +162580,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-092",
@@ -162392,7 +162783,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-094",
@@ -162702,7 +163094,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-097",
@@ -163223,7 +163616,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-102",
@@ -163316,7 +163710,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-103",
@@ -163515,7 +163910,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-105",
@@ -163935,7 +164331,8 @@
       "verified_one_club_man": true,
       "verified_club_tenure_2027": 0,
       "primary_position": "RP",
-      "secondary_positions": []
+      "secondary_positions": [],
+      "pitch_role": "중간"
     },
     {
       "id": "D2027-109",
@@ -164150,6 +164547,713 @@
         "CF": 22,
         "RF": 28,
         "DH": 88
+      }
+    },
+    {
+      "id": "2026-SSG-47",
+      "kbo_player_id": null,
+      "name": "전의산",
+      "team": "SSG",
+      "position": "IF",
+      "primary_position": "1B",
+      "secondary_positions": [
+        "DH"
+      ],
+      "position_proficiency": {
+        "1B": 88,
+        "DH": 82,
+        "3B": 40,
+        "LF": 36,
+        "RF": 36
+      },
+      "jersey": "47",
+      "level_2026": 1,
+      "status": "2026_official_baseline",
+      "fa_approved_2027": false,
+      "fa_grade_2027": null,
+      "foreign_slot": null,
+      "draft_round": 1,
+      "draft_pick": 10,
+      "draft_year": 2020,
+      "draft_method": "2차 지명",
+      "draft_rank_label": "1R 전체 10번",
+      "debut_year": 2022,
+      "school": "경남고",
+      "birth_date": "2000-11-25",
+      "bats": "L",
+      "throws": "R",
+      "height_cm": 188,
+      "weight_kg": 108,
+      "salary_krw": 75000000,
+      "contract_end_year": 2027,
+      "previous_league_club": "상무 피닉스 (2024-12-02~2026-06-01)",
+      "career_by_year": [
+        {
+          "season": 2026,
+          "playerId": "50854",
+          "team": "SSG",
+          "G": 86,
+          "PA": 332,
+          "AB": 298,
+          "R": 38,
+          "H": 74,
+          "B2": 14,
+          "B3": 1,
+          "HR": 13,
+          "RBI": 53,
+          "SB": 1,
+          "BB": 29,
+          "HBP": 3,
+          "SO": 88,
+          "AVG": 0.248,
+          "OBP": 0.318,
+          "SLG": 0.433,
+          "OPS": 0.751
+        },
+        {
+          "season": 2024,
+          "playerId": "50854",
+          "team": "SSG",
+          "G": 34,
+          "PA": 64,
+          "AB": 57,
+          "R": 4,
+          "H": 5,
+          "B2": 1,
+          "B3": 0,
+          "HR": 1,
+          "RBI": 3,
+          "SB": 0,
+          "BB": 6,
+          "HBP": 1,
+          "SO": 22,
+          "AVG": 0.088,
+          "OBP": 0.188,
+          "SLG": 0.158,
+          "OPS": 0.346
+        },
+        {
+          "season": 2023,
+          "playerId": "50854",
+          "team": "SSG",
+          "G": 56,
+          "PA": 154,
+          "AB": 134,
+          "R": 15,
+          "H": 27,
+          "B2": 6,
+          "B3": 0,
+          "HR": 4,
+          "RBI": 21,
+          "SB": 0,
+          "BB": 18,
+          "HBP": 1,
+          "SO": 49,
+          "AVG": 0.201,
+          "OBP": 0.299,
+          "SLG": 0.336,
+          "OPS": 0.635
+        },
+        {
+          "season": 2022,
+          "playerId": "50854",
+          "team": "SSG",
+          "G": 77,
+          "PA": 274,
+          "AB": 241,
+          "R": 36,
+          "H": 60,
+          "B2": 15,
+          "B3": 1,
+          "HR": 13,
+          "RBI": 45,
+          "SB": 1,
+          "BB": 28,
+          "HBP": 4,
+          "SO": 86,
+          "AVG": 0.249,
+          "OBP": 0.336,
+          "SLG": 0.481,
+          "OPS": 0.817
+        }
+      ],
+      "futures_2026": {
+        "season": 2026,
+        "kind": "batting",
+        "team": "상무",
+        "source": "2026 퓨처스리그 상무 복무 전역 전 기록",
+        "values": {
+          "G": 45,
+          "AB": 160,
+          "H": 55,
+          "HR": 9,
+          "RBI": 47,
+          "AVG": 0.344,
+          "OBP": 0.422,
+          "SLG": 0.57,
+          "OPS": 0.992
+        }
+      },
+      "verified_team_history": [
+        {
+          "teamId": "SSG",
+          "fromSeason": 2020,
+          "toSeason": 2024,
+          "moveType": "신인 드래프트",
+          "note": "2020 2차 1R 전체 10번 SK/SSG 입단"
+        },
+        {
+          "teamId": "SSG",
+          "fromSeason": 2025,
+          "toSeason": 2026,
+          "moveType": "상무 입대",
+          "transferDate": "2024-12-02",
+          "note": "상무 피닉스 복무 (2025 퓨처스 16HR 72RBI · 2026 전역)"
+        },
+        {
+          "teamId": "SSG",
+          "fromSeason": 2026,
+          "toSeason": 2027,
+          "moveType": "상무 전역 복귀",
+          "transferDate": "2026-06-01",
+          "note": "2026-06-01 상무 전역 후 SSG 1군 복귀 (86G 13HR 53RBI)"
+        }
+      ],
+      "verified_one_club_man": true,
+      "verified_club_tenure_2027": 7,
+      "military_verified": {
+        "status": "군필",
+        "enlist_date": "2024-12-02",
+        "discharge_date": "2026-06-01",
+        "enlisted_season": 2024,
+        "return_season": 2026,
+        "note": "상무 피닉스 야구단 복무 완료 (2024-12-02 입대 · 2026-06-01 전역 · 군필)",
+        "source": "국군체육부대(상무) 공식 전역 및 KBO 등록 이력"
+      },
+      "game_ratings": {
+        "overall": 68,
+        "potential": 78,
+        "batting": {
+          "contact_proxy": 63,
+          "power_proxy": 79,
+          "eye_proxy": 64,
+          "speed_proxy": 48,
+          "defense_proxy": 63
+        },
+        "pitching": null,
+        "fitness": 95,
+        "morale": 80
+      },
+      "evaluation_v18": {
+        "age_used": 26,
+        "source_note": "v26 사용자 피드백 복구: 상무 전역(2026-06-01) 후 SSG 1군 86G 13HR 53RBI 반영"
+      }
+    },
+    {
+      "id": "2026-HH-43",
+      "kbo_player_id": "68743",
+      "name": "정은원",
+      "team": "HH",
+      "position": "IF",
+      "primary_position": "2B",
+      "secondary_positions": [
+        "LF",
+        "3B"
+      ],
+      "position_proficiency": {
+        "2B": 90,
+        "LF": 68,
+        "3B": 60,
+        "SS": 54
+      },
+      "jersey": "43",
+      "level_2026": 1,
+      "status": "2026_official_baseline",
+      "fa_approved_2027": false,
+      "fa_grade_2027": null,
+      "foreign_slot": null,
+      "draft_round": 3,
+      "draft_pick": 24,
+      "draft_year": 2018,
+      "draft_method": "2차 지명",
+      "draft_rank_label": "2018 2차 3R 전체 24번",
+      "debut_year": 2018,
+      "school": "인천고",
+      "birth_date": "2000-01-17",
+      "bats": "L",
+      "throws": "R",
+      "height_cm": 177,
+      "weight_kg": 78,
+      "salary_krw": 110000000,
+      "contract_end_year": 2027,
+      "previous_league_club": "상무 피닉스 (2024-12-02~2026-06-01)",
+      "career_by_year": [
+        {
+          "season": 2026,
+          "playerId": "68743",
+          "team": "한화",
+          "G": 68,
+          "PA": 230,
+          "AB": 196,
+          "R": 30,
+          "H": 52,
+          "B2": 9,
+          "B3": 1,
+          "HR": 3,
+          "RBI": 21,
+          "SB": 6,
+          "BB": 31,
+          "HBP": 2,
+          "SO": 38,
+          "AVG": 0.265,
+          "OBP": 0.371,
+          "SLG": 0.367,
+          "OPS": 0.738
+        },
+        {
+          "season": 2024,
+          "playerId": "68743",
+          "team": "한화",
+          "G": 64,
+          "PA": 148,
+          "AB": 121,
+          "R": 20,
+          "H": 25,
+          "B2": 3,
+          "B3": 1,
+          "HR": 1,
+          "RBI": 12,
+          "SB": 5,
+          "BB": 25,
+          "HBP": 1,
+          "SO": 27,
+          "AVG": 0.207,
+          "OBP": 0.347,
+          "SLG": 0.273,
+          "OPS": 0.62
+        },
+        {
+          "season": 2023,
+          "playerId": "68743",
+          "team": "한화",
+          "G": 122,
+          "PA": 459,
+          "AB": 388,
+          "R": 52,
+          "H": 86,
+          "B2": 13,
+          "B3": 2,
+          "HR": 2,
+          "RBI": 30,
+          "SB": 6,
+          "BB": 64,
+          "HBP": 2,
+          "SO": 75,
+          "AVG": 0.222,
+          "OBP": 0.334,
+          "SLG": 0.281,
+          "OPS": 0.615
+        }
+      ],
+      "verified_team_history": [
+        {
+          "teamId": "한화",
+          "fromSeason": 2018,
+          "toSeason": 2024,
+          "moveType": "신인 드래프트",
+          "note": "2018 2차 3R 한화 입단 (2021 2B 골든글러브)"
+        },
+        {
+          "teamId": "한화",
+          "fromSeason": 2025,
+          "toSeason": 2026,
+          "moveType": "상무 입대",
+          "transferDate": "2024-12-02",
+          "note": "상무 피닉스 복무 후 2026-06-01 전역 복귀"
+        }
+      ],
+      "verified_one_club_man": true,
+      "verified_club_tenure_2027": 9,
+      "military_verified": {
+        "status": "군필",
+        "enlist_date": "2024-12-02",
+        "discharge_date": "2026-06-01",
+        "enlisted_season": 2024,
+        "return_season": 2026,
+        "note": "상무 피닉스 야구단 복무 완료 (2024-12-02 입대 · 2026-06-01 전역 · 군필)",
+        "source": "국군체육부대(상무) 공식 전역 및 KBO 등록 이력"
+      },
+      "game_ratings": {
+        "overall": 68,
+        "potential": 75,
+        "batting": {
+          "contact_proxy": 69,
+          "power_proxy": 55,
+          "eye_proxy": 80,
+          "speed_proxy": 71,
+          "defense_proxy": 72
+        },
+        "pitching": null,
+        "fitness": 94,
+        "morale": 76
+      },
+      "evaluation_v18": {
+        "age_used": 26,
+        "source_note": "v26 상무 전역 복귀 선수 복구 (한화 2B/LF)"
+      }
+    },
+    {
+      "id": "v26-SS-KHJ",
+      "kbo_player_id": "51463",
+      "name": "김현준",
+      "team": "SS",
+      "position": "OF",
+      "primary_position": "CF",
+      "secondary_positions": [
+        "LF",
+        "RF"
+      ],
+      "position_proficiency": {
+        "CF": 86,
+        "LF": 80,
+        "RF": 78
+      },
+      "jersey": "22",
+      "level_2026": 1,
+      "status": "2026_official_baseline",
+      "fa_approved_2027": false,
+      "fa_grade_2027": null,
+      "foreign_slot": null,
+      "draft_round": 9,
+      "draft_pick": 83,
+      "draft_year": 2021,
+      "draft_method": "2차 지명",
+      "draft_rank_label": "2021 2차 9R 전체 83번",
+      "debut_year": 2021,
+      "school": "개성고",
+      "birth_date": "2002-08-21",
+      "bats": "L",
+      "throws": "L",
+      "height_cm": 180,
+      "weight_kg": 78,
+      "salary_krw": 95000000,
+      "contract_end_year": 2027,
+      "previous_league_club": "상무 피닉스 (2024-12-02~2026-06-01)",
+      "career_by_year": [
+        {
+          "season": 2026,
+          "playerId": "51463",
+          "team": "삼성",
+          "G": 62,
+          "PA": 195,
+          "AB": 174,
+          "R": 25,
+          "H": 46,
+          "B2": 7,
+          "B3": 2,
+          "HR": 1,
+          "RBI": 17,
+          "SB": 5,
+          "BB": 18,
+          "HBP": 2,
+          "SO": 35,
+          "AVG": 0.264,
+          "OBP": 0.34,
+          "SLG": 0.345,
+          "OPS": 0.685
+        },
+        {
+          "season": 2024,
+          "playerId": "51463",
+          "team": "삼성",
+          "G": 79,
+          "PA": 206,
+          "AB": 183,
+          "R": 21,
+          "H": 41,
+          "B2": 6,
+          "B3": 1,
+          "HR": 0,
+          "RBI": 11,
+          "SB": 3,
+          "BB": 17,
+          "HBP": 2,
+          "SO": 39,
+          "AVG": 0.224,
+          "OBP": 0.297,
+          "SLG": 0.268,
+          "OPS": 0.565
+        },
+        {
+          "season": 2023,
+          "playerId": "51463",
+          "team": "삼성",
+          "G": 109,
+          "PA": 484,
+          "AB": 433,
+          "R": 62,
+          "H": 119,
+          "B2": 19,
+          "B3": 4,
+          "HR": 3,
+          "RBI": 46,
+          "SB": 5,
+          "BB": 42,
+          "HBP": 4,
+          "SO": 75,
+          "AVG": 0.275,
+          "OBP": 0.344,
+          "SLG": 0.358,
+          "OPS": 0.702
+        }
+      ],
+      "verified_team_history": [
+        {
+          "teamId": "삼성",
+          "fromSeason": 2021,
+          "toSeason": 2024,
+          "moveType": "신인 드래프트",
+          "note": "2021 2차 9R 삼성 입단"
+        },
+        {
+          "teamId": "삼성",
+          "fromSeason": 2025,
+          "toSeason": 2026,
+          "moveType": "상무 입대",
+          "transferDate": "2024-12-02",
+          "note": "상무 피닉스 복무 후 2026-06-01 전역 복귀"
+        }
+      ],
+      "verified_one_club_man": true,
+      "verified_club_tenure_2027": 6,
+      "military_verified": {
+        "status": "군필",
+        "enlist_date": "2024-12-02",
+        "discharge_date": "2026-06-01",
+        "enlisted_season": 2024,
+        "return_season": 2026,
+        "note": "상무 피닉스 야구단 복무 완료 (2024-12-02 입대 · 2026-06-01 전역 · 군필)",
+        "source": "국군체육부대(상무) 공식 전역 및 KBO 등록 이력"
+      },
+      "game_ratings": {
+        "overall": 66,
+        "potential": 76,
+        "batting": {
+          "contact_proxy": 71,
+          "power_proxy": 52,
+          "eye_proxy": 68,
+          "speed_proxy": 74,
+          "defense_proxy": 74
+        },
+        "pitching": null,
+        "fitness": 95,
+        "morale": 76
+      },
+      "evaluation_v18": {
+        "age_used": 24,
+        "source_note": "v26 상무 전역 복귀 선수 복구 (삼성 CF)"
+      }
+    },
+    {
+      "id": "v26-WO-JJY",
+      "kbo_player_id": null,
+      "name": "장재영",
+      "team": "WO",
+      "position": "OF",
+      "primary_position": "CF",
+      "secondary_positions": [
+        "RF",
+        "LF"
+      ],
+      "position_proficiency": {
+        "CF": 82,
+        "RF": 80,
+        "LF": 74
+      },
+      "jersey": "9",
+      "level_2026": 2,
+      "status": "2026_official_baseline",
+      "fa_approved_2027": false,
+      "fa_grade_2027": null,
+      "foreign_slot": null,
+      "draft_round": 1,
+      "draft_pick": 1,
+      "draft_year": 2021,
+      "draft_method": "1차 지명",
+      "draft_rank_label": "2021 키움 1차 지명",
+      "debut_year": 2021,
+      "school": "덕수고",
+      "birth_date": "2002-05-16",
+      "bats": "R",
+      "throws": "R",
+      "height_cm": 188,
+      "weight_kg": 92,
+      "salary_krw": 50000000,
+      "contract_end_year": 2027,
+      "previous_league_club": "상무 피닉스 (2025-05-12~2026-11-11)",
+      "career_by_year": [
+        {
+          "season": 2024,
+          "playerId": "51301",
+          "team": "키움",
+          "G": 38,
+          "PA": 138,
+          "AB": 119,
+          "R": 18,
+          "H": 20,
+          "B2": 5,
+          "B3": 1,
+          "HR": 4,
+          "RBI": 13,
+          "SB": 3,
+          "BB": 17,
+          "HBP": 2,
+          "SO": 56,
+          "AVG": 0.168,
+          "OBP": 0.283,
+          "SLG": 0.328,
+          "OPS": 0.611
+        }
+      ],
+      "verified_team_history": [
+        {
+          "teamId": "키움",
+          "fromSeason": 2021,
+          "toSeason": 2024,
+          "moveType": "신인 드래프트",
+          "note": "2021 1차지명 키움 입단 (2024 외야수 전향)"
+        },
+        {
+          "teamId": "키움",
+          "fromSeason": 2025,
+          "toSeason": 2026,
+          "moveType": "상무 입대",
+          "transferDate": "2025-05-12",
+          "note": "상무 피닉스 복무 후 2026-11-11 전역 복귀"
+        }
+      ],
+      "verified_one_club_man": true,
+      "verified_club_tenure_2027": 6,
+      "military_verified": {
+        "status": "군필",
+        "enlist_date": "2025-05-12",
+        "discharge_date": "2026-11-11",
+        "enlisted_season": 2025,
+        "return_season": 2026,
+        "note": "상무 피닉스 야구단 복무 완료 (2025-05-12 입대 · 2026-11-11 전역 · 군필)",
+        "source": "국군체육부대(상무) 공식 전역 및 KBO 등록 이력"
+      },
+      "game_ratings": {
+        "overall": 60,
+        "potential": 78,
+        "batting": {
+          "contact_proxy": 55,
+          "power_proxy": 76,
+          "eye_proxy": 60,
+          "speed_proxy": 75,
+          "defense_proxy": 68
+        },
+        "pitching": null,
+        "fitness": 94,
+        "morale": 74
+      },
+      "evaluation_v18": {
+        "age_used": 24,
+        "source_note": "v26 상무 전역 복귀 선수 복구 (키움 CF/RF)"
+      }
+    },
+    {
+      "id": "v26-LT-JMR",
+      "kbo_player_id": "54551",
+      "name": "전미르",
+      "team": "LT",
+      "position": "P",
+      "primary_position": "RP",
+      "pitch_role": "중간",
+      "jersey": "61",
+      "level_2026": 2,
+      "status": "2026_official_baseline",
+      "fa_approved_2027": false,
+      "fa_grade_2027": null,
+      "foreign_slot": null,
+      "draft_round": 1,
+      "draft_pick": 3,
+      "draft_year": 2024,
+      "draft_method": "전면 드래프트",
+      "draft_rank_label": "2024 1R 전체 3번",
+      "debut_year": 2024,
+      "school": "경북고",
+      "birth_date": "2005-06-13",
+      "bats": "R",
+      "throws": "R",
+      "height_cm": 188,
+      "weight_kg": 95,
+      "salary_krw": 45000000,
+      "contract_end_year": 2027,
+      "previous_league_club": "상무 피닉스 (2025-05-12~2026-11-11)",
+      "career_by_year": [
+        {
+          "season": 2024,
+          "playerId": "54551",
+          "team": "롯데",
+          "G": 36,
+          "IP": "33 2/3",
+          "W": 1,
+          "L": 5,
+          "SV": 1,
+          "HLD": 5,
+          "SO": 34,
+          "BB": 21,
+          "H": 35,
+          "ER": 22,
+          "ERA": 5.88,
+          "WHIP": 1.66
+        }
+      ],
+      "verified_team_history": [
+        {
+          "teamId": "롯데",
+          "fromSeason": 2024,
+          "toSeason": 2024,
+          "moveType": "신인 드래프트",
+          "note": "2024 1R 전체 3번 롯데 입단"
+        },
+        {
+          "teamId": "롯데",
+          "fromSeason": 2025,
+          "toSeason": 2026,
+          "moveType": "상무 입대",
+          "transferDate": "2025-05-12",
+          "note": "상무 피닉스 복무 후 2026-11-11 전역 복귀"
+        }
+      ],
+      "verified_one_club_man": true,
+      "verified_club_tenure_2027": 3,
+      "military_verified": {
+        "status": "군필",
+        "enlist_date": "2025-05-12",
+        "discharge_date": "2026-11-11",
+        "enlisted_season": 2025,
+        "return_season": 2026,
+        "note": "상무 피닉스 야구단 복무 완료 (2025-05-12 입대 · 2026-11-11 전역 · 군필)",
+        "source": "국군체육부대(상무) 공식 전역 및 KBO 등록 이력"
+      },
+      "game_ratings": {
+        "overall": 62,
+        "potential": 82,
+        "batting": null,
+        "pitching": {
+          "stuff_proxy": 75,
+          "control_proxy": 58,
+          "movement_proxy": 66,
+          "stamina_proxy": 54
+        },
+        "fitness": 96,
+        "morale": 78
+      },
+      "evaluation_v18": {
+        "age_used": 21,
+        "source_note": "v26 상무 전역 복귀 선수 복구 (롯데 RP/필승조)"
       }
     }
   ],

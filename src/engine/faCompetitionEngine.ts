@@ -25,11 +25,267 @@ import { calcAVG, calcERA, calcOPS, computeStandings } from './stats';
 
 /** 고령 선수의 비현실적인 장기계약 방지 상한 (연령·기량 기반) */
 export function getMaxRealisticFaYears(age: number, ability = 75): number {
-  if (age >= 38) return ability >= 83 ? 2 : 1;
-  if (age >= 36) return 2;
-  if (age >= 34) return 3;
-  if (age >= 32) return 4;
-  return 6;
+  if (age >= 38) return ability >= 84 ? 2 : 1;
+  if (age >= 36) return ability >= 76 ? 2 : 1;
+  if (age >= 34) return ability >= 82 ? 3 : 2;
+  if (age >= 32) return ability >= 80 ? 4 : 3;
+  if (age >= 30) return ability >= 82 ? 5 : 4;
+  return ability >= 83 ? 6 : 4;
+}
+
+export interface FaContractBreakdown {
+  years: number;
+  totalBillion: number;
+  signingBonusBillion: number;
+  annualSalaryBillion: number;
+  optionTotalBillion: number;
+  guaranteedTotalBillion: number;
+  totalManwon: number;
+  totalKrwWon: number;
+}
+
+/**
+ * 억원 · 만원 · 원 단위 변환 오차 0을 보장하는 FA 계약금·연봉·옵션·총액 정밀 계산기
+ * - 내부 산술을 1만원 정수 단위로 처리하여 (계약금 + 연봉×기간 + 옵션 === 총액) 항등식 보장
+ * - 1억 원 = 10,000만 원 = 100,000,000원
+ */
+export function calculateExactFaContractBreakdown(
+  totalBillionInput: number,
+  yearsInput: number,
+  options?: { age?: number; injuryHistoryCount?: number; season?: number }
+): FaContractBreakdown {
+  const years = Math.max(1, Math.min(8, Math.round(yearsInput || 1)));
+  const minAnnualManwon = (options?.season ?? 2027) >= 2027 ? 3300 : 3000; // 최저연봉 3,300만 원
+  const rawTotalManwon = Math.round((Number.isFinite(totalBillionInput) ? totalBillionInput : 0) * 10000);
+  const totalManwon = Math.max(minAnnualManwon * years, rawTotalManwon);
+
+  const age = options?.age ?? 30;
+  const injCount = options?.injuryHistoryCount ?? 0;
+
+  // 고령 또는 부상 이력이 많은 선수는 인센티브(옵션) 비중 확대
+  const optionRatio = clamp(
+    (years === 1 ? 0.08 : 0.10) + (age >= 35 ? 0.05 : 0) + (injCount >= 2 ? 0.04 : 0),
+    0.05,
+    0.22
+  );
+  const signingBonusRatio =
+    years === 1 ? 0.0 : years === 2 ? 0.28 : 0.34;
+
+  // 만원 단위를 100만 원(0.01억) 단위로 깔끔하게 정렬하되 총합 항등식을 100% 보존
+  const roundTo100Man = (v: number) => Math.round(v / 100) * 100;
+  let optionTotalManwon = totalManwon >= minAnnualManwon * years + 1000 ? roundTo100Man(totalManwon * optionRatio) : 0;
+  let signingBonusManwon =
+    years > 1 && totalManwon >= minAnnualManwon * years + 2000
+      ? roundTo100Man(totalManwon * signingBonusRatio)
+      : 0;
+
+  // 연봉이 최저연봉 미만으로 떨어지지 않도록 상한 보정
+  const maxNonSalary = Math.max(0, totalManwon - minAnnualManwon * years);
+  if (signingBonusManwon + optionTotalManwon > maxNonSalary) {
+    const scale = maxNonSalary / Math.max(1, signingBonusManwon + optionTotalManwon);
+    signingBonusManwon = roundTo100Man(signingBonusManwon * scale);
+    optionTotalManwon = Math.max(0, maxNonSalary - signingBonusManwon);
+  }
+
+  const salaryPoolManwon = totalManwon - signingBonusManwon - optionTotalManwon;
+  const annualSalaryManwon = Math.max(minAnnualManwon, Math.floor(salaryPoolManwon / years));
+  const salaryTotalManwon = annualSalaryManwon * years;
+  const remainderManwon = totalManwon - (signingBonusManwon + salaryTotalManwon + optionTotalManwon);
+
+  // 잔여 1~years 만원은 계약금(다년) 또는 옵션(단년)에 흡수해 합계 100% 일치
+  if (remainderManwon !== 0) {
+    if (years > 1) {
+      signingBonusManwon = Math.max(0, signingBonusManwon + remainderManwon);
+    } else {
+      optionTotalManwon = Math.max(0, optionTotalManwon + remainderManwon);
+    }
+  }
+
+  const guaranteedTotalManwon = signingBonusManwon + salaryTotalManwon;
+  const finalTotalManwon = guaranteedTotalManwon + optionTotalManwon;
+
+  return {
+    years,
+    totalBillion: Number((finalTotalManwon / 10000).toFixed(4)),
+    signingBonusBillion: Number((signingBonusManwon / 10000).toFixed(4)),
+    annualSalaryBillion: Number((annualSalaryManwon / 10000).toFixed(4)),
+    optionTotalBillion: Number((optionTotalManwon / 10000).toFixed(4)),
+    guaranteedTotalBillion: Number((guaranteedTotalManwon / 10000).toFixed(4)),
+    totalManwon: finalTotalManwon,
+    totalKrwWon: finalTotalManwon * 10000,
+  };
+}
+
+function parseHistoricalIp(ipVal: unknown): number {
+  if (typeof ipVal === 'number') return Number.isFinite(ipVal) ? ipVal : 0;
+  if (typeof ipVal !== 'string') return 0;
+  const s = ipVal.trim();
+  const frac = s.match(/^(\d+)\s+(\d)\/3$/);
+  if (frac) return Number(frac[1]) + Number(frac[2]) / 3;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : 0;
+}
+
+/**
+ * 최근 3년간 실제 성적(historicalSeasons + 당해 p.stats) 기반 WAR 및 퍼포먼스 지수 산출
+ */
+function estimateRecent3YrPerformanceAndWar(p: Player): {
+  estimatedWar: number;
+  recent3YrScore: number;
+  sampleSeasons: number;
+} {
+  const posWarAdj: Record<string, number> = {
+    C: 0.55,
+    SS: 0.45,
+    CF: 0.25,
+    '2B': 0.15,
+    '3B': 0.1,
+    RF: -0.1,
+    LF: -0.2,
+    '1B': -0.35,
+    DH: -0.65,
+  };
+
+  const weights = [0.5, 0.32, 0.18]; // 최근 시즌 가중치 높게
+  const seasonWars: number[] = [];
+  const seasonScores: number[] = [];
+
+  // 1) 진행 중/방금 끝난 현재 시즌 live stats 반영 (충분한 표본 시 최우선 가중)
+  if (p.role === '타자') {
+    const bs = p.stats as BatterStats;
+    if ((bs?.PA ?? 0) >= 80) {
+      const ops = calcOPS(bs) ?? 0.72;
+      const paFactor = clamp((bs.PA ?? 0) / 500, 0.25, 1.15);
+      const war = clamp(((ops - 0.67) * 14.5 + (posWarAdj[p.position] ?? 0)) * paFactor, -0.8, 8.2);
+      const sc = clamp(52 + (ops - 0.62) * 98 + (bs.HR ?? 0) * 0.22, 46, 95);
+      seasonWars.push(war);
+      seasonScores.push(sc);
+    }
+  } else {
+    const ps = p.stats as PitcherStats;
+    const ip = (ps?.outs ?? 0) / 3;
+    if (ip >= 25) {
+      const era = calcERA(ps.ER, ps.outs) ?? 4.3;
+      const isSp = p.position === 'SP' || p.pitchRole === '선발';
+      const workload = isSp ? clamp(ip / 155, 0.3, 1.25) : clamp(ip / 60, 0.35, 1.15);
+      const war = isSp
+        ? clamp((4.75 - era) * 1.95 * workload + 1.2 * workload, -0.6, 7.8)
+        : clamp((4.45 - era) * 1.15 * workload + ((ps.SV ?? 0) * 0.045 + (ps.HLD ?? 0) * 0.03), -0.5, 4.6);
+      const sc = clamp(76 + (3.8 - era) * 7.8 + (isSp ? (ip - 110) * 0.05 : ((ps.SV ?? 0) + (ps.HLD ?? 0)) * 0.18), 46, 95);
+      seasonWars.push(war);
+      seasonScores.push(sc);
+    }
+  }
+
+  // 2) 최근 3개년 historicalSeasons 성적 반영
+  const hist = [...(p.historicalSeasons ?? [])].sort((a, b) => (b.season ?? 0) - (a.season ?? 0)).slice(0, 3);
+  for (const h of hist) {
+    if (seasonWars.length >= 3) break;
+    if (p.role === '타자') {
+      const pa = Number(h.PA ?? h.AB ?? 0);
+      if (pa < 50) continue;
+      const avg = Number(h.AVG ?? (Number(h.AB ?? 0) > 0 ? Number(h.H ?? 0) / Number(h.AB) : 0.24));
+      const ops = Number(h.OPS ?? (avg * 2.55 + 0.08));
+      const hr = Number(h.HR ?? 0);
+      const paFactor = clamp(pa / 500, 0.25, 1.15);
+      const war = clamp(((ops - 0.67) * 14.2 + (posWarAdj[p.position] ?? 0)) * paFactor, -0.8, 8.2);
+      const sc = clamp(52 + (ops - 0.62) * 95 + hr * 0.2, 46, 95);
+      seasonWars.push(war);
+      seasonScores.push(sc);
+    } else {
+      const ip = parseHistoricalIp(h.IP);
+      if (ip < 18) continue;
+      const era = Number(h.ERA ?? 4.4);
+      const sv = Number(h.SV ?? 0);
+      const hld = Number(h.HLD ?? 0);
+      const isSp = p.position === 'SP' || p.pitchRole === '선발' || ip >= 85;
+      const workload = isSp ? clamp(ip / 155, 0.3, 1.25) : clamp(ip / 60, 0.35, 1.15);
+      const war = isSp
+        ? clamp((4.75 - era) * 1.9 * workload + 1.15 * workload, -0.6, 7.8)
+        : clamp((4.45 - era) * 1.12 * workload + sv * 0.045 + hld * 0.03, -0.5, 4.6);
+      const sc = clamp(76 + (3.8 - era) * 7.6 + (isSp ? (ip - 110) * 0.05 : (sv + hld) * 0.16), 46, 95);
+      seasonWars.push(war);
+      seasonScores.push(sc);
+    }
+  }
+
+  if (seasonWars.length === 0) {
+    const fallbackScore =
+      typeof p.recent3YrScore === 'number' && Number.isFinite(p.recent3YrScore)
+        ? p.recent3YrScore
+        : p.ability;
+    const fallbackWar = clamp((fallbackScore - 64) * 0.22, -0.2, 6.2);
+    return {
+      estimatedWar: Number(fallbackWar.toFixed(2)),
+      recent3YrScore: Number(fallbackScore.toFixed(1)),
+      sampleSeasons: 0,
+    };
+  }
+
+  let wSum = 0;
+  let warSum = 0;
+  let scSum = 0;
+  for (let i = 0; i < seasonWars.length; i++) {
+    const w = weights[i] ?? 0.15;
+    wSum += w;
+    warSum += seasonWars[i] * w;
+    scSum += seasonScores[i] * w;
+  }
+
+  return {
+    estimatedWar: Number((warSum / wSum).toFixed(2)),
+    recent3YrScore: Number((scSum / wSum).toFixed(1)),
+    sampleSeasons: seasonWars.length,
+  };
+}
+
+function getPositionScarcityMultiplier(p: Player): number {
+  if (p.role === '투수') {
+    if (p.position === 'SP' || p.pitchRole === '선발') return 1.10;
+    if (p.position === 'CL' || p.pitchRole === '마무리') return 1.04;
+    if (p.pitchRole === '필승조') return 0.98;
+    return 0.91;
+  }
+  switch (p.position) {
+    case 'C':
+      return 1.14;
+    case 'SS':
+      return 1.11;
+    case 'CF':
+      return 1.06;
+    case '2B':
+    case '3B':
+      return 1.0;
+    case 'RF':
+    case 'LF':
+      return 0.97;
+    case '1B':
+      return 0.91;
+    case 'DH':
+      return 0.85;
+    default:
+      return 0.96;
+  }
+}
+
+export interface RealisticFaValuation {
+  grade: 'A' | 'B' | 'C';
+  protectionLimit: number;
+  cashCompBillion: number;
+  fairYears: number;
+  maxRealisticYears: number;
+  fairTotalBillion: number;
+  baseTotalBillion: number;
+  tierLabel: '정상급 특급' | '핵심 주전' | '일반 주전' | '베테랑' | '백업·유틸';
+  estimatedWar: number;
+  recent3YrScore: number;
+  positionScarcityMult: number;
+  injuryMod: number;
+  marketDemandMult: number;
+  competingClubCount: number;
+  unclaimedRounds: number;
+  breakdown: FaContractBreakdown;
+  valuationSummary: string;
 }
 
 /** KBO 공식 구단당 단일 시즌 외부 FA 영입 상한 (원소속팀 재계약은 미포함) */
@@ -53,19 +309,13 @@ function hashStr(str: string): number {
 }
 
 /**
- * FA 등급 및 KBO 보상 규정 계산 (원소속팀 기준 A/B/C)
+ * FA 등급(보상 규정용) + 현실적 FA 시장가치 정밀 산출
+ * - 등급만으로 계약액을 결정하지 않고 최근 3년 성적, WAR, OVR, 나이, 포지션 희소성, 부상 이력, 경쟁 구단 수, 미계약 경과를 종합 반영
  */
 export function evaluateFaGradeAndComp(
   career: CareerSave,
   p: Player
-): {
-  grade: 'A' | 'B' | 'C';
-  protectionLimit: number;
-  cashCompBillion: number;
-  fairYears: number;
-  fairTotalBillion: number;
-} {
-  const originTeam = p.formerTeamId ?? p.teamId;
+): RealisticFaValuation {
   const grade: 'A' | 'B' | 'C' =
     p.contract.faGrade ??
     (p.age >= 35
@@ -75,37 +325,205 @@ export function evaluateFaGradeAndComp(
       : p.ability >= 76 || p.contract.annualSalary >= 2.5
       ? 'B'
       : 'C');
-  const prevSal = Math.max(0.5, p.contract.annualSalary || 1.0);
+  const minSal = career.season >= 2027 ? 0.33 : 0.3;
+  const prevSal = Math.max(minSal, p.previousAnnualSalary ?? p.contract.annualSalary ?? 1.0);
   const protectionLimit = grade === 'A' ? 20 : grade === 'B' ? 25 : 0;
   const cashCompBillion = Number(
     (grade === 'A' ? prevSal * 2.0 : grade === 'B' ? prevSal * 1.0 : prevSal * 1.5).toFixed(2)
   );
 
-  // 시장 적정가 산출: 최근 3시즌 성적(recent3YrScore) + 능력치 + 연령 반영 (고령 장기계약 방지)
-  const maxYears = getMaxRealisticFaYears(p.age, p.ability);
-  const fairYears = clamp(p.age >= 36 ? 2 : p.age >= 34 ? 2 : p.age >= 32 ? 3 : 4, 1, maxYears);
-  const recent3 = typeof p.recent3YrScore === 'number' && Number.isFinite(p.recent3YrScore)
-    ? p.recent3YrScore
-    : p.ability;
-  const effectiveRating = p.ability * 0.65 + recent3 * 0.35;
-  const baseAnnual =
-    effectiveRating >= 86
-      ? 22.0
-      : effectiveRating >= 83
-      ? 15.5
-      : effectiveRating >= 80
-      ? 11.0
-      : effectiveRating >= 77
-      ? 7.2
-      : effectiveRating >= 74
-      ? 4.6
-      : 2.4;
-  const ageMult = p.age >= 38 ? 0.5 : p.age >= 36 ? 0.62 : p.age >= 34 ? 0.78 : p.age >= 32 ? 0.9 : 1.04;
-  const fairTotalBillion = Number(
-    Math.max(1.8, fairYears * baseAnnual * ageMult * (originTeam ? 1 : 1)).toFixed(1)
+  // 1) 최근 3년 성적 및 WAR 평가
+  const perf = estimateRecent3YrPerformanceAndWar(p);
+  const warIndex = clamp(50 + perf.estimatedWar * 8.4, 42, 96);
+  const compositeScore = p.ability * 0.48 + perf.recent3YrScore * 0.30 + warIndex * 0.22;
+
+  // 2) 포지션 희소성 · 부상 이력 · 연령 곡선
+  const positionScarcityMult = getPositionScarcityMultiplier(p);
+  const injCount = p.injuryHistoryCount ?? 0;
+  const injuryMod = clamp(
+    1 -
+      Math.min(0.18, injCount * 0.04) -
+      (p.injury ? 0.08 : 0) -
+      (p.hiddenTrait === '유리몸' ? 0.1 : 0) +
+      (p.hiddenTrait === '철강왕' ? 0.05 : 0),
+    0.72,
+    1.05
+  );
+  const ageMult =
+    p.age >= 39
+      ? 0.30
+      : p.age >= 38
+      ? 0.36
+      : p.age >= 36
+      ? 0.50
+      : p.age >= 34
+      ? 0.69
+      : p.age >= 32
+      ? 0.87
+      : p.age >= 30
+      ? 1.0
+      : 1.06;
+
+  // 3) 선수 티어 분류 (정상급 / 핵심 주전 / 일반 주전 / 베테랑 / 백업·유틸)
+  let tierLabel: RealisticFaValuation['tierLabel'];
+  if (compositeScore >= 83.5 && perf.estimatedWar >= 3.5 && p.age <= 34) {
+    tierLabel = '정상급 특급';
+  } else if (compositeScore >= 77.5 && p.age <= 35) {
+    tierLabel = '핵심 주전';
+  } else if (p.age >= 35 && compositeScore >= 70) {
+    tierLabel = '베테랑';
+  } else if (compositeScore >= 71.5) {
+    tierLabel = '일반 주전';
+  } else {
+    tierLabel = '백업·유틸';
+  }
+
+  // 4) 현실적 계약 기간 (고령 초장기 계약 방지)
+  const maxRealisticYears = getMaxRealisticFaYears(p.age, p.ability);
+  const rawFairYears =
+    tierLabel === '정상급 특급'
+      ? p.age <= 29
+        ? 5
+        : p.age <= 32
+        ? 4
+        : 3
+      : tierLabel === '핵심 주전'
+      ? p.age <= 31
+        ? 4
+        : 3
+      : tierLabel === '일반 주전'
+      ? p.age <= 32
+        ? 3
+        : 2
+      : tierLabel === '베테랑'
+      ? p.age >= 37
+        ? 1
+        : 2
+      : p.age >= 34
+      ? 1
+      : 2;
+  const fairYears = clamp(rawFairYears, 1, maxRealisticYears);
+
+  // 5) 연속형 연평균 적정가(AAV, 억원) — 등급이 아닌 실력·WAR·나이·희소성·부상이력 기반
+  let baseAnnual: number;
+  if (compositeScore >= 86) {
+    baseAnnual = 18.5 + (compositeScore - 86) * 1.45; // 특급: 18.5 ~ 25억/년
+  } else if (compositeScore >= 82) {
+    baseAnnual = 12.2 + (compositeScore - 82) * 1.55; // 준특급/올스타: 12.2 ~ 18.4억/년
+  } else if (compositeScore >= 77) {
+    baseAnnual = 6.8 + (compositeScore - 77) * 1.08; // 핵심 주전: 6.8 ~ 12.2억/년
+  } else if (compositeScore >= 72) {
+    baseAnnual = 3.2 + (compositeScore - 72) * 0.72; // 일반 주전: 3.2 ~ 6.8억/년
+  } else if (compositeScore >= 66) {
+    baseAnnual = 1.4 + (compositeScore - 66) * 0.30; // 백업/플래툰: 1.4 ~ 3.2억/년
+  } else {
+    baseAnnual = Math.max(minSal + 0.25, 0.75 + Math.max(0, compositeScore - 58) * 0.08);
+  }
+
+  // WAR 직접 보정 (같은 OVR라도 최근 실제 성적/WAR가 높으면 가치 상승, 부진하면 하락)
+  const warBonusAnnual = clamp((perf.estimatedWar - 1.5) * 0.75, -1.5, 4.2);
+  const adjustedAnnual = Math.max(
+    minSal + 0.15,
+    (baseAnnual + warBonusAnnual) * ageMult * positionScarcityMult * injuryMod
   );
 
-  return { grade, protectionLimit, cashCompBillion, fairYears, fairTotalBillion };
+  // 티어별·연령별 현실 상한 적용 (고령 선수 비현실적 초대형 계약 차단)
+  const hardTotalCap =
+    p.age >= 38
+      ? p.ability >= 84
+        ? 24
+        : 10
+      : p.age >= 36
+      ? p.ability >= 82
+        ? 30
+        : 16
+      : p.age >= 34
+      ? p.ability >= 83
+        ? 54
+        : 28
+      : tierLabel === '백업·유틸'
+      ? 12
+      : 145;
+
+  const baseTotalBillion = Number(
+    clamp(adjustedAnnual * fairYears, Math.max(0.6, minSal * fairYears), hardTotalCap).toFixed(1)
+  );
+
+  // 6) 실시간 시장 수요(경쟁 구단 수 상승) 및 장기 미계약(라운드 경과 시 점진적 하락) 반영
+  const neg =
+    career.faCompetition?.season === career.season
+      ? career.faCompetition.negotiations[p.id]
+      : undefined;
+  const competingClubCount = neg
+    ? neg.bids.length + (neg.mlbStatus === 'MLB제안접수' && neg.mlbOffer ? 1 : 0)
+    : 0;
+  const unclaimedRounds = neg && neg.status === '입찰중' ? Math.max(0, neg.roundCount) : 0;
+
+  const competitionBoost =
+    competingClubCount >= 4
+      ? 0.14
+      : competingClubCount === 3
+      ? 0.09
+      : competingClubCount === 2
+      ? 0.04
+      : 0;
+  const unclaimedDecay =
+    unclaimedRounds >= 5
+      ? competingClubCount <= 1
+        ? 0.26
+        : 0.18
+      : unclaimedRounds === 4
+      ? competingClubCount <= 1
+        ? 0.20
+        : 0.13
+      : unclaimedRounds === 3
+      ? competingClubCount <= 1
+        ? 0.13
+        : 0.08
+      : unclaimedRounds === 2
+      ? competingClubCount <= 1
+        ? 0.07
+        : 0.04
+      : 0;
+  const marketDemandMult = Number(clamp(1 + competitionBoost - unclaimedDecay, 0.72, 1.18).toFixed(3));
+
+  const fairTotalBillion = Number(
+    clamp(baseTotalBillion * marketDemandMult, Math.max(0.5, minSal * fairYears), hardTotalCap * 1.1).toFixed(1)
+  );
+
+  const breakdown = calculateExactFaContractBreakdown(fairTotalBillion, fairYears, {
+    age: p.age,
+    injuryHistoryCount: injCount,
+    season: career.season,
+  });
+
+  const marketNote =
+    competitionBoost > unclaimedDecay
+      ? `경쟁 ${competingClubCount}구단(+${Math.round((marketDemandMult - 1) * 100)}%)`
+      : unclaimedDecay > competitionBoost
+      ? `미계약 ${unclaimedRounds}R(${Math.round((marketDemandMult - 1) * 100)}%)`
+      : '시장 표준가';
+  const valuationSummary = `${tierLabel} · 3년WAR ${perf.estimatedWar.toFixed(1)} · 포지션×${positionScarcityMult.toFixed(2)} · 부상×${injuryMod.toFixed(2)} · ${marketNote}`;
+
+  return {
+    grade,
+    protectionLimit,
+    cashCompBillion,
+    fairYears,
+    maxRealisticYears,
+    fairTotalBillion: Number(breakdown.totalBillion.toFixed(1)),
+    baseTotalBillion,
+    tierLabel,
+    estimatedWar: perf.estimatedWar,
+    recent3YrScore: perf.recent3YrScore,
+    positionScarcityMult,
+    injuryMod,
+    marketDemandMult,
+    competingClubCount,
+    unclaimedRounds,
+    breakdown,
+    valuationSummary,
+  };
 }
 
 /**
@@ -146,34 +564,88 @@ function getClubMarketProfile(
 ): {
   contentionScore: number;
   budgetCapacityBillion: number;
+  maxAnnualBillion: number;
   aggressiveness: number;
   payrollBillion: number;
+  capHeadroomBillion: number;
+  consecutiveExceedYears: number;
 } {
   const rank = rankByTeam.get(teamId) ?? 5;
   const teamMeta = KBO_TEAMS[teamId];
-  const payrollBillion = Object.values(career.players)
-    .filter((p) => p.teamId === teamId && p.rosterTier !== '은퇴' && p.rosterTier !== '해외이적' && p.rosterTier !== 'FA')
-    .reduce((s, p) => s + (p.contract.currency === 'KRW' ? p.contract.annualSalary : 0), 0);
+  // KBO 경쟁균형세 기준 상위 40인 보수 총액(억 원) 산출
+  const top40Salaries = Object.values(career.players)
+    .filter(
+      (p) =>
+        p.teamId === teamId &&
+        p.rosterTier !== '은퇴' &&
+        p.rosterTier !== '해외이적' &&
+        p.rosterTier !== 'FA' &&
+        !isMilitaryServing(p.militaryStatus)
+    )
+    .map((p) =>
+      p.contract.currency === 'USD'
+        ? ((p.contract.annualSalary + (p.contract.signingBonus ?? 0)) * 1350) / 100_000_000
+        : (p.contract.annualSalary || 0) +
+          ((p.contract.years ?? 1) > 1
+            ? (p.contract.signingBonus ?? 0) / Math.max(1, p.contract.years)
+            : p.contract.signingBonus ?? 0)
+    )
+    .sort((a, b) => b - a)
+    .slice(0, 40);
+  const payrollBillion = top40Salaries.reduce((s, v) => s + v, 0);
 
   const softCap = getAnnualKboCapBillion(career.season);
-  const headroom = Math.max(0, softCap - payrollBillion);
+  const capHeadroomBillion = Number((softCap - payrollBillion).toFixed(2));
+  const consecutiveExceedYears =
+    career.competitiveBalance?.clubs?.[teamId]?.exceedStreak ?? 0;
   const marketMult = teamMeta.ticketDemandMultiplier ?? 1.0;
 
-  // 구단별 현실적 재정 여력 + 시즌 성적에 따른 공격성 (고정 균등할당 없음)
-  const seedJitter = ((hashStr(`${career.season}-${teamId}`) % 21) - 10) / 100; // -0.10..+0.10
+  // 구단별 재정 여력 + 샐러리캡 여유 + 3년 연속 초과(1R -9단계 제재) 회피 보정
+  const seedJitter = ((hashStr(`${career.season}-${teamId}`) % 17) - 8) / 100; // -0.08..+0.08
   const contentionScore = clamp(96 - (rank - 1) * 7.5 + (marketMult - 1) * 10, 30, 96);
+
+  // 캡 여유에 비례한 연간 투입 가능액(억) 산정 — 캡 초과 구단은 외부 초대형 계약을 강력히 자제
+  let maxAnnualBillion: number;
+  if (consecutiveExceedYears >= 2 && capHeadroomBillion <= 5) {
+    // 2년 연속 초과 상태면 3년차 제재(100% + 1R -9단계) 회피 위해 극도로 보수적
+    maxAnnualBillion = Math.max(2.0, capHeadroomBillion * 0.85);
+  } else if (capHeadroomBillion <= 0) {
+    // 이미 캡 초과: 소규모 보강·원소속 잔류 위주 (대형 시장 우승권만 소폭 추가 허용)
+    maxAnnualBillion = rank <= 3 && marketMult >= 1.05 ? 9.5 : 5.5;
+  } else {
+    // 캡 여유가 있는 구단: 남은 캡 여유 + 시장 규모에 비례한 현실적 연간 지출 한도
+    maxAnnualBillion = capHeadroomBillion * 0.92 + (marketMult >= 1.08 ? 5.0 : marketMult >= 0.98 ? 2.5 : 0.8);
+  }
+  maxAnnualBillion = Number(clamp(maxAnnualBillion, 2.0, 28.0).toFixed(1));
+
   const budgetCapacityBillion = Number(
-    Math.max(12, headroom * 1.1 + marketMult * 32 + (rank <= 5 ? 10 : 4)).toFixed(1)
+    clamp(maxAnnualBillion * (rank <= 5 ? 4.2 : 3.4), 6.0, 125.0).toFixed(1)
   );
-  // 중상위권(3~6위)이 승부수를 던지고, 최하위 리빌딩 구단은 고령 FA에 보수적
-  const rankAggro = rank <= 2 ? 1.02 : rank <= 6 ? 1.07 : 0.91;
-  const aggressiveness = clamp(rankAggro * (0.94 + (marketMult - 0.95) * 0.35) + seedJitter, 0.78, 1.2);
+
+  // 중상위권(3~6위)이 승부수를 던지고, 캡 초과·리빌딩 구단은 보수적
+  const capAggroFactor =
+    consecutiveExceedYears >= 2
+      ? 0.72
+      : capHeadroomBillion <= 0
+      ? 0.78
+      : capHeadroomBillion >= 25
+      ? 1.06
+      : 0.98;
+  const rankAggro = rank <= 2 ? 1.01 : rank <= 6 ? 1.06 : 0.88;
+  const aggressiveness = clamp(
+    rankAggro * capAggroFactor * (0.94 + (marketMult - 0.95) * 0.3) + seedJitter,
+    0.68,
+    1.18
+  );
 
   return {
     contentionScore,
     budgetCapacityBillion,
+    maxAnnualBillion,
     aggressiveness,
     payrollBillion: Number(payrollBillion.toFixed(1)),
+    capHeadroomBillion,
+    consecutiveExceedYears,
   };
 }
 
@@ -548,9 +1020,14 @@ function evaluateAiClubBidsForPlayerInPlace(
     const need = computeClubPositionalNeed(career, tid, p);
     const clubProfile = getClubMarketProfile(career, tid, rankByTeam);
 
-    // 구단별 관심도 계산: 능력치 + 포지션 필요도 + 원소속 우선권 + 재정 여력
-    const budgetOk = clubProfile.budgetCapacityBillion >= comp.fairTotalBillion * 0.72;
+    // 구단별 관심도 계산: 능력치 + 포지션 필요도 + 원소속 우선권 + 재정·샐러리캡 여력
+    const fairAav = comp.fairTotalBillion / Math.max(1, comp.fairYears);
+    const budgetOk =
+      clubProfile.budgetCapacityBillion >= comp.fairTotalBillion * 0.8 &&
+      clubProfile.maxAnnualBillion >= fairAav * (isOriginalClub ? 0.72 : 0.88);
     if (!budgetOk && !isOriginalClub) continue;
+    // 2년 연속 샐러리캡 초과 구단은 외부 대형 FA(연평균 6억+) 입찰 원천 자제
+    if (!isOriginalClub && clubProfile.consecutiveExceedYears >= 2 && fairAav >= 6.0) continue;
 
     // 이미 입찰이 과도하게 쏠린 구단은 자연스럽게 추가 대형 FA 추격 자제 (인위적 할당 X, 예산/로스터 현실 반영)
     const activeBidsByClub = Object.values(state.negotiations).filter(
@@ -579,22 +1056,34 @@ function evaluateAiClubBidsForPlayerInPlace(
 
     if (prevBidIdx < 0 && interestScore < threshold) continue;
 
-    // 입찰 금액 산정
-    const needMult = 0.88 + (need / 100) * 0.24; // 0.91 ~ 1.12
+    // 입찰 금액 산정 (재정·샐러리캡 연간 한도 엄격 준수)
+    const needMult = 0.88 + (need / 100) * 0.22; // 0.91 ~ 1.10
     const origMult = isOriginalClub ? 0.97 : 1.03;
+    const maxYears = getMaxRealisticFaYears(p.age, p.ability);
+    const offerYears = clamp(
+      comp.fairYears + (need >= 80 && p.age <= 31 ? 1 : 0) - (p.age >= 35 ? 1 : 0),
+      1,
+      maxYears
+    );
+    const capCeilingTotal = Number(
+      Math.min(
+        clubProfile.budgetCapacityBillion,
+        clubProfile.maxAnnualBillion * offerYears * (isOriginalClub ? 1.18 : 1.02)
+      ).toFixed(1)
+    );
     const maxWilling = Number(
       Math.min(
-        clubProfile.budgetCapacityBillion * 1.15,
-        comp.fairTotalBillion * needMult * origMult * clubProfile.aggressiveness * (0.94 + rng.next() * 0.16)
+        capCeilingTotal,
+        comp.fairTotalBillion * needMult * origMult * clubProfile.aggressiveness * (0.94 + rng.next() * 0.14)
       ).toFixed(1)
     );
 
     if (prevBidIdx >= 0) {
       const prevBid = neg.bids[prevBidIdx];
-      // 경쟁 입찰이 더 높고 구단 상한 여유가 있으면 4~9% 상향 재입찰
+      // 경쟁 입찰이 더 높고 구단 캡·재정 상한 여유가 있으면 3~7% 상향 재입찰
       if (existingTopTotal > prevBid.totalBillion && maxWilling > prevBid.totalBillion * 1.03) {
         const raisedTotal = Number(
-          Math.min(maxWilling, existingTopTotal * (1.02 + rng.next() * 0.06)).toFixed(1)
+          Math.min(maxWilling, existingTopTotal * (1.02 + rng.next() * 0.05)).toFixed(1)
         );
         const years = prevBid.years;
         const annualBillion = Number((raisedTotal / years).toFixed(2));
@@ -618,14 +1107,9 @@ function evaluateAiClubBidsForPlayerInPlace(
       continue;
     }
 
+    const minFloor = Number((Math.max(0.33, career.season >= 2027 ? 0.33 : 0.3) * offerYears).toFixed(1));
     const offerTotal = Number(
-      Math.max(1.8, Math.min(maxWilling, comp.fairTotalBillion * (0.9 + rng.next() * 0.16))).toFixed(1)
-    );
-    const maxYears = getMaxRealisticFaYears(p.age, p.ability);
-    const offerYears = clamp(
-      comp.fairYears + (need >= 80 && p.age <= 31 ? 1 : 0) - (p.age >= 35 ? 1 : 0),
-      1,
-      maxYears
+      Math.max(minFloor, Math.min(maxWilling, comp.fairTotalBillion * (0.9 + rng.next() * 0.14))).toFixed(1)
     );
     const annualBillion = Number((offerTotal / offerYears).toFixed(2));
     const scored = scoreBidForPlayer(
@@ -675,10 +1159,14 @@ function finalizeAiClubFaSigningInPlace(
     career.teams[fromTeamId].bullpenOrder = career.teams[fromTeamId].bullpenOrder.filter((id) => id !== p.id);
   }
 
-  const signingBonus = Number((winningBid.totalBillion * 0.4).toFixed(2));
-  const annualSalary = Number(
-    ((winningBid.totalBillion - signingBonus) / Math.max(1, winningBid.years)).toFixed(2)
-  );
+  const exactBreakdown = calculateExactFaContractBreakdown(winningBid.totalBillion, winningBid.years, {
+    age: p.age,
+    injuryHistoryCount: p.injuryHistoryCount,
+    season: career.season,
+  });
+  const signingBonus = exactBreakdown.signingBonusBillion;
+  const annualSalary = exactBreakdown.annualSalaryBillion;
+  const optionTotal = exactBreakdown.optionTotalBillion;
 
   const prevAnnualSalBeforeAiSign = Math.max(0.33, p.previousAnnualSalary ?? p.contract.annualSalary ?? 1.0);
   p.previousAnnualSalary = prevAnnualSalBeforeAiSign;
@@ -711,15 +1199,15 @@ function finalizeAiClubFaSigningInPlace(
     yearsRemaining: winningBid.years,
     annualSalary,
     signingBonus,
-    totalValue: winningBid.totalBillion,
+    totalValue: exactBreakdown.totalBillion,
     startSeason: career.season,
     endSeason: career.season + winningBid.years - 1,
     isFAEligible: false,
     faGrade: comp.grade,
     optionBonusPaidBillion: 0,
     note: isOriginalClub
-      ? `${career.season} 원소속팀 FA 잔류 (${winningBid.years}년 ${winningBid.totalBillion.toFixed(1)}억)`
-      : `${career.season} 외부 FA ${comp.grade}등급 계약 (${winningBid.years}년 ${winningBid.totalBillion.toFixed(1)}억)`,
+      ? `${career.season} 원소속팀 FA 잔류 (${winningBid.years}년 총액 ${exactBreakdown.totalBillion.toFixed(1)}억 · 계약금 ${signingBonus.toFixed(2)}억/연봉 ${annualSalary.toFixed(2)}억/옵션 ${optionTotal.toFixed(2)}억)`
+      : `${career.season} 외부 FA ${comp.grade}등급 계약 (${winningBid.years}년 총액 ${exactBreakdown.totalBillion.toFixed(1)}억 · 계약금 ${signingBonus.toFixed(2)}억/연봉 ${annualSalary.toFixed(2)}억/옵션 ${optionTotal.toFixed(2)}억)`,
   };
 
   if (career.teams[newTeamId]) {
@@ -883,7 +1371,12 @@ export function submitUserClubFaBid(
   }
 
   const comp = evaluateFaGradeAndComp(next, p);
-  const signingBonus = Number((offerTotalBillion * 0.4).toFixed(2));
+  const previewBreakdown = calculateExactFaContractBreakdown(offerTotalBillion, offerYears, {
+    age: p.age,
+    injuryHistoryCount: p.injuryHistoryCount,
+    season: next.season,
+  });
+  const signingBonus = previewBreakdown.signingBonusBillion;
   const cComp = !isOriginalClub && comp.grade === 'C' ? comp.cashCompBillion : 0;
   const requiredCash = Number((signingBonus + cComp).toFixed(2));
   if (next.finances.cashBalanceBillion !== null && next.finances.cashBalanceBillion < requiredCash) {

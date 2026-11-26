@@ -1,0 +1,804 @@
+{
+  "version": "v26_feedback_roles_military_fa",
+  "appliedAt": "2026-11-26T08:34:58.759Z",
+  "recoveredPlayers": [
+    {
+      "id": "2026-SSG-47",
+      "name": "전의산",
+      "team": "SSG",
+      "primary_position": "1B",
+      "overall": 68,
+      "potential": 78,
+      "militaryStatus": "군필",
+      "dischargeDate": "2026-06-01"
+    },
+    {
+      "id": "2026-HH-43",
+      "name": "정은원",
+      "team": "HH",
+      "primary_position": "2B",
+      "overall": 68,
+      "potential": 75,
+      "militaryStatus": "군필",
+      "dischargeDate": "2026-06-01"
+    },
+    {
+      "id": "v26-SS-KHJ",
+      "name": "김현준",
+      "team": "SS",
+      "primary_position": "CF",
+      "overall": 66,
+      "potential": 76,
+      "militaryStatus": "군필",
+      "dischargeDate": "2026-06-01"
+    },
+    {
+      "id": "v26-WO-JJY",
+      "name": "장재영",
+      "team": "WO",
+      "primary_position": "CF",
+      "overall": 60,
+      "potential": 78,
+      "militaryStatus": "군필",
+      "dischargeDate": "2026-11-11"
+    },
+    {
+      "id": "v26-LT-JMR",
+      "name": "전미르",
+      "team": "LT",
+      "primary_position": "RP",
+      "overall": 62,
+      "potential": 82,
+      "militaryStatus": "군필",
+      "dischargeDate": "2026-11-11"
+    }
+  ],
+  "militaryUpdates": [
+    {
+      "id": "v15-0183",
+      "name": "박지환",
+      "team": "SSG",
+      "beforeStatus": "미확인",
+      "afterStatus": "복무 중",
+      "enlistDate": "2026-04-27",
+      "dischargeDate": "2027-10-26"
+    },
+    {
+      "id": "v15-0161",
+      "name": "이율예",
+      "team": "SSG",
+      "beforeStatus": "미확인",
+      "afterStatus": "복무 중",
+      "enlistDate": "2026-04-27",
+      "dischargeDate": "2027-10-26"
+    },
+    {
+      "id": "v15-0142",
+      "name": "송영진",
+      "team": "SSG",
+      "beforeStatus": "미확인",
+      "afterStatus": "복무 중",
+      "enlistDate": "2026-04-27",
+      "dischargeDate": "2027-10-26"
+    },
+    {
+      "id": "v15-0158",
+      "name": "김규민",
+      "team": "SSG",
+      "beforeStatus": "미확인",
+      "afterStatus": "복무 중",
+      "enlistDate": "2026-04-27",
+      "dischargeDate": "2027-10-26"
+    }
+  ],
+  "pitcherRoleChanges": [
+    {
+      "id": "2026-LG-19",
+      "name": "고우석",
+      "team": "LG",
+      "overall": 78,
+      "before": "RP/중간 (stam 54)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "LG 복귀 필승조·마무리 경쟁 불펜"
+    },
+    {
+      "id": "2026-LG-37",
+      "name": "김강률",
+      "team": "LG",
+      "overall": 71,
+      "before": "RP/중간 (stam 49)",
+      "after": "RP/필승조 (stam 49)",
+      "reason": "최근 실제 등판(22G 20.7IP, 경기당 0.94IP · 8HLD 1SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-LG-67",
+      "name": "김영우",
+      "team": "LG",
+      "overall": 73,
+      "before": "RP/중간 (stam 57)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(51G 45.3IP, 경기당 0.89IP · 5HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "v15-0008",
+      "name": "김진성",
+      "team": "LG",
+      "overall": 72,
+      "before": "SP/선발 (stam 59)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(53G 47.3IP, 경기당 0.89IP · 18HLD 1SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-LG-45",
+      "name": "김진수",
+      "team": "LG",
+      "overall": 63,
+      "before": "RP/중간 (stam 56)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(60G 61.0IP, 경기당 1.02IP · 13HLD 1SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "v15-0010",
+      "name": "박명근",
+      "team": "LG",
+      "overall": 60,
+      "before": "RP/중간 (stam 53)",
+      "after": "RP/필승조 (stam 53)",
+      "reason": "최근 실제 등판(44G 38.7IP, 경기당 0.88IP · 10HLD 4SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-LG-58",
+      "name": "박시원",
+      "team": "LG",
+      "overall": 54,
+      "before": "RP/중간 (stam 57)",
+      "after": "RP/롱릴리프 (stam 57)",
+      "reason": "최근 실제 등판(29G 59.3IP, 경기당 2.05IP · 0HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-LG-29",
+      "name": "손주영",
+      "team": "LG",
+      "overall": 77,
+      "before": "SP/선발 (stam 68)",
+      "after": "CL/마무리 (stam 54)",
+      "reason": "최근 실제 등판(47G 50.3IP · 31SV) 기반 마무리 재평가"
+    },
+    {
+      "id": "2026-LG-20",
+      "name": "우강훈",
+      "team": "LG",
+      "overall": 65,
+      "before": "RP/중간 (stam 54)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(68G 52.7IP, 경기당 0.77IP · 20HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "v15-0022",
+      "name": "유영찬",
+      "team": "LG",
+      "overall": 84,
+      "before": "RP/중간 (stam 53)",
+      "after": "CL/마무리 (stam 53)",
+      "reason": "2025 21SV·2026 11SV LG 마무리 투수"
+    },
+    {
+      "id": "v15-0025",
+      "name": "이정용",
+      "team": "LG",
+      "overall": 51,
+      "before": "RP/중간 (stam 57)",
+      "after": "RP/롱릴리프 (stam 57)",
+      "reason": "최근 실제 등판(30G 56.7IP, 경기당 1.89IP · 1HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-LG-50",
+      "name": "장현식",
+      "team": "LG",
+      "overall": 68,
+      "before": "SP/선발 (stam 58)",
+      "after": "RP/롱릴리프 (stam 57)",
+      "reason": "최근 실제 등판(32G 53.7IP, 경기당 1.68IP · 7HLD 2SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "v15-0033",
+      "name": "최지명",
+      "team": "LG",
+      "overall": 56,
+      "before": "RP/중간 (stam 50)",
+      "after": "SP/선발 (stam 50)",
+      "reason": "최근 실제 등판(13G 경기당 2.23IP) 기반 선발/스윙맨 유지"
+    },
+    {
+      "id": "2026-HH-44",
+      "name": "김서현",
+      "team": "HH",
+      "overall": 62,
+      "before": "RP/중간 (stam 55)",
+      "after": "CL/마무리 (stam 54)",
+      "reason": "2025 33SV 한화 마무리/필승조"
+    },
+    {
+      "id": "FA2027-HH-박상원",
+      "name": "박상원",
+      "team": "HH",
+      "overall": 71,
+      "before": "SP/선발 (stam 59)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(56G 50.7IP, 경기당 0.90IP · 11HLD 2SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-HH-27",
+      "name": "이민우",
+      "team": "HH",
+      "overall": 65,
+      "before": "SP/선발 (stam 58)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(59G 57.0IP, 경기당 0.97IP · 7HLD 7SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-HH-18",
+      "name": "이상규",
+      "team": "HH",
+      "overall": 59,
+      "before": "RP/중간 (stam 56)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(54G 59.0IP, 경기당 1.09IP · 9HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-HH-57",
+      "name": "조동욱",
+      "team": "HH",
+      "overall": 67,
+      "before": "SP/선발 (stam 58)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(75G 56.3IP, 경기당 0.75IP · 10HLD 1SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-HH-29",
+      "name": "황준서",
+      "team": "HH",
+      "overall": 61,
+      "before": "SP/선발 (stam 60)",
+      "after": "RP/롱릴리프 (stam 57)",
+      "reason": "최근 실제 등판(30G 63.7IP, 경기당 2.12IP · 0HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "v15-0130",
+      "name": "김민",
+      "team": "SSG",
+      "overall": 79,
+      "before": "SP/선발 (stam 61)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(71G 64.3IP, 경기당 0.91IP · 21HLD 1SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "v15-0134",
+      "name": "노경은",
+      "team": "SSG",
+      "overall": 75,
+      "before": "SP/선발 (stam 60)",
+      "after": "RP/필승조 (stam 53)",
+      "reason": "사용자 피드백 및 2025 35HLD·2026 52G 10HLD 기록 반영 (불펜 필승조)"
+    },
+    {
+      "id": "2026-SSG-42",
+      "name": "문승원",
+      "team": "SSG",
+      "overall": 68,
+      "before": "SP/선발 (stam 63)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(62G 62.7IP, 경기당 1.01IP · 17HLD 2SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-SSG-92",
+      "name": "이로운",
+      "team": "SSG",
+      "overall": 69,
+      "before": "SP/선발 (stam 61)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "사용자 피드백 및 2025 33HLD·2026 50G 불펜 등판 기록 반영 (불펜 필승조)"
+    },
+    {
+      "id": "2026-SSG-28",
+      "name": "전영준",
+      "team": "SSG",
+      "overall": 66,
+      "before": "SP/선발 (stam 58)",
+      "after": "RP/중간 (stam 54)",
+      "reason": "최근 실제 등판(63G 56.7IP, 경기당 0.90IP · 6HLD 2SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-SSG-19",
+      "name": "조병현",
+      "team": "SSG",
+      "overall": 88,
+      "before": "SP/선발 (stam 59)",
+      "after": "CL/마무리 (stam 52)",
+      "reason": "2025 30SV·2026 24SV SSG 마무리 투수"
+    },
+    {
+      "id": "2026-SS-62",
+      "name": "김재윤",
+      "team": "SS",
+      "overall": 80,
+      "before": "SP/선발 (stam 60)",
+      "after": "CL/마무리 (stam 53)",
+      "reason": "2025 13SV·2026 35SV 삼성 마무리 투수"
+    },
+    {
+      "id": "2026-SS-55",
+      "name": "배찬승",
+      "team": "SS",
+      "overall": 73,
+      "before": "RP/중간 (stam 56)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(56G 44.0IP, 경기당 0.79IP · 10HLD 1SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-SS-28",
+      "name": "이승민",
+      "team": "SS",
+      "overall": 74,
+      "before": "SP/선발 (stam 60)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(74G 68.0IP, 경기당 0.92IP · 23HLD 2SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "v15-0215",
+      "name": "이호성",
+      "team": "SS",
+      "overall": 57,
+      "before": "RP/중간 (stam 57)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(58G 55.3IP, 경기당 0.95IP · 3HLD 9SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-SS-60",
+      "name": "장찬희",
+      "team": "SS",
+      "overall": 67,
+      "before": "SP/선발 (stam 63)",
+      "after": "RP/롱릴리프 (stam 57)",
+      "reason": "최근 실제 등판(41G 76.0IP, 경기당 1.85IP · 3HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "v15-0221",
+      "name": "최지광",
+      "team": "SS",
+      "overall": 70,
+      "before": "RP/중간 (stam 51)",
+      "after": "RP/필승조 (stam 51)",
+      "reason": "최근 실제 등판(25G 22.0IP, 경기당 0.88IP · 8HLD 1SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "v15-0258",
+      "name": "김영규",
+      "team": "NC",
+      "overall": 70,
+      "before": "RP/중간 (stam 53)",
+      "after": "RP/필승조 (stam 53)",
+      "reason": "최근 실제 등판(28G 20.7IP, 경기당 0.74IP · 2HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-NC-21",
+      "name": "김재열",
+      "team": "NC",
+      "overall": 77,
+      "before": "RP/중간 (stam 52)",
+      "after": "RP/필승조 (stam 52)",
+      "reason": "최근 실제 등판(24G 23.0IP, 경기당 0.96IP · 2HLD 1SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "v15-0260",
+      "name": "김진호",
+      "team": "NC",
+      "overall": 62,
+      "before": "RP/중간 (stam 57)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(58G 45.3IP, 경기당 0.78IP · 18HLD 1SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "v15-0261",
+      "name": "김태경",
+      "team": "NC",
+      "overall": 53,
+      "before": "RP/중간 (stam 54)",
+      "after": "RP/롱릴리프 (stam 54)",
+      "reason": "최근 실제 등판(21G 45.3IP, 경기당 2.16IP · 0HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-NC-61",
+      "name": "배재환",
+      "team": "NC",
+      "overall": 68,
+      "before": "RP/중간 (stam 56)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(60G 49.3IP, 경기당 0.82IP · 17HLD 1SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "v15-0270",
+      "name": "원종해",
+      "team": "NC",
+      "overall": 54,
+      "before": "RP/중간 (stam 51)",
+      "after": "RP/롱릴리프 (stam 51)",
+      "reason": "최근 실제 등판(17G 29.3IP, 경기당 1.73IP · 1HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "v15-0275",
+      "name": "임지민",
+      "team": "NC",
+      "overall": 66,
+      "before": "RP/중간 (stam 54)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(49G 46.7IP, 경기당 0.95IP · 9HLD 6SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-NC-57",
+      "name": "전사민",
+      "team": "NC",
+      "overall": 62,
+      "before": "SP/선발 (stam 60)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(69G 63.0IP, 경기당 0.91IP · 6HLD 10SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-NC-67",
+      "name": "최요한",
+      "team": "NC",
+      "overall": 57,
+      "before": "SP/선발 (stam 63)",
+      "after": "RP/중간 (stam 54)",
+      "reason": "최근 실제 등판(15G 11.3IP, 경기당 0.76IP · 1HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-KT-26",
+      "name": "김민수",
+      "team": "KT",
+      "overall": 63,
+      "before": "SP/선발 (stam 58)",
+      "after": "RP/중간 (stam 54)",
+      "reason": "최근 실제 등판(39G 42.7IP, 경기당 1.09IP · 3HLD 1SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-KT-60",
+      "name": "박영현",
+      "team": "KT",
+      "overall": 84,
+      "before": "SP/선발 (stam 61)",
+      "after": "CL/마무리 (stam 54)",
+      "reason": "2025 35SV·2026 30SV KT 마무리 투수"
+    },
+    {
+      "id": "v15-0331",
+      "name": "손동현",
+      "team": "KT",
+      "overall": 73,
+      "before": "SP/선발 (stam 59)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(68G 63.0IP, 경기당 0.93IP · 14HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-KT-11",
+      "name": "스기모토",
+      "team": "KT",
+      "overall": 66,
+      "before": "SP/선발 (stam 62)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(73G 71.7IP, 경기당 0.98IP · 25HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-KT-12",
+      "name": "우규민",
+      "team": "KT",
+      "overall": 75,
+      "before": "RP/중간 (stam 55)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(51G 40.3IP, 경기당 0.79IP · 5HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "v15-0335",
+      "name": "원상현",
+      "team": "KT",
+      "overall": 57,
+      "before": "SP/선발 (stam 59)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(52G 57.0IP, 경기당 1.10IP · 14HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-KT-37",
+      "name": "이상동",
+      "team": "KT",
+      "overall": 65,
+      "before": "RP/중간 (stam 52)",
+      "after": "RP/필승조 (stam 52)",
+      "reason": "최근 실제 등판(29G 23.7IP, 경기당 0.82IP · 8HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "v15-0341",
+      "name": "전용주",
+      "team": "KT",
+      "overall": 61,
+      "before": "RP/중간 (stam 53)",
+      "after": "RP/필승조 (stam 53)",
+      "reason": "최근 실제 등판(63G 45.3IP, 경기당 0.72IP · 10HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "FA2027-KT-한승혁",
+      "name": "한승혁",
+      "team": "KT",
+      "overall": 65,
+      "before": "RP/중간 (stam 56)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(35G 32.3IP, 경기당 0.92IP · 10HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "v15-0379",
+      "name": "김상수",
+      "team": "LT",
+      "overall": 63,
+      "before": "SP/선발 (stam 58)",
+      "after": "RP/중간 (stam 54)",
+      "reason": "최근 실제 등판(45G 36.7IP, 경기당 0.81IP · 3HLD 2SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-LT-34",
+      "name": "김원중",
+      "team": "LT",
+      "overall": 74,
+      "before": "SP/선발 (stam 59)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(68G 58.7IP, 경기당 0.86IP · 21HLD 5SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-LT-36",
+      "name": "박정민",
+      "team": "LT",
+      "overall": 76,
+      "before": "SP/선발 (stam 59)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(63G 59.0IP, 경기당 0.94IP · 14HLD 1SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "v15-0389",
+      "name": "박진",
+      "team": "LT",
+      "overall": 65,
+      "before": "SP/선발 (stam 60)",
+      "after": "RP/중간 (stam 54)",
+      "reason": "최근 실제 등판(51G 69.3IP, 경기당 1.36IP · 3HLD 1SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-LT-56",
+      "name": "최준용",
+      "team": "LT",
+      "overall": 71,
+      "before": "SP/선발 (stam 58)",
+      "after": "CL/마무리 (stam 54)",
+      "reason": "최근 실제 등판(61G 60.7IP · 15SV) 기반 마무리 재평가"
+    },
+    {
+      "id": "2026-HT-0",
+      "name": "곽도규",
+      "team": "HT",
+      "overall": 68,
+      "before": "RP/중간 (stam 52)",
+      "after": "RP/필승조 (stam 52)",
+      "reason": "최근 실제 등판(44G 32.0IP, 경기당 0.73IP · 11HLD 2SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "v15-0440",
+      "name": "김건국",
+      "team": "HT",
+      "overall": 50,
+      "before": "RP/중간 (stam 51)",
+      "after": "RP/롱릴리프 (stam 51)",
+      "reason": "최근 실제 등판(32G 51.7IP, 경기당 1.61IP · 1HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-HT-49",
+      "name": "김범수",
+      "team": "HT",
+      "overall": 65,
+      "before": "RP/중간 (stam 54)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(60G 40.0IP, 경기당 0.67IP · 13HLD 1SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-HT-65",
+      "name": "성영탁",
+      "team": "HT",
+      "overall": 78,
+      "before": "SP/선발 (stam 58)",
+      "after": "CL/마무리 (stam 54)",
+      "reason": "최근 실제 등판(60G 57.0IP · 13SV) 기반 마무리 재평가"
+    },
+    {
+      "id": "2026-HT-48",
+      "name": "이의리",
+      "team": "HT",
+      "overall": 52,
+      "before": "RP/중간 (stam 57)",
+      "after": "RP/롱릴리프 (stam 57)",
+      "reason": "최근 실제 등판(39G 63.3IP, 경기당 1.62IP · 2HLD 6SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-HT-51",
+      "name": "전상현",
+      "team": "HT",
+      "overall": 83,
+      "before": "SP/선발 (stam 58)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(46G 46.3IP, 경기당 1.01IP · 15HLD 4SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-HT-62",
+      "name": "정해영",
+      "team": "HT",
+      "overall": 70,
+      "before": "RP/중간 (stam 57)",
+      "after": "CL/마무리 (stam 53)",
+      "reason": "2025 27SV KIA 마무리 투수 (상무 복무중)"
+    },
+    {
+      "id": "2026-HT-11",
+      "name": "조상우",
+      "team": "HT",
+      "overall": 74,
+      "before": "SP/선발 (stam 59)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(72G 63.0IP, 경기당 0.88IP · 21HLD 1SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-OB-16",
+      "name": "김정우",
+      "team": "OB",
+      "overall": 48,
+      "before": "RP/중간 (stam 55)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(61G 59.3IP, 경기당 0.97IP · 10HLD 2SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-OB-63",
+      "name": "김택연",
+      "team": "OB",
+      "overall": 83,
+      "before": "SP/선발 (stam 59)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "2025 24SV·2026 55G 13HLD 두산 핵심 불펜/마무리"
+    },
+    {
+      "id": "v15-0511",
+      "name": "박신지",
+      "team": "OB",
+      "overall": 63,
+      "before": "RP/중간 (stam 54)",
+      "after": "RP/롱릴리프 (stam 54)",
+      "reason": "최근 실제 등판(21G 35.3IP, 경기당 1.68IP · 0HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-OB-1",
+      "name": "박치국",
+      "team": "OB",
+      "overall": 67,
+      "before": "RP/중간 (stam 57)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(56G 48.3IP, 경기당 0.86IP · 8HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-OB-29",
+      "name": "이병헌",
+      "team": "OB",
+      "overall": 63,
+      "before": "RP/중간 (stam 55)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(58G 44.7IP, 경기당 0.77IP · 8HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-OB-50",
+      "name": "이영하",
+      "team": "OB",
+      "overall": 79,
+      "before": "SP/선발 (stam 61)",
+      "after": "CL/마무리 (stam 54)",
+      "reason": "최근 실제 등판(61G 68.0IP · 26SV) 기반 마무리 재평가"
+    },
+    {
+      "id": "v15-0527",
+      "name": "최원준",
+      "team": "OB",
+      "overall": 68,
+      "before": "SP/선발 (stam 64)",
+      "after": "RP/롱릴리프 (stam 57)",
+      "reason": "최근 실제 등판(49G 경기당 2.22IP · 9HLD) 기반 롱릴리프 재평가"
+    },
+    {
+      "id": "2026-WO-49",
+      "name": "김선기",
+      "team": "WO",
+      "overall": 56,
+      "before": "SP/선발 (stam 58)",
+      "after": "RP/중간 (stam 54)",
+      "reason": "최근 실제 등판(24G 25.0IP, 경기당 1.04IP · 2HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "2026-WO-21",
+      "name": "김성진",
+      "team": "WO",
+      "overall": 57,
+      "before": "RP/중간 (stam 54)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(34G 40.3IP, 경기당 1.19IP · 8HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "v15-0566",
+      "name": "김연주",
+      "team": "WO",
+      "overall": 48,
+      "before": "RP/중간 (stam 52)",
+      "after": "SP/선발 (stam 52)",
+      "reason": "최근 실제 등판(23G 경기당 2.49IP) 기반 선발/스윙맨 유지"
+    },
+    {
+      "id": "2026-WO-94",
+      "name": "박정훈",
+      "team": "WO",
+      "overall": 54,
+      "before": "RP/중간 (stam 56)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(42G 58.3IP, 경기당 1.39IP · 11HLD 0SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "v15-0571",
+      "name": "박주성",
+      "team": "WO",
+      "overall": 54,
+      "before": "RP/중간 (stam 57)",
+      "after": "SP/선발 (stam 57)",
+      "reason": "최근 실제 등판(18G 경기당 2.89IP) 기반 선발/스윙맨 유지"
+    },
+    {
+      "id": "v15-0580",
+      "name": "원종현",
+      "team": "WO",
+      "overall": 59,
+      "before": "RP/중간 (stam 56)",
+      "after": "RP/필승조 (stam 54)",
+      "reason": "최근 실제 등판(53G 48.0IP, 경기당 0.91IP · 8HLD 7SV) 기반 불펜 보직 재평가"
+    },
+    {
+      "id": "v15-0581",
+      "name": "유토",
+      "team": "WO",
+      "overall": 68,
+      "before": "RP/중간 (stam 57)",
+      "after": "CL/마무리 (stam 54)",
+      "reason": "최근 실제 등판(59G 50.3IP · 14SV) 기반 마무리 재평가"
+    },
+    {
+      "id": "v15-0586",
+      "name": "전준표",
+      "team": "WO",
+      "overall": 54,
+      "before": "RP/중간 (stam 57)",
+      "after": "SP/선발 (stam 60)",
+      "reason": "최근 실제 등판(21G 65.0IP, 경기당 3.10IP) 기반 선발 보직 유지"
+    },
+    {
+      "id": "v26-LT-JMR",
+      "name": "전미르",
+      "team": "LT",
+      "overall": 62,
+      "before": "RP/필승조 (stam 54)",
+      "after": "RP/중간 (stam 54)",
+      "reason": "불펜 스태미나 기준 유지"
+    }
+  ],
+  "summary": {
+    "totalPlayersAfter": 737,
+    "recoveredCount": 5,
+    "militaryUpdatesCount": 4,
+    "pitcherRoleChangesCount": 78
+  }
+}

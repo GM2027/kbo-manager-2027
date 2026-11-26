@@ -21,9 +21,9 @@ import { SeededRng } from './rng';
 import { getCurrentCareerDate } from './salaryCapEngine';
 import { computeStandings } from './stats';
 
-/** KBO 공식 웨이버 이적료: 300만 원 (= 0.003억 원) */
+/** KBO 공식 웨이버 이적료: 300만 원 (= 0.03억 원) */
 export const KBO_WAIVER_FEE_MANWON = 300;
-export const KBO_WAIVER_FEE_BILLION = 0.003;
+export const KBO_WAIVER_FEE_BILLION = 0.03;
 /** KBO 공식 웨이버 영입 신청 접수 기간: 7일 */
 export const KBO_WAIVER_CLAIM_WINDOW_DAYS = 7;
 /** KBO 공식 웨이버 영입 후 재웨이버 금지 기간: 60일 */

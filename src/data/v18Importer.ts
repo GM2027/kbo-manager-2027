@@ -58,6 +58,7 @@ interface RawV18Player {
   team: string;
   position: string;
   primary_position?: string;
+  pitch_role?: Player['pitchRole'];
   secondary_positions?: string[];
   position_proficiency?: Record<string, number>;
   jersey: string | null;
@@ -1109,6 +1110,135 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
       }
     }
 
+    // v26: 사용자 피드백 기반 선수 데이터 복구(전의산 등 상무 전역자), 병역(박지환·이율예 등), 10구단 투수 보직(이로운·노경은 등) 일괄 보정
+    // - 기존 세이브의 선수 ID, 성적, 계약, 인게임 이동/입대·전역 상태는 100% 보존
+    if (career.season >= 2027 && career.databaseVersion !== 'v26_feedback_roles_military_fa') {
+      // 1) 누락된 2026 상무 전역 복귀 선수(전의산·정은원·김현준·장재영·전미르) 복구
+      const recoveredSeedIds = ['2026-SSG-47', '2026-HH-43', 'v26-SS-KHJ', 'v26-WO-JJY', 'v26-LT-JMR'];
+      const hasAnyMissing = recoveredSeedIds.some((sid) => {
+        const src = V18_BY_SOURCE_ID.get(sid);
+        if (!src) return false;
+        const tid = V18_TEAM_MAP[src.team];
+        return !Object.values(career.players).some(
+          (pl) =>
+            pl.v18SourceId === sid ||
+            (pl.name.replace(/\s+/g, '') === src.name && pl.teamId === tid)
+        );
+      });
+      if (hasAnyMissing) {
+        const freshAll = buildAll10TeamsFromV18Dataset().players;
+        for (const sid of recoveredSeedIds) {
+          const freshPl = freshAll[sid];
+          if (!freshPl) continue;
+          const dupExists = Object.values(career.players).some(
+            (pl) =>
+              pl.v18SourceId === sid ||
+              (pl.name.replace(/\s+/g, '') === freshPl.name && pl.teamId === freshPl.teamId)
+          );
+          if (!dupExists) {
+            career.players[freshPl.id] = freshPl;
+            const ts = career.teams[freshPl.teamId];
+            if (ts && freshPl.role === '타자' && freshPl.rosterTier === '1군' && !ts.benchOrder.includes(freshPl.id) && !ts.lineupOrder.includes(freshPl.id)) {
+              ts.benchOrder.push(freshPl.id);
+            } else if (ts && freshPl.role === '투수' && freshPl.rosterTier === '1군' && !ts.bullpenOrder.includes(freshPl.id) && !ts.rotationOrder.includes(freshPl.id)) {
+              ts.bullpenOrder.push(freshPl.id);
+            }
+          }
+        }
+      }
+
+      // 2) 박지환·이율예·송영진·김규민 군 복무(상무 군보류) 반영 + 1군 액티브 정리
+      const sangmuSyncIds = new Set(['v15-0183', 'v15-0161', 'v15-0142', 'v15-0158']);
+      for (const p of Object.values(career.players)) {
+        if (!p.v18SourceId || !sangmuSyncIds.has(p.v18SourceId)) continue;
+        if (p.militaryChangedInGame) continue;
+        const src = V18_BY_SOURCE_ID.get(p.v18SourceId);
+        if (src?.military_verified && isMilitaryServing(src.military_verified.status)) {
+          p.militaryStatus = '복무 중';
+          p.militaryNote = src.military_verified.note;
+          p.militaryEnlistDate = src.military_verified.enlist_date;
+          p.militaryDischargeDate = src.military_verified.discharge_date;
+          p.militaryEnlistedSeason = src.military_verified.enlisted_season;
+          p.militaryReturnSeason = src.military_verified.return_season;
+          p.militaryReturnRound = src.military_verified.return_round;
+          p.rosterTier = '대기';
+          p.gameDayActive = false;
+          const ts = career.teams[p.teamId];
+          if (ts) {
+            ts.lineupOrder = ts.lineupOrder.filter((id) => id !== p.id);
+            ts.benchOrder = ts.benchOrder.filter((id) => id !== p.id);
+            ts.rotationOrder = ts.rotationOrder.filter((id) => id !== p.id);
+            ts.bullpenOrder = ts.bullpenOrder.filter((id) => id !== p.id);
+          }
+        }
+      }
+
+      // 3) KBO 10개 구단 투수 보직(SP / RP / CL · 선발 / 필승조 / 마무리 / 중간) 실등판 기록 기반 보정
+      for (const p of Object.values(career.players)) {
+        if (p.role !== '투수' || p.rosterTier === '은퇴') continue;
+        const src = p.v18SourceId ? V18_BY_SOURCE_ID.get(p.v18SourceId) : undefined;
+        if (!src) continue;
+        const verifiedPos =
+          src.primary_position === 'CL' || src.primary_position === 'RP' || src.primary_position === 'SP'
+            ? (src.primary_position as Position)
+            : null;
+        if (verifiedPos) {
+          p.position = verifiedPos;
+        }
+        if (src.pitch_role) {
+          p.pitchRole = src.pitch_role;
+        }
+        if (p.v18Ratings?.pitching && src.game_ratings?.pitching) {
+          p.v18Ratings.pitching.stamina_proxy = src.game_ratings.pitching.stamina_proxy;
+        }
+      }
+
+      // 불펜/마무리 투수가 선발 로테이션에 잘못 들어가 있는 경우 불펜으로 이동하고 실선발 투수로 보충
+      for (const tid of TEAM_IDS) {
+        const ts = career.teams[tid];
+        if (!ts) continue;
+        const misInRot = ts.rotationOrder.filter((pid) => {
+          const pl = career.players[pid];
+          return pl && (pl.position === 'RP' || pl.position === 'CL' || (pl.pitchRole && pl.pitchRole !== '선발'));
+        });
+        if (misInRot.length > 0) {
+          ts.rotationOrder = ts.rotationOrder.filter((pid) => !misInRot.includes(pid));
+          for (const rid of misInRot) {
+            if (!ts.bullpenOrder.includes(rid)) {
+              const rpl = career.players[rid];
+              if (rpl?.pitchRole === '마무리' || rpl?.position === 'CL') {
+                ts.bullpenOrder.unshift(rid);
+              } else {
+                ts.bullpenOrder.splice(Math.min(1, ts.bullpenOrder.length), 0, rid);
+              }
+            }
+          }
+          // 선발 로테이션 5인 보충
+          const spCandidates = Object.values(career.players)
+            .filter(
+              (pl) =>
+                pl.teamId === tid &&
+                pl.role === '투수' &&
+                (pl.rosterTier === '1군' || pl.rosterTier === '2군') &&
+                !isMilitaryServing(pl.militaryStatus) &&
+                !ts.rotationOrder.includes(pl.id) &&
+                pl.position === 'SP'
+            )
+            .sort((a, b) => b.ability - a.ability);
+          for (const sp of spCandidates) {
+            if (ts.rotationOrder.length >= 5) break;
+            sp.rosterTier = '1군';
+            sp.gameDayActive = true;
+            sp.pitchRole = '선발';
+            ts.bullpenOrder = ts.bullpenOrder.filter((id) => id !== sp.id);
+            ts.rotationOrder.push(sp.id);
+          }
+        }
+      }
+
+      career.databaseVersion = 'v26_feedback_roles_military_fa';
+    }
+
     // KBO 현역 선수단과 해외파 목록 간 중복 등록 상시 방지
     if (career.amateurAndOverseas?.overseasPlayers) {
       const activeKboKey = new Set<string>();
@@ -1465,6 +1595,10 @@ export function buildAll10TeamsFromV18Dataset(): {
       category,
       role,
       position,
+      pitchRole:
+        role === '투수'
+          ? (raw.pitch_role ?? (position === 'CL' ? '마무리' : position === 'RP' ? '중간' : '선발'))
+          : undefined,
       secondaryPositions: role === '타자' ? secondaryPositions : undefined,
       positionProficiency: role === '타자' ? positionProficiency : undefined,
       age,
@@ -1643,25 +1777,34 @@ export function buildAll10TeamsFromV18Dataset(): {
         return bScore - aScore;
       });
 
-    // 선발 5명 (스태미나/구위 높은 상위 5명 · 전문 구원/마무리 투수는 불펜 유지)
+    // 선발 5명 (실제 등판 기록 기반 SP 우선 · 전문 구원/필승조/마무리 투수는 불펜 엄격 유지)
+    const activePitchers = pitchers.filter((p) => !isMilitaryServing(p.militaryStatus));
     const isDedicatedReliever = (p: Player): boolean => {
+      if (
+        p.position === 'RP' ||
+        p.position === 'CL' ||
+        p.pitchRole === '마무리' ||
+        p.pitchRole === '필승조' ||
+        p.pitchRole === '중간' ||
+        p.pitchRole === '추격조' ||
+        p.pitchRole === '롱릴리프'
+      ) {
+        return true;
+      }
       const cs = p.careerStats;
       if (cs && 'SV' in cs) {
         if (cs.SV >= 20) return true;
         if (cs.G >= 30 && cs.outs / Math.max(1, cs.G) < 6) return true;
       }
-      if (p.v18SourceId === '2026-LG-19' || p.name === '고우석' || p.name === '유영찬') {
-        return true;
-      }
       return false;
     };
-    const starterPool = [...pitchers].sort((a, b) => {
+    const starterPool = [...activePitchers].sort((a, b) => {
       const aStam = a.v18Ratings?.pitching?.stamina_proxy ?? 50;
       const bStam = b.v18Ratings?.pitching?.stamina_proxy ?? 50;
-      const aRelPen = isDedicatedReliever(a) ? -48 : 0;
-      const bRelPen = isDedicatedReliever(b) ? -48 : 0;
-      const aVal = a.ability * 1.4 + aStam * 0.4 + (a.category !== '국내' ? 5 : 0) + aRelPen;
-      const bVal = b.ability * 1.4 + bStam * 0.4 + (b.category !== '국내' ? 5 : 0) + bRelPen;
+      const aRelPen = isDedicatedReliever(a) ? -90 : 0;
+      const bRelPen = isDedicatedReliever(b) ? -90 : 0;
+      const aVal = a.ability * 1.35 + aStam * 0.45 + (a.category !== '국내' ? 5 : 0) + aRelPen;
+      const bVal = b.ability * 1.35 + bStam * 0.45 + (b.category !== '국내' ? 5 : 0) + bRelPen;
       return bVal - aVal;
     });
     const rotationOrder: string[] = [];
@@ -1675,47 +1818,67 @@ export function buildAll10TeamsFromV18Dataset(): {
       usedPitchers.add(sp.id);
     }
 
-    // 불펜 8명 (마무리 1 + 셋업/필승조 3 + 중간 3 + 롱릴리프 1)
-    const relievers = pitchers.filter((p) => !usedPitchers.has(p.id));
+    // 불펜 8명 (마무리 1 + 셋업/필승조 3 + 중간 3 + 롱릴리프 1 · 실제 보직 우선 정렬)
+    const bpPriority = (p: Player): number => {
+      if (p.position === 'CL' || p.pitchRole === '마무리') return 300;
+      if (p.pitchRole === '필승조') return 200;
+      if (p.pitchRole === '중간') return 100;
+      if (p.pitchRole === '롱릴리프') return 60;
+      return 40;
+    };
+    const relievers = activePitchers
+      .filter((p) => !usedPitchers.has(p.id))
+      .sort((a, b) => bpPriority(b) - bpPriority(a) || b.ability - a.ability);
     const bullpenOrder: string[] = [];
     relievers.slice(0, 8).forEach((rp, idx) => {
-      rp.position = idx === 0 ? 'CL' : 'RP';
-      rp.pitchRole =
-        idx === 0
-          ? '마무리'
-          : idx <= 2
+      if (idx === 0) {
+        rp.position = 'CL';
+        rp.pitchRole = '마무리';
+      } else {
+        rp.position = 'RP';
+        rp.pitchRole =
+          rp.pitchRole === '필승조' || idx <= 3
             ? '필승조'
-            : idx <= 5
-              ? '중간'
-              : idx === 6
-                ? '추격조'
-                : '롱릴리프';
+            : rp.pitchRole === '롱릴리프' || idx === 7
+              ? '롱릴리프'
+              : idx <= 5
+                ? '중간'
+                : '추격조';
+      }
       rp.rosterTier = '1군';
       rp.gameDayActive = true;
       bullpenOrder.push(rp.id);
       usedPitchers.add(rp.id);
     });
 
-    // 나머지 투수는 2군 배치
+    // 나머지 투수는 2군 배치 (군복무 중인 선수는 '대기' 유지, 실제 보직 보존)
     for (const p of pitchers) {
+      if (isMilitaryServing(p.militaryStatus)) {
+        p.rosterTier = '대기';
+        p.gameDayActive = false;
+        continue;
+      }
       if (!usedPitchers.has(p.id)) {
         p.rosterTier = '2군';
         p.gameDayActive = false;
-        p.position = (p.v18Ratings?.pitching?.stamina_proxy ?? 45) >= 58 ? 'SP' : 'RP';
-        p.pitchRole = p.position === 'SP' ? '선발' : '중간';
+        if (!p.pitchRole) {
+          p.position = (p.v18Ratings?.pitching?.stamina_proxy ?? 45) >= 58 ? 'SP' : 'RP';
+          p.pitchRole = p.position === 'SP' ? '선발' : '중간';
+        }
       }
     }
 
-    // 주전 9명 (각 수비 포지션 C, 1B, 2B, 3B, SS, LF, CF, RF + DH · 멀티 포지션 숙련도 반영)
+    // 주전 9명 (각 수비 포지션 C, 1B, 2B, 3B, SS, LF, CF, RF + DH · 멀티 포지션 숙련도 반영 · 군복무 선수 제외)
+    const activeHitters = hitters.filter((h) => !isMilitaryServing(h.militaryStatus));
     const requiredSlots: Position[] = ['C', 'SS', 'CF', '2B', '3B', '1B', 'RF', 'LF', 'DH'];
     const lineupOrder: string[] = [];
     const lineupPositions: Record<string, Position> = {};
     const usedHitters = new Set<string>();
 
     for (const slot of requiredSlots) {
-      let chosen = hitters.find((h) => !usedHitters.has(h.id) && h.position === slot);
+      let chosen = activeHitters.find((h) => !usedHitters.has(h.id) && h.position === slot);
       if (!chosen && slot !== 'DH') {
-        chosen = hitters
+        chosen = activeHitters
           .filter((h) => !usedHitters.has(h.id) && getPositionProficiency(h, slot) >= (slot === 'C' ? 60 : 62))
           .sort(
             (a, b) =>
@@ -1723,7 +1886,7 @@ export function buildAll10TeamsFromV18Dataset(): {
           )[0];
       }
       if (!chosen) {
-        chosen = hitters.find((h) => !usedHitters.has(h.id));
+        chosen = activeHitters.find((h) => !usedHitters.has(h.id));
       }
       if (chosen) {
         chosen.rosterTier = '1군';
@@ -1736,20 +1899,26 @@ export function buildAll10TeamsFromV18Dataset(): {
 
     // 벤치 6명 (최소 포수 백업 1명 포함)
     const benchOrder: string[] = [];
-    const backupCatcher = hitters.find((h) => !usedHitters.has(h.id) && h.position === 'C');
+    const backupCatcher = activeHitters.find((h) => !usedHitters.has(h.id) && h.position === 'C');
     if (backupCatcher) {
       backupCatcher.rosterTier = '1군';
       backupCatcher.gameDayActive = true;
       benchOrder.push(backupCatcher.id);
       usedHitters.add(backupCatcher.id);
     }
-    for (const h of hitters) {
+    for (const h of activeHitters) {
       if (benchOrder.length >= 6) break;
       if (!usedHitters.has(h.id)) {
         h.rosterTier = '1군';
         h.gameDayActive = true;
         benchOrder.push(h.id);
         usedHitters.add(h.id);
+      }
+    }
+    for (const h of hitters) {
+      if (isMilitaryServing(h.militaryStatus)) {
+        h.rosterTier = '대기';
+        h.gameDayActive = false;
       }
     }
 

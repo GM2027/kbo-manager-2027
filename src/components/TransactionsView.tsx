@@ -56,6 +56,7 @@ import {
 } from '../engine/transactions';
 import {
   advanceFaCompetitionRound,
+  calculateExactFaContractBreakdown,
   declinePendingUserFaApproval,
   getTeamExternalFaSigningCount,
   isOverseasFaEligible,
@@ -901,27 +902,50 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                 </div>
 
                 {faPool.autoExempt.length > 0 && (
-                  <div className="pt-2 border-t border-amber-400/40 space-y-1.5">
-                    <div className="flex items-center justify-between text-[11px] font-bold text-emerald-800 dark:text-emerald-300">
+                  <div className="pt-2.5 border-t border-amber-400/40 space-y-2">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-bold text-emerald-800 dark:text-emerald-300">
                       <span className="inline-flex items-center gap-1">
                         <Lock className="w-3 h-3" />
-                        규정상 자동 보호(제외) 선수 ({faPool.autoExempt.length}명) — 보호 인원({limit}명) 미포함 · 보상 지명 불가
+                        규정상 자동 보호(제외) 선수 ({faPool.autoExempt.length}명) — 보호 정원({limit}명) 미포함 · 선택 버튼 비활성화 · 보상 지명 불가
                       </span>
                     </div>
-                    <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1">
-                      {faPool.autoExempt.map((item) => (
-                        <span
-                          key={item.player.id}
-                          title={item.reason}
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-emerald-500/40 bg-emerald-500/10 text-[10px] text-emerald-900 dark:text-emerald-200"
-                        >
-                          <span className="font-bold">{item.player.name}</span>
-                          <span className="opacity-75">({item.player.position})</span>
-                          <span className="px-1 py-0.2 rounded bg-emerald-600/20 font-semibold">
-                            {item.exemptCategory}
-                          </span>
-                        </span>
-                      ))}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-1.5 max-h-40 overflow-y-auto overscroll-contain pr-1">
+                      {faPool.autoExempt
+                        .filter((item) =>
+                          matchesQuery(
+                            protectionSearch,
+                            item.player.name,
+                            item.player.position,
+                            item.exemptCategory ?? '',
+                            item.reason
+                          )
+                        )
+                        .map((item) => (
+                          <button
+                            key={item.player.id}
+                            type="button"
+                            disabled
+                            aria-disabled="true"
+                            title={item.reason}
+                            className="text-left px-2 py-1.5 rounded border border-emerald-500/35 bg-emerald-500/10 text-[10px] text-emerald-900 dark:text-emerald-200 opacity-80 cursor-not-allowed select-none"
+                          >
+                            <div className="flex items-center justify-between gap-1">
+                              <span className="font-bold truncate">
+                                {item.player.name} ({item.player.position})
+                              </span>
+                              <span className="px-1 py-0.2 rounded bg-emerald-600/20 font-bold shrink-0">
+                                {item.exemptCategory}
+                              </span>
+                            </div>
+                            <div className="mt-0.5 flex items-center justify-between gap-1 text-[9px] opacity-80">
+                              <span className="truncate">{item.reason}</span>
+                              <span className="inline-flex items-center gap-0.5 font-bold shrink-0">
+                                <Lock className="w-2.5 h-2.5" />
+                                선택 불가
+                              </span>
+                            </div>
+                          </button>
+                        ))}
                     </div>
                   </div>
                 )}
@@ -945,15 +969,20 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
               <div className="max-h-[380px] overflow-y-auto overscroll-contain pr-1.5 divide-y divide-orange-200/70 dark:divide-orange-900/40">
                 {myDepartedFa.map((item) => {
                   const p = item.player;
-                  const years = faOfferYears[p.id] ?? item.fairYears;
+                  const years = Math.min(item.maxRealisticYears, faOfferYears[p.id] ?? item.fairYears);
                   const totalStr = faOfferTotal[p.id] ?? item.fairTotalBillion.toFixed(1);
                   const amtNum = Number(totalStr);
                   const validAmt = Number.isFinite(amtNum) && amtNum > 0 ? amtNum : item.fairTotalBillion;
-                  const estSigningBonus = Number((validAmt * 0.35).toFixed(2));
-                  const estAnnual = Number(((validAmt - estSigningBonus) / Math.max(1, years)).toFixed(2));
+                  const exactOffer = calculateExactFaContractBreakdown(validAmt, years, {
+                    age: p.age,
+                    injuryHistoryCount: p.injuryHistoryCount,
+                    season: career.season,
+                  });
+                  const estSigningBonus = exactOffer.signingBonusBillion;
+                  const estAnnual = exactOffer.annualSalaryBillion;
                   const estFirstYearCash = Number((estSigningBonus + estAnnual).toFixed(2));
                   const livePreview = previewContractSalaryCapImpact(career, {
-                    title: `${p.name} 원소속 FA 재계약 승인 (${years}년 총액 ${validAmt.toFixed(1)}억 원)`,
+                    title: `${p.name} 원소속 FA 재계약 승인 (${years}년 총액 ${exactOffer.totalBillion.toFixed(1)}억 원)`,
                     items: [
                       {
                         existingPlayerId: p.id,
@@ -980,14 +1009,17 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                           </button>
                           <FranchiseStarIcon active={isFranchiseStarPlayer(career, p)} />
                           <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 shrink-0">
-                            · FA
+                            · FA ({item.tierLabel})
                           </span>
                           <span className="font-mono-stats text-slate-500 dark:text-slate-400 shrink-0">
                             {p.position} · 만 {p.age}세 · OVR {p.ability}
                           </span>
                         </div>
                         <div className="text-[11px] text-slate-500">
-                          원소속팀 재계약 보상 없음 · 적정 기준 총액 약 {item.fairTotalBillion}억 ({item.fairYears}년)
+                          원소속팀 재계약 보상 없음 · 적정 기준 {item.fairYears}년 {item.fairTotalBillion.toFixed(1)}억 (최대 {item.maxRealisticYears}년) · {item.valuationSummary}
+                        </div>
+                        <div className="text-[10px] font-mono-stats text-slate-500 dark:text-slate-400">
+                          제안 구성: 계약금 {exactOffer.signingBonusBillion.toFixed(2)}억 + 연봉 {exactOffer.annualSalaryBillion.toFixed(2)}억×{years}년 + 옵션 {exactOffer.optionTotalBillion.toFixed(2)}억 = 총 {formatBillionExactKorean(exactOffer.totalBillion)}
                         </div>
                         <div className="text-[11px] font-mono-stats text-slate-600 dark:text-slate-300">
                           사전 샐러리캡 검사:{' '}
@@ -1010,7 +1042,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                           onChange={(e) => setFaOfferYears((prev) => ({ ...prev, [p.id]: Number(e.target.value) }))}
                           className="px-2 py-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-mono-stats"
                         >
-                          {[2, 3, 4, 5, 6].map((y) => (
+                          {Array.from({ length: item.maxRealisticYears }, (_, idx) => idx + 1).map((y) => (
                             <option key={y} value={y}>
                               {y}년
                             </option>
@@ -1018,9 +1050,9 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                         </select>
                         <input
                           type="number"
-                          step="1"
-                          min="4"
-                          max="200"
+                          step="0.5"
+                          min="0.5"
+                          max="180"
                           value={totalStr}
                           onChange={(e) => setFaOfferTotal((prev) => ({ ...prev, [p.id]: e.target.value }))}
                           className="w-20 px-2 py-1 text-right font-mono-stats rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950"
@@ -1109,19 +1141,21 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
               <div className="max-h-[520px] overflow-y-auto overscroll-contain px-4 divide-y divide-slate-100 dark:divide-slate-800">
                 {filteredExternalFa.map((item) => {
                   const p = item.player;
-                  const years = faOfferYears[p.id] ?? item.fairYears;
+                  const years = Math.min(item.maxRealisticYears, faOfferYears[p.id] ?? item.fairYears);
                   const totalStr = faOfferTotal[p.id] ?? item.fairTotalBillion.toFixed(1);
                   const amtNum = Number(totalStr);
                   const validAmt = Number.isFinite(amtNum) && amtNum > 0 ? amtNum : item.fairTotalBillion;
-                  const estSigningBonus = Number((validAmt * 0.35).toFixed(2));
-                  const estAnnual = Number(((validAmt - estSigningBonus) / Math.max(1, years)).toFixed(2));
+                  const exactOffer = calculateExactFaContractBreakdown(validAmt, years, {
+                    age: p.age,
+                    injuryHistoryCount: p.injuryHistoryCount,
+                    season: career.season,
+                  });
+                  const estSigningBonus = exactOffer.signingBonusBillion;
+                  const estAnnual = exactOffer.annualSalaryBillion;
                   const estFirstYearCash = Number((estSigningBonus + estAnnual).toFixed(2));
-                  const prevSal = Math.max(0.5, p.contract.annualSalary || 1.5);
-                  const estCompCash = Number(
-                    (item.grade === 'A' ? prevSal * 2.0 : item.grade === 'B' ? prevSal * 1.0 : prevSal * 1.5).toFixed(2)
-                  );
+                  const estCompCash = item.cashCompBillion;
                   const livePreview = previewContractSalaryCapImpact(career, {
-                    title: `${p.name} 외부 FA ${item.grade}등급 공식 제안 (${years}년 총액 ${validAmt.toFixed(1)}억 원)`,
+                    title: `${p.name} 외부 FA ${item.grade}등급 공식 제안 (${years}년 총액 ${exactOffer.totalBillion.toFixed(1)}억 원)`,
                     items: [
                       {
                         existingPlayerId: p.id,
@@ -1153,7 +1187,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                           </button>
                           <FranchiseStarIcon active={isFranchiseStarPlayer(career, p)} />
                           <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 shrink-0">
-                            · FA
+                            · FA {item.grade}등급 ({item.tierLabel})
                           </span>
                           <span className="font-mono-stats text-slate-500 shrink-0">
                             {p.position} · 만 {p.age}세 · OVR {p.ability}
@@ -1163,7 +1197,10 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                           </span>
                         </div>
                         <div className="text-[11px] text-slate-500">
-                          {item.compensationRule} · 기준 총액 약 {item.fairTotalBillion}억 ({item.fairYears}년)
+                          {item.compensationRule} · 기준 {item.fairYears}년 {item.fairTotalBillion.toFixed(1)}억 (최대 {item.maxRealisticYears}년) · {item.valuationSummary}
+                        </div>
+                        <div className="text-[10px] font-mono-stats text-slate-500 dark:text-slate-400">
+                          제안 구성: 계약금 {exactOffer.signingBonusBillion.toFixed(2)}억 + 연봉 {exactOffer.annualSalaryBillion.toFixed(2)}억×{years}년 + 옵션 {exactOffer.optionTotalBillion.toFixed(2)}억 = 총 {formatBillionExactKorean(exactOffer.totalBillion)}
                         </div>
                         {(() => {
                           const neg = faComp?.negotiations[p.id];
@@ -1234,7 +1271,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                           onChange={(e) => setFaOfferYears((prev) => ({ ...prev, [p.id]: Number(e.target.value) }))}
                           className="px-2 py-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-mono-stats"
                         >
-                          {[2, 3, 4, 5, 6].map((y) => (
+                          {Array.from({ length: item.maxRealisticYears }, (_, idx) => idx + 1).map((y) => (
                             <option key={y} value={y}>
                               {y}년
                             </option>
@@ -1242,9 +1279,9 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                         </select>
                         <input
                           type="number"
-                          step="1"
-                          min="4"
-                          max="200"
+                          step="0.5"
+                          min="0.5"
+                          max="180"
                           value={totalStr}
                           onChange={(e) => setFaOfferTotal((prev) => ({ ...prev, [p.id]: e.target.value }))}
                           className="w-20 px-2 py-1 text-right font-mono-stats rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950"

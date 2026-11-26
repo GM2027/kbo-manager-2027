@@ -37,9 +37,14 @@ import {
 } from '../data/playerMetadata';
 import { getKboMinSalaryBillion, sanitizeCareerOvrPotInPlace } from '../data/v18Importer';
 import {
+  calculateExactFaContractBreakdown,
+  evaluateFaGradeAndComp,
+  FaContractBreakdown,
+  getMaxRealisticFaYears,
   getTeamExternalFaSigningCount,
   markFaNegotiationSignedInPlace,
   MAX_EXTERNAL_FA_PER_CLUB,
+  RealisticFaValuation,
   resolveRemainingAiFaCompetitionInPlace,
   syncFaCompetitionMarketInPlace,
 } from './faCompetitionEngine';
@@ -4991,40 +4996,41 @@ export interface ExternalFaListing {
   grade: 'A' | 'B' | 'C';
   compensationRule: string;
   fairYears: number;
+  maxRealisticYears: number;
   fairTotalBillion: number;
   cashCompBillion: number;
   protectionLimit: 20 | 25 | null;
+  tierLabel: RealisticFaValuation['tierLabel'];
+  estimatedWar: number;
+  marketDemandMult: number;
+  competingClubCount: number;
+  unclaimedRounds: number;
+  valuationSummary: string;
+  breakdown: FaContractBreakdown;
 }
 
 function buildFaListing(career: CareerSave, p: Player): ExternalFaListing | null {
   const q = computeFaQualification(career, p);
   const grade = q.grade ?? p.contract.faGrade;
   if (!grade) return null;
-  const fairYears = p.age >= 35 ? 2 : p.age >= 32 ? 3 : 4;
-  const baseAnnual =
-    p.ability >= 86
-      ? 18
-      : p.ability >= 82
-      ? 12.5
-      : p.ability >= 78
-      ? 7.5
-      : 4.0;
-  const fairTotalBillion = Number(
-    Math.max(6, baseAnnual * fairYears * (p.age >= 35 ? 0.78 : 1.0)).toFixed(1)
-  );
-  const prevAnnual = Math.max(1, p.contract.annualSalary);
-  const cashCompBillion = Number(
-    (grade === 'A' ? prevAnnual * 2.0 : grade === 'B' ? prevAnnual * 1.0 : prevAnnual * 1.5).toFixed(2)
-  );
+  const val = evaluateFaGradeAndComp(career, p);
   const protectionLimit: 20 | 25 | null = grade === 'A' ? 20 : grade === 'B' ? 25 : null;
   return {
     player: p,
     grade,
     compensationRule: q.compensationRule,
-    fairYears,
-    fairTotalBillion,
-    cashCompBillion,
+    fairYears: val.fairYears,
+    maxRealisticYears: val.maxRealisticYears,
+    fairTotalBillion: val.fairTotalBillion,
+    cashCompBillion: val.cashCompBillion,
     protectionLimit,
+    tierLabel: val.tierLabel,
+    estimatedWar: val.estimatedWar,
+    marketDemandMult: val.marketDemandMult,
+    competingClubCount: val.competingClubCount,
+    unclaimedRounds: val.unclaimedRounds,
+    valuationSummary: val.valuationSummary,
+    breakdown: val.breakdown,
   };
 }
 
@@ -5232,7 +5238,19 @@ export function signExternalFaPlayer(
       throw new Error('현재 FA 자격을 충족하지 않은 선수입니다.');
     }
 
-    const signingBonus = Number((offerTotalBillion * 0.4).toFixed(2));
+    const maxRealisticYears = getMaxRealisticFaYears(p.age, p.ability);
+    if (Math.round(offerYears) > maxRealisticYears) {
+      throw new Error(
+        `고령 선수 장기계약 제한: 만 ${p.age}세 ${p.name} 선수의 최대 현실적 FA 계약 기간은 ${maxRealisticYears}년입니다.`
+      );
+    }
+
+    const exactBreakdown = calculateExactFaContractBreakdown(offerTotalBillion, offerYears, {
+      age: p.age,
+      injuryHistoryCount: p.injuryHistoryCount,
+      season: next.season,
+    });
+    const signingBonus = exactBreakdown.signingBonusBillion;
     const cComp = !isOwnFormerFa && listing.grade === 'C' ? listing.cashCompBillion : 0;
     const upFrontCash = Number((signingBonus + cComp).toFixed(2));
     if (next.finances.cashBalanceBillion !== null && next.finances.cashBalanceBillion < upFrontCash) {
@@ -5278,19 +5296,19 @@ export function signExternalFaPlayer(
     p.contract = {
       status: '확정',
       currency: 'KRW',
-      years: offerYears,
-      yearsRemaining: offerYears,
-      annualSalary: Number(((offerTotalBillion - signingBonus) / Math.max(1, offerYears)).toFixed(2)),
-      signingBonus,
-      totalValue: Number(offerTotalBillion.toFixed(2)),
+      years: exactBreakdown.years,
+      yearsRemaining: exactBreakdown.years,
+      annualSalary: exactBreakdown.annualSalaryBillion,
+      signingBonus: exactBreakdown.signingBonusBillion,
+      totalValue: exactBreakdown.totalBillion,
       startSeason: next.season,
-      endSeason: next.season + offerYears - 1,
+      endSeason: next.season + exactBreakdown.years - 1,
       isFAEligible: false,
       faGrade: listing.grade,
       optionBonusPaidBillion: 0,
       note: isOwnFormerFa
-        ? `${next.season} 원소속팀 FA 잔류 재계약 (${offerYears}년 총액 ${offerTotalBillion.toFixed(1)}억)`
-        : `${next.season} 외부 FA ${listing.grade}등급 영입 (${offerYears}년 총액 ${offerTotalBillion.toFixed(1)}억)`,
+        ? `${next.season} 원소속팀 FA 잔류 재계약 (${exactBreakdown.years}년 총액 ${exactBreakdown.totalBillion.toFixed(1)}억 · 계약금 ${exactBreakdown.signingBonusBillion.toFixed(2)}억/연봉 ${exactBreakdown.annualSalaryBillion.toFixed(2)}억/옵션 ${exactBreakdown.optionTotalBillion.toFixed(2)}억)`
+        : `${next.season} 외부 FA ${listing.grade}등급 영입 (${exactBreakdown.years}년 총액 ${exactBreakdown.totalBillion.toFixed(1)}억 · 계약금 ${exactBreakdown.signingBonusBillion.toFixed(2)}억/연봉 ${exactBreakdown.annualSalaryBillion.toFixed(2)}억/옵션 ${exactBreakdown.optionTotalBillion.toFixed(2)}억)`,
     };
     reassignNonConflictingUniformNumber(next, p, next.playerTeamId);
 

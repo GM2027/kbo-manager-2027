@@ -508,8 +508,9 @@ export function ensureFranchiseState(career: CareerSave): void {
       p.uniformNumber === undefined
   );
   const needsDevBackfill =
-    career.databaseVersion !== 'v24_recalibrated_prospect_potentials' &&
+    career.databaseVersion !== 'v26_feedback_roles_military_fa' &&
     career.databaseVersion !== 'v25_verified_positions_and_fa_compensation' &&
+    career.databaseVersion !== 'v24_recalibrated_prospect_potentials' &&
     career.databaseVersion !== 'v23_go_woosuk_kbo_return' &&
     career.databaseVersion !== 'v22_verified_birthdates' &&
     career.databaseVersion !== 'v21_verified_career_histories' &&
@@ -1742,6 +1743,10 @@ export function enlistPlayerToSangmuInternal(
     t.benchOrder = t.benchOrder.filter((id) => id !== p.id);
     t.rotationOrder = t.rotationOrder.filter((id) => id !== p.id);
     t.bullpenOrder = t.bullpenOrder.filter((id) => id !== p.id);
+  }
+  // 입대 즉시 군보류 자동 제외 대상이 되므로 진행 중인 FA 보호명단 선택 목록에서도 자동 제거 (정원 낭비 방지)
+  if (next.pendingFaProtection && next.pendingFaProtection.protectedIds.includes(p.id)) {
+    next.pendingFaProtection.protectedIds = next.pendingFaProtection.protectedIds.filter((id) => id !== p.id);
   }
 
   const returnLabel =
