@@ -1095,9 +1095,15 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                             {p.name}
                           </button>
                           <FranchiseStarIcon active={isFranchiseStarPlayer(career, p)} />
-                          <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 shrink-0">
-                            · FA ({item.tierLabel})
-                          </span>
+                          {item.isMegaFranchise ? (
+                            <span className="px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/50 text-[10px] font-extrabold text-amber-800 dark:text-amber-300 shrink-0">
+                              FA · {item.tierLabel}
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 shrink-0">
+                              · FA ({item.tierLabel})
+                            </span>
+                          )}
                           <span className="font-mono-stats text-slate-500 dark:text-slate-400 shrink-0">
                             {p.position} · 만 {p.age}세 · OVR {p.ability}
                           </span>
@@ -1182,10 +1188,9 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                           type="number"
                           step="0.5"
                           min="0.5"
-                          max="180"
                           value={totalStr}
                           onChange={(e) => setFaOfferTotal((prev) => ({ ...prev, [p.id]: e.target.value }))}
-                          className="w-20 px-2 py-1 text-right font-mono-stats rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950"
+                          className="w-24 px-2 py-1 text-right font-mono-stats rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950"
                         />
                         <span className="text-slate-500">억</span>
                         <button
@@ -1316,9 +1321,15 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                             {p.name}
                           </button>
                           <FranchiseStarIcon active={isFranchiseStarPlayer(career, p)} />
-                          <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 shrink-0">
-                            · FA {item.grade}등급 ({item.tierLabel})
-                          </span>
+                          {item.isMegaFranchise ? (
+                            <span className="px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/50 text-[10px] font-extrabold text-amber-800 dark:text-amber-300 shrink-0">
+                              FA {item.grade}등급 · {item.tierLabel}
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 shrink-0">
+                              · FA {item.grade}등급 ({item.tierLabel})
+                            </span>
+                          )}
                           <span className="font-mono-stats text-slate-500 shrink-0">
                             {p.position} · 만 {p.age}세 · OVR {p.ability}
                           </span>
@@ -1412,10 +1423,9 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                           type="number"
                           step="0.5"
                           min="0.5"
-                          max="180"
                           value={totalStr}
                           onChange={(e) => setFaOfferTotal((prev) => ({ ...prev, [p.id]: e.target.value }))}
-                          className="w-20 px-2 py-1 text-right font-mono-stats rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950"
+                          className="w-24 px-2 py-1 text-right font-mono-stats rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950"
                         />
                         <span className="text-slate-500">억</span>
                         <button

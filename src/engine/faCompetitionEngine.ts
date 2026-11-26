@@ -19,18 +19,38 @@ import {
 import { evaluateFranchiseStar } from './franchiseStarEngine';
 import { recordLeagueAcquisitionInPlace } from './leagueAcquisitionsEngine';
 import { appendPlayerTeamHistoryInPlace } from './leagueLifeEngine';
+import { resolveRecordOps } from './ratingEvaluationEngine';
 import { SeededRng } from './rng';
 import { getAnnualKboCapBillion, getCurrentCareerDate } from './salaryCapEngine';
 import { calcAVG, calcERA, calcOPS, computeStandings } from './stats';
 
-/** 고령 선수의 비현실적인 장기계약 방지 상한 (연령·기량 기반) */
-export function getMaxRealisticFaYears(age: number, ability = 75): number {
+/**
+ * 현실적 FA 최대 계약 기간 산출 (고령 일반 선수는 장기계약 제한, 초특급 프랜차이즈 스타는 6~10년 장기계약 허용)
+ */
+export function getMaxRealisticFaYears(
+  age: number,
+  ability = 75,
+  options?: { isMegaFranchise?: boolean; franchiseScore?: number; potential?: number }
+): number {
+  const isMega =
+    Boolean(options?.isMegaFranchise) ||
+    ((options?.franchiseScore ?? 0) >= 75 &&
+      (ability >= 86 || (ability >= 80 && (options?.potential ?? ability) >= 86 && age <= 28)));
+
+  if (isMega && age <= 34) {
+    if (age <= 27) return 10;
+    if (age <= 29) return 9;
+    if (age <= 31) return 8;
+    if (age <= 33) return 7;
+    return 5;
+  }
+
   if (age >= 38) return ability >= 84 ? 2 : 1;
   if (age >= 36) return ability >= 76 ? 2 : 1;
   if (age >= 34) return ability >= 82 ? 3 : 2;
   if (age >= 32) return ability >= 80 ? 4 : 3;
   if (age >= 30) return ability >= 82 ? 5 : 4;
-  return ability >= 83 ? 6 : 4;
+  return ability >= 83 ? 6 : 5;
 }
 
 export interface FaContractBreakdown {
@@ -54,7 +74,7 @@ export function calculateExactFaContractBreakdown(
   yearsInput: number,
   options?: { age?: number; injuryHistoryCount?: number; season?: number }
 ): FaContractBreakdown {
-  const years = Math.max(1, Math.min(8, Math.round(yearsInput || 1)));
+  const years = Math.max(1, Math.min(10, Math.round(yearsInput || 1)));
   const minAnnualManwon = (options?.season ?? 2027) >= 2027 ? 3300 : 3000; // 최저연봉 3,300만 원
   const rawTotalManwon = Math.round((Number.isFinite(totalBillionInput) ? totalBillionInput : 0) * 10000);
   const totalManwon = Math.max(minAnnualManwon * years, rawTotalManwon);
@@ -154,26 +174,32 @@ function estimateRecent3YrPerformanceAndWar(p: Player): {
   if (p.role === '타자') {
     const bs = p.stats as BatterStats;
     if ((bs?.PA ?? 0) >= 80) {
-      const ops = calcOPS(bs) ?? 0.72;
+      const rawOps = calcOPS(bs);
+      const ops = typeof rawOps === 'number' && Number.isFinite(rawOps) ? rawOps : 0.72;
       const paFactor = clamp((bs.PA ?? 0) / 500, 0.25, 1.15);
       const war = clamp(((ops - 0.67) * 14.5 + (posWarAdj[p.position] ?? 0)) * paFactor, -0.8, 8.2);
       const sc = clamp(52 + (ops - 0.62) * 98 + (bs.HR ?? 0) * 0.22, 46, 95);
-      seasonWars.push(war);
-      seasonScores.push(sc);
+      if (Number.isFinite(war) && Number.isFinite(sc)) {
+        seasonWars.push(war);
+        seasonScores.push(sc);
+      }
     }
   } else {
     const ps = p.stats as PitcherStats;
     const ip = (ps?.outs ?? 0) / 3;
     if (ip >= 25) {
-      const era = calcERA(ps.ER, ps.outs) ?? 4.3;
+      const rawEra = calcERA(ps.ER, ps.outs);
+      const era = typeof rawEra === 'number' && Number.isFinite(rawEra) ? rawEra : 4.3;
       const isSp = p.position === 'SP' || p.pitchRole === '선발';
       const workload = isSp ? clamp(ip / 155, 0.3, 1.25) : clamp(ip / 60, 0.35, 1.15);
       const war = isSp
         ? clamp((4.75 - era) * 1.95 * workload + 1.2 * workload, -0.6, 7.8)
         : clamp((4.45 - era) * 1.15 * workload + ((ps.SV ?? 0) * 0.045 + (ps.HLD ?? 0) * 0.03), -0.5, 4.6);
       const sc = clamp(76 + (3.8 - era) * 7.8 + (isSp ? (ip - 110) * 0.05 : ((ps.SV ?? 0) + (ps.HLD ?? 0)) * 0.18), 46, 95);
-      seasonWars.push(war);
-      seasonScores.push(sc);
+      if (Number.isFinite(war) && Number.isFinite(sc)) {
+        seasonWars.push(war);
+        seasonScores.push(sc);
+      }
     }
   }
 
@@ -183,29 +209,36 @@ function estimateRecent3YrPerformanceAndWar(p: Player): {
     if (seasonWars.length >= 3) break;
     if (p.role === '타자') {
       const pa = Number(h.PA ?? h.AB ?? 0);
-      if (pa < 50) continue;
-      const avg = Number(h.AVG ?? (Number(h.AB ?? 0) > 0 ? Number(h.H ?? 0) / Number(h.AB) : 0.24));
-      const ops = Number(h.OPS ?? (avg * 2.55 + 0.08));
-      const hr = Number(h.HR ?? 0);
+      if (!Number.isFinite(pa) || pa < 50) continue;
+      const rawAvg = Number(h.AVG ?? (Number(h.AB ?? 0) > 0 ? Number(h.H ?? 0) / Number(h.AB) : 0.24));
+      const avg = Number.isFinite(rawAvg) ? rawAvg : 0.24;
+      const rawOps = resolveRecordOps(h) ?? Number(h.OPS ?? (avg * 2.55 + 0.08));
+      const ops = Number.isFinite(rawOps) ? rawOps : 0.72;
+      const hr = Number.isFinite(Number(h.HR ?? 0)) ? Number(h.HR ?? 0) : 0;
       const paFactor = clamp(pa / 500, 0.25, 1.15);
       const war = clamp(((ops - 0.67) * 14.2 + (posWarAdj[p.position] ?? 0)) * paFactor, -0.8, 8.2);
       const sc = clamp(52 + (ops - 0.62) * 95 + hr * 0.2, 46, 95);
-      seasonWars.push(war);
-      seasonScores.push(sc);
+      if (Number.isFinite(war) && Number.isFinite(sc)) {
+        seasonWars.push(war);
+        seasonScores.push(sc);
+      }
     } else {
       const ip = parseHistoricalIp(h.IP);
-      if (ip < 18) continue;
-      const era = Number(h.ERA ?? 4.4);
-      const sv = Number(h.SV ?? 0);
-      const hld = Number(h.HLD ?? 0);
+      if (!Number.isFinite(ip) || ip < 18) continue;
+      const rawEra = Number(h.ERA ?? 4.4);
+      const era = Number.isFinite(rawEra) ? rawEra : 4.4;
+      const sv = Number.isFinite(Number(h.SV ?? 0)) ? Number(h.SV ?? 0) : 0;
+      const hld = Number.isFinite(Number(h.HLD ?? 0)) ? Number(h.HLD ?? 0) : 0;
       const isSp = p.position === 'SP' || p.pitchRole === '선발' || ip >= 85;
       const workload = isSp ? clamp(ip / 155, 0.3, 1.25) : clamp(ip / 60, 0.35, 1.15);
       const war = isSp
         ? clamp((4.75 - era) * 1.9 * workload + 1.15 * workload, -0.6, 7.8)
         : clamp((4.45 - era) * 1.12 * workload + sv * 0.045 + hld * 0.03, -0.5, 4.6);
       const sc = clamp(76 + (3.8 - era) * 7.6 + (isSp ? (ip - 110) * 0.05 : (sv + hld) * 0.16), 46, 95);
-      seasonWars.push(war);
-      seasonScores.push(sc);
+      if (Number.isFinite(war) && Number.isFinite(sc)) {
+        seasonWars.push(war);
+        seasonScores.push(sc);
+      }
     }
   }
 
@@ -276,7 +309,9 @@ export interface RealisticFaValuation {
   maxRealisticYears: number;
   fairTotalBillion: number;
   baseTotalBillion: number;
-  tierLabel: '정상급 특급' | '핵심 주전' | '일반 주전' | '베테랑' | '백업·유틸';
+  tierLabel: '초특급 프랜차이즈' | '정상급 특급' | '핵심 주전' | '일반 주전' | '베테랑' | '백업·유틸';
+  isMegaFranchise: boolean;
+  franchiseScore: number;
   estimatedWar: number;
   recent3YrScore: number;
   positionScarcityMult: number;
@@ -332,8 +367,10 @@ export function evaluateFaGradeAndComp(
     (grade === 'A' ? prevSal * 2.0 : grade === 'B' ? prevSal * 1.0 : prevSal * 1.5).toFixed(2)
   );
 
-  // 1) 최근 3년 성적 및 WAR 평가
+  // 1) 최근 3년 성적, WAR, 구단 프랜차이즈 기여도 평가 (특정 선수 하드코딩 없이 범용 공식 적용)
   const perf = estimateRecent3YrPerformanceAndWar(p);
+  const franchiseAssessment = evaluateFranchiseStar(career, p);
+  const franchiseScore = franchiseAssessment.score;
   const warIndex = clamp(50 + perf.estimatedWar * 8.4, 42, 96);
   const compositeScore = p.ability * 0.48 + perf.recent3YrScore * 0.30 + warIndex * 0.22;
 
@@ -364,27 +401,60 @@ export function evaluateFaGradeAndComp(
       ? 1.0
       : 1.06;
 
-  // 3) 선수 티어 분류 (정상급 / 핵심 주전 / 일반 주전 / 베테랑 / 백업·유틸)
+  // 3) 선수 티어 분류 (초특급 프랜차이즈 / 정상급 특급 / 핵심 주전 / 일반 주전 / 베테랑 / 백업·유틸)
+  // - 초특급 프랜차이즈: 리그 최정상급 기량 + 프랜차이즈 상징성/기여도 또는 전성기(28세 이하) 토종 에이스/간판 스타
+  const isPrimeAceStarter =
+    p.role === '투수' &&
+    (p.position === 'SP' || p.pitchRole === '선발') &&
+    p.age <= 28 &&
+    p.ability >= 80 &&
+    p.potential >= 86;
+  const isMegaFranchise =
+    p.age <= 34 &&
+    ((p.ability >= 86 && franchiseScore >= 68 && p.age <= 33) ||
+      (p.ability >= 88 && p.age <= 31) ||
+      (isPrimeAceStarter && franchiseScore >= 72) ||
+      (compositeScore >= 84 && franchiseScore >= 82 && p.age <= 33) ||
+      (p.age <= 27 && p.ability >= 80 && p.potential >= 87 && franchiseScore >= 85));
+
   let tierLabel: RealisticFaValuation['tierLabel'];
-  if (compositeScore >= 83.5 && perf.estimatedWar >= 3.5 && p.age <= 34) {
+  if (isMegaFranchise) {
+    tierLabel = '초특급 프랜차이즈';
+  } else if ((compositeScore >= 83.0 && perf.estimatedWar >= 3.2 && p.age <= 34) || (p.ability >= 85 && p.age <= 33)) {
     tierLabel = '정상급 특급';
-  } else if (compositeScore >= 77.5 && p.age <= 35) {
+  } else if (compositeScore >= 76.5 && p.age <= 35) {
     tierLabel = '핵심 주전';
-  } else if (p.age >= 35 && compositeScore >= 70) {
+  } else if (p.age >= 35 && compositeScore >= 69.5) {
     tierLabel = '베테랑';
-  } else if (compositeScore >= 71.5) {
+  } else if (compositeScore >= 70.5) {
     tierLabel = '일반 주전';
   } else {
     tierLabel = '백업·유틸';
   }
 
-  // 4) 현실적 계약 기간 (고령 초장기 계약 방지)
-  const maxRealisticYears = getMaxRealisticFaYears(p.age, p.ability);
+  // 4) 현실적 계약 기간 (초특급 프랜차이즈 6~10년 장기계약 가능 · 고령 일반 선수는 장기 제한 유지)
+  const maxRealisticYears = getMaxRealisticFaYears(p.age, p.ability, {
+    isMegaFranchise,
+    franchiseScore,
+    potential: p.potential,
+  });
   const rawFairYears =
-    tierLabel === '정상급 특급'
-      ? p.age <= 29
+    tierLabel === '초특급 프랜차이즈'
+      ? p.age <= 25
+        ? 9
+        : p.age <= 27
+        ? 8
+        : p.age <= 29
+        ? 7
+        : p.age <= 33
+        ? 6
+        : 5
+      : tierLabel === '정상급 특급'
+      ? p.age <= 28
+        ? 6
+        : p.age <= 31
         ? 5
-        : p.age <= 32
+        : p.age <= 33
         ? 4
         : 3
       : tierLabel === '핵심 주전'
@@ -404,49 +474,83 @@ export function evaluateFaGradeAndComp(
       : 2;
   const fairYears = clamp(rawFairYears, 1, maxRealisticYears);
 
-  // 5) 연속형 연평균 적정가(AAV, 억원) — 등급이 아닌 실력·WAR·나이·희소성·부상이력 기반
-  let baseAnnual: number;
-  if (compositeScore >= 86) {
-    baseAnnual = 18.5 + (compositeScore - 86) * 1.45; // 특급: 18.5 ~ 25억/년
-  } else if (compositeScore >= 82) {
-    baseAnnual = 12.2 + (compositeScore - 82) * 1.55; // 준특급/올스타: 12.2 ~ 18.4억/년
-  } else if (compositeScore >= 77) {
-    baseAnnual = 6.8 + (compositeScore - 77) * 1.08; // 핵심 주전: 6.8 ~ 12.2억/년
-  } else if (compositeScore >= 72) {
-    baseAnnual = 3.2 + (compositeScore - 72) * 0.72; // 일반 주전: 3.2 ~ 6.8억/년
-  } else if (compositeScore >= 66) {
-    baseAnnual = 1.4 + (compositeScore - 66) * 0.30; // 백업/플래툰: 1.4 ~ 3.2억/년
+  // 5) 연속형 연평균 적정가(AAV, 억원) — 일반 FA 몸값은 유지하고 초특급 프랜차이즈만 KBO 현실 초대형 곡선 반영
+  let adjustedAnnual: number;
+  if (isMegaFranchise) {
+    // 초특급 프랜차이즈 전용 연속 가치 모델 (기량 + 잠재력 + 성적/WAR + 프랜차이즈 기여도 + 에이스/포지션 희소성 + 나이 + 초장기 분산 효과)
+    const skillSignal = p.ability * 0.56 + p.potential * 0.22 + compositeScore * 0.22;
+    const baseMegaAav = 16.5 + Math.max(0, skillSignal - 80) * 0.90;
+    const franchiseContributionMult = 1 + clamp((franchiseScore - 60) / 180, 0.0, 0.22);
+    const megaAgeMult =
+      p.age <= 25
+        ? 1.07
+        : p.age <= 27
+        ? 1.04
+        : p.age <= 29
+        ? 1.01
+        : p.age <= 31
+        ? 0.96
+        : p.age <= 33
+        ? 0.90
+        : 0.82;
+    // 8~10년 초장기 보장 계약은 총액이 커지는 대신 연평균(AAV)이 완만히 분산되는 현실 계약 곡선 반영
+    const termAavSmooth =
+      fairYears >= 9 ? 0.81 : fairYears === 8 ? 0.86 : fairYears === 7 ? 0.93 : 1.0;
+    const aceStarterScarcityBonus = isPrimeAceStarter ? 1.12 : 1.0;
+    const warMegaAdj = clamp((perf.estimatedWar - 2.5) * 0.65, -0.8, 2.8);
+    adjustedAnnual = Math.max(
+      16.5,
+      (baseMegaAav + warMegaAdj) *
+        franchiseContributionMult *
+        megaAgeMult *
+        positionScarcityMult *
+        aceStarterScarcityBonus *
+        termAavSmooth *
+        injuryMod
+    );
   } else {
-    baseAnnual = Math.max(minSal + 0.25, 0.75 + Math.max(0, compositeScore - 58) * 0.08);
+    let baseAnnual: number;
+    if (compositeScore >= 86) {
+      baseAnnual = 18.5 + (compositeScore - 86) * 1.45;
+    } else if (compositeScore >= 82) {
+      baseAnnual = 12.2 + (compositeScore - 82) * 1.55;
+    } else if (compositeScore >= 77) {
+      baseAnnual = 6.8 + (compositeScore - 77) * 1.08;
+    } else if (compositeScore >= 72) {
+      baseAnnual = 3.2 + (compositeScore - 72) * 0.72;
+    } else if (compositeScore >= 66) {
+      baseAnnual = 1.4 + (compositeScore - 66) * 0.30;
+    } else {
+      baseAnnual = Math.max(minSal + 0.25, 0.75 + Math.max(0, compositeScore - 58) * 0.08);
+    }
+    const warBonusAnnual = clamp((perf.estimatedWar - 1.5) * 0.75, -1.5, 4.2);
+    adjustedAnnual = Math.max(
+      minSal + 0.15,
+      (baseAnnual + warBonusAnnual) * ageMult * positionScarcityMult * injuryMod
+    );
   }
 
-  // WAR 직접 보정 (같은 OVR라도 최근 실제 성적/WAR가 높으면 가치 상승, 부진하면 하락)
-  const warBonusAnnual = clamp((perf.estimatedWar - 1.5) * 0.75, -1.5, 4.2);
-  const adjustedAnnual = Math.max(
-    minSal + 0.15,
-    (baseAnnual + warBonusAnnual) * ageMult * positionScarcityMult * injuryMod
-  );
-
-  // 티어별·연령별 현실 상한 적용 (고령 선수 비현실적 초대형 계약 차단)
-  const hardTotalCap =
-    p.age >= 38
+  // 획일적 총액 상한선 제거: 고령 일반 선수·백업만 비현실적 폭등 방지, 초특급/정상급은 선수 가치·시장 경쟁에 따라 200억+ 역대 최고액 자연 허용
+  const elderlyOrBackupCap: number | null =
+    !isMegaFranchise && p.age >= 38
       ? p.ability >= 84
-        ? 24
+        ? 26
         : 10
-      : p.age >= 36
+      : !isMegaFranchise && p.age >= 36
       ? p.ability >= 82
-        ? 30
+        ? 34
         : 16
-      : p.age >= 34
+      : !isMegaFranchise && p.age >= 34
       ? p.ability >= 83
-        ? 54
-        : 28
+        ? 60
+        : 30
       : tierLabel === '백업·유틸'
       ? 12
-      : 145;
+      : null;
 
+  const rawBaseTotal = Math.max(Math.max(0.6, minSal * fairYears), adjustedAnnual * fairYears);
   const baseTotalBillion = Number(
-    clamp(adjustedAnnual * fairYears, Math.max(0.6, minSal * fairYears), hardTotalCap).toFixed(1)
+    (elderlyOrBackupCap !== null ? Math.min(rawBaseTotal, elderlyOrBackupCap) : rawBaseTotal).toFixed(1)
   );
 
   // 6) 실시간 시장 수요(경쟁 구단 수 상승) 및 장기 미계약(라운드 경과 시 점진적 하락) 반영
@@ -460,35 +564,46 @@ export function evaluateFaGradeAndComp(
   const unclaimedRounds = neg && neg.status === '입찰중' ? Math.max(0, neg.roundCount) : 0;
 
   const competitionBoost =
-    competingClubCount >= 4
-      ? 0.14
+    competingClubCount >= 6
+      ? isMegaFranchise
+        ? 0.14
+        : 0.17
+      : competingClubCount >= 4
+      ? isMegaFranchise
+        ? 0.10
+        : 0.14
       : competingClubCount === 3
-      ? 0.09
+      ? isMegaFranchise
+        ? 0.06
+        : 0.09
       : competingClubCount === 2
-      ? 0.04
+      ? isMegaFranchise
+        ? 0.03
+        : 0.04
       : 0;
   const unclaimedDecay =
     unclaimedRounds >= 5
       ? competingClubCount <= 1
-        ? 0.26
-        : 0.18
+        ? 0.24
+        : 0.14
       : unclaimedRounds === 4
       ? competingClubCount <= 1
-        ? 0.20
-        : 0.13
+        ? 0.18
+        : 0.10
       : unclaimedRounds === 3
       ? competingClubCount <= 1
-        ? 0.13
-        : 0.08
+        ? 0.12
+        : 0.06
       : unclaimedRounds === 2
       ? competingClubCount <= 1
-        ? 0.07
-        : 0.04
+        ? 0.06
+        : 0.03
       : 0;
-  const marketDemandMult = Number(clamp(1 + competitionBoost - unclaimedDecay, 0.72, 1.18).toFixed(3));
+  const marketDemandMult = Number(clamp(1 + competitionBoost - unclaimedDecay, 0.74, 1.26).toFixed(3));
 
+  const rawFairTotal = Math.max(Math.max(0.5, minSal * fairYears), baseTotalBillion * marketDemandMult);
   const fairTotalBillion = Number(
-    clamp(baseTotalBillion * marketDemandMult, Math.max(0.5, minSal * fairYears), hardTotalCap * 1.1).toFixed(1)
+    (elderlyOrBackupCap !== null ? Math.min(rawFairTotal, elderlyOrBackupCap * 1.1) : rawFairTotal).toFixed(1)
   );
 
   const breakdown = calculateExactFaContractBreakdown(fairTotalBillion, fairYears, {
@@ -503,7 +618,8 @@ export function evaluateFaGradeAndComp(
       : unclaimedDecay > competitionBoost
       ? `미계약 ${unclaimedRounds}R(${Math.round((marketDemandMult - 1) * 100)}%)`
       : '시장 표준가';
-  const valuationSummary = `${tierLabel} · 3년WAR ${perf.estimatedWar.toFixed(1)} · 포지션×${positionScarcityMult.toFixed(2)} · 부상×${injuryMod.toFixed(2)} · ${marketNote}`;
+  const franTag = isMegaFranchise ? ` · 프랜차이즈지수 ${franchiseScore}` : '';
+  const valuationSummary = `${tierLabel}${franTag} · 3년WAR ${perf.estimatedWar.toFixed(1)} · 포지션×${positionScarcityMult.toFixed(2)} · 부상×${injuryMod.toFixed(2)} · ${marketNote}`;
 
   return {
     grade,
@@ -514,6 +630,8 @@ export function evaluateFaGradeAndComp(
     fairTotalBillion: Number(breakdown.totalBillion.toFixed(1)),
     baseTotalBillion,
     tierLabel,
+    isMegaFranchise,
+    franchiseScore,
     estimatedWar: perf.estimatedWar,
     recent3YrScore: perf.recent3YrScore,
     positionScarcityMult,
@@ -616,10 +734,11 @@ function getClubMarketProfile(
     // 캡 여유가 있는 구단: 남은 캡 여유 + 시장 규모에 비례한 현실적 연간 지출 한도
     maxAnnualBillion = capHeadroomBillion * 0.92 + (marketMult >= 1.08 ? 5.0 : marketMult >= 0.98 ? 2.5 : 0.8);
   }
-  maxAnnualBillion = Number(clamp(maxAnnualBillion, 2.0, 28.0).toFixed(1));
+  maxAnnualBillion = Number(clamp(maxAnnualBillion, 2.0, 42.0).toFixed(1));
 
+  // 초대형 프랜차이즈 장기계약(6~10년, 200억+)도 재정·캡 여유 구단이 자연스럽게 입찰할 수 있도록 획일적 125억 상한 제거
   const budgetCapacityBillion = Number(
-    clamp(maxAnnualBillion * (rank <= 5 ? 4.2 : 3.4), 6.0, 125.0).toFixed(1)
+    clamp(maxAnnualBillion * (rank <= 5 ? 7.2 : 5.8), 6.0, 340.0).toFixed(1)
   );
 
   // 중상위권(3~6위)이 승부수를 던지고, 캡 초과·리빌딩 구단은 보수적
@@ -659,30 +778,55 @@ export function scoreBidForPlayer(
   bid: Omit<FaClubBid, 'score' | 'note'>,
   rankByTeam: Map<TeamId, number>
 ): { score: number; note: string } {
-  const { fairTotalBillion, fairYears } = evaluateFaGradeAndComp(career, p);
+  const { fairTotalBillion, fairYears, isMegaFranchise, franchiseScore } =
+    evaluateFaGradeAndComp(career, p);
   const need = computeClubPositionalNeed(career, bid.teamId, p);
   const clubProfile = getClubMarketProfile(career, bid.teamId, rankByTeam);
 
   const moneyRatio = bid.totalBillion / Math.max(1, fairTotalBillion);
   const aavRatio = bid.annualBillion / Math.max(0.5, fairTotalBillion / Math.max(1, fairYears));
-  const moneyScore = clamp(moneyRatio * 52 + aavRatio * 14, 15, 88);
-  const yearsFit = p.age >= 34
-    ? bid.years >= 2 ? 8 : 3
-    : bid.years >= 4 ? 10 : bid.years === 3 ? 7 : 4;
+  const moneyScore = clamp(moneyRatio * 54 + aavRatio * 15, 12, 114);
+  const yearsFit = isMegaFranchise
+    ? bid.years >= 7
+      ? 13
+      : bid.years >= 6
+      ? 11
+      : bid.years >= 5
+      ? 8
+      : bid.years >= 4
+      ? 3
+      : -5
+    : p.age >= 34
+    ? bid.years >= 2
+      ? 8
+      : 3
+    : bid.years >= 4
+    ? 10
+    : bid.years === 3
+    ? 7
+    : 4;
   const playTimeScore = (need / 100) * 14;
   const contentionBonus =
     (p.age >= 32 ? 0.14 : 0.09) * clubProfile.contentionScore;
-  const originalBonus = bid.isOriginalClub ? 5.5 : 0;
+  // 핵심 프랜차이즈 스타는 원소속 구단 친숙도·상징성 가산이 높아, 타 구단은 더 좋은 조건을 제시해야 영입 가능
+  const originalBonus = bid.isOriginalClub
+    ? isMegaFranchise
+      ? franchiseScore >= 85
+        ? 9.0
+        : 7.5
+      : 5.5
+    : 0;
 
   const totalScore = Number(
     (moneyScore + yearsFit + playTimeScore + contentionBonus + originalBonus).toFixed(2)
   );
 
   const reasons: string[] = [];
-  if (moneyRatio >= 1.04) reasons.push('최고 대우');
+  if (moneyRatio >= 1.05) reasons.push(isMegaFranchise ? '역대급 최고 대우' : '최고 대우');
+  if (isMegaFranchise && bid.years >= 6) reasons.push('초장기 보장');
   if (need >= 75) reasons.push('확실한 주전 기회');
   if (clubProfile.contentionScore >= 75) reasons.push('우승 전력');
-  if (bid.isOriginalClub) reasons.push('원소속 친숙도');
+  if (bid.isOriginalClub) reasons.push(isMegaFranchise ? '원소속 프랜차이즈 예우' : '원소속 친숙도');
 
   return {
     score: totalScore,
@@ -1017,40 +1161,72 @@ function buildClubAutoBidOffer(
   valueDiscount = 1.0
 ): FaClubBid | null {
   const isUserClub = tid === career.playerTeamId;
-  const needMult = 0.88 + (need / 100) * 0.22; // 0.91 ~ 1.10
-  const origMult = isOriginalClub ? 0.97 : 1.03;
-  const maxYears = getMaxRealisticFaYears(p.age, p.ability);
+  const isMega = comp.isMegaFranchise;
+  const needMult = isMega
+    ? 0.96 + (need / 100) * 0.14 // 초특급 프랜차이즈는 포지션 여유와 무관하게 리그 구단들이 적극 평가
+    : 0.88 + (need / 100) * 0.22; // 0.91 ~ 1.10
+  // 초특급 프랜차이즈: 원소속 구단은 적극적 잔류 투자(1.03), 타 구단은 이적 유인을 위한 프리미엄(1.09) 제시
+  const origMult = isMega
+    ? isOriginalClub
+      ? 1.03
+      : 1.09
+    : isOriginalClub
+    ? 0.97
+    : 1.03;
+  const maxYears = getMaxRealisticFaYears(p.age, p.ability, {
+    isMegaFranchise: comp.isMegaFranchise,
+    franchiseScore: comp.franchiseScore,
+    potential: p.potential,
+  });
   const offerYears = clamp(
-    valueDiscount < 0.92
+    isMega
+      ? comp.fairYears + (!isOriginalClub && need >= 62 && p.age <= 31 ? 1 : isOriginalClub && p.age <= 29 && rng.next() < 0.45 ? 1 : 0)
+      : valueDiscount < 0.92
       ? Math.min(2, comp.fairYears)
       : comp.fairYears + (need >= 80 && p.age <= 31 ? 1 : 0) - (p.age >= 35 ? 1 : 0),
     1,
     maxYears
   );
-  const capCeilingTotal = Number(
-    Math.min(
-      clubProfile.budgetCapacityBillion,
-      clubProfile.maxAnnualBillion * offerYears * (isOriginalClub ? 1.18 : 1.02)
-    ).toFixed(1)
-  );
+
+  // 초특급 프랜차이즈 잔류/영입 시 구단의 프랜차이즈 특별 투자 한도 반영 (일반 FA는 기존 캡·예산 엄격 유지)
+  const capCeilingTotal = isMega
+    ? Number(
+        Math.max(
+          isOriginalClub ? comp.fairTotalBillion * 1.16 : comp.fairTotalBillion * 1.06,
+          Math.min(
+            clubProfile.budgetCapacityBillion * (isOriginalClub ? 1.45 : 1.28),
+            clubProfile.maxAnnualBillion * offerYears * (isOriginalClub ? 1.48 : 1.24)
+          )
+        ).toFixed(1)
+      )
+    : Number(
+        Math.min(
+          clubProfile.budgetCapacityBillion,
+          clubProfile.maxAnnualBillion * offerYears * (isOriginalClub ? 1.18 : 1.02)
+        ).toFixed(1)
+      );
+
   const maxWilling = Number(
     Math.min(
       capCeilingTotal,
       comp.fairTotalBillion *
-        valueDiscount *
+        (isMega ? Math.max(0.96, valueDiscount) : valueDiscount) *
         needMult *
         origMult *
-        clubProfile.aggressiveness *
-        (0.94 + rng.next() * 0.14)
+        (isMega ? Math.max(0.95, clubProfile.aggressiveness) : clubProfile.aggressiveness) *
+        (isMega ? 0.98 + rng.next() * 0.14 : 0.94 + rng.next() * 0.14)
     ).toFixed(1)
   );
   const minFloor = Number((Math.max(0.33, career.season >= 2027 ? 0.33 : 0.3) * offerYears).toFixed(1));
-  let offerTotal = Number(
-    Math.max(
-      minFloor,
-      Math.min(maxWilling, comp.fairTotalBillion * valueDiscount * (0.9 + rng.next() * 0.14))
-    ).toFixed(1)
-  );
+  const targetStart = isMega
+    ? comp.fairTotalBillion * (isOriginalClub ? 0.97 + rng.next() * 0.11 : 1.01 + rng.next() * 0.14)
+    : comp.fairTotalBillion * valueDiscount * (0.9 + rng.next() * 0.14);
+  let offerTotal = Number(Math.max(minFloor, Math.min(maxWilling, targetStart)).toFixed(1));
+
+  // 정상급·초특급 선수에게 구단이 비현실적 저가 오퍼를 던지지 않도록 최소 입찰선 강제
+  if (isMega && offerTotal < comp.fairTotalBillion * (isOriginalClub ? 0.9 : 0.95)) {
+    return null;
+  }
 
   // 사용자 구단 자동 입찰은 실제 보유 현금(계약금+C등급 보상금) 한도를 엄격히 준수
   if (isUserClub && career.finances.cashBalanceBillion !== null) {
@@ -1065,7 +1241,7 @@ function buildClubAutoBidOffer(
       const scaled = Number(
         Math.max(minFloor, (career.finances.cashBalanceBillion * 0.8 - cComp) * 2.1).toFixed(1)
       );
-      if (scaled < comp.fairTotalBillion * 0.72) return null;
+      if (scaled < comp.fairTotalBillion * (isMega ? 0.9 : 0.72)) return null;
       offerTotal = Math.min(offerTotal, scaled);
     }
   }
@@ -1100,6 +1276,7 @@ function evaluateAiClubBidsForPlayerInPlace(
   rng: SeededRng
 ): void {
   const comp = evaluateFaGradeAndComp(career, p);
+  const isMega = comp.isMegaFranchise;
   const existingTopTotal = neg.bids.reduce((m, b) => Math.max(m, b.totalBillion), 0);
   const userAutoEnabled = state.autoBidForUserClub !== false;
 
@@ -1119,9 +1296,12 @@ function evaluateAiClubBidsForPlayerInPlace(
 
     // 구단별 관심도 계산: 능력치 + 포지션 필요도 + 원소속 우선권 + 재정·샐러리캡 여력
     const fairAav = comp.fairTotalBillion / Math.max(1, comp.fairYears);
-    const budgetOk =
-      clubProfile.budgetCapacityBillion >= comp.fairTotalBillion * 0.72 &&
-      clubProfile.maxAnnualBillion >= fairAav * (isOriginalClub ? 0.68 : 0.8);
+    const budgetOk = isMega
+      ? isOriginalClub ||
+        (clubProfile.consecutiveExceedYears < 2 &&
+          (clubProfile.capHeadroomBillion >= 8 || clubProfile.maxAnnualBillion >= fairAav * 0.7))
+      : clubProfile.budgetCapacityBillion >= comp.fairTotalBillion * 0.72 &&
+        clubProfile.maxAnnualBillion >= fairAav * (isOriginalClub ? 0.68 : 0.8);
     if (!budgetOk && !isOriginalClub) continue;
     // 2년 연속 샐러리캡 초과 구단은 외부 초대형 FA(연평균 8억+) 입찰 자제
     if (!isOriginalClub && clubProfile.consecutiveExceedYears >= 2 && fairAav >= 8.0) continue;
@@ -1132,28 +1312,37 @@ function evaluateAiClubBidsForPlayerInPlace(
     ).length;
     const maxActiveBids = isUserClub ? 5 : 12;
     const prevBidIdx = neg.bids.findIndex((b) => b.teamId === tid);
-    if (prevBidIdx < 0 && !isOriginalClub && activeBidsByClub >= maxActiveBids) continue;
+    if (prevBidIdx < 0 && !isOriginalClub && !isMega && activeBidsByClub >= maxActiveBids) continue;
 
     // 외부 A/B등급 FA는 보상선수 + 보상금 부담 반영
     const compBurdenPenalty =
       !isOriginalClub && comp.grade === 'A'
-        ? 7.0
+        ? isMega
+          ? 4.0
+          : 7.0
         : !isOriginalClub && comp.grade === 'B'
         ? 3.2
         : 0;
-    const crowdPenalty = Math.max(0, activeBidsByClub - 4) * 1.8;
+    const crowdPenalty = Math.max(0, activeBidsByClub - 4) * (isMega ? 0.9 : 1.8);
     const interestScore =
       p.ability * 0.46 +
       need * 0.42 +
-      (isOriginalClub ? 18 : 0) +
+      (isOriginalClub ? (isMega ? 34 : 18) : isMega ? 10 : 0) +
       (clubProfile.aggressiveness - 1) * 28 -
       compBurdenPenalty -
       crowdPenalty +
       (rng.next() * 14 - 7);
 
     // 전 등급 FA가 현실적으로 다수 구단의 입찰을 받도록 티어별 기준선 정교화
-    const baseThreshold =
-      p.ability >= 80 ? 60 : p.ability >= 74 ? 63 : p.ability >= 66 ? 66 : 68;
+    const baseThreshold = isMega
+      ? 56
+      : p.ability >= 80
+      ? 60
+      : p.ability >= 74
+      ? 63
+      : p.ability >= 66
+      ? 66
+      : 68;
     const threshold = isUserClub ? baseThreshold + 3 : baseThreshold;
 
     if (prevBidIdx < 0 && interestScore < threshold) continue;
@@ -1163,25 +1352,45 @@ function evaluateAiClubBidsForPlayerInPlace(
       const prevBid = neg.bids[prevBidIdx];
       if (isUserClub && !prevBid.isAutoBid) continue;
 
-      const needMult = 0.88 + (need / 100) * 0.22;
-      const origMult = isOriginalClub ? 0.97 : 1.03;
-      const capCeilingTotal = Number(
-        Math.min(
-          clubProfile.budgetCapacityBillion,
-          clubProfile.maxAnnualBillion * prevBid.years * (isOriginalClub ? 1.18 : 1.02)
-        ).toFixed(1)
-      );
+      const needMult = isMega ? 0.98 + (need / 100) * 0.14 : 0.88 + (need / 100) * 0.22;
+      const origMult = isMega
+        ? isOriginalClub
+          ? 1.06
+          : 1.12
+        : isOriginalClub
+        ? 0.97
+        : 1.03;
+      const capCeilingTotal = isMega
+        ? Number(
+            Math.max(
+              isOriginalClub ? comp.fairTotalBillion * 1.2 : comp.fairTotalBillion * 1.24,
+              Math.min(
+                clubProfile.budgetCapacityBillion * (isOriginalClub ? 1.5 : 1.35),
+                clubProfile.maxAnnualBillion * prevBid.years * (isOriginalClub ? 1.52 : 1.3)
+              )
+            ).toFixed(1)
+          )
+        : Number(
+            Math.min(
+              clubProfile.budgetCapacityBillion,
+              clubProfile.maxAnnualBillion * prevBid.years * (isOriginalClub ? 1.18 : 1.02)
+            ).toFixed(1)
+          );
       const maxWilling = Number(
         Math.min(
           capCeilingTotal,
-          comp.fairTotalBillion * needMult * origMult * clubProfile.aggressiveness * (0.96 + rng.next() * 0.14)
+          comp.fairTotalBillion *
+            needMult *
+            origMult *
+            (isMega ? Math.max(0.96, clubProfile.aggressiveness) : clubProfile.aggressiveness) *
+            (isMega ? 1.0 + rng.next() * 0.16 : 0.96 + rng.next() * 0.14)
         ).toFixed(1)
       );
 
-      // 경쟁 입찰이 더 높고 구단 캡·재정 상한 여유가 있으면 2~7% 상향 재입찰
+      // 경쟁 입찰이 더 높고 구단 캡·재정 상한 여유가 있으면 상향 재입찰 (초특급 프랜차이즈는 원소속·경쟁 구단 모두 적극 대응)
       if (existingTopTotal > prevBid.totalBillion && maxWilling > prevBid.totalBillion * 1.02) {
         let raisedTotal = Number(
-          Math.min(maxWilling, existingTopTotal * (1.02 + rng.next() * 0.05)).toFixed(1)
+          Math.min(maxWilling, existingTopTotal * (isMega ? 1.03 + rng.next() * 0.06 : 1.02 + rng.next() * 0.05)).toFixed(1)
         );
         if (isUserClub && career.finances.cashBalanceBillion !== null) {
           const preview = calculateExactFaContractBreakdown(raisedTotal, prevBid.years, {
@@ -1621,10 +1830,14 @@ export function submitUserClubFaBid(
   const rankByTeam = new Map<TeamId, number>();
   standings.forEach((row, idx) => rankByTeam.set(row.teamId, idx + 1));
 
-  const maxRealisticYears = getMaxRealisticFaYears(p.age, p.ability);
+  const maxRealisticYears = getMaxRealisticFaYears(p.age, p.ability, {
+    isMegaFranchise: comp.isMegaFranchise,
+    franchiseScore: comp.franchiseScore,
+    potential: p.potential,
+  });
   if (Math.round(offerYears) > maxRealisticYears) {
     throw new Error(
-      `고령 선수 장기계약 현실성 제한: 만 ${p.age}세 ${p.name} 선수의 최대 현실적 계약 기간은 ${maxRealisticYears}년입니다.`
+      `계약 기간 현실성 제한: 만 ${p.age}세 ${p.name} 선수의 최대 현실적 계약 기간은 ${maxRealisticYears}년입니다.`
     );
   }
   const years = clamp(Math.round(offerYears), 1, maxRealisticYears);
@@ -1662,7 +1875,20 @@ export function submitUserClubFaBid(
   neg.roundCount += 1;
 
   const topBid = neg.bids[0];
-  const meetsThreshold = totalBillion >= comp.fairTotalBillion * (isOriginalClub ? 0.88 : 0.94);
+  const minAcceptRatio = comp.isMegaFranchise
+    ? isOriginalClub
+      ? 0.92
+      : 0.98
+    : comp.tierLabel === '정상급 특급'
+    ? isOriginalClub
+      ? 0.9
+      : 0.96
+    : isOriginalClub
+    ? 0.88
+    : 0.94;
+  const minAcceptYears = comp.isMegaFranchise ? Math.min(5, Math.max(4, comp.fairYears - 2)) : 1;
+  const meetsThreshold =
+    totalBillion >= comp.fairTotalBillion * minAcceptRatio && years >= minAcceptYears;
   const mlbBeatsUser = Boolean(
     neg.mlbOffer &&
       neg.mlbStatus === 'MLB제안접수' &&
@@ -1775,13 +2001,24 @@ export function advanceFaCompetitionRound(career: CareerSave): {
     if (!topBid) continue;
     const comp = evaluateFaGradeAndComp(next, p);
 
-    // 라운드가 진행될수록 선수가 최종 행선지 결정
-    const decideThreshold =
-      neg.roundCount >= 3
-        ? comp.fairTotalBillion * 0.82
-        : neg.roundCount >= 2
+    // 라운드가 진행될수록 선수가 최종 행선지 결정 (초특급/정상급 선수는 후기 라운드에도 비현실적 저가 수락 방지)
+    const decideThreshold = comp.isMegaFranchise
+      ? neg.roundCount >= 3
         ? comp.fairTotalBillion * 0.92
-        : comp.fairTotalBillion * 1.02;
+        : neg.roundCount >= 2
+        ? comp.fairTotalBillion * 0.97
+        : comp.fairTotalBillion * 1.04
+      : comp.tierLabel === '정상급 특급'
+      ? neg.roundCount >= 3
+        ? comp.fairTotalBillion * 0.88
+        : neg.roundCount >= 2
+        ? comp.fairTotalBillion * 0.94
+        : comp.fairTotalBillion * 1.03
+      : neg.roundCount >= 3
+      ? comp.fairTotalBillion * 0.82
+      : neg.roundCount >= 2
+      ? comp.fairTotalBillion * 0.92
+      : comp.fairTotalBillion * 1.02;
 
     if (topBid.totalBillion < decideThreshold) continue;
 

@@ -5006,6 +5006,8 @@ export interface ExternalFaListing {
   cashCompBillion: number;
   protectionLimit: 20 | 25 | null;
   tierLabel: RealisticFaValuation['tierLabel'];
+  isMegaFranchise: boolean;
+  franchiseScore: number;
   estimatedWar: number;
   marketDemandMult: number;
   competingClubCount: number;
@@ -5030,6 +5032,8 @@ function buildFaListing(career: CareerSave, p: Player): ExternalFaListing | null
     cashCompBillion: val.cashCompBillion,
     protectionLimit,
     tierLabel: val.tierLabel,
+    isMegaFranchise: val.isMegaFranchise,
+    franchiseScore: val.franchiseScore,
     estimatedWar: val.estimatedWar,
     marketDemandMult: val.marketDemandMult,
     competingClubCount: val.competingClubCount,
@@ -5243,10 +5247,14 @@ export function signExternalFaPlayer(
       throw new Error('현재 FA 자격을 충족하지 않은 선수입니다.');
     }
 
-    const maxRealisticYears = getMaxRealisticFaYears(p.age, p.ability);
+    const maxRealisticYears = getMaxRealisticFaYears(p.age, p.ability, {
+      isMegaFranchise: listing.isMegaFranchise,
+      franchiseScore: listing.franchiseScore,
+      potential: p.potential,
+    });
     if (Math.round(offerYears) > maxRealisticYears) {
       throw new Error(
-        `고령 선수 장기계약 제한: 만 ${p.age}세 ${p.name} 선수의 최대 현실적 FA 계약 기간은 ${maxRealisticYears}년입니다.`
+        `계약 기간 현실성 제한: 만 ${p.age}세 ${p.name} 선수의 최대 현실적 FA 계약 기간은 ${maxRealisticYears}년입니다.`
       );
     }
 
@@ -5264,12 +5272,15 @@ export function signExternalFaPlayer(
 
     // Evaluate agent preference + difficulty rival bidding (#6, #23)
     // 단, 샐러리캡 상한 초과만을 이유로 계약을 자동 취소하지 않습니다.
+    const ownClubFairBase = listing.isMegaFranchise
+      ? Number((listing.fairTotalBillion * 0.96).toFixed(1))
+      : Number((listing.fairTotalBillion * 0.94).toFixed(1));
     const evalRes = evaluatePlayerContractAcceptance(
       next,
       p,
       offerTotalBillion,
       offerYears,
-      isOwnFormerFa ? Number((listing.fairTotalBillion * 0.94).toFixed(1)) : listing.fairTotalBillion
+      isOwnFormerFa ? ownClubFairBase : listing.fairTotalBillion
     );
     if (!evalRes.accepted) {
       return {

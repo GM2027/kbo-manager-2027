@@ -1527,6 +1527,29 @@ export function evaluatePlayerContractAcceptance(
     fairTotalBillion * agent.greedFactor * diff.agentSelectivity * awardDemand.multiplier;
   const moneyRatio = offerTotalBillion / Math.max(1, requiredTotal);
 
+  // 정상급/초특급 프랜차이즈 선수의 비현실적 저가 후려치기 제안 원천 거절 (우승권·충성도 보너스로 저가 수락 불가)
+  const isTopStar = player.ability >= 84 || fairTotalBillion >= 110;
+  const isCoreStarter = player.ability >= 78 || fairTotalBillion >= 40;
+  const hardMoneyFloorRatio = isTopStar ? 0.86 : isCoreStarter ? 0.78 : 0.65;
+  if (offerTotalBillion < fairTotalBillion * hardMoneyFloorRatio) {
+    return {
+      accepted: false,
+      reason: `[${agent.agency} ${agent.name} · ${agent.persona}] ${
+        isTopStar
+          ? `리그 최정상급 프랜차이즈 가치(예상 약 ${fairTotalBillion.toFixed(1)}억 원)에 크게 못 미치는 저평가 제안은 수락할 수 없습니다.`
+          : `시장 적정 가치(예상 약 ${fairTotalBillion.toFixed(1)}억 원) 대비 지나치게 낮은 조건이어서 제안을 정중히 거절했습니다.`
+      }`,
+    };
+  }
+  // 초특급 FA에게 연평균이 압도적이지 않은 초단기(1~3년) 제안도 거절
+  const fairAavEst = fairTotalBillion / Math.max(1, offerYears);
+  if (fairTotalBillion >= 140 && offerYears <= 3 && offerTotalBillion < fairTotalBillion * 0.96 && fairAavEst < 42) {
+    return {
+      accepted: false,
+      reason: `[${agent.agency} ${agent.name} · ${agent.persona}] 초특급 프랜차이즈 선수에게 ${offerYears}년 단기 계약은 장기 보장 기준에 미달해 거절했습니다. (최소 5~6년 이상 장기 계약 권장)`,
+    };
+  }
+
   let preferenceScore = moneyRatio * 75;
   // 직전 시즌 한국시리즈 우승 구단(디펜딩 챔피언) FA 선호도 소폭 보너스 (#18)
   const defendingChamp = getDefendingChampionTeamId(career);
