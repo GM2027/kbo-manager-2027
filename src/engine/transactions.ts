@@ -116,6 +116,7 @@ import {
   ensureDeepFranchiseState,
   evaluatePlayerContractAcceptance,
   reassignNonConflictingUniformNumber,
+  runAiClubsOverseasReturneeMarketInPlace,
   validateTradeCompliance,
 } from './deepFranchise';
 import {
@@ -4037,8 +4038,14 @@ export function advanceToNextSeason(career: CareerSave): {
   // 시즌 종료 경쟁균형세 최종 정산 (이미 시상식/오프시즌 진입 시 정산되었다면 1회 차감 보장 로직으로 자동 건너뜀)
   const finishedSeasonNum = next.season;
   settleSeasonCompetitiveBalance(next, finishedSeasonNum, `${finishedSeasonNum}-11-16`);
-  // 미계약 잔여 FA들에 대한 AI 구단 오프시즌 최종 정리 (사용자 구단 자동 체결 없음)
+  // 미계약 잔여 FA 및 해외 복귀 선수들에 대한 AI 구단 오프시즌 최종 정리 (사용자 구단 자동 체결 없음)
   resolveRemainingAiFaCompetitionInPlace(next, `${finishedSeasonNum}-12-10`);
+  runAiClubsOverseasReturneeMarketInPlace(next, {
+    dateStr: `${finishedSeasonNum}-12-10`,
+    maxSignings: 3,
+    roundSeed: finishedSeasonNum,
+    forceSign: true,
+  });
 
   // 시즌 종료 프랜차이즈 지수(0~100) 및 5단계 보호 등급 재평가
   reevaluateLeagueFranchiseProtectionInPlace(next);

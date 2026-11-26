@@ -2,6 +2,7 @@ import { CareerSave } from '../types/kbo';
 import { addDaysIso } from './schedule';
 import { getCurrentCareerDate } from './salaryCapEngine';
 import { advanceFaCompetitionRound, syncFaCompetitionMarketInPlace } from './faCompetitionEngine';
+import { runAiClubsOverseasReturneeMarketInPlace } from './deepFranchise';
 
 export interface AnnualCalendarEvent {
   id: string;
@@ -367,6 +368,20 @@ export function advanceGameDateByDays(
       }
     }
     next.lastAutoFaDate = endIso;
+  } else if (isFaWindow && next.lastAutoFaDate !== endIso) {
+    const hasUnsignedOverseas = (next.overseasReturnPool ?? []).some((c) => !c.signed);
+    const dayOfMonth = Number(endIso.slice(8, 10)) || 1;
+    if (hasUnsignedOverseas && (safeDays >= 7 || dayOfMonth % 7 === 0)) {
+      const ovRes = runAiClubsOverseasReturneeMarketInPlace(next, {
+        dateStr: endIso,
+        maxSignings: 1,
+        roundSeed: monthNum * 31 + dayOfMonth,
+      });
+      if (ovRes.signedSummaries.length > 0) {
+        eventsTriggered.push(`타 구단 해외 복귀 영입: ${ovRes.signedSummaries.join(', ')}`);
+      }
+      next.lastAutoFaDate = endIso;
+    }
   }
 
   return { nextCareer: next, eventsTriggered };

@@ -22,6 +22,7 @@ import { appendPlayerTeamHistoryInPlace } from './leagueLifeEngine';
 import { resolveRecordOps } from './ratingEvaluationEngine';
 import { SeededRng } from './rng';
 import { getAnnualKboCapBillion, getCurrentCareerDate } from './salaryCapEngine';
+import { runAiClubsOverseasReturneeMarketInPlace } from './deepFranchise';
 import { calcAVG, calcERA, calcOPS, computeStandings } from './stats';
 
 /**
@@ -2053,6 +2054,16 @@ export function advanceFaCompetitionRound(career: CareerSave): {
         `${KBO_TEAMS[topBid.teamId].shortName} ← ${p.name} (${topBid.years}년 ${topBid.totalBillion.toFixed(1)}억)`
       );
     }
+  }
+
+  // 타 구단(AI 9개 구단)의 해외 복귀 선수 시장 영입 경쟁도 FA 라운드와 함께 진행
+  const ovRes = runAiClubsOverseasReturneeMarketInPlace(next, {
+    dateStr,
+    maxSignings: 1,
+    roundSeed: state.round,
+  });
+  if (ovRes.signedSummaries.length > 0) {
+    signedSummaries.push(...ovRes.signedSummaries);
   }
 
   next.updatedAt = new Date().toISOString();

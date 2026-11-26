@@ -43,6 +43,9 @@ import {
   selectAnnualTopAmateurProspectsInPlace,
 } from './leagueLifeEngine';
 import { findRealPlayerClubProfile } from '../data/realKboHistories';
+import { recordLeagueAcquisitionInPlace } from './leagueAcquisitionsEngine';
+import { ensurePlayerOotpRatingsInPlace } from './ootpRatingsEngine';
+import { syncSeasonRookieEligibilityInPlace } from './kboAwardsEngine';
 import {
   archiveOverseasSeasonByLevelInPlace,
   determineInitialOverseasLeague,
@@ -495,7 +498,8 @@ export function evaluateOverseasReturnEligibility(
 export function assertNotBlockedByArticle107(
   career: CareerSave,
   playerName: string,
-  permanentId?: string
+  permanentId?: string,
+  options?: { allowReturnPoolWaiver?: boolean }
 ): void {
   const state = career.amateurAndOverseas;
   if (!state) return;
@@ -507,11 +511,20 @@ export function assertNotBlockedByArticle107(
   );
   if (!match) return;
   const audit = evaluateOverseasReturnEligibility(match, isoDate);
-  if (audit.blockedByArticle107) {
-    throw new Error(
-      `[KBO 규약 제107조 위반] ${match.name} 선수는 해외 계약 종료 후 2년 유예 기간(${audit.domesticEligibleDate ?? '계약중'}) 중이므로 정식선수 또는 육성선수 계약을 통한 우회 영입이 불가합니다.`
-    );
+  if (!audit.blockedByArticle107) return;
+
+  // 해외 복귀 시장(overseasReturnPool)에 공식 등재된 선수는 실제 2년 유예 징계(계약 종료 후 2년 제한) 상태일 때만 차단
+  if (
+    options?.allowReturnPoolWaiver &&
+    !match.returnRestrictionActive &&
+    !match.overseasContractEndDate
+  ) {
+    return;
   }
+
+  throw new Error(
+    `[KBO 규약 제107조 위반] ${match.name} 선수는 해외 계약 종료 후 2년 유예 기간(${audit.domesticEligibleDate ?? '계약중'}) 중이므로 정식선수 또는 육성선수 계약을 통한 우회 영입이 불가합니다.`
+  );
 }
 
 /**
@@ -845,6 +858,10 @@ export function completeOverseasReturnToKboInPlace(
     }
   }
 
+  // 세부능력치 및 신인왕 자격(해외 프로 경력 제외) 즉시 동기화
+  ensurePlayerOotpRatingsInPlace(player);
+  syncSeasonRookieEligibilityInPlace(career);
+
   // 해외파 상태 자동 종료 및 KBO 선수 연결
   ov.status = 'KBO복귀완료';
   ov.league = 'FA/방출';
@@ -859,16 +876,42 @@ export function completeOverseasReturnToKboInPlace(
   });
 
   if (career.overseasReturnPool) {
-    career.overseasReturnPool = career.overseasReturnPool.filter(
-      (c) => c.playerName !== ov.name
+    const matchedCand = career.overseasReturnPool.find(
+      (c) => (c.permanentId && c.permanentId === ov.permanentId) || c.playerName === ov.name
     );
+    if (matchedCand) {
+      matchedCand.signed = true;
+      matchedCand.signedTeamId = teamId;
+      matchedCand.signedSeason = career.season;
+      matchedCand.signedDate = refIso;
+      matchedCand.signedTotalBillion = totalBillion;
+      matchedCand.signedYears = years;
+    }
   }
+
+  recordLeagueAcquisitionInPlace(
+    career,
+    {
+      dedupeKey: `overseas-return-${career.season}-${ov.permanentId}-${teamId}`,
+      season: career.season,
+      date: refIso,
+      category: 'FA',
+      playerId: player.id,
+      playerName: ov.name,
+      position: ov.position,
+      previousTeamLabel: `${ov.league} ${ov.clubName}`,
+      acquiringTeamId: teamId,
+      contractAmountLabel: `${years}년 ${totalBillion}억 원`,
+      note: opts.notePrefix ?? '해외파 KBO 복귀',
+    },
+    { pushNewsAlert: false }
+  );
 
   pushNewsSafe(career, {
     date: refIso,
     category: '이적·계약',
     headline: `[국내 복귀 확정] ${KBO_TEAMS[teamId].shortName}, 해외파 ${ov.name}과 ${years}년 ${totalBillion}억 원 복귀 계약`,
-    body: `${ov.clubName}에서 활약한 ${ov.name}(${ov.position}) 선수가 KBO 원소속 구단 ${KBO_TEAMS[teamId].name} 복귀 및 1군 합류를 확정했습니다.`,
+    body: `${ov.clubName}에서 활약한 ${ov.name}(${ov.position}) 선수가 KBO 구단 ${KBO_TEAMS[teamId].name} 복귀 및 1군 합류를 확정했습니다.`,
     teamId,
     isHighlight: true,
   });
@@ -901,11 +944,31 @@ export function signEligibleKboAlumniReturnee(
 
   const teamId = next.playerTeamId;
   const annualBillion = Number(Math.max(3.5, (ov.ability - 66) * 0.72).toFixed(1));
-  const years = ov.age >= 34 ? 2 : 4;
+  const years = ov.age >= 35 ? (ov.ability >= 80 ? 2 : 1) : ov.age >= 34 ? 2 : 4;
+  const signingBonusBillion = Number((annualBillion * 0.5).toFixed(1));
+  if (
+    next.finances.cashBalanceBillion !== null &&
+    next.finances.cashBalanceBillion < signingBonusBillion
+  ) {
+    throw new Error(`해외 복귀 계약금(${signingBonusBillion}억 원)이 부족합니다.`);
+  }
+  if (next.finances.cashBalanceBillion !== null) {
+    next.finances.cashBalanceBillion = Number(
+      (next.finances.cashBalanceBillion - signingBonusBillion).toFixed(2)
+    );
+    next.finances.seasonExpenseBillion = Number(
+      (next.finances.seasonExpenseBillion + signingBonusBillion).toFixed(2)
+    );
+  } else {
+    next.finances.krwUnpaidBillion = Number(
+      (next.finances.krwUnpaidBillion + signingBonusBillion).toFixed(2)
+    );
+  }
+
   const { totalBillion } = completeOverseasReturnToKboInPlace(next, ov, teamId, {
     years,
     annualBillion,
-    signingBonusBillion: Number((annualBillion * 0.5).toFixed(1)),
+    signingBonusBillion,
     isoDate,
     notePrefix: '해외파 원소속 복귀',
   });

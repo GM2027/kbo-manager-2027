@@ -70,9 +70,11 @@ import { buildTeamFaProtectionPool } from '../engine/faCompensationEngine';
 import { formatCompactPlayerPosition } from '../engine/positionEngine';
 import { getMlbClubMeta, MlbTeamLogo } from './MlbTeamLogo';
 import {
+  advanceOverseasReturneeMarketRound,
   computePlayerTradeValue,
   computeSalaryCapSummary,
   confirmFaProtectionList,
+  getOverseasReturneeContractTerms,
   getTradeWindowStatus,
   signOverseasReturnee,
 } from '../engine/deepFranchise';
@@ -192,6 +194,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
     onUpdateCareer(res.nextCareer);
   }, [subTab, career, myDepartedFa, externalFaMarket, onUpdateCareer]);
   const overseasReturnees = (career.overseasReturnPool ?? []).filter((r) => !r.signed);
+  const signedOverseasReturnees = (career.overseasReturnPool ?? []).filter((r) => Boolean(r.signed));
   const pendingIncomingTrades = getPendingIncomingTradeOffers(career);
   const tradeWindow = getTradeWindowStatus(career);
   const isTradeClosed = !tradeWindow.isOpen;
@@ -1528,22 +1531,41 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
               <div>
                 <div className="text-sm font-extrabold">해외 리그 복귀 · 해외 직행 선수 시장</div>
                 <p className="text-[11px] text-slate-500 mt-0.5">
-                  MLB 포스팅 진출 선수(김하성·이정후·송성문 등)는 원소속 구단 우선협상권이 적용되며, 고교 졸업 후 해외 직행 선수(박효준·배지환 등)는 원소속팀이 없어 전 구단 동등 조건으로 영입할 수 있습니다.
+                  MLB 포스팅 진출 선수(김하성·이정후·송성문 등)는 원소속 구단 우선협상권이 적용되며, 고교 졸업 후 해외 직행 선수(박효준·배지환 등)는 전 구단 동등 조건으로 영입할 수 있습니다. (타 구단 AI도 FA 라운드·시즌 진행 중 영입 경쟁에 참여)
                 </p>
               </div>
-              <span className="text-[11px] font-mono-stats text-slate-500">
-                등록 {overseasReturnees.length}명
-              </span>
+              <div className="flex items-center gap-2">
+                {overseasReturnees.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const res = advanceOverseasReturneeMarketRound(career);
+                      onUpdateCareer(res.nextCareer, res.backupSnapshot);
+                      setNotice({
+                        type: 'ok',
+                        text:
+                          res.signedSummaries.length > 0
+                            ? `타 구단 해외 복귀 영입 체결: ${res.signedSummaries.join(' · ')}`
+                            : '타 구단 해외 복귀 영입 검토를 마쳤습니다. (추가 계약 없음)',
+                      });
+                    }}
+                    className="px-2.5 py-1 rounded border border-indigo-300 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-[11px] font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 cursor-pointer"
+                  >
+                    타 구단 영입 경쟁 1라운드 진행
+                  </button>
+                )}
+                <span className="text-[11px] font-mono-stats text-slate-500">
+                  등록 {overseasReturnees.length}명
+                </span>
+              </div>
             </div>
             {overseasReturnees.length === 0 ? (
               <p className="text-slate-500">현재 복귀 협상 가능한 해외파 선수가 없습니다.</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-h-[420px] overflow-y-auto overscroll-contain pr-1">
                 {overseasReturnees.map((cand) => {
-                  const hasOrig = cand.originalKboTeamId !== null;
-                  const isOrig = hasOrig && cand.originalKboTeamId === career.playerTeamId;
-                  const mult = !hasOrig ? 1.0 : isOrig ? 0.88 : 1.12;
-                  const finalTotal = Number((cand.demandedTotalBillion * mult).toFixed(1));
+                  const terms = getOverseasReturneeContractTerms(cand, career.playerTeamId);
+                  const { hasOriginalClub: hasOrig, isOriginalClub: isOrig, years, finalTotal, signingBonus: bonus, annualSalary: annual } = terms;
                   return (
                     <div key={cand.id} className="p-3 rounded border border-slate-200 dark:border-slate-800 flex flex-col justify-between gap-2">
                       <div>
@@ -1568,18 +1590,16 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                       <button
                         type="button"
                         onClick={() => {
-                          const bonus = Number((finalTotal * 0.35).toFixed(2));
-                          const annual = Number(((finalTotal - bonus) / Math.max(1, cand.demandedYears)).toFixed(2));
                           const preview = previewContractSalaryCapImpact(career, {
-                            title: `${cand.playerName} 해외 복귀 계약 승인 (${cand.demandedYears}년 총액 ${finalTotal}억 원)`,
+                            title: `${cand.playerName} 해외 복귀 계약 승인 (${years}년 총액 ${finalTotal}억 원)`,
                             items: [
                               {
                                 playerName: cand.playerName,
                                 category: '국내',
-                                years: cand.demandedYears,
+                                years,
                                 annualSalaryBillion: annual,
                                 signingBonusBillion: bonus,
-                                cashRequiredNowBillion: Number((bonus + annual).toFixed(2)),
+                                cashRequiredNowBillion: bonus,
                                 isNewIncomingPlayer: true,
                               },
                             ],
@@ -1591,21 +1611,56 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                               try {
                                 const { nextCareer, backupSnapshot } = signOverseasReturnee(career, cand.id);
                                 onUpdateCareer(nextCareer, backupSnapshot);
-                                setNotice({ type: 'ok', text: `${cand.playerName} 해외 복귀 영입 완료 (${cand.demandedYears}년 ${finalTotal}억)` });
+                                setNotice({ type: 'ok', text: `${cand.playerName} 해외 복귀 영입 완료 (${years}년 ${finalTotal}억)` });
                               } catch (err) {
                                 setNotice({ type: 'err', text: err instanceof Error ? err.message : '해외 복귀 영입 오류' });
                               }
                             },
                           });
                         }}
-                        className="w-full py-1.5 rounded bg-slate-900 dark:bg-indigo-600 text-white font-bold"
+                        className="w-full py-1.5 rounded bg-slate-900 dark:bg-indigo-600 text-white font-bold cursor-pointer"
                       >
-                        {cand.demandedYears}년 {finalTotal}억 영입{' '}
+                        {years}년 {finalTotal}억 영입{' '}
                         {!hasOrig ? '(동등 조건)' : isOrig ? '(우선권 12% 할인)' : '(원소속 외 +12%)'}
                       </button>
                     </div>
                   );
                 })}
+              </div>
+            )}
+
+            {signedOverseasReturnees.length > 0 && (
+              <div className="pt-2.5 border-t border-slate-200 dark:border-slate-800 space-y-1.5">
+                <div className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
+                  구단별 해외 복귀 영입 완료 ({signedOverseasReturnees.length}명)
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {signedOverseasReturnees.map((cand) => {
+                    const teamMeta = cand.signedTeamId ? KBO_TEAMS[cand.signedTeamId] : null;
+                    const isMine = cand.signedTeamId === career.playerTeamId;
+                    return (
+                      <div
+                        key={`signed-${cand.id}`}
+                        className={`px-2.5 py-1 rounded border text-[11px] flex items-center gap-1.5 ${
+                          isMine
+                            ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-200'
+                            : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-700 dark:text-slate-200'
+                        }`}
+                      >
+                        <span className="font-extrabold">
+                          {teamMeta ? teamMeta.shortName : 'KBO 구단'}
+                        </span>
+                        <span className="text-slate-400">←</span>
+                        <span className="font-bold">
+                          {cand.playerName} ({cand.position})
+                        </span>
+                        <span className="font-mono-stats text-slate-500 dark:text-slate-400">
+                          {cand.signedYears ?? cand.demandedYears}년 {cand.signedTotalBillion ?? cand.demandedTotalBillion}억
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>

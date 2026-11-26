@@ -1141,6 +1141,7 @@ export interface RetirementCeremonyRecord {
 
 export interface OverseasReturnCandidate {
   id: string;
+  permanentId?: string;
   playerName: string;
   /** KBO 포스팅·임의탈퇴 진출자는 원소속 구단 ID, 고교 졸업 후 해외 직행 선수는 null (원소속팀 없음) */
   originalKboTeamId: TeamId | null;
@@ -1155,6 +1156,11 @@ export interface OverseasReturnCandidate {
   demandedYears: number;
   demandedTotalBillion: number;
   signed?: boolean;
+  signedTeamId?: TeamId;
+  signedSeason?: number;
+  signedDate?: string;
+  signedTotalBillion?: number;
+  signedYears?: number;
 }
 
 export interface IncomingTradeOffer {

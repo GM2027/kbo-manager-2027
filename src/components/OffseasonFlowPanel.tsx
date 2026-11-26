@@ -23,6 +23,7 @@ import {
   buildAnalyticsReport,
   computePlayerSalaryDemand,
   computeSalaryCapSummary,
+  getOverseasReturneeContractTerms,
   negotiateDomesticSalary,
   playExhibitionGames,
   runSpringCamp,
@@ -996,10 +997,8 @@ export const OffseasonFlowPanel: React.FC<OffseasonFlowPanelProps> = ({
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {returnPool.map((cand) => {
-                    const hasOrig = cand.originalKboTeamId !== null;
-                    const isOrig = hasOrig && cand.originalKboTeamId === career.playerTeamId;
-                    const mult = !hasOrig ? 1.0 : isOrig ? 0.88 : 1.12;
-                    const estTotal = Number((cand.demandedTotalBillion * mult).toFixed(1));
+                    const terms = getOverseasReturneeContractTerms(cand, career.playerTeamId);
+                    const { hasOriginalClub: hasOrig, years, finalTotal: estTotal, signingBonus: bonus, annualSalary: annual } = terms;
                     return (
                       <div
                         key={cand.id}
@@ -1028,18 +1027,16 @@ export const OffseasonFlowPanel: React.FC<OffseasonFlowPanelProps> = ({
                         <button
                           type="button"
                           onClick={() => {
-                            const bonus = Number((estTotal * 0.35).toFixed(2));
-                            const annual = Number(((estTotal - bonus) / Math.max(1, cand.demandedYears)).toFixed(2));
                             const preview = previewContractSalaryCapImpact(career, {
-                              title: `${cand.playerName} 해외 복귀 영입 승인 (${cand.demandedYears}년 총액 ${estTotal}억 원)`,
+                              title: `${cand.playerName} 해외 복귀 영입 승인 (${years}년 총액 ${estTotal}억 원)`,
                               items: [
                                 {
                                   playerName: cand.playerName,
                                   category: '국내',
-                                  years: cand.demandedYears,
+                                  years,
                                   annualSalaryBillion: annual,
                                   signingBonusBillion: bonus,
-                                  cashRequiredNowBillion: Number((bonus + annual).toFixed(2)),
+                                  cashRequiredNowBillion: bonus,
                                   isNewIncomingPlayer: true,
                                 },
                               ],
@@ -1060,7 +1057,7 @@ export const OffseasonFlowPanel: React.FC<OffseasonFlowPanelProps> = ({
                           }}
                           className="w-full py-1.5 rounded bg-slate-900 dark:bg-indigo-600 hover:opacity-90 text-white font-bold cursor-pointer"
                         >
-                          {cand.demandedYears}년 {estTotal}억 영입
+                          {years}년 {estTotal}억 영입
                         </button>
                       </div>
                     );
