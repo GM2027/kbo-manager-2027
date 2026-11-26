@@ -25,6 +25,7 @@ import {
   getPositionProficiency,
 } from '../engine/positionEngine';
 import { reconcileAllTeamsLineupPositionsInPlace } from '../engine/lineupValidationEngine';
+import { syncSeasonRookieEligibilityInPlace } from '../engine/kboAwardsEngine';
 import {
   ensureCareerOotpRatingsInPlace,
   ensurePlayerOotpRatingsInPlace,
@@ -325,6 +326,7 @@ function buildHistoricalCareerStats(
     const agg: CareerBatterStats = {
       seasons: distinctSeasonCount,
       G: 0,
+      PA: 0,
       AB: 0,
       H: 0,
       HR: 0,
@@ -335,6 +337,7 @@ function buildHistoricalCareerStats(
     };
     for (const r of records) {
       agg.G += r.G ?? 0;
+      agg.PA = (agg.PA ?? 0) + (r.PA ?? (r.AB ?? 0) + (r.BB ?? 0));
       agg.AB += r.AB ?? 0;
       agg.H += r.H ?? 0;
       agg.HR += r.HR ?? 0;
@@ -1527,6 +1530,8 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
 
     // 세이브 로드 시마다 현재 게임 날짜·생년월일 기준으로 전체 만 나이 일괄 동기화
     syncAllAgesToDateInPlace(career);
+    // 세이브 로드 시마다 당해 시즌 신인왕 자격 스냅샷 자동 동기화 (당해 성적·퓨처스 제외, 기존 세이브 100% 보존)
+    syncSeasonRookieEligibilityInPlace(career);
     // 세이브 로드 시마다 10개 구단 선발 타자 라인업 9포지션 중복·누락 자동 검증 및 보정 (이미 정상인 라인업은 불변)
     reconcileAllTeamsLineupPositionsInPlace(career);
   }

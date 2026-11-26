@@ -1,5 +1,6 @@
 import { buildCoachSubRatings } from '../data/coachesData';
 import { calculateKoreanFullAge, parseIsoDate } from './ageEngine';
+import { computeLiveRookieRace } from './kboAwardsEngine';
 import { KBO_TEAMS, TEAM_IDS } from '../data/kboTeams';
 import {
   BASELINE_2026_ROOKIE_BONUS_TOP10,
@@ -933,26 +934,8 @@ export function computeLiveAwardRaces(career: CareerSave): LiveAwardRaces {
       tag: idx === 0 ? '유력 후보' : idx < 3 ? '상위 경쟁' : undefined,
     }));
 
-  // 신인왕 Top 10 (국내 선수, 프로 연차 2년 이하 또는 나이 23세 이하 신인급)
-  const rookiePool = evaluated.filter((item) => {
-    const p = item.player;
-    if (p.category !== '국내') return false;
-    return (p.serviceYears ?? 0) <= 2 && p.age <= 24;
-  });
-  const rookieSorted = rookiePool
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 10)
-    .map<LiveAwardCandidate>((item, idx) => ({
-      rank: idx + 1,
-      playerId: item.player.id,
-      playerName: item.player.name,
-      teamId: item.player.teamId,
-      position: item.player.position,
-      role: item.player.role,
-      score: item.score,
-      statSummary: item.statSummary,
-      tag: item.player.rookieInfo?.pickNotation ?? `${item.player.age}세 신예`,
-    }));
+  // 신인왕 Top 10 (KBO 공식 규정: 입단 6년 차 이내 · 이전 1군 ≤30IP/≤60PA · 비해외파 · 기수상 제외 · 나이 무관 · WAR+기자단 예상)
+  const rookieSorted = computeLiveRookieRace(career, 10);
 
   // 골든글러브 포지션별 후보 (투수, 포수, 1루, 2루, 3루, 유격수, 외야수 TOP 5, 지명타자)
   const ggGroups: { label: string; positions: Position[]; limit: number }[] = [

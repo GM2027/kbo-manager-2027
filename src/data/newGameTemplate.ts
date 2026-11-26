@@ -2,6 +2,7 @@ import { ensureAmateurAndOverseasStateInPlace } from '../engine/amateurOverseasE
 import { ensureDeepFranchiseState } from '../engine/deepFranchise';
 import { applyPreGameEditorStoreToNewCareerInPlace } from '../engine/editorEngine';
 import { syncFaCompetitionMarketInPlace } from '../engine/faCompetitionEngine';
+import { syncSeasonRookieEligibilityInPlace } from '../engine/kboAwardsEngine';
 import { ensureLeagueLifeStateInPlace } from '../engine/leagueLifeEngine';
 import { reconcileAllTeamsLineupPositionsInPlace } from '../engine/lineupValidationEngine';
 import { optimizeBattingLineup } from '../engine/lineupOptimizer';
@@ -154,6 +155,7 @@ export function createNewCareer(params: {
   ensureLeagueLifeStateInPlace(created);
   sanitizePlayerAgeAndServiceYearsInPlace(created.players, 2027);
   sanitizeCareerOvrPotInPlace(created);
+  syncSeasonRookieEligibilityInPlace(created);
 
   // 프리게임 에디터 수정 사항은 새 게임 초기 데이터에만 적용 (기존 세이브 불변)
   if (!skipPreGameEditor) {

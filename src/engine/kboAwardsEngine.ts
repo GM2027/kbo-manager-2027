@@ -5,13 +5,18 @@ import {
   CareerBatterStats,
   CareerPitcherStats,
   CareerSave,
+  LiveAwardCandidate,
   ManagerOfYearAward,
   PitcherStats,
   Player,
   PlayerAwardHonor,
   Position,
+  RookieEligibilitySnapshot,
+  RookiePressVoteEntry,
   SeasonAwards,
+  TeamId,
 } from '../types/kbo';
+import { SeededRng } from './rng';
 import {
   calcAVG,
   calcERA,
@@ -54,10 +59,37 @@ export const KBO_2026_AWARDS_RULES = {
   PITCHER_MIN_HOLDS: 30,
   FIELDER_MIN_DEFENSIVE_INNINGS: 720,
   DH_MIN_PA: 297,
-  ROOKIE_MAX_PRIOR_YEARS: 5,
-  ROOKIE_MAX_PRIOR_OUTS: 90, // 30.0 이닝
-  ROOKIE_MAX_PRIOR_PA: 60,
+  ROOKIE_MAX_PRIOR_YEARS: 5, // 입단 연도 포함 6년 차 이내 (season - entryYear <= 5)
+  ROOKIE_MAX_ENTRY_YEAR_NUMBER: 6, // 해당 시즌 포함 입단 6년 차 이내
+  ROOKIE_MAX_PRIOR_OUTS: 90, // 이전 시즌까지 1군 통산 30.0 이닝 이하
+  ROOKIE_MAX_PRIOR_PA: 60, // 이전 시즌까지 1군 통산 60 타석 이하
+  ROOKIE_PRESS_VOTER_COUNT: 100, // 한국야구기자회 기자단 AI 100인 투표
 } as const;
+
+/**
+ * 실존 KBO 역대 신인왕 기수상자 기준표 (동명이인 오판 방지 위해 출생연도 병기)
+ */
+const REAL_PRIOR_KBO_ROOKIE_WINNERS: Record<string, { wonSeason: number; birthYear: number }> = {
+  안현민: { wonSeason: 2025, birthYear: 2003 },
+  김택연: { wonSeason: 2024, birthYear: 2005 },
+  문동주: { wonSeason: 2023, birthYear: 2003 },
+  정철원: { wonSeason: 2022, birthYear: 1999 },
+  이의리: { wonSeason: 2021, birthYear: 2002 },
+  소형준: { wonSeason: 2020, birthYear: 2001 },
+  정우영: { wonSeason: 2019, birthYear: 1999 },
+  강백호: { wonSeason: 2018, birthYear: 1999 },
+  이정후: { wonSeason: 2017, birthYear: 1998 },
+  신재영: { wonSeason: 2016, birthYear: 1989 },
+  구자욱: { wonSeason: 2015, birthYear: 1993 },
+  박민우: { wonSeason: 2014, birthYear: 1993 },
+  이재학: { wonSeason: 2013, birthYear: 1990 },
+  서건창: { wonSeason: 2012, birthYear: 1989 },
+  배영섭: { wonSeason: 2011, birthYear: 1986 },
+  양의지: { wonSeason: 2010, birthYear: 1987 },
+  이용찬: { wonSeason: 2009, birthYear: 1989 },
+  최형우: { wonSeason: 2008, birthYear: 1983 },
+  류현진: { wonSeason: 2006, birthYear: 1987 },
+};
 
 export interface GoldenGloveEligibilityResult {
   eligible: boolean;
@@ -70,9 +102,14 @@ export interface RookieEligibilityResult {
   eligible: boolean;
   reason: string;
   priorInnings: number;
+  priorOuts: number;
   priorPA: number;
+  entryYear: number;
+  /** 해당 시즌 포함 입단 N년차 (1 = 당해 입단, 최대 6년차까지 자격) */
+  entryYearNumber: number;
   yearsSinceDebut: number;
   hasOverseasProCareer: boolean;
+  alreadyWonRookieOfYear: boolean;
 }
 
 function getRegularBatterStats(player: Player): BatterStats {
@@ -109,13 +146,16 @@ export function getRegularDefensiveInnings(player: Player): number {
 export function hasOverseasProBaseballCareer(player: Player): boolean {
   if (player.category !== '국내') return true;
   const prev = player.previousLeagueClub ?? '';
-  if (/MLB|NPB|CPBL|AAA|AA|마이너|메이저|일본\s*프로|대만\s*프로|미국\s*프로|해외\s*프로|독립리그\s*해외/i.test(prev)) {
+  if (/MLB|NPB|CPBL|ABL|AAA|AA|마이너|메이저|일본\s*프로|대만\s*프로|미국\s*프로|해외\s*프로|호주\s*프로/i.test(prev)) {
     return true;
   }
+  const kboTeamSet = new Set<string>(TEAM_IDS);
   const hist = player.careerTeamHistory ?? [];
   for (const h of hist) {
     if ((h.league && h.league !== 'KBO') || h.mlbTeamName) return true;
-    if (/MLB|NPB|CPBL|AAA|마이너|메이저|요미우리|소프트뱅크|오릭스|한신|지바롯데|다저스|양키스|자이언츠|파드리스|컵스|블루제이스/i.test(h.teamLabel)) {
+    // KBO 10개 구단 소속 이력(예: '롯데 자이언츠')은 해외 구단 키워드 오탐 방지
+    if (h.league === 'KBO' || (h.teamId && kboTeamSet.has(h.teamId))) continue;
+    if (/MLB|NPB|CPBL|AAA|AA|마이너|메이저|요미우리|소프트뱅크|오릭스|한신|지바롯데|다저스|양키스|샌프란시스코\s*자이언츠|파드리스|컵스|블루제이스/i.test(h.teamLabel)) {
       return true;
     }
   }
@@ -123,135 +163,638 @@ export function hasOverseasProBaseballCareer(player: Player): boolean {
 }
 
 /**
- * 2026 KBO 공식 신인왕 자격 검증
- * - 당해 입단 선수 또는 이전 5개 연도 입단 선수
- * - 해당 시즌 이전 누적 투구 30이닝(90아웃) 이하 또는 타격 60타석 이하
- * - 해외 프로야구 기구 소속 경력이 없는 선수
+ * 기존 KBO 신인왕(신인상) 기수상자 여부 판정 (나이·연차와 무관하게 기수상자는 영구 제외)
  */
-export function checkRookieOfYearEligibility(
+export function hasAlreadyWonRookieOfYear(
   player: Player,
-  season: number
-): RookieEligibilityResult {
-  const hasOverseas = hasOverseasProBaseballCareer(player);
-  if (hasOverseas) {
-    return {
-      eligible: false,
-      reason: '해외 프로야구 기구 소속 경력 보유 (신인왕 자격 제외)',
-      priorInnings: 0,
-      priorPA: 0,
-      yearsSinceDebut: player.serviceYears,
-      hasOverseasProCareer: true,
-    };
-  }
-
-  // 입단 연차 판정: 당해(0년차) 또는 이전 5개 연도(1~5년차)
-  const kboEntries = (player.careerTeamHistory ?? []).filter(
-    (h) => (!h.league || h.league === 'KBO') && !h.mlbTeamName && Boolean(h.teamId)
+  currentSeason: number,
+  career?: CareerSave
+): { won: boolean; wonSeason?: number } {
+  const honorMatch = (player.awardHonors ?? []).find(
+    (h) => h.awardType === '신인왕' && h.season < currentSeason
   );
-  const firstKboSeason =
-    kboEntries.length > 0
-      ? Math.min(...kboEntries.map((h) => h.fromSeason))
-      : season - Math.max(0, player.serviceYears);
-  const yearsSinceDebut = Math.max(0, season - firstKboSeason);
-  const effectiveYears = Math.max(yearsSinceDebut, Math.max(0, player.serviceYears));
+  if (honorMatch) {
+    return { won: true, wonSeason: honorMatch.season };
+  }
+  if (career?.awardsHistory) {
+    const histMatch = career.awardsHistory.find(
+      (a) => a.season < currentSeason && a.rookieOfYear?.playerId === player.id
+    );
+    if (histMatch) {
+      return { won: true, wonSeason: histMatch.season };
+    }
+  }
+  const realMatch = REAL_PRIOR_KBO_ROOKIE_WINNERS[player.name];
+  if (realMatch && realMatch.wonSeason < currentSeason) {
+    const birthCompatible =
+      typeof player.birthYear === 'number'
+        ? Math.abs(player.birthYear - realMatch.birthYear) <= 1
+        : Math.abs(currentSeason - player.age - realMatch.birthYear) <= 2;
+    if (birthCompatible) {
+      return { won: true, wonSeason: realMatch.wonSeason };
+    }
+  }
+  return { won: false };
+}
 
-  if (effectiveYears > KBO_2026_AWARDS_RULES.ROOKIE_MAX_PRIOR_YEARS && !player.rookieInfo) {
-    return {
-      eligible: false,
-      reason: `입단 ${effectiveYears}년차 (5년 이내 입단 기준 초과)`,
-      priorInnings: 0,
-      priorPA: 0,
-      yearsSinceDebut: effectiveYears,
-      hasOverseasProCareer: false,
-    };
+function parseHistoricalIpToOuts(ipRaw: unknown): number {
+  if (typeof ipRaw === 'number' && Number.isFinite(ipRaw)) {
+    const whole = Math.floor(ipRaw);
+    const frac = Math.round((ipRaw - whole) * 10);
+    return Math.max(0, whole * 3 + Math.min(2, Math.max(0, frac)));
+  }
+  if (typeof ipRaw === 'string') {
+    const trimmed = ipRaw.trim();
+    if (!trimmed) return 0;
+    const m = trimmed.match(/^(\d+)(?:\.(\d))?$/);
+    if (m) {
+      const whole = Number(m[1]);
+      const frac = m[2] ? Math.min(2, Number(m[2])) : 0;
+      return Math.max(0, whole * 3 + frac);
+    }
+    const fracMatch = trimmed.match(/^(\d+)\s+(\d)\/3$/);
+    if (fracMatch) {
+      return Math.max(0, Number(fracMatch[1]) * 3 + Math.min(2, Number(fracMatch[2])));
+    }
+    const onlyThird = trimmed.match(/^(\d)\/3$/);
+    if (onlyThird) {
+      return Math.min(2, Number(onlyThird[1]));
+    }
+  }
+  return 0;
+}
+
+/**
+ * KBO 입단 연도 산출 (나이 제한 미적용 · 드래프트/입단 연도 우선)
+ */
+function resolveKboEntryYear(player: Player, season: number): number {
+  if (typeof player.draftYear === 'number' && player.draftYear >= 1990 && player.draftYear <= season) {
+    return player.draftYear;
+  }
+  if (
+    typeof player.acquisitionInfo?.draftYear === 'number' &&
+    player.acquisitionInfo.draftYear >= 1990 &&
+    player.acquisitionInfo.draftYear <= season
+  ) {
+    return player.acquisitionInfo.draftYear;
+  }
+  const kboEntries = (player.careerTeamHistory ?? []).filter(
+    (h) => (!h.league || h.league === 'KBO') && !h.mlbTeamName && Boolean(h.teamId) && h.fromSeason <= season
+  );
+  if (kboEntries.length > 0) {
+    return Math.min(...kboEntries.map((h) => h.fromSeason));
+  }
+  const histYears = (player.historicalSeasons ?? [])
+    .map((h) => h.season)
+    .filter((s) => typeof s === 'number' && s >= 1990 && s <= season);
+  if (histYears.length > 0) {
+    return Math.min(...histYears);
+  }
+  if (player.rookieInfo) return season;
+  return season - Math.max(0, player.serviceYears ?? 0);
+}
+
+/**
+ * 이전 시즌까지의 KBO 1군 통산 이닝(아웃)·타석 산출
+ * - 당해 시즌 성적(player.stats) 및 퓨처스리그 기록(futuresStats, verifiedFutures2026)은 완전 배제
+ */
+function computePriorKboFirstTeamTotals(
+  player: Player,
+  season: number,
+  effectiveYears: number
+): { priorOuts: number; priorPA: number } {
+  let histOuts = 0;
+  let histPA = 0;
+  let hasPriorHist = false;
+  for (const h of player.historicalSeasons ?? []) {
+    if (typeof h.season !== 'number' || h.season >= season) continue;
+    hasPriorHist = true;
+    if (player.role === '투수') {
+      histOuts += parseHistoricalIpToOuts(h.IP);
+    } else {
+      histPA += Math.max(0, Number(h.PA ?? (h.AB ?? 0) + (h.BB ?? 0)));
+    }
   }
 
-  // 해당 시즌 이전 누적 기록 산출 (careerStats는 이전 시즌 누적분)
-  let priorOuts = 0;
-  let priorPA = 0;
-
+  let csOuts = 0;
+  let csPA = 0;
+  let hasCareerStats = false;
   if (player.role === '투수') {
     const cs = player.careerStats as CareerPitcherStats | undefined;
     if (cs && typeof cs.outs === 'number') {
-      priorOuts = Math.max(0, cs.outs);
-    } else if (effectiveYears >= 1 && (player.careerSO ?? 0) > 0) {
-      // 이전 시즌 기록 fallback 추정 (당해 신인 rookieInfo는 0)
-      priorOuts = player.rookieInfo ? 0 : Math.round((player.careerSO ?? 0) * 3.1);
-    } else if (effectiveYears >= 2 && !player.rookieInfo && (player.careerWins ?? 0) >= 3) {
-      priorOuts = (player.careerWins ?? 0) * 45;
+      hasCareerStats = true;
+      csOuts = Math.max(0, cs.outs);
     }
   } else {
     const cs = player.careerStats as CareerBatterStats | undefined;
-    if (cs && typeof cs.AB === 'number') {
-      priorPA = Math.max(0, cs.AB + (cs.BB ?? 0));
-    } else if (effectiveYears >= 1 && (player.careerHits ?? 0) > 0) {
-      priorPA = player.rookieInfo ? 0 : Math.round((player.careerHits ?? 0) * 3.8);
+    if (cs && (typeof cs.PA === 'number' || typeof cs.AB === 'number')) {
+      hasCareerStats = true;
+      csPA = Math.max(0, cs.PA ?? cs.AB + (cs.BB ?? 0));
     }
   }
 
+  if (hasPriorHist || hasCareerStats) {
+    return {
+      priorOuts: Math.max(histOuts, csOuts),
+      priorPA: Math.max(histPA, csPA),
+    };
+  }
+
+  // 레거시/합성 세이브에 careerStats·historicalSeasons가 모두 없을 때만 최소 fallback 사용
+  if (player.rookieInfo && effectiveYears === 0) {
+    return { priorOuts: 0, priorPA: 0 };
+  }
+  if (player.role === '투수') {
+    const est =
+      effectiveYears >= 1 && (player.careerSO ?? 0) > 0
+        ? Math.round((player.careerSO ?? 0) * 3.1)
+        : effectiveYears >= 2 && (player.careerWins ?? 0) >= 3
+        ? (player.careerWins ?? 0) * 45
+        : 0;
+    return { priorOuts: est, priorPA: 0 };
+  }
+  const estPa =
+    effectiveYears >= 1 && (player.careerHits ?? 0) > 0
+      ? Math.round((player.careerHits ?? 0) * 3.8)
+      : 0;
+  return { priorOuts: 0, priorPA: estPa };
+}
+
+/**
+ * KBO 공식 신인왕 시즌 자격 판정 (시즌 개막 시점 기준 · 당해 성적 및 퓨처스 기록 제외 · 나이 제한 없음)
+ * - 해당 시즌 포함 입단 6년 차 이내 (season - entryYear <= 5)
+ * - 투수: 이전 시즌까지 1군 통산 30이닝(90아웃) 이하
+ * - 타자: 이전 시즌까지 1군 통산 60타석 이하
+ * - 해외 프로야구 소속 경력 없음
+ * - 기존 신인왕 기수상자 제외
+ */
+export function evaluateOpeningDayRookieEligibility(
+  player: Player,
+  season: number,
+  career?: CareerSave
+): RookieEligibilitySnapshot {
+  const entryYear = resolveKboEntryYear(player, season);
+  const yearsSinceEntry = Math.max(0, season - entryYear);
+  const effectiveYears = Math.max(yearsSinceEntry, Math.max(0, player.serviceYears ?? 0));
+  const entryYearNumber = effectiveYears + 1;
+
+  const hasOverseas = hasOverseasProBaseballCareer(player);
+  const priorWin = hasAlreadyWonRookieOfYear(player, season, career);
+  const { priorOuts, priorPA } = computePriorKboFirstTeamTotals(player, season, effectiveYears);
   const priorInnings = Number((priorOuts / 3).toFixed(1));
+
+  if (hasOverseas) {
+    return {
+      season,
+      eligible: false,
+      entryYear,
+      entryYearNumber,
+      priorInnings,
+      priorOuts,
+      priorPA,
+      hasOverseasProCareer: true,
+      alreadyWonRookieOfYear: priorWin.won,
+      reason: '해외 프로야구 소속 경력 보유 (신인왕 자격 제외)',
+    };
+  }
+
+  if (priorWin.won) {
+    return {
+      season,
+      eligible: false,
+      entryYear,
+      entryYearNumber,
+      priorInnings,
+      priorOuts,
+      priorPA,
+      hasOverseasProCareer: false,
+      alreadyWonRookieOfYear: true,
+      reason: `기존 신인왕 수상자 (${priorWin.wonSeason ? `${priorWin.wonSeason}년 수상` : '기수상'} · 후보 제외)`,
+    };
+  }
+
+  if (entryYearNumber > KBO_2026_AWARDS_RULES.ROOKIE_MAX_ENTRY_YEAR_NUMBER && !player.rookieInfo) {
+    return {
+      season,
+      eligible: false,
+      entryYear,
+      entryYearNumber,
+      priorInnings,
+      priorOuts,
+      priorPA,
+      hasOverseasProCareer: false,
+      alreadyWonRookieOfYear: false,
+      reason: `입단 ${entryYearNumber}년 차 (입단 6년 차 이내 기준 초과)`,
+    };
+  }
 
   if (player.role === '투수' && priorOuts > KBO_2026_AWARDS_RULES.ROOKIE_MAX_PRIOR_OUTS) {
     return {
+      season,
       eligible: false,
-      reason: `이전 시즌 누적 ${priorInnings}이닝 (30이닝 상한 초과)`,
+      entryYear,
+      entryYearNumber,
       priorInnings,
+      priorOuts,
       priorPA: 0,
-      yearsSinceDebut: effectiveYears,
       hasOverseasProCareer: false,
+      alreadyWonRookieOfYear: false,
+      reason: `이전 1군 통산 ${formatIP(priorOuts)}이닝 (30이닝 상한 초과)`,
     };
   }
 
   if (player.role === '타자' && priorPA > KBO_2026_AWARDS_RULES.ROOKIE_MAX_PRIOR_PA) {
     return {
+      season,
       eligible: false,
-      reason: `이전 시즌 누적 ${priorPA}타석 (60타석 상한 초과)`,
+      entryYear,
+      entryYearNumber,
       priorInnings: 0,
+      priorOuts: 0,
       priorPA,
-      yearsSinceDebut: effectiveYears,
       hasOverseasProCareer: false,
+      alreadyWonRookieOfYear: false,
+      reason: `이전 1군 통산 ${priorPA}타석 (60타석 상한 초과)`,
     };
   }
 
-  // 당해 정규시즌 실제 출전 기록 보유 확인
-  if (player.role === '투수') {
-    const ps = getRegularPitcherStats(player);
-    if ((ps.outs ?? 0) <= 0) {
-      return {
-        eligible: false,
-        reason: '당해 정규시즌 등판 기록 없음',
-        priorInnings,
-        priorPA: 0,
-        yearsSinceDebut: effectiveYears,
-        hasOverseasProCareer: false,
-      };
+  const yearLabel = entryYearNumber === 1 ? '입단 1년 차(순수 신인)' : `입단 ${entryYearNumber}년 차`;
+  const priorLabel =
+    player.role === '투수'
+      ? `이전 1군 ${formatIP(priorOuts)}이닝(≤30IP)`
+      : `이전 1군 ${priorPA}타석(≤60PA)`;
+
+  return {
+    season,
+    eligible: true,
+    entryYear,
+    entryYearNumber,
+    priorInnings: player.role === '투수' ? priorInnings : 0,
+    priorOuts: player.role === '투수' ? priorOuts : 0,
+    priorPA: player.role === '타자' ? priorPA : 0,
+    hasOverseasProCareer: false,
+    alreadyWonRookieOfYear: false,
+    reason: `${yearLabel} · ${priorLabel} · 신인왕 자격 충족 (나이 무관)`,
+  };
+}
+
+/**
+ * 시즌 개막 시점·새 게임·다음 시즌 전환·세이브 로드 시 전 선수 신인왕 자격을 자동 판정·저장합니다.
+ * - 당해 시즌 성적과 퓨처스 기록은 자격 판정에서 완전 제외됩니다.
+ */
+export function syncSeasonRookieEligibilityInPlace(career: CareerSave): {
+  season: number;
+  eligibleCount: number;
+} {
+  const season = career.season;
+  let eligibleCount = 0;
+  for (const p of Object.values(career.players)) {
+    if (p.rosterTier === '은퇴' || p.rosterTier === '해외이적') {
+      p.rookieEligibility = undefined;
+      continue;
     }
-  } else {
-    const bs = getRegularBatterStats(player);
-    if ((bs.PA ?? 0) <= 0) {
-      return {
-        eligible: false,
-        reason: '당해 정규시즌 타석 기록 없음',
-        priorInnings: 0,
-        priorPA,
-        yearsSinceDebut: effectiveYears,
-        hasOverseasProCareer: false,
-      };
+    const snap = evaluateOpeningDayRookieEligibility(p, season, career);
+    p.rookieEligibility = snap;
+    if (snap.eligible) eligibleCount += 1;
+  }
+  return { season, eligibleCount };
+}
+
+/**
+ * KBO 공식 신인왕 자격 검증 (시즌 개막 스냅샷 우선 활용 + 당해 출전 여부 옵션)
+ */
+export function checkRookieOfYearEligibility(
+  player: Player,
+  season: number,
+  options?: {
+    career?: CareerSave;
+    requireCurrentSeasonAppearance?: boolean;
+    ignoreCachedSnapshot?: boolean;
+  }
+): RookieEligibilityResult {
+  const snap =
+    !options?.ignoreCachedSnapshot && player.rookieEligibility?.season === season
+      ? player.rookieEligibility
+      : evaluateOpeningDayRookieEligibility(player, season, options?.career);
+
+  if (!snap.eligible) {
+    return {
+      eligible: false,
+      reason: snap.reason,
+      priorInnings: snap.priorInnings,
+      priorOuts: snap.priorOuts,
+      priorPA: snap.priorPA,
+      entryYear: snap.entryYear,
+      entryYearNumber: snap.entryYearNumber,
+      yearsSinceDebut: Math.max(0, snap.entryYearNumber - 1),
+      hasOverseasProCareer: snap.hasOverseasProCareer,
+      alreadyWonRookieOfYear: snap.alreadyWonRookieOfYear,
+    };
+  }
+
+  const requireAppearance = options?.requireCurrentSeasonAppearance !== false;
+  if (requireAppearance) {
+    if (player.role === '투수') {
+      const ps = getRegularPitcherStats(player);
+      if ((ps.outs ?? 0) <= 0) {
+        return {
+          eligible: false,
+          reason: '당해 정규시즌 1군 등판 기록 없음',
+          priorInnings: snap.priorInnings,
+          priorOuts: snap.priorOuts,
+          priorPA: 0,
+          entryYear: snap.entryYear,
+          entryYearNumber: snap.entryYearNumber,
+          yearsSinceDebut: Math.max(0, snap.entryYearNumber - 1),
+          hasOverseasProCareer: false,
+          alreadyWonRookieOfYear: false,
+        };
+      }
+    } else {
+      const bs = getRegularBatterStats(player);
+      if ((bs.PA ?? 0) <= 0) {
+        return {
+          eligible: false,
+          reason: '당해 정규시즌 1군 타석 기록 없음',
+          priorInnings: 0,
+          priorOuts: 0,
+          priorPA: snap.priorPA,
+          entryYear: snap.entryYear,
+          entryYearNumber: snap.entryYearNumber,
+          yearsSinceDebut: Math.max(0, snap.entryYearNumber - 1),
+          hasOverseasProCareer: false,
+          alreadyWonRookieOfYear: false,
+        };
+      }
     }
   }
 
-  const yearLabel = effectiveYears === 0 || Boolean(player.rookieInfo) ? '당해 입단 신인' : `입단 ${effectiveYears}년차`;
-  const priorLabel =
-    player.role === '투수' ? `이전 누적 ${priorInnings}IP(≤30IP)` : `이전 누적 ${priorPA}타석(≤60타석)`;
-
   return {
     eligible: true,
-    reason: `${yearLabel} · ${priorLabel} · 국내 순수 신인 자격 충족`,
-    priorInnings,
-    priorPA,
-    yearsSinceDebut: effectiveYears,
+    reason: snap.reason,
+    priorInnings: snap.priorInnings,
+    priorOuts: snap.priorOuts,
+    priorPA: snap.priorPA,
+    entryYear: snap.entryYear,
+    entryYearNumber: snap.entryYearNumber,
+    yearsSinceDebut: Math.max(0, snap.entryYearNumber - 1),
     hasOverseasProCareer: false,
+    alreadyWonRookieOfYear: false,
   };
+}
+
+/**
+ * 정규시즌 성적 기반 추정 WAR 산출 (정규시즌 1군 기록만 사용 · 기자단 AI 투표 핵심 지표)
+ */
+export function estimatePlayerSeasonWar(player: Player): number {
+  if (player.role === '타자') {
+    const b = getRegularBatterStats(player);
+    const pa = b.PA ?? 0;
+    const ab = b.AB ?? 0;
+    if (pa <= 0 || ab <= 0) return 0;
+    const ops = calcOPS(b) ?? 0.65;
+    const sb = b.SB ?? 0;
+    const posBonusPer500: Partial<Record<Position, number>> = {
+      C: 0.75,
+      SS: 0.65,
+      CF: 0.45,
+      '2B': 0.3,
+      '3B': 0.2,
+      RF: 0.0,
+      LF: -0.15,
+      '1B': -0.35,
+      DH: -0.65,
+    };
+    const posAdj = (posBonusPer500[player.position] ?? 0) * Math.min(1.2, pa / 500);
+    const battingRuns = ((ops - 0.725) * 32 + 12.5) * (pa / 500);
+    const baserunningRuns = sb * 0.14;
+    const war = (battingRuns + baserunningRuns) / 9.6 + posAdj;
+    return Number(Math.max(-1.8, Math.min(10.5, war)).toFixed(2));
+  }
+
+  const ps = getRegularPitcherStats(player);
+  const outs = ps.outs ?? 0;
+  if (outs <= 0) return 0;
+  const ip = outs / 3;
+  const era = calcERA(ps.ER, ps.outs) ?? 5.2;
+  const whip = calcWHIP(ps.H, ps.BB, ps.outs) ?? 1.5;
+  const sv = ps.SV ?? 0;
+  const hld = ps.HLD ?? 0;
+  const so = ps.SO ?? 0;
+  const isReliever = sv >= 8 || hld >= 8 || ((ps.GS ?? 0) <= 5 && ip < 100);
+  const replacementEra = isReliever ? 5.15 : 5.45;
+  const runsSaved = ((replacementEra - era) * ip) / 9 + (1.42 - whip) * (ip / 38) + so * 0.025;
+  const leverageBonus = isReliever ? sv * 0.045 + hld * 0.032 : 0;
+  const war = runsSaved / 9.8 + leverageBonus;
+  return Number(Math.max(-1.8, Math.min(9.5, war)).toFixed(2));
+}
+
+function computeRookieTeamContribution(
+  player: Player,
+  teamRank: number,
+  teamPct: number
+): number {
+  // 팀 성적 가중 (가을야구권 1~5위 + 승률 반영)
+  const teamStandingPts =
+    (teamRank <= 5 ? 24 + (6 - teamRank) * 3.5 : 14 + (11 - teamRank) * 1.4) +
+    Math.max(0, (teamPct - 0.4) * 38);
+
+  if (player.role === '타자') {
+    const b = getRegularBatterStats(player);
+    const prod = (b.RBI ?? 0) * 0.42 + (b.R ?? 0) * 0.36 + (b.HR ?? 0) * 0.95 + (b.H ?? 0) * 0.12;
+    return Number(Math.max(0, Math.min(100, teamStandingPts + Math.min(62, prod * 0.62))).toFixed(1));
+  }
+
+  const ps = getRegularPitcherStats(player);
+  const ip = (ps.outs ?? 0) / 3;
+  const prod = (ps.W ?? 0) * 3.8 + (ps.SV ?? 0) * 1.65 + (ps.HLD ?? 0) * 1.45 + ip * 0.16;
+  return Number(Math.max(0, Math.min(100, teamStandingPts + Math.min(62, prod * 0.72))).toFixed(1));
+}
+
+/**
+ * 한국야구기자회 기자단 AI 투표 (100명 · 1위 5점 / 2위 3점 / 3위 1점)
+ * - WAR, 타격 성적, 투구 성적, 팀 기여도를 기자단 성향별로 종합 평가하여 최종 수상자 선정
+ */
+export function runRookieOfYearPressVote(
+  career: CareerSave,
+  options?: { season?: number; voterCount?: number; limit?: number }
+): {
+  voterCount: number;
+  entries: RookiePressVoteEntry[];
+} {
+  const season = options?.season ?? career.season;
+  const voterCount = options?.voterCount ?? KBO_2026_AWARDS_RULES.ROOKIE_PRESS_VOTER_COUNT;
+  const validTeamSet = new Set<string>(TEAM_IDS);
+
+  const standings = computeStandings(career.gamesLedger);
+  const standingByTeam = new Map<TeamId, { rank: number; pct: number }>();
+  standings.forEach((row, idx) => {
+    standingByTeam.set(row.teamId, { rank: idx + 1, pct: row.pct });
+  });
+
+  const activeKboPlayers = Object.values(career.players).filter(
+    (p) => validTeamSet.has(p.teamId) && p.rosterTier !== '은퇴' && p.rosterTier !== '해외이적'
+  );
+
+  const pool = activeKboPlayers
+    .map((p) => {
+      const elig = checkRookieOfYearEligibility(p, season, {
+        career,
+        requireCurrentSeasonAppearance: true,
+      });
+      if (!elig.eligible) return null;
+      const statScore = computeNormalizedRegularAwardScore(p);
+      if (statScore <= 0) return null;
+      const war = estimatePlayerSeasonWar(p);
+      const st = standingByTeam.get(p.teamId) ?? { rank: 5, pct: 0.5 };
+      const teamContribution = computeRookieTeamContribution(p, st.rank, st.pct);
+      return {
+        player: p,
+        elig,
+        war,
+        statScore,
+        teamContribution,
+        // WAR(0~100 환산): WAR 0 -> 20, WAR 5 -> 88
+        warScore: Math.max(0, Math.min(100, 20 + war * 13.6)),
+      };
+    })
+    .filter((x): x is NonNullable<typeof x> => Boolean(x));
+
+  if (pool.length === 0) {
+    return { voterCount, entries: [] };
+  }
+
+  // 결정론적 기자단 AI 100명 투표 (4개 기자단 성향: 세이버/WAR 35명 · 클래식 성적 30명 · 팀기여/임팩트 20명 · 균형파 15명)
+  const rng = new SeededRng((season * 7919 + career.gamesPlayed * 97 + pool.length * 31) >>> 0);
+  const voteTallies = new Map<
+    string,
+    { points: number; first: number; second: number; third: number }
+  >();
+  for (const c of pool) {
+    voteTallies.set(c.player.id, { points: 0, first: 0, second: 0, third: 0 });
+  }
+
+  for (let v = 0; v < voterCount; v++) {
+    // 기자단 성향별 가중치
+    let wWar: number;
+    let wStat: number;
+    let wTeam: number;
+    if (v < Math.round(voterCount * 0.35)) {
+      // 세이버메트릭스·WAR 중시 기자단
+      wWar = 0.56;
+      wStat = 0.30;
+      wTeam = 0.14;
+    } else if (v < Math.round(voterCount * 0.65)) {
+      // 클래식 타격·투구 기록 중시 기자단
+      wWar = 0.26;
+      wStat = 0.56;
+      wTeam = 0.18;
+    } else if (v < Math.round(voterCount * 0.85)) {
+      // 팀 성적·임팩트·기여도 중시 기자단
+      wWar = 0.32;
+      wStat = 0.30;
+      wTeam = 0.38;
+    } else {
+      // 종합 균형형 기자단
+      wWar = 0.42;
+      wStat = 0.38;
+      wTeam = 0.20;
+    }
+
+    const ballot = pool
+      .map((c) => {
+        const jitter = (rng.next() - 0.5) * 6.5;
+        const val = c.warScore * wWar + c.statScore * wStat + c.teamContribution * wTeam + jitter;
+        return { id: c.player.id, val };
+      })
+      .sort((a, b) => b.val - a.val);
+
+    if (ballot[0]) {
+      const t = voteTallies.get(ballot[0].id)!;
+      t.points += 5;
+      t.first += 1;
+    }
+    if (ballot[1]) {
+      const t = voteTallies.get(ballot[1].id)!;
+      t.points += 3;
+      t.second += 1;
+    }
+    if (ballot[2]) {
+      const t = voteTallies.get(ballot[2].id)!;
+      t.points += 1;
+      t.third += 1;
+    }
+  }
+
+  const maxPointsPerPlayer = voterCount * 5;
+  const ranked: RookiePressVoteEntry[] = pool
+    .map((c) => {
+      const t = voteTallies.get(c.player.id)!;
+      const combinedScore = Number(
+        (c.warScore * 0.42 + c.statScore * 0.38 + c.teamContribution * 0.20).toFixed(1)
+      );
+      return {
+        rank: 0,
+        playerId: c.player.id,
+        playerName: c.player.name,
+        teamId: c.player.teamId,
+        position: c.player.position,
+        role: c.player.role,
+        age: c.player.age,
+        entryYearNumber: c.elig.entryYearNumber,
+        war: c.war,
+        statSummary:
+          c.player.role === '투수' ? buildPitcherSummary(c.player) : buildBatterSummary(c.player),
+        teamContribution: c.teamContribution,
+        normalizedScore: combinedScore,
+        totalVotePoints: t.points,
+        firstPlaceVotes: t.first,
+        secondPlaceVotes: t.second,
+        thirdPlaceVotes: t.third,
+        voteSharePct: Number(((t.points / Math.max(1, maxPointsPerPlayer)) * 100).toFixed(1)),
+        eligibilityNote: c.elig.reason,
+      };
+    })
+    .sort(
+      (a, b) =>
+        b.totalVotePoints - a.totalVotePoints ||
+        b.firstPlaceVotes - a.firstPlaceVotes ||
+        b.war - a.war ||
+        b.normalizedScore - a.normalizedScore
+    );
+
+  ranked.forEach((entry, idx) => {
+    entry.rank = idx + 1;
+  });
+
+  return {
+    voterCount,
+    entries: options?.limit ? ranked.slice(0, options.limit) : ranked,
+  };
+}
+
+/**
+ * 시즌 진행 중 공식 신인왕 후보 실시간 TOP 10 순위 산출 (공식 자격 + WAR + 기자단 AI 예상 득표율)
+ */
+export function computeLiveRookieRace(
+  career: CareerSave,
+  limit = 10
+): LiveAwardCandidate[] {
+  const { entries } = runRookieOfYearPressVote(career, { limit });
+  return entries.map((e) => ({
+    rank: e.rank,
+    playerId: e.playerId,
+    playerName: e.playerName,
+    teamId: e.teamId,
+    position: e.position,
+    role: e.role,
+    score: e.normalizedScore,
+    statSummary: `WAR ${e.war.toFixed(1)} · ${e.statSummary}`,
+    war: e.war,
+    entryYearNumber: e.entryYearNumber,
+    projectedVoteSharePct: e.voteSharePct,
+    tag: `입단 ${e.entryYearNumber}년 차 · ${e.age}세`,
+  }));
 }
 
 /**
@@ -611,16 +1154,10 @@ export function runOfficialSeasonAwardsCeremonyInPlace(
     .sort((a, b) => getScore(b) - getScore(a) || b.ability - a.ability);
   const mvpPlayer = mvpCandidates[0] ?? null;
 
-  // 4. 신인왕 (2026 KBO 공식 자격: 5년 이내 입단, 이전 ≤30IP/≤60PA, 해외 프로 경력 없음)
-  const rookieCandidates = activeKboPlayers
-    .map((p) => ({
-      player: p,
-      elig: checkRookieOfYearEligibility(p, targetSeason),
-      score: getScore(p),
-    }))
-    .filter((x) => x.elig.eligible && x.score > 0)
-    .sort((a, b) => b.score - a.score || b.player.ability - a.player.ability);
-  const royWinner = rookieCandidates[0] ?? null;
+  // 4. 신인왕 (KBO 공식 규정: 입단 6년 차 이내, 이전 1군 ≤30IP/≤60PA, 당해·퓨처스 제외, 비해외파, 기수상 제외, 나이 무관)
+  //    정규시즌 종료 후 WAR · 타격 성적 · 투구 성적 · 팀 기여도를 종합해 한국야구기자회 기자단 AI 100인 투표로 최종 선정
+  const rookieVoteResult = runRookieOfYearPressVote(career, { season: targetSeason });
+  const royVoteWinner = rookieVoteResult.entries[0] ?? null;
 
   // 5. 골든글러브 10명 (투수 1, 포수 1, 1B·2B·3B·SS 각 1, 외야수 3, 지명타자 1)
   interface GgSlotDef {
@@ -820,22 +1357,26 @@ export function runOfficialSeasonAwardsCeremonyInPlace(
           votes: Math.min(99, Math.max(66, Math.round(58 + getScore(mvpPlayer) * 0.42))),
         }
       : null,
-    rookieOfYear: royWinner
+    rookieOfYear: royVoteWinner
       ? {
           category: '신인왕',
-          playerId: royWinner.player.id,
-          playerName: royWinner.player.name,
-          teamId: royWinner.player.teamId,
-          statSummary:
-            royWinner.player.role === '투수'
-              ? buildPitcherSummary(royWinner.player)
-              : buildBatterSummary(royWinner.player),
-          normalizedScore: royWinner.score,
-          eligibilityNote: royWinner.elig.reason,
-          candidateCount: rookieCandidates.length,
-          votes: Math.min(98, Math.max(60, Math.round(54 + royWinner.score * 0.44))),
+          playerId: royVoteWinner.playerId,
+          playerName: royVoteWinner.playerName,
+          teamId: royVoteWinner.teamId,
+          statSummary: `WAR ${royVoteWinner.war.toFixed(1)} · ${royVoteWinner.statSummary}`,
+          normalizedScore: royVoteWinner.normalizedScore,
+          war: royVoteWinner.war,
+          firstPlaceVotes: royVoteWinner.firstPlaceVotes,
+          votePoints: royVoteWinner.totalVotePoints,
+          voteSharePct: royVoteWinner.voteSharePct,
+          voterCount: rookieVoteResult.voterCount,
+          eligibilityNote: royVoteWinner.eligibilityNote,
+          candidateCount: rookieVoteResult.entries.length,
+          votes: Math.round(royVoteWinner.voteSharePct),
         }
       : null,
+    rookiePressVotes: rookieVoteResult.entries.slice(0, 5),
+    rookiePressVoterCount: rookieVoteResult.voterCount,
     choiDongWon: choiBest
       ? {
           category: '최동원상',

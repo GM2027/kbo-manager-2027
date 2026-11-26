@@ -13,10 +13,10 @@ import {
 import { KBO_TEAMS, normalizeChampionHistory, TEAM_IDS } from '../data/kboTeams';
 import {
   checkGoldenGloveEligibility,
-  checkRookieOfYearEligibility,
   computeNormalizedRegularAwardScore,
   computeOfficialRegularTitles,
   confirmAwardsCeremonyAndEnterOffseason,
+  runRookieOfYearPressVote,
 } from '../engine/kboAwardsEngine';
 import { computeLiveAwardRaces, getClubTitleCount } from '../engine/leagueLifeEngine';
 import { computeSeasonAwards } from '../engine/transactions';
@@ -89,9 +89,7 @@ export const KboAwardsCeremonyView: React.FC<KboAwardsCeremonyViewProps> = ({
       .sort((a, b) => b.score - a.score);
 
     const topMvp = scored.slice(0, 5);
-    const topRookies = scored
-      .filter((x) => checkRookieOfYearEligibility(x.player, career.season).eligible)
-      .slice(0, 5);
+    const topRookies = runRookieOfYearPressVote(career, { limit: 5 }).entries;
 
     const { battingTitleHolderMap, pitchingTitleHolderMap } = computeOfficialRegularTitles(career);
     const ggPreviewSlots: { label: string; posList: Position[]; slotType: 'P' | 'FIELDER' | 'DH' }[] = [
@@ -371,50 +369,67 @@ export const KboAwardsCeremonyView: React.FC<KboAwardsCeremonyViewProps> = ({
             </div>
 
             <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 p-4">
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
                 <div className="flex items-center gap-2 font-bold text-sm text-slate-900 dark:text-white">
                   <Crown className="w-4 h-4 text-sky-500" />
-                  신인왕 후보 TOP 10
+                  신인왕 후보 TOP 10 (기자단 AI 예상)
                 </div>
                 <span className="text-[11px] text-slate-500 dark:text-slate-400">
                   수상 시 연봉요구 +20%
                 </span>
               </div>
-              <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
-                {liveRaces.rookieTop10.map((c) => (
-                  <button
-                    key={c.playerId}
-                    type="button"
-                    onClick={() => onSelectPlayer?.(c.playerId)}
-                    className="w-full py-2 flex items-center justify-between gap-2 text-left hover:bg-slate-50 dark:hover:bg-slate-800/40 px-1.5 rounded transition-colors"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <span
-                        className={`w-6 text-center font-mono-stats text-xs font-extrabold ${
-                          c.rank === 1 ? 'text-sky-500' : 'text-slate-500'
-                        }`}
-                      >
-                        {c.rank}
-                      </span>
-                      <TeamLogo teamId={c.teamId} size="xs" />
-                      <div className="min-w-0">
-                        <div className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                          {c.playerName}{' '}
-                          <span className="font-normal text-slate-500">
-                            {c.teamId} · {c.position}
-                          </span>
-                        </div>
-                        <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate font-mono-stats">
-                          {c.statSummary}
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 mb-2.5">
+                공식 자격: 입단 6년 차 이내 · 이전 1군 ≤30IP/≤60PA · 당해·퓨처스 제외 · 비해외파 · 기수상 제외 · 나이 무관
+              </div>
+              {liveRaces.rookieTop10.length === 0 ? (
+                <div className="text-xs text-slate-500 py-5 text-center">
+                  정규시즌 개막 후 공식 신인왕 자격 보유 선수의 1군 출전 기록이 쌓이면 후보 순위가 자동 갱신됩니다.
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
+                  {liveRaces.rookieTop10.map((c) => (
+                    <button
+                      key={c.playerId}
+                      type="button"
+                      onClick={() => onSelectPlayer?.(c.playerId)}
+                      className="w-full py-2 flex items-center justify-between gap-2 text-left hover:bg-slate-50 dark:hover:bg-slate-800/40 px-1.5 rounded transition-colors"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span
+                          className={`w-6 text-center font-mono-stats text-xs font-extrabold ${
+                            c.rank === 1 ? 'text-sky-500' : 'text-slate-500'
+                          }`}
+                        >
+                          {c.rank}
+                        </span>
+                        <TeamLogo teamId={c.teamId} size="xs" />
+                        <div className="min-w-0">
+                          <div className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                            {c.playerName}{' '}
+                            <span className="font-normal text-slate-500">
+                              {c.teamId} · {c.position}
+                              {c.entryYearNumber ? ` · 입단 ${c.entryYearNumber}년 차` : ''}
+                            </span>
+                          </div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate font-mono-stats">
+                            {c.statSummary}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <span className="shrink-0 text-xs font-mono-stats font-bold text-sky-600 dark:text-sky-400">
-                      {c.score.toFixed(1)}
-                    </span>
-                  </button>
-                ))}
-              </div>
+                      <div className="shrink-0 text-right font-mono-stats">
+                        <div className="text-xs font-bold text-sky-600 dark:text-sky-400">
+                          {c.projectedVoteSharePct !== undefined
+                            ? `${c.projectedVoteSharePct.toFixed(1)}%`
+                            : `${c.score.toFixed(1)}점`}
+                        </div>
+                        {c.war !== undefined && (
+                          <div className="text-[10px] text-slate-400">WAR {c.war.toFixed(1)}</div>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -731,13 +746,13 @@ export const KboAwardsCeremonyView: React.FC<KboAwardsCeremonyViewProps> = ({
 
             {/* 신인왕 */}
             <div className="kbo-gala-stage rounded-xl border border-emerald-400/55 p-5 text-white shadow-xl space-y-4 animate-award-enter">
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-400 text-slate-950 text-xs font-black">
                   <Star className="w-3.5 h-3.5" />
                   <span>{activeAwards.season} KBO 신인왕</span>
                 </div>
                 <span className="text-[11px] font-semibold text-emerald-200/90">
-                  5년 이내 · ≤30IP/≤60PA · 비해외파
+                  입단 6년 차 이내 · ≤30IP/≤60PA · 기자단 AI {activeAwards.rookiePressVoterCount ?? 100}인 투표
                 </span>
               </div>
 
@@ -760,6 +775,13 @@ export const KboAwardsCeremonyView: React.FC<KboAwardsCeremonyViewProps> = ({
                       </div>
                       <div className="text-xs font-semibold text-emerald-200">
                         {KBO_TEAMS[activeAwards.rookieOfYear.teamId].name}
+                        {activeAwards.rookieOfYear.votePoints !== undefined && (
+                          <span className="ml-2 font-mono-stats text-emerald-300">
+                            · 1위표 {activeAwards.rookieOfYear.firstPlaceVotes ?? 0}표 / 총{' '}
+                            {activeAwards.rookieOfYear.votePoints}점 (득표율{' '}
+                            {activeAwards.rookieOfYear.voteSharePct?.toFixed(1) ?? activeAwards.rookieOfYear.votes}%)
+                          </span>
+                        )}
                       </div>
                       <div className="text-xs font-mono-stats text-slate-100 bg-white/10 rounded px-2.5 py-1 inline-block">
                         {activeAwards.rookieOfYear.statSummary}
@@ -773,10 +795,40 @@ export const KboAwardsCeremonyView: React.FC<KboAwardsCeremonyViewProps> = ({
                       <span>{activeAwards.rookieOfYear.eligibilityNote}</span>
                     </div>
                   )}
+                  {activeAwards.rookiePressVotes && activeAwards.rookiePressVotes.length > 0 && (
+                    <div className="rounded-lg bg-slate-950/45 border border-emerald-400/25 p-2.5 space-y-1.5">
+                      <div className="text-[10px] font-bold text-emerald-200/90 flex items-center justify-between">
+                        <span>기자단 AI 투표 TOP {activeAwards.rookiePressVotes.length} (1위 5점 · 2위 3점 · 3위 1점)</span>
+                        <span className="font-mono-stats text-slate-300">WAR · 성적 · 팀기여도 종합</span>
+                      </div>
+                      <div className="divide-y divide-white/10 text-[11px]">
+                        {activeAwards.rookiePressVotes.map((rv) => (
+                          <div key={rv.playerId} className="py-1 flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <span className="font-mono-stats font-black text-emerald-300 w-4">{rv.rank}</span>
+                              <button
+                                type="button"
+                                onClick={() => onSelectPlayer?.(rv.playerId)}
+                                className="font-bold text-white hover:text-emerald-300 truncate"
+                              >
+                                {rv.playerName}
+                              </button>
+                              <span className="text-[10px] text-slate-300 shrink-0">
+                                {rv.teamId}·{rv.position} ({rv.entryYearNumber}년 차)
+                              </span>
+                            </div>
+                            <div className="font-mono-stats text-[10px] text-emerald-200 shrink-0">
+                              WAR {rv.war.toFixed(1)} · 1위 {rv.firstPlaceVotes} · {rv.totalVotePoints}점 ({rv.voteSharePct.toFixed(1)}%)
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </>
               ) : (
                 <div className="text-xs text-slate-400">
-                  2026 KBO 공식 신인왕 자격(5년 이내 · 이전 30이닝/60타석 이하 · 해외 프로 경력 없음) 충족 수상자 없음
+                  KBO 공식 신인왕 자격(입단 6년 차 이내 · 이전 1군 30이닝/60타석 이하 · 해외 프로 경력 없음 · 기수상 제외) 충족 수상자 없음
                 </div>
               )}
             </div>
@@ -950,34 +1002,39 @@ export const KboAwardsCeremonyView: React.FC<KboAwardsCeremonyViewProps> = ({
             </div>
 
             <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-lg p-4 space-y-2.5">
-              <div className="text-sm font-extrabold flex items-center gap-1.5">
-                <Star className="w-4 h-4 text-emerald-500" />
-                <span>신인왕 공식 자격 후보 선두권</span>
+              <div className="text-sm font-extrabold flex items-center justify-between gap-1.5">
+                <span className="flex items-center gap-1.5">
+                  <Star className="w-4 h-4 text-emerald-500" />
+                  <span>신인왕 공식 자격 후보 선두권 (기자단 AI 예상)</span>
+                </span>
+                <span className="text-[10px] font-normal text-slate-400">입단 6년 차 이내 · 나이 무관</span>
               </div>
               {liveProjection.topRookies.length === 0 ? (
                 <div className="text-xs text-slate-500 py-4 text-center">
-                  정규시즌 출전 기록이 쌓이면 공식 신인왕 자격 후보(5년 이내·≤30IP/≤60PA·비해외파)가 표시됩니다.
+                  정규시즌 1군 출전 기록이 쌓이면 공식 신인왕 자격 후보(입단 6년 차 이내·≤30IP/≤60PA·비해외파·기수상 제외)가 표시됩니다.
                 </div>
               ) : (
                 <div className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
                   {liveProjection.topRookies.map((item, i) => (
-                    <div key={item.player.id} className="py-2 flex items-center justify-between gap-2">
+                    <div key={item.playerId} className="py-2 flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2 min-w-0">
                         <span className="font-mono-stats font-black text-emerald-600 dark:text-emerald-400 w-4">
                           {i + 1}
                         </span>
-                        <TeamLogo teamId={item.player.teamId} size="xs" />
+                        <TeamLogo teamId={item.teamId} size="xs" />
                         <button
                           type="button"
-                          onClick={() => onSelectPlayer?.(item.player.id)}
+                          onClick={() => onSelectPlayer?.(item.playerId)}
                           className="font-bold hover:underline truncate"
                         >
-                          {item.player.name}
+                          {item.playerName}
                         </button>
-                        <span className="text-slate-400">{item.player.position}</span>
+                        <span className="text-slate-400 shrink-0">
+                          {item.position} · {item.entryYearNumber}년 차
+                        </span>
                       </div>
-                      <span className="font-mono-stats font-extrabold text-emerald-600 dark:text-emerald-400">
-                        {item.score.toFixed(1)}점
+                      <span className="font-mono-stats font-extrabold text-emerald-600 dark:text-emerald-400 shrink-0">
+                        WAR {item.war.toFixed(1)} · {item.voteSharePct.toFixed(1)}%
                       </span>
                     </div>
                   ))}

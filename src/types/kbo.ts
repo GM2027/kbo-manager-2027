@@ -296,6 +296,8 @@ export type TradeProtectionTier =
 export interface CareerBatterStats {
   seasons: number;
   G: number;
+  /** 이전 시즌까지 KBO 1군 통산 타석 수 (신인왕 60타석 이하 자격 판정용 정확 누적) */
+  PA?: number;
   AB: number;
   H: number;
   HR: number;
@@ -508,6 +510,8 @@ export interface Player {
   markedForOffseasonRelease?: boolean;
   /** 직전 시즌 개인 주요 수상 효과 (MVP / 신인왕 / 골든글러브) */
   lastSeasonAwards?: ('MVP' | '신인왕' | '골든글러브')[];
+  /** 당해 시즌 개막 기준 공식 신인왕 자격 판정 스냅샷 (매 시즌 개막·종료 후 자동 재계산) */
+  rookieEligibility?: RookieEligibilitySnapshot;
   /** 최근 이적 시 등번호 중복 재배정 메모 */
   uniformChangeNote?: string;
   /** 시즌별 결정론적 커리어 흐름 (깜짝 활약 · 슬럼프 · 후반기 반등 · 평온) — 확정 후 저장 고정 */
@@ -1883,6 +1887,44 @@ export interface PlayerAwardHonor {
   statSummary: string;
 }
 
+export interface RookieEligibilitySnapshot {
+  season: number;
+  eligible: boolean;
+  entryYear: number;
+  /** 해당 시즌 포함 입단 연차 (1년차 = 당해 입단, 최대 6년차까지 자격 보유) */
+  entryYearNumber: number;
+  /** 이전 시즌까지 1군 통산 투구 이닝 (당해 시즌·퓨처스 제외) */
+  priorInnings: number;
+  /** 이전 시즌까지 1군 통산 아웃 카운트 (90아웃 = 30.0이닝) */
+  priorOuts: number;
+  /** 이전 시즌까지 1군 통산 타석 (당해 시즌·퓨처스 제외) */
+  priorPA: number;
+  hasOverseasProCareer: boolean;
+  alreadyWonRookieOfYear: boolean;
+  reason: string;
+}
+
+export interface RookiePressVoteEntry {
+  rank: number;
+  playerId: string;
+  playerName: string;
+  teamId: TeamId;
+  position: Position;
+  role: PlayerRole;
+  age: number;
+  entryYearNumber: number;
+  war: number;
+  statSummary: string;
+  teamContribution: number;
+  normalizedScore: number;
+  totalVotePoints: number;
+  firstPlaceVotes: number;
+  secondPlaceVotes: number;
+  thirdPlaceVotes: number;
+  voteSharePct: number;
+  eligibilityNote: string;
+}
+
 export interface AwardEntry {
   category: string;
   playerId: string;
@@ -1895,7 +1937,17 @@ export interface AwardEntry {
   positionLabel?: string;
   /** 투수·타자 직접 비교용 0~100 정규시즌 정규화 평가점수 */
   normalizedScore?: number;
-  /** 2026 KBO 공식 후보 자격 근거 (규정이닝, 10승/30세이브/30홀드, 720수비이닝, DH 297타석, 타이틀홀더 예외 등) */
+  /** 정규시즌 추정 WAR */
+  war?: number;
+  /** 기자단 AI 투표 1위표 수 */
+  firstPlaceVotes?: number;
+  /** 기자단 AI 투표 총점 (1위 5점 · 2위 3점 · 3위 1점) */
+  votePoints?: number;
+  /** 기자단 AI 투표 득표율 (%) */
+  voteSharePct?: number;
+  /** 기자단 투표 참여 인원 */
+  voterCount?: number;
+  /** KBO 공식 후보 자격 근거 */
   eligibilityNote?: string;
   /** 공식 타이틀홀더 예외 자격으로 후보 등재 여부 */
   isTitleHolderException?: boolean;
@@ -1922,6 +1974,10 @@ export interface SeasonAwards {
   managerOfTheYear?: ManagerOfYearAward | null;
   mvp: AwardEntry | null;
   rookieOfYear: AwardEntry | null;
+  /** 신인왕 기자단 AI 투표 상위 결과 (1위 5점 · 2위 3점 · 3위 1점) */
+  rookiePressVotes?: RookiePressVoteEntry[];
+  /** 신인왕 기자단 AI 투표 참여 기자 수 */
+  rookiePressVoterCount?: number;
   choiDongWon: AwardEntry | null;
   goldenGloves: AwardEntry[];
   defenseAwards: AwardEntry[];
@@ -3021,6 +3077,12 @@ export interface LiveAwardCandidate {
   score: number;
   statSummary: string;
   tag?: string;
+  /** 정규시즌 추정 WAR */
+  war?: number;
+  /** 입단 연차 (신인왕 후보 표시용, 1~6년차) */
+  entryYearNumber?: number;
+  /** 기자단 AI 예상 득표율 (%) */
+  projectedVoteSharePct?: number;
 }
 
 export interface LiveAwardRaces {

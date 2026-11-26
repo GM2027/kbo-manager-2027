@@ -160,6 +160,7 @@ import {
 import {
   confirmAwardsCeremonyAndEnterOffseason,
   runOfficialSeasonAwardsCeremonyInPlace,
+  syncSeasonRookieEligibilityInPlace,
 } from './kboAwardsEngine';
 import {
   canHoldPlayerMeeting,
@@ -5048,6 +5049,8 @@ export function advanceToNextSeason(career: CareerSave): {
     }
   }
   ensureCareerOotpRatingsInPlace(next);
+  // 매 시즌 종료 → 차기 시즌 개막 시 전체 선수 신인왕 자격 자동 재계산 (직전 시즌 1군 이닝·타석 반영)
+  syncSeasonRookieEligibilityInPlace(next);
 
   next.rngState = rng.getState();
   next.version = bumpVersion(next.version);

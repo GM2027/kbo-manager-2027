@@ -26,6 +26,7 @@ import {
   evaluateFranchiseStar,
   evaluatePlayerTradeValuationDetailed,
 } from '../engine/franchiseStarEngine';
+import { evaluateOpeningDayRookieEligibility } from '../engine/kboAwardsEngine';
 import {
   computeYoYSalaryChange,
   countDistinctMlbSeasons,
@@ -428,6 +429,42 @@ export const PlayerDetailModal: React.FC<PlayerDetailModalProps> = ({
               )}
             </div>
           </div>
+
+          {/* 신인왕 공식 자격 여부 배너 (시즌 개막 시 자동 판정 · 입단 6년 차 이내 · 이전 1군 ≤30IP/≤60PA · 비해외파 · 기수상 제외 · 나이 무관) */}
+          {player.rosterTier !== '은퇴' && (() => {
+            const royElig =
+              player.rookieEligibility?.season === career.season
+                ? player.rookieEligibility
+                : evaluateOpeningDayRookieEligibility(player, career.season, career);
+            return (
+              <div
+                data-testid="rookie-eligibility-banner"
+                className={`px-3 py-2 rounded-lg border flex flex-wrap items-center justify-between gap-2 text-[11px] ${
+                  royElig.eligible
+                    ? 'border-emerald-500/40 bg-emerald-50/70 dark:bg-emerald-950/25 text-emerald-900 dark:text-emerald-200'
+                    : 'border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/50 text-slate-600 dark:text-slate-300'
+                }`}
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <span
+                    className={`px-2 py-0.5 rounded-full font-extrabold text-[10px] shrink-0 ${
+                      royElig.eligible
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    {royElig.eligible
+                      ? `${career.season} 신인왕 자격 보유`
+                      : `${career.season} 신인왕 자격 없음`}
+                  </span>
+                  <span className="truncate font-semibold">{royElig.reason}</span>
+                </div>
+                <span className="font-mono-stats text-[10px] text-slate-500 dark:text-slate-400 shrink-0">
+                  기준: 입단 6년 차 이내 · 이전 1군 ≤30IP/≤60PA · 당해·퓨처스 제외 · 나이 무관
+                </span>
+              </div>
+            );
+          })()}
 
           {/* OOTP 스타일 6탭 세부 능력치 패널 (타격 · 투구 · 수비 · 주루 · 성향 · 성장 기록) */}
           <OotpRatingsPanel

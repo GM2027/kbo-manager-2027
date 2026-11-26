@@ -1033,9 +1033,12 @@ export function getLiveCareerStats(player: Player): CareerBatterStats | CareerPi
     const b = base as CareerBatterStats;
     const cur = player.stats as BatterStats;
     const curG = cur.G ?? 0;
+    const basePa = b.PA ?? b.AB + b.BB;
+    const curPa = cur.PA ?? (cur.AB ?? 0) + (cur.BB ?? 0) + (cur.HBP ?? 0) + (cur.SF ?? 0);
     return {
       seasons: b.seasons + (curG > 0 ? 1 : 0),
       G: b.G + curG,
+      PA: basePa + curPa,
       AB: b.AB + (cur.AB ?? 0),
       H: b.H + (cur.H ?? 0),
       HR: b.HR + (cur.HR ?? 0),
