@@ -49,7 +49,11 @@ import {
   computeOotpPitcherOverall,
   evaluatePitcherRoleFit,
 } from '../engine/ootpRatingsEngine';
-import { ALL_FIELD_POSITIONS, formatCompactPlayerPosition } from '../engine/positionEngine';
+import {
+  ALL_FIELD_POSITIONS,
+  ALL_HITTER_LINEUP_POSITIONS,
+  formatCompactPlayerPosition,
+} from '../engine/positionEngine';
 import {
   countPreGameEditorChanges,
   loadPreGameEditorStore,
@@ -1846,9 +1850,9 @@ export const GameEditorView: React.FC<GameEditorViewProps> = ({
                               }}
                               className="w-full px-2.5 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-bold"
                             >
-                              {ALL_FIELD_POSITIONS.map((pos) => (
+                              {ALL_HITTER_LINEUP_POSITIONS.map((pos) => (
                                 <option key={pos} value={pos}>
-                                  {pos}
+                                  {pos === 'DH' ? 'DH (지명타자)' : pos}
                                 </option>
                               ))}
                             </select>
@@ -1895,7 +1899,7 @@ export const GameEditorView: React.FC<GameEditorViewProps> = ({
                             포지션별 수비 숙련도 (0 ~ 100)
                           </div>
                           <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                            {ALL_FIELD_POSITIONS.map((pos) => {
+                            {ALL_HITTER_LINEUP_POSITIONS.map((pos) => {
                               const val = Math.round(playerDraft.positionProficiency[pos] ?? (pos === playerDraft.position ? 90 : 35));
                               return (
                                 <label
@@ -2448,9 +2452,9 @@ export const GameEditorView: React.FC<GameEditorViewProps> = ({
                 onChange={(e) => setNewPlayerForm({ ...newPlayerForm, position: e.target.value as Position })}
                 className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-bold"
               >
-                {(newPlayerForm.role === '투수' ? PITCHER_POSITIONS : ALL_FIELD_POSITIONS).map((pos) => (
+                {(newPlayerForm.role === '투수' ? PITCHER_POSITIONS : ALL_HITTER_LINEUP_POSITIONS).map((pos) => (
                   <option key={pos} value={pos}>
-                    {pos}
+                    {pos === 'DH' ? 'DH (지명타자)' : pos}
                   </option>
                 ))}
               </select>

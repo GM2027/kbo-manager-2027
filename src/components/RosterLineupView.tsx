@@ -1818,11 +1818,24 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                         className="py-1.5 px-2 whitespace-nowrap font-mono-stats"
                         title={
                           p.role === '타자'
-                            ? ALL_FIELD_POSITIONS.map((fp) => `${fp}:${getPositionProficiency(p, fp)}`).join(' · ')
+                            ? ALL_HITTER_LINEUP_POSITIONS.map((fp) => `${fp}:${getPositionProficiency(p, fp)}`).join(' · ')
                             : p.position
                         }
                       >
-                        <span>{formatCompactPlayerPosition(p)}</span>
+                        {p.position === 'DH' ? (
+                          <span className="inline-flex items-center gap-1">
+                            <span className="px-1.5 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 font-extrabold text-[10px]">
+                              DH
+                            </span>
+                            {formatCompactPlayerPosition(p).replace(/^DH\s*/, '') && (
+                              <span className="text-slate-500 text-[10px]">
+                                {formatCompactPlayerPosition(p).replace(/^DH\s*/, '')}
+                              </span>
+                            )}
+                          </span>
+                        ) : (
+                          <span>{formatCompactPlayerPosition(p)}</span>
+                        )}
                         {p.positionTrainingTarget && (
                           <span className="ml-1 text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
                             [훈련:{p.positionTrainingTarget}]

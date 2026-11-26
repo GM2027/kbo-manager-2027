@@ -75,10 +75,14 @@ export function ensurePlayerPositionProficiencyInPlace(p: Player): Partial<Recor
     }
   }
 
-  // 주 포지션은 최소 76 이상 보장
-  map[p.position] = clamp(Math.max(map[p.position] ?? primaryDefault, primaryDefault), 76, 100);
+  // 주 포지션은 최소 76 이상 보장 (전담 DH는 최상위 지명타자 숙련도 보장)
+  map[p.position] = clamp(
+    Math.max(map[p.position] ?? primaryDefault, p.position === 'DH' ? 94 : primaryDefault),
+    p.position === 'DH' ? 92 : 76,
+    100
+  );
   // 지명타자는 타자 전원 높은 적응도 유지
-  map.DH = clamp(Math.max(map.DH ?? 88, 84), 80, 98);
+  map.DH = clamp(Math.max(map.DH ?? (p.position === 'DH' ? 95 : 88), p.position === 'DH' ? 92 : 84), 80, 100);
 
   // 보조 포지션은 최소 60 이상 보장
   if (p.secondaryPositions && p.secondaryPositions.length > 0) {
@@ -104,7 +108,8 @@ export function getPositionProficiency(p: Player, pos: Position): number {
     return p.position === pos ? 90 : 0;
   }
   if (pos === 'DH') {
-    return clamp(p.positionProficiency?.DH ?? 88, 80, 100);
+    const baseDh = p.position === 'DH' ? 95 : 88;
+    return clamp(p.positionProficiency?.DH ?? baseDh, p.position === 'DH' ? 90 : 80, 100);
   }
   if (p.positionProficiency && typeof p.positionProficiency[pos] === 'number') {
     return clamp(p.positionProficiency[pos]!, 0, 100);

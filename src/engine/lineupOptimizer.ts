@@ -771,7 +771,7 @@ export function optimizeBattingLineup(
   const scorePlayerAtFieldSlot = (p: Player, slot: Position): number => {
     const batVal = scoreCandidateOffense(p);
     if (slot === 'DH') {
-      const defWeight = p.position === 'DH' || p.position === '1B' || p.position === 'LF' ? 2.8 : 0;
+      const defWeight = p.position === 'DH' ? 11.0 : p.position === '1B' || p.position === 'LF' ? 2.8 : 0;
       return batVal * 1.06 + defWeight;
     }
     const prof = getPositionProficiency(p, slot);

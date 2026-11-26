@@ -145,7 +145,7 @@ export const HANWHA_2026_CORE_ROSTER: HanwhaPlayerDef[] = [
     contract: { status: '미확인', currency: 'KRW', years: 1, yearsRemaining: 1, annualSalary: 0, signingBonus: 0, totalValue: 0, note: '기존 구단 핵심 (포스팅 자격 7시즌 검토 가능)' },
   },
   {
-    name: '강백호', role: '타자', position: '1B', category: '국내', age: 27,
+    name: '강백호', role: '타자', position: 'DH', category: '국내', age: 27,
     ability: 85, potential: 90, abilityStatus: '확정', rosterTier: '1군', gameDayActive: true, serviceYears: 8,
     contract: { status: '미확인', currency: 'KRW', years: 1, yearsRemaining: 1, annualSalary: 0, signingBonus: 0, totalValue: 0, note: '기존 구단 선수' },
   },

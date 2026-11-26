@@ -21,6 +21,7 @@ import {
 import { isMilitaryResolved, isMilitaryServing } from '../engine/militaryEngine';
 import {
   ALL_FIELD_POSITIONS,
+  ALL_HITTER_LINEUP_POSITIONS,
   ensurePlayerPositionProficiencyInPlace,
   getPositionProficiency,
 } from '../engine/positionEngine';
@@ -376,6 +377,70 @@ function buildHistoricalCareerStats(
   return agg;
 }
 
+/**
+ * 2027 실존 포지션 교정 및 전담 지명타자(DH) 포지션 매핑
+ * - 힐리어드(KT): 외야수(LF 주포지션 · CF/RF 멀티, 1B 보조)
+ * - 강백호(한화), 최형우(삼성), 김현수(KT), 김재환(SSG), 전준우(롯데): 전담 지명타자(DH) 주포지션
+ */
+const REAL_KBO_2027_POSITION_OVERRIDES: Record<
+  string,
+  {
+    position: Position;
+    secondaryPositions: Position[];
+    positionProficiency: Partial<Record<Position, number>>;
+  }
+> = {
+  'KT::힐리어드': {
+    position: 'LF',
+    secondaryPositions: ['CF', 'RF', '1B'],
+    positionProficiency: { LF: 88, CF: 84, RF: 84, '1B': 64, DH: 88 },
+  },
+  '한화::강백호': {
+    position: 'DH',
+    secondaryPositions: ['1B', 'RF', 'C'],
+    positionProficiency: { DH: 96, '1B': 72, RF: 68, C: 60 },
+  },
+  '삼성::최형우': {
+    position: 'DH',
+    secondaryPositions: ['LF'],
+    positionProficiency: { DH: 97, LF: 68, '1B': 52 },
+  },
+  'KT::김현수': {
+    position: 'DH',
+    secondaryPositions: ['LF', '1B'],
+    positionProficiency: { DH: 95, LF: 72, '1B': 68 },
+  },
+  'SSG::김재환': {
+    position: 'DH',
+    secondaryPositions: ['LF', '1B'],
+    positionProficiency: { DH: 95, LF: 68, '1B': 60 },
+  },
+  '롯데::전준우': {
+    position: 'DH',
+    secondaryPositions: ['LF', '1B'],
+    positionProficiency: { DH: 94, LF: 72, '1B': 66 },
+  },
+};
+
+function findVerifiedPositionOverride(teamId: TeamId, name: string) {
+  const clean = name.replace(/\s+/g, '');
+  return (
+    REAL_KBO_2027_POSITION_OVERRIDES[`${teamId}::${clean}`] ??
+    REAL_KBO_2027_POSITION_OVERRIDES[`${teamId}::${name}`] ??
+    (clean === '힐리어드' || clean === '샘힐리어드'
+      ? REAL_KBO_2027_POSITION_OVERRIDES['KT::힐리어드']
+      : clean === '강백호'
+      ? REAL_KBO_2027_POSITION_OVERRIDES['한화::강백호']
+      : clean === '최형우'
+      ? REAL_KBO_2027_POSITION_OVERRIDES['삼성::최형우']
+      : clean === '김재환'
+      ? REAL_KBO_2027_POSITION_OVERRIDES['SSG::김재환']
+      : clean === '전준우'
+      ? REAL_KBO_2027_POSITION_OVERRIDES['롯데::전준우']
+      : undefined)
+  );
+}
+
 function inferConcretePosition(
   raw: RawV18Player,
   teamId: TeamId,
@@ -393,6 +458,16 @@ function inferConcretePosition(
 
   if (posRaw === 'P' || explicitPrimary === 'SP' || explicitPrimary === 'RP' || explicitPrimary === 'CL') {
     return { role: '투수', position: explicitPrimary === 'RP' || explicitPrimary === 'CL' ? explicitPrimary : 'SP' };
+  }
+
+  const verifiedOverride = findVerifiedPositionOverride(teamId, cleanName);
+  if (verifiedOverride) {
+    return {
+      role: '타자',
+      position: verifiedOverride.position,
+      secondaryPositions: [...verifiedOverride.secondaryPositions],
+      positionProficiency: { ...verifiedOverride.positionProficiency },
+    };
   }
 
   const validSec = Array.isArray(raw.secondary_positions)
@@ -623,6 +698,8 @@ export function computeRealisticServiceYears2027(
 
 function getDatabaseVersionRank(ver?: string): number {
   switch (ver) {
+    case 'v30_hilliard_of_and_dh_position':
+      return 30;
     case 'v29_realistic_service_years':
       return 29;
     case 'v28_ootp_detailed_ratings':
@@ -1244,7 +1321,7 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
         }
         if (p.role !== '타자') continue;
         const src = p.v18SourceId ? V18_BY_SOURCE_ID.get(p.v18SourceId) : undefined;
-        if (src && src.primary_position && ALL_FIELD_POSITIONS.includes(src.primary_position as Position)) {
+        if (src && src.primary_position && ALL_HITTER_LINEUP_POSITIONS.includes(src.primary_position as Position)) {
           const verifiedPrimary = src.primary_position as Position;
           const prevPos = p.position;
           p.position = verifiedPrimary;
@@ -1509,6 +1586,30 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
       }
       sanitizePlayerAgeAndServiceYearsInPlace(career.players, career.season ?? 2027);
       career.databaseVersion = 'v29_realistic_service_years';
+    }
+
+    // v30: 힐리어드 외야수(LF/CF/RF) 포지션 교정 + 강백호·최형우·김현수·김재환·전준우 전담 DH 포지션 마이그레이션
+    if (getDatabaseVersionRank(career.databaseVersion) < 30) {
+      const editorTouchedIds = new Set(Object.keys(career.editorOriginals?.players ?? {}));
+      let anyPositionChanged = false;
+      for (const p of Object.values(career.players)) {
+        if (p.role !== '타자' || editorTouchedIds.has(p.id)) continue;
+        const ov = findVerifiedPositionOverride(p.teamId, p.name);
+        if (!ov) continue;
+        p.position = ov.position;
+        p.secondaryPositions = [...ov.secondaryPositions];
+        p.positionProficiency = {
+          ...(p.positionProficiency ?? {}),
+          ...ov.positionProficiency,
+        };
+        ensurePlayerPositionProficiencyInPlace(p);
+        ensurePlayerOotpRatingsInPlace(p);
+        anyPositionChanged = true;
+      }
+      if (anyPositionChanged) {
+        reconcileAllTeamsLineupPositionsInPlace(career);
+      }
+      career.databaseVersion = 'v30_hilliard_of_and_dh_position';
     }
 
     // KBO 현역 선수단과 해외파 목록 간 중복 등록 상시 방지
