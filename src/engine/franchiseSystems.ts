@@ -508,6 +508,7 @@ export function ensureFranchiseState(career: CareerSave): void {
       p.uniformNumber === undefined
   );
   const needsDevBackfill =
+    career.databaseVersion !== 'v27_unified_player_ratings' &&
     career.databaseVersion !== 'v26_feedback_roles_military_fa' &&
     career.databaseVersion !== 'v25_verified_positions_and_fa_compensation' &&
     career.databaseVersion !== 'v24_recalibrated_prospect_potentials' &&

@@ -166,6 +166,17 @@ interface RawV18Player {
     tier: string;
     reason: string;
   };
+  rebalance_v27?: {
+    prev_ovr: number;
+    prev_pot: number;
+    new_ovr: number;
+    new_pot: number;
+    ovr_delta: number;
+    pot_delta: number;
+    tier: string;
+    bounce_back_eligible?: boolean;
+    reason: string;
+  };
 }
 
 interface RawV18Dataset {
@@ -469,12 +480,41 @@ const V18_BY_SOURCE_ID: Map<string, RawV18Player> = new Map(
   V18_DATA.players.map((p) => [String(p.id).trim(), p])
 );
 
+function getDatabaseVersionRank(ver?: string): number {
+  switch (ver) {
+    case 'v27_unified_player_ratings':
+      return 27;
+    case 'v26_feedback_roles_military_fa':
+      return 26;
+    case 'v25_verified_positions_and_fa_compensation':
+      return 25;
+    case 'v24_recalibrated_prospect_potentials':
+      return 24;
+    case 'v23_go_woosuk_kbo_return':
+      return 23;
+    case 'v22_verified_birthdates':
+      return 22;
+    case 'v21_verified_career_histories':
+      return 21;
+    case 'v20_verified_player_db':
+      return 20;
+    case 'v19_unified_rebalance':
+      return 19;
+    case 'v18_recalibrated':
+      return 18;
+    default:
+      return 0;
+  }
+}
+
 export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
+  const initialDbRank = getDatabaseVersionRank(career.databaseVersion);
+
   // 기존 v18 2027 세이브 로드 시 계약·경기 기록·로스터를 100% 유지하면서 v19 통합 능력치 척도로 1회 안전 마이그레이션
   if (
     !career.isPreservedMaster &&
     career.season >= 2027 &&
-    career.databaseVersion === 'v18_recalibrated'
+    initialDbRank === 18
   ) {
     for (const p of Object.values(career.players)) {
       const src = p.v18SourceId ? V18_BY_SOURCE_ID.get(p.v18SourceId) : undefined;
@@ -623,7 +663,7 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
   if (
     !career.isPreservedMaster &&
     career.season >= 2027 &&
-    career.databaseVersion !== 'v21_verified_career_histories'
+    getDatabaseVersionRank(career.databaseVersion) < 21
   ) {
     const prePatchChangedIds = new Set<string>();
     for (const p of Object.values(career.players)) {
@@ -760,7 +800,7 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
 
   // v22: 전수 검증된 실제 선수 생년월일(최지만·박종훈 및 KBO 10개 구단/2군/상무/FA/해외파) + 최지만 능력치 보정 + 날짜 기준 만 나이 동기화
   if (!career.isPreservedMaster) {
-    const needsV22Patch = career.databaseVersion !== 'v22_verified_birthdates';
+    const needsV22Patch = getDatabaseVersionRank(career.databaseVersion) < 22;
 
     if (needsV22Patch) {
       for (const p of Object.values(career.players)) {
@@ -835,7 +875,7 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
     }
 
     // v23: 고우석 LG 트윈스 국내 복귀 등록, 해외파 전수 검증 현행화, KBO↔해외 중복 등록 차단
-    if (career.season >= 2027 && career.databaseVersion !== 'v23_go_woosuk_kbo_return') {
+    if (career.season >= 2027 && getDatabaseVersionRank(career.databaseVersion) < 23) {
       const goRaw = V18_BY_SOURCE_ID.get('2026-LG-19');
       const existingGo = Object.values(career.players).find(
         (p) => p.v18SourceId === '2026-LG-19' || p.kboOfficialId === '67119' || (p.name === '고우석' && p.teamId === 'LG')
@@ -1012,7 +1052,7 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
 
     // v24: 기존 유망주 및 2군 젊은 선수 잠재력(POT) 통일 척도 재평가 마이그레이션
     // - 기존 세이브의 선수 ID·현재 오버롤·성적·계약·인게임 성장을 모두 보존하면서 과소평가된 잠재력만 상향 보정
-    if (career.season >= 2027 && career.databaseVersion !== 'v24_recalibrated_prospect_potentials') {
+    if (career.season >= 2027 && getDatabaseVersionRank(career.databaseVersion) < 24) {
       for (const p of Object.values(career.players)) {
         if (p.rosterTier === '은퇴' || p.category !== '국내') continue;
         const src = p.v18SourceId ? V18_BY_SOURCE_ID.get(p.v18SourceId) : undefined;
@@ -1051,7 +1091,7 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
 
     // v25: KBO 10개 구단 전체 선수 주/보조 포지션 + 포지션별 수비 숙련도(0~100) 전수 검증 및 최정 3B 교정 마이그레이션
     // - 기존 세이브의 선수 ID, 능력치(OVR/POT), 성적, 계약, 인게임 성장/훈련 숙련도는 100% 보존
-    if (career.databaseVersion !== 'v25_verified_positions_and_fa_compensation') {
+    if (getDatabaseVersionRank(career.databaseVersion) < 25) {
       for (const p of Object.values(career.players)) {
         // 한글 이름 내부 공백 정규화 (예: '최  정' -> '최정')
         if (/^[가-힣\s]+$/.test(p.name) && /\s/.test(p.name)) {
@@ -1112,7 +1152,7 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
 
     // v26: 사용자 피드백 기반 선수 데이터 복구(전의산 등 상무 전역자), 병역(박지환·이율예 등), 10구단 투수 보직(이로운·노경은 등) 일괄 보정
     // - 기존 세이브의 선수 ID, 성적, 계약, 인게임 이동/입대·전역 상태는 100% 보존
-    if (career.season >= 2027 && career.databaseVersion !== 'v26_feedback_roles_military_fa') {
+    if (career.season >= 2027 && getDatabaseVersionRank(career.databaseVersion) < 26) {
       // 1) 누락된 2026 상무 전역 복귀 선수(전의산·정은원·김현준·장재영·전미르) 복구
       const recoveredSeedIds = ['2026-SSG-47', '2026-HH-43', 'v26-SS-KHJ', 'v26-WO-JJY', 'v26-LT-JMR'];
       const hasAnyMissing = recoveredSeedIds.some((sid) => {
@@ -1237,6 +1277,50 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
       }
 
       career.databaseVersion = 'v26_feedback_roles_military_fa';
+    }
+
+    // v27: 전체 실제 선수 OVR/POT 및 세부 능력치 통합 재평가 1회 안전 마이그레이션
+    // - 엄상백(48/48 → 64/72) 포함 10개 구단 전체 실제 선수 개별 재평가 + 세부 스탯 공식 일치
+    // - 인게임 에디터로 사용자가 직접 수정한 선수(editorOriginals.players 등록)는 절대 덮어쓰지 않음
+    // - 기존 세이브의 시즌 중 성장/노쇠화 변동분(liveDelta), 계약, 경기 성적, 소속팀 이동은 100% 보존
+    if (career.season >= 2027 && getDatabaseVersionRank(career.databaseVersion) < 27) {
+      const editorTouchedIds = new Set(Object.keys(career.editorOriginals?.players ?? {}));
+      for (const p of Object.values(career.players)) {
+        if (editorTouchedIds.has(p.id)) continue;
+        const src = p.v18SourceId ? V18_BY_SOURCE_ID.get(p.v18SourceId) : undefined;
+        if (!src || !src.rebalance_v27) continue;
+
+        const r27 = src.rebalance_v27;
+        // 기존 세이브에서 이미 진행된 시즌 성장/하락분 보존
+        const liveDelta = Math.max(-10, Math.min(10, p.ability - r27.prev_ovr));
+        const nextPot = Math.max(40, Math.min(99, r27.new_pot));
+        const nextOvr = Math.max(38, Math.min(nextPot, r27.new_ovr + (career.gamesPlayed > 0 || career.season > 2027 ? liveDelta : 0)));
+        p.ability = nextOvr;
+        p.potential = Math.max(nextOvr, nextPot);
+        p.v18Ratings = {
+          overall: p.ability,
+          potential: p.potential,
+          batting: src.game_ratings?.batting ? { ...src.game_ratings.batting } : null,
+          pitching: src.game_ratings?.pitching ? { ...src.game_ratings.pitching } : null,
+        };
+        if (p.v18Evaluation) {
+          p.v18Evaluation.ovr = p.ability;
+          p.v18Evaluation.pot = p.potential;
+          p.v18Evaluation.basis = 'recalibrated_v27_unified_rating_engine';
+          p.v18Evaluation.potential_range = [p.ability, p.potential];
+        }
+        p.rebalanceMeta = {
+          prevOvr: r27.prev_ovr,
+          prevPot: r27.prev_pot,
+          newOvr: r27.new_ovr,
+          newPot: r27.new_pot,
+          ovrDelta: r27.ovr_delta,
+          potDelta: r27.pot_delta,
+          tier: r27.tier,
+          reason: r27.reason,
+        };
+      }
+      career.databaseVersion = 'v27_unified_player_ratings';
     }
 
     // KBO 현역 선수단과 해외파 목록 간 중복 등록 상시 방지
@@ -1675,16 +1759,16 @@ export function buildAll10TeamsFromV18Dataset(): {
         ovr: ability,
         pot: potential,
       },
-      rebalanceMeta: raw.rebalance_v19
+      rebalanceMeta: (raw.rebalance_v27 ?? raw.rebalance_v19)
         ? {
-            prevOvr: raw.rebalance_v19.prev_ovr,
-            prevPot: raw.rebalance_v19.prev_pot,
-            newOvr: raw.rebalance_v19.new_ovr,
-            newPot: raw.rebalance_v19.new_pot,
-            ovrDelta: raw.rebalance_v19.ovr_delta,
-            potDelta: raw.rebalance_v19.pot_delta,
-            tier: raw.rebalance_v19.tier,
-            reason: raw.rebalance_v19.reason,
+            prevOvr: (raw.rebalance_v27 ?? raw.rebalance_v19)!.prev_ovr,
+            prevPot: (raw.rebalance_v27 ?? raw.rebalance_v19)!.prev_pot,
+            newOvr: (raw.rebalance_v27 ?? raw.rebalance_v19)!.new_ovr,
+            newPot: (raw.rebalance_v27 ?? raw.rebalance_v19)!.new_pot,
+            ovrDelta: (raw.rebalance_v27 ?? raw.rebalance_v19)!.ovr_delta,
+            potDelta: (raw.rebalance_v27 ?? raw.rebalance_v19)!.pot_delta,
+            tier: (raw.rebalance_v27 ?? raw.rebalance_v19)!.tier,
+            reason: (raw.rebalance_v27 ?? raw.rebalance_v19)!.reason,
           }
         : undefined,
       historicalSeasons,

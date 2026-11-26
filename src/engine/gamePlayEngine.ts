@@ -45,11 +45,17 @@ function getBatterSkills(p: Player, formDelta: number, coachEdge: number): Batte
   const base = num(p.ability, 64);
   const b = p.v18Ratings?.batting;
   const fatiguePen = Math.max(0, num(p.fatigue, 0) - 52) * 0.11;
+  // 부상 복귀 직후 재활·경기 감각 보정(기본 능력치와 별도 관리: rehabGamesLeft 감소에 따라 자연 회복)
+  const rehabSharpnessPen = Math.min(6, Math.max(0, num(p.rehabGamesLeft, 0)) * 0.9);
   const adaptPen =
     p.category !== '국내' && num(p.kboAdaptation, 90) < 80
       ? (80 - num(p.kboAdaptation, 80)) * 0.14
       : 0;
-  const formAdj = clamp(num(p.form, 0) * 1.1 + formDelta * 0.45 + coachEdge, -8, 8) - fatiguePen - adaptPen;
+  const formAdj =
+    clamp(num(p.form, 0) * 1.1 + formDelta * 0.45 + coachEdge, -8, 8) -
+    fatiguePen -
+    rehabSharpnessPen -
+    adaptPen;
   const focusBat = p.trainingFocus === '타격' ? 1.4 : 0;
   const focusRun = p.trainingFocus === '주루' ? 2.0 : 0;
   const focusDef = p.trainingFocus === '수비' ? 2.2 : 0;
@@ -74,6 +80,8 @@ function getPitcherSkills(
   const base = num(p.ability, 64);
   const pt = p.v18Ratings?.pitching;
   const preFatiguePen = num(p.fatigue, 0) * 0.12 + Math.max(0, num(p.fatigue, 0) - 50) * 0.1;
+  // 부상 복귀 직후 재활·경기 감각 보정(기본 능력치와 별도 관리: 경기 등판/시간 경과로 자동 회복)
+  const rehabSharpnessPen = Math.min(6, Math.max(0, num(p.rehabGamesLeft, 0)) * 0.9);
   const adaptPen =
     p.category !== '국내' && num(p.kboAdaptation, 90) < 80
       ? (80 - num(p.kboAdaptation, 80)) * 0.15
@@ -94,6 +102,7 @@ function getPitcherSkills(
   const formAdj =
     clamp(num(p.form, 0) * 1.05 + formDelta * 0.45 + coachEdge, -8, 8) -
     preFatiguePen -
+    rehabSharpnessPen -
     adaptPen -
     liveFatiguePen;
 

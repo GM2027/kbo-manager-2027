@@ -1,4 +1,5 @@
 import { calculateKoreanFullAge, generateVirtualBirthDate } from '../engine/ageEngine';
+import { evaluateUnifiedRookieDraftRatings } from '../engine/ratingEvaluationEngine';
 import { SeededRng } from '../engine/rng';
 import { DraftCandidate, DraftState, Position, TeamId } from '../types/kbo';
 import { DRAFT_ORDER_2026, INITIAL_VIRTUAL_DRAFT_ORDER_2028 } from './kboTeams';
@@ -313,31 +314,20 @@ export function generate150DraftCandidates(
     }
 
     const slot = POSITIONS_POOL[rng.int(0, POSITIONS_POOL.length - 1)];
-    // Unified KBO rating scale (identical to existing pros):
-    // Unproven rookies OVR 39..57 (never exceeding established 1군 starters 65..77),
-    // POT 90+ very rare (max 2 per 150-player draft class, ~1~1.5%).
+    // 기존 실제 KBO 선수와 동일한 통합 능력치 평가 엔진(ratingEvaluationEngine) 적용
     const rawRoll = rng.next();
     const tierScore = id <= 12 ? 0.66 + rawRoll * 0.34 : id <= 35 ? 0.35 + rawRoll * 0.45 : rawRoll * 0.68;
-    const collegeReadyBoost = originType === '대학' ? 3 : originType === '독립리그' ? 2 : 0;
-    const ability = Math.max(39, Math.min(57, Math.round(38 + tierScore * 15 + collegeReadyBoost)));
-
-    // Unified KBO prospect potential scale (identical to existing KBO prospects):
-    // 초특급 88~93 (극소수 1~1.5%), 특급 80~87 (1R급), 상위권 73~82 (2~3R급), 일반 63~75 (4R~11R)
-    let potential: number;
-    if (id <= 8 && elite90PotCount < 2 && rng.next() < 0.16) {
-      potential = rng.int(88, 93);
-      elite90PotCount += 1;
-    } else if (id <= 12) {
-      potential = rng.int(80, 87);
-    } else if (id <= 35) {
-      potential = rng.int(73, 81);
-    } else {
-      potential = Math.round(
-        ability + (originType === '고졸' ? 20 : originType === '대학' ? 14 : 11) + rng.next() * 9
-      );
-      potential = Math.min(75, Math.max(63, Math.max(ability + 8, potential)));
-    }
-    potential = Math.max(ability + 6, Math.min(93, potential));
+    const isSuperRareElite = id <= 8 && elite90PotCount < 2 && rng.next() < 0.16;
+    if (isSuperRareElite) elite90PotCount += 1;
+    const unifiedRookie = evaluateUnifiedRookieDraftRatings({
+      originType,
+      tierScore,
+      rankIndex: id,
+      isSuperRareElite,
+      jitter: rng.next(),
+    });
+    const ability = unifiedRookie.ability;
+    const potential = unifiedRookie.potential;
 
     const composite = potential * 0.62 + ability * 0.38;
     const scoutGrade: DraftCandidate['scoutGrade'] =
