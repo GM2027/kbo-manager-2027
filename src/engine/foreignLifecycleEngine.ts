@@ -16,6 +16,7 @@ import { recordMlbExportPlayer } from './franchiseSystems';
 import { recordLeagueAcquisitionInPlace } from './leagueAcquisitionsEngine';
 import { reconcileTeamLineupPositionsInPlace } from './lineupValidationEngine';
 import { ensurePlayerOotpRatingsInPlace } from './ootpRatingsEngine';
+import { ensurePlayerPortraitProfileInPlace } from './playerPortraitEngine';
 import { SeededRng } from './rng';
 import { executeAtomicCareerMutation, getCurrentCareerDate, getPlayerClubTenureSeasons } from './salaryCapEngine';
 import {
@@ -340,6 +341,7 @@ function spawnAiReplacementForeignPlayerInPlace(
 
   const repPlayer: Player = {
     id: repId,
+    originType: 'virtual',
     name: repName,
     teamId,
     category: departed.category,
@@ -390,6 +392,7 @@ function spawnAiReplacementForeignPlayerInPlace(
   };
   ensurePlayerRichMetadata(repPlayer);
   ensurePlayerOotpRatingsInPlace(repPlayer);
+  ensurePlayerPortraitProfileInPlace(repPlayer, nextSeasonNum);
   career.players[repId] = repPlayer;
 
   const t = career.teams[teamId];

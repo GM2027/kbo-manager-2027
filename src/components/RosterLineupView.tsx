@@ -113,6 +113,7 @@ import {
   TrainingFocus,
 } from '../types/kbo';
 import { PlayerCategoryTag } from './PlayerCategoryTag';
+import { PlayerPortrait } from './PlayerPortrait';
 import {
   FranchiseStarIcon,
   isFranchiseStarPlayer,
@@ -2316,8 +2317,8 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                 background: `linear-gradient(120deg, ${KBO_TEAMS[selectedPlayer.teamId].primaryColor} 0%, ${KBO_TEAMS[selectedPlayer.teamId].secondaryColor} 100%)`,
               }}
             >
-              <div className="flex items-center gap-3">
-                <TeamLogo teamId={selectedPlayer.teamId} size="md" />
+              <div className="flex items-center gap-3.5">
+                <PlayerPortrait player={selectedPlayer} season={career.season} size="md" />
                 <div>
                   <div className="text-[11px] font-semibold opacity-90 flex items-center gap-1.5 flex-wrap">
                     <span>

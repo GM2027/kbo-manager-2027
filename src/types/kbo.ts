@@ -330,6 +330,22 @@ export interface PlayerAcquisitionInfo {
   label: string; // e.g. '2024 1R 전체 1번', '2022 1차지명', '육성선수 입단', '외국인 영입 (미국)'
 }
 
+export interface PlayerAppearanceProfile {
+  /** 선수 고유 ID에 영구 고정된 얼굴 시드 (시즌 경과·이적 시에도 동일 얼굴 유지) */
+  faceSeed: number;
+  faceShape: 'oval' | 'square' | 'diamond' | 'round';
+  skinToneIndex: number; // 0..5 (국적 기반 피부톤)
+  hairStyle: 'short_crop' | 'side_part' | 'textured_fringe' | 'buzz' | 'curly_taper' | 'long_flow';
+  hairColor: 'jet_black' | 'dark_brown' | 'chestnut' | 'dirty_blonde' | 'salt_pepper';
+  eyebrowStyle: 'thick' | 'straight' | 'arched';
+  facialHair: 'none' | 'light_stubble' | 'mustache' | 'goatee' | 'short_beard';
+  eyeBlack: boolean;
+  glasses: 'none' | 'classic' | 'sport';
+  build: 'lean' | 'athletic' | 'broad';
+  /** 최초 AI 프로필 생성 시즌 (1회 생성 보장) */
+  generatedAtSeason: number;
+}
+
 export interface Player {
   id: string;
   name: string;
@@ -472,6 +488,10 @@ export interface Player {
   acquiredSeason?: number;
   signedAsFaSeason?: number;
   faQualificationCount?: number;
+  /** 가상·생성 선수의 영구 외형 프로필 (최초 등록 시 1회 생성, 고유 ID 기준 얼굴 유지) */
+  portraitProfile?: PlayerAppearanceProfile;
+  /** 사용 권한이 확보된 실존 KBO 선수 공식 프로필 이미지 URL (선택) */
+  licensedPhotoUrl?: string;
   overseasInterest?: '없음' | '관심' | '적극희망';
   potentialTrend?: '급상승' | '안정' | '정체' | '하락';
   salaryNegotiationStatus?: '미협상' | '협상완료' | '조정신청' | '보류제외';

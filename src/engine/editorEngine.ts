@@ -28,6 +28,7 @@ import {
 } from '../types/kbo';
 import { calculateKoreanFullAge, parseIsoDate, syncAllAgesToDateInPlace } from './ageEngine';
 import { appendPlayerTeamHistoryInPlace } from './leagueLifeEngine';
+import { ensurePlayerPortraitProfileInPlace } from './playerPortraitEngine';
 import { isMilitaryServing } from './militaryEngine';
 import {
   ALL_FIELD_POSITIONS,
@@ -988,6 +989,8 @@ export function createNewPlayerInCareer(
     ensurePlayerPositionProficiencyInPlace(newPlayer);
   }
   ensurePlayerOotpRatingsInPlace(newPlayer);
+  newPlayer.originType = 'virtual';
+  ensurePlayerPortraitProfileInPlace(newPlayer, next.season);
 
   next.players[newPlayer.id] = newPlayer;
   if (!next.editorOriginals) next.editorOriginals = {};

@@ -71,6 +71,7 @@ import { CountryFlag, NationalityBadge } from './CountryFlag';
 import { MlbTeamLogo } from './MlbTeamLogo';
 import { OotpRatingsPanel } from './OotpRatingsPanel';
 import { PlayerCategoryTag } from './PlayerCategoryTag';
+import { PlayerPortrait } from './PlayerPortrait';
 import { FuturesTeamLogo, TeamLogo } from './TeamLogo';
 
 interface PlayerDetailModalProps {
@@ -156,8 +157,8 @@ export const PlayerDetailModal: React.FC<PlayerDetailModalProps> = ({
       >
         {/* Header */}
         <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/60 flex items-start justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <TeamLogo teamId={player.teamId} size="md" />
+          <div className="flex items-start gap-3.5 min-w-0">
+            <PlayerPortrait player={player} season={career.season} size="md" />
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 {player.uniformNumber !== undefined && (
