@@ -59,6 +59,7 @@ import {
 } from './salaryCapEngine';
 import { assertNotBlockedByArticle107 } from './amateurOverseasEngine';
 import { allocatePermanentPlayerId } from './playerRegistry';
+import { getPositionProficiency } from './positionEngine';
 import { calcAVG, calcERA, calcOPS, computeStandings, emptyBatterStats, emptyPitcherStats, formatIP } from './stats';
 
 export {
@@ -3008,12 +3009,36 @@ export interface TeamPositionSummary {
   priorityPositions: Position[];
 }
 
+export type AcquisitionRouteType =
+  | 'FA 영입'
+  | '자유계약(방출)'
+  | '웨이버 클레임'
+  | '트레이드 (유력)'
+  | '트레이드 (협상 가능)'
+  | '트레이드 (대가 높음)';
+
+export type AcquisitionFeasibility = '높음' | '보통' | '도전적';
+
+export interface RecommendedTargetItem {
+  player: Player;
+  targetPosition: Position;
+  isSecondaryFit: boolean;
+  route: AcquisitionRouteType;
+  feasibility: AcquisitionFeasibility;
+  feasibilityScore: number; // 0..100
+  upgradeDelta: number;
+  tradeValue: number;
+  estimatedCostLabel: string;
+  sellerContext: string;
+  reason: string;
+}
+
 export interface AnalyticsCenterData {
   batters: AnalyticsPlayerReport[];
   pitchers: AnalyticsPlayerReport[];
   positionStrength: PositionStrengthItem[];
   positionSummary: TeamPositionSummary;
-  recommendedTargets: { player: Player; reason: string; tradeValue: number }[];
+  recommendedTargets: RecommendedTargetItem[];
   lineupInsight: string;
   overuseAlerts: Player[];
 }
@@ -3483,30 +3508,418 @@ export function buildAnalyticsReport(career: CareerSave, teamId: TeamId = career
     priorityPositions,
   };
 
-  const weakPositions = new Set(positionStrength.filter((x) => x.status === '보강필요').map((x) => x.position));
-  const posScoreMap = new Map(positionStrength.map((x) => [x.position, x.avgOvr]));
-  const recommendedTargets = Object.values(career.players)
+  // =========================================================================
+  // 현실적 KBO 추천 영입 타깃 산출 엔진
+  // - 프랜차이즈 스타 / 레전드 / 핵심 프랜차이즈 / 트레이드 불가 초특급 유망주 원천 차단
+  // - 4대 실제 영입 경로 통합 평가: FA 시장 · 방출 자유계약 · 웨이버 · 타 구단 잉여/예비FA 트레이드
+  // - 소속팀 포지션 중복(백업/2군 대기), 계약 만료(예비 FA), 순위(셀러/바이어), 멀티포지션 숙련도, 구단 자금 반영
+  // =========================================================================
+  const tradeWindow = getTradeWindowStatus(career);
+  const standingsRows = computeStandings(career.gamesLedger);
+  const teamRankMap = new Map<TeamId, number>();
+  standingsRows.forEach((row, idx) => teamRankMap.set(row.teamId, idx + 1));
+
+  const posStrengthMap = new Map(positionStrength.map((x) => [x.position, x]));
+  const weakPosList = positionStrength
+    .filter((x) => x.status === '보강필요')
+    .sort((a, b) => a.diffFromLeagueAvg - b.diffFromLeagueAvg);
+  const secondaryNeedList = positionStrength
     .filter(
-      (p) =>
-        p.teamId !== teamId &&
-        p.category === '국내' &&
-        (p.rosterTier === '1군' || p.rosterTier === 'FA') &&
-        !isMilitaryServing(p.militaryStatus) &&
-        (weakPositions.size === 0 || weakPositions.has(p.position)) &&
-        p.ability >= Math.max(70, (posScoreMap.get(p.position) ?? 68) + 2) &&
-        p.age <= 32
+      (x) =>
+        x.status !== '보강필요' &&
+        (x.depthGrade === '얇음' ||
+          x.riskFlags.includes('노쇠화 주의') ||
+          x.riskFlags.includes('부상 이탈') ||
+          x.riskFlags.includes('만료 예정') ||
+          x.diffFromLeagueAvg < 0)
     )
-    .map((p) => {
-      const tv = computePlayerTradeValue(p);
-      const gap = p.ability - (posScoreMap.get(p.position) ?? 68);
-      return {
-        player: p,
-        tradeValue: tv.index,
-        reason: `취약 포지션(${POSITION_KOREAN_LABEL[p.position]}) +${gap}pt 즉시 보강 · 시장지수 ${tv.index} (${tv.tierLabel})`,
-      };
-    })
-    .sort((a, b) => b.player.ability - a.player.ability)
-    .slice(0, 6);
+    .sort((a, b) => a.diffFromLeagueAvg - b.diffFromLeagueAvg);
+
+  // 보강 우선순위 포지션 맵 (weight: 보강필요 1.0, 뎁스/노쇠/만료 주의 0.65)
+  const needPositions = new Map<Position, { weight: number; item: PositionStrengthItem; needNote: string }>();
+  for (const w of weakPosList) {
+    needPositions.set(w.position, {
+      weight: 1.0,
+      item: w,
+      needNote: `취약 ${POSITION_KOREAN_LABEL[w.position]}(리그 ${w.leagueRank}위)`,
+    });
+  }
+  for (const s of secondaryNeedList) {
+    if (needPositions.size >= 6) break;
+    if (!needPositions.has(s.position)) {
+      const flag = s.riskFlags[0] ?? (s.depthGrade === '얇음' ? '뎁스 보강' : '전력 보강');
+      needPositions.set(s.position, {
+        weight: 0.68,
+        item: s,
+        needNote: `${POSITION_KOREAN_LABEL[s.position]}(${flag})`,
+      });
+    }
+  }
+  // 전 포지션이 최상위권일 때도 하위 3개 포지션 뎁스 보강 후보를 현실적으로 제시
+  if (needPositions.size < 3) {
+    const lowest = [...positionStrength].sort((a, b) => a.diffFromLeagueAvg - b.diffFromLeagueAvg);
+    for (const lo of lowest) {
+      if (needPositions.size >= 3) break;
+      if (!needPositions.has(lo.position)) {
+        needPositions.set(lo.position, {
+          weight: 0.55,
+          item: lo,
+          needNote: `${POSITION_KOREAN_LABEL[lo.position]} 뎁스 강화`,
+        });
+      }
+    }
+  }
+
+  const waiverPlayerIds = new Set(
+    (career.waiverPool ?? [])
+      .filter((w) => w.fromTeamId !== teamId && Boolean(w.player?.id))
+      .map((w) => w.player.id)
+  );
+  const myCash = career.finances.cashBalanceBillion;
+
+  const findBestNeedFit = (
+    p: Player
+  ): { pos: Position; isSecondary: boolean; prof: number; weight: number; item: PositionStrengthItem; needNote: string } | null => {
+    let best: {
+      pos: Position;
+      isSecondary: boolean;
+      prof: number;
+      weight: number;
+      item: PositionStrengthItem;
+      needNote: string;
+      fitScore: number;
+    } | null = null;
+
+    for (const [needPos, meta] of needPositions.entries()) {
+      if (p.role === '투수') {
+        if (needPos !== 'SP' && needPos !== 'RP' && needPos !== 'CL') continue;
+        const isDirect = p.position === needPos;
+        const isBullpenCross =
+          (needPos === 'CL' && p.position === 'RP' && p.ability >= 70) ||
+          (needPos === 'RP' && (p.position === 'CL' || p.position === 'SP'));
+        const isStarterCross =
+          needPos === 'SP' && p.position === 'RP' && (p.v18Ratings?.pitching?.stamina_proxy ?? 50) >= 56;
+        if (!isDirect && !isBullpenCross && !isStarterCross) continue;
+        const fitScore = meta.weight * (isDirect ? 1.0 : 0.78);
+        if (!best || fitScore > best.fitScore) {
+          best = { pos: needPos, isSecondary: !isDirect, prof: isDirect ? 92 : 76, ...meta, fitScore };
+        }
+      } else {
+        if (needPos === 'SP' || needPos === 'RP' || needPos === 'CL') continue;
+        if (needPos === 'DH') {
+          // 지명타자는 포수·유격수·중견수 같은 수비 특화 주전이 아니라 1B/LF/RF/DH 타격형 자원만 현실적으로 추천
+          if (p.ability < 68 || p.position === 'C' || p.position === 'SS' || p.position === 'CF') continue;
+          const fitScore = meta.weight * (p.position === 'DH' || p.position === '1B' || p.position === 'LF' || p.position === 'RF' ? 0.9 : 0.72);
+          if (!best || fitScore > best.fitScore) {
+            best = { pos: 'DH', isSecondary: p.position !== 'DH', prof: 88, ...meta, fitScore };
+          }
+          continue;
+        }
+        const isDirect = p.position === needPos;
+        const prof = getPositionProficiency(p, needPos);
+        if (!isDirect && prof < 64) continue;
+        const fitScore = meta.weight * (isDirect ? 1.0 : 0.72 + (prof - 60) * 0.006);
+        if (!best || fitScore > best.fitScore) {
+          best = { pos: needPos, isSecondary: !isDirect, prof, ...meta, fitScore };
+        }
+      }
+    }
+    return best;
+  };
+
+  interface ScoredTargetCandidate extends RecommendedTargetItem {
+    compositeScore: number;
+  }
+
+  const scoredCandidates: ScoredTargetCandidate[] = [];
+
+  for (const p of Object.values(career.players)) {
+    if (p.teamId === teamId && p.rosterTier !== 'FA') continue;
+    if (p.rosterTier === '은퇴' || p.rosterTier === '해외이적' || p.rosterTier === '육성' || p.rosterTier === '제외후보') {
+      continue;
+    }
+    if (p.category !== '국내') continue;
+    if (isMilitaryServing(p.militaryStatus)) continue;
+    if (p.injury && p.injury.daysRemaining >= 21) continue;
+
+    const isWaiver = waiverPlayerIds.has(p.id);
+    const isReleasedFreeAgent = p.rosterTier === 'FA' && Boolean(p.releasedAfter2026);
+    const isMarketFa = p.rosterTier === 'FA' && !isReleasedFreeAgent;
+    const isDirectSigning = isWaiver || isReleasedFreeAgent || isMarketFa;
+
+    // 우리 팀 원소속 이탈 FA는 별도 재계약 섹션에서 관리하므로 외부 영입 타깃에서 제외
+    if (isDirectSigning && (p.formerTeamId ?? p.teamId) === teamId && !isReleasedFreeAgent) continue;
+    // 올 시즌 이미 FA 계약 완료한 타 구단 선수는 트레이드 불가
+    if (!isDirectSigning && p.signedAsFaSeason === career.season) continue;
+
+    const fit = findBestNeedFit(p);
+    if (!fit) continue;
+
+    const myPosInfo = posStrengthMap.get(fit.pos);
+    const myStarterOvr = myPosInfo?.starterOvr ?? myPosInfo?.avgOvr ?? 66;
+    const upgradeDelta = p.ability - myStarterOvr;
+
+    // 실질 전력 기여 기준: 주전 업그레이드 또는 얇은 뎁스/노쇠 후계자 보강
+    const fillsThinOrAging =
+      myPosInfo != null &&
+      (myPosInfo.depthGrade === '얇음' || myPosInfo.riskFlags.includes('노쇠화 주의')) &&
+      ((p.ability >= 62 && p.age <= 29) || (p.potential >= 75 && p.age <= 25));
+    const isImmediateUpgrade = p.ability >= Math.max(64, myStarterOvr - 1);
+    const isUsefulBullpen = (fit.pos === 'RP' || fit.pos === 'CL') && p.ability >= 65;
+    if (!isImmediateUpgrade && !fillsThinOrAging && !isUsefulBullpen) continue;
+
+    // 너무 고령이면서 기량이 하락한 선수 제외 (단, FA/자유계약 즉시전력 베테랑은 36세까지 허용)
+    if (p.age >= 37 || (p.age >= 35 && p.ability < 68)) continue;
+
+    const tv = computePlayerTradeValue(p);
+    let route: AcquisitionRouteType;
+    let feasibility: AcquisitionFeasibility;
+    let feasibilityScore = 50;
+    let sellerContext = '';
+    let estimatedCostLabel = '';
+
+    if (isWaiver) {
+      route = '웨이버 클레임';
+      feasibility = '높음';
+      feasibilityScore = 92;
+      sellerContext = '웨이버 공시 중 (선수 교환 없이 즉시 영입 가능)';
+      estimatedCostLabel = '웨이버 이적료 300만 원 · 기존 연봉 승계';
+    } else if (isReleasedFreeAgent) {
+      route = '자유계약(방출)';
+      feasibility = '높음';
+      feasibilityScore = 90;
+      sellerContext = '방출 자유계약 신분 (보상선수·트레이드 불필요)';
+      estimatedCostLabel = '예상 계약: 단년 최저연봉~1억 원대';
+    } else if (isMarketFa) {
+      route = 'FA 영입';
+      const grade = p.contract.faGrade ?? p.faApproved2027Grade ?? (p.age >= 35 ? 'C' : p.ability >= 80 ? 'A' : p.ability >= 73 ? 'B' : 'C');
+      const estYears = p.age >= 35 ? 2 : p.age >= 32 ? 3 : 4;
+      const estAnnual = Math.max(1.5, Number(((p.ability - 64) * 0.72).toFixed(1)));
+      const estTotal = Number((estYears * estAnnual).toFixed(1));
+      const cashNeeded = estTotal * 0.4;
+      const affordable = myCash === null || myCash >= cashNeeded;
+      feasibilityScore =
+        (grade === 'C' ? 84 : grade === 'B' ? 72 : 60) + (affordable ? 10 : -24);
+      feasibility = feasibilityScore >= 76 ? '높음' : feasibilityScore >= 56 ? '보통' : '도전적';
+      sellerContext = `현재 FA 시장 등록 (${grade}등급 · ${
+        grade === 'C' ? '보상선수 없음' : grade === 'B' ? '보호 25인 외 보상' : '보호 20인 외 보상'
+      })`;
+      estimatedCostLabel = `예상 FA ${estYears}년 약 ${estTotal.toFixed(1)}억${!affordable ? ' (보유 자금 주의)' : ''}`;
+    } else {
+      // 트레이드 후보 현실성 엄격 심사 (프랜차이즈 보호 + 소속팀 포지션 중복/순위/계약만료)
+      const fran = evaluateFranchiseStar(career, p);
+
+      // 1) 트레이드 불가 프랜차이즈 스타 / 레전드 / 핵심 프랜차이즈 / 24세 이하 초특급 영건 원천 제외!
+      if (
+        fran.isHardTradeLocked ||
+        fran.protectionTier === '프랜차이즈 스타' ||
+        fran.tier === '레전드' ||
+        fran.tier === '핵심 프랜차이즈' ||
+        (p.age <= 24 && (p.ability >= 76 || p.potential >= 84))
+      ) {
+        continue;
+      }
+
+      // 2) 소속팀 로스터 내 실제 입지 정밀 판별 (선발 5인 로테이션·필승조 3인·주전 야수 9인 정확 반영)
+      const sellerTeamState = career.teams[p.teamId];
+      const sellerEval = allTeamsEval[p.teamId]?.[p.position];
+      const sellerStarter = sellerEval?.starter;
+      const inSellerRotation5 = Boolean(sellerTeamState?.rotationOrder.slice(0, 5).includes(p.id));
+      const inSellerCoreBullpen = Boolean(
+        p.role === '투수' &&
+          !inSellerRotation5 &&
+          (p.pitchRole === '마무리' || p.pitchRole === '필승조' || p.pitchRole === '셋업맨' || sellerTeamState?.bullpenOrder.slice(0, 3).includes(p.id))
+      );
+      const inSellerLineup9 = Boolean(sellerTeamState?.lineupOrder.slice(0, 9).includes(p.id));
+      const isSellerCoreRole =
+        p.position === 'SP'
+          ? inSellerRotation5
+          : p.position === 'CL' || p.position === 'RP'
+            ? inSellerCoreBullpen || sellerStarter?.id === p.id
+            : inSellerLineup9 || sellerStarter?.id === p.id;
+
+      const sellerHasBetterStarter =
+        p.role === '타자'
+          ? Boolean(sellerStarter && sellerStarter.id !== p.id && !inSellerLineup9 && sellerStarter.ability >= p.ability - 1)
+          : p.position === 'SP'
+            ? !inSellerRotation5 && (sellerTeamState?.rotationOrder.length ?? 0) >= 5
+            : !inSellerCoreBullpen && (sellerTeamState?.bullpenOrder.length ?? 0) >= 6;
+
+      const sellerDepthCount = sellerEval?.depthCount ?? 1;
+      const sellerRank = teamRankMap.get(p.teamId) ?? 5;
+      // KBO 보류선수는 매년 1년 재계약이므로, 실제 '예비 FA'는 계약 잔여 1년 이하이면서 FA 취득 연차(고졸 7년+/대졸 6년+)에 근접한 경우만 해당
+      const faQual = computeFaQualification(career, p);
+      const isImpendingFa =
+        p.contract.yearsRemaining <= 1 &&
+        (faQual.isFaEligible || faQual.creditedSeasons >= faQual.requiredSeasons - 1 || p.serviceYears >= 7);
+      const isSellerRebuilding = sellerRank >= 7 && career.gamesPlayed >= 20;
+      const isMinorOrBackup = p.rosterTier === '2군' || !isSellerCoreRole;
+
+      // 최근 다년 대형 계약(FA/비FA 3년 이상 잔여) 체결 직후 주전 선수는 트레이드 불가
+      if (p.contract.yearsRemaining >= 3 && p.contract.totalValue >= 20 && isSellerCoreRole) {
+        continue;
+      }
+
+      if (fran.protectionTier === '핵심 유망주') {
+        if (p.potential >= 82 || isSellerCoreRole || !sellerHasBetterStarter) {
+          continue;
+        }
+      }
+
+      // 3) 구단 핵심 선수(protectionTier === '구단 핵심 선수')는 실제 예비 FA이거나 백업으로 밀린 예외 상황만 허용
+      if (fran.protectionTier === '구단 핵심 선수') {
+        const hasRealOpening =
+          (isImpendingFa && (isSellerRebuilding || sellerDepthCount >= 3)) ||
+          (sellerHasBetterStarter && p.age >= 30);
+        if (!hasRealOpening) {
+          continue;
+        }
+      }
+
+      // 4) 팀 핵심 주전(OVR 74+)이면서 예비 FA도 아니고 리빌딩 매물도 아니면 비현실적 -> 제외
+      if (isSellerCoreRole && p.ability >= 74 && !isImpendingFa && !isSellerRebuilding) {
+        continue;
+      }
+
+      // 현실적 트레이드 성사 가능성 점수 산출 (0~100)
+      let score = 46;
+      const ctxParts: string[] = [];
+
+      if (sellerHasBetterStarter) {
+        score += 24;
+        ctxParts.push(
+          p.role === '타자' && sellerStarter
+            ? `${KBO_TEAMS[p.teamId].shortName} ${POSITION_KOREAN_LABEL[p.position]} 주전(${sellerStarter.name}) 중복 · ${
+                p.rosterTier === '2군' ? '2군 대기' : '백업 출장'
+              }`
+            : `${KBO_TEAMS[p.teamId].shortName} ${POSITION_KOREAN_LABEL[p.position]} 뎁스 잉여 (${p.rosterTier} 대기)`
+        );
+      } else if (isMinorOrBackup && sellerDepthCount >= 3) {
+        score += 18;
+        ctxParts.push(`${KBO_TEAMS[p.teamId].shortName} 포지션 잉여 자원 (${p.rosterTier})`);
+      }
+
+      if (isImpendingFa) {
+        score += 15;
+        ctxParts.push('시즌 후 FA 예정(예비 FA)');
+      }
+      if (isSellerRebuilding && p.age >= 29) {
+        score += 12;
+        ctxParts.push(`하위권(${sellerRank}위) 구단 베테랑 매물`);
+      }
+      if (p.tradeRequested || (p.dissatisfaction ?? 0) >= 60) {
+        score += 15;
+        ctxParts.push('출전 기회 불만 · 이적 의향');
+      }
+      if (fran.protectionTier === '구단 핵심 선수') {
+        score -= 22;
+      } else if (fran.protectionTier === '핵심 유망주') {
+        score -= 14;
+      } else if (fran.protectionTier === '전력 외 선수') {
+        score += 16;
+      }
+      if (isSellerCoreRole && !isImpendingFa) {
+        score -= 16;
+      }
+      if (tv.index >= 82) {
+        score -= 10;
+      }
+      if (!tradeWindow.isOpen) {
+        score -= 10;
+        ctxParts.push('트레이드 마감(오프시즌 추진)');
+      }
+
+      feasibilityScore = Math.max(20, Math.min(92, Math.round(score)));
+      if (feasibilityScore < 44) continue; // 성사 가능성이 너무 낮은 비현실적 매물 차단
+
+      if (feasibilityScore >= 70) {
+        route = '트레이드 (유력)';
+        feasibility = '높음';
+      } else if (feasibilityScore >= 54) {
+        route = '트레이드 (협상 가능)';
+        feasibility = '보통';
+      } else {
+        route = '트레이드 (대가 높음)';
+        feasibility = '도전적';
+      }
+
+      sellerContext =
+        ctxParts.length > 0
+          ? ctxParts.slice(0, 2).join(' · ')
+          : `${KBO_TEAMS[p.teamId].shortName} ${p.rosterTier} 협상 가능 매물`;
+
+      estimatedCostLabel =
+        tv.index >= 86
+          ? '예상 대가: 1군 주전급 1명 + 유망주/지명권'
+          : tv.index >= 76
+            ? '예상 대가: 1군 준주전급 1명 또는 상위 유망주'
+            : tv.index >= 64
+              ? '예상 대가: 1군 백업 1명 또는 2군 유망주'
+              : '예상 대가: 2군 백업 또는 현금 트레이드';
+    }
+
+    const posRoleNote = fit.isSecondary
+      ? `${fit.needNote} (보조 ${fit.pos} 숙련 ${fit.prof} 활용)`
+      : fit.needNote;
+    const deltaLabel =
+      upgradeDelta >= 2
+        ? `+${upgradeDelta}pt 즉시 보강`
+        : upgradeDelta >= 0
+          ? '주전 경쟁·뎁스 보강'
+          : p.age <= 26 && p.potential >= 74
+            ? `차세대 육성(POT ${p.potential})`
+            : '1군 백업·로테이션 보강';
+
+    const reason = `${posRoleNote} · ${deltaLabel} · ${sellerContext}`;
+
+    // 종합 현실성 추천 점수: 보강 필요도(40%) + 실제 성사 가능성(38%) + 실전/잠재 기여도(22%)
+    const impactScore = Math.max(
+      25,
+      Math.min(
+        95,
+        55 + upgradeDelta * 3.2 + (p.age <= 27 && p.potential >= 75 ? (p.potential - 70) * 0.9 : 0)
+      )
+    );
+    const needScore = fit.weight * 85 + (fit.isSecondary ? -6 : 6);
+    const compositeScore = Number(
+      (needScore * 0.4 + feasibilityScore * 0.38 + impactScore * 0.22).toFixed(2)
+    );
+
+    scoredCandidates.push({
+      player: p,
+      targetPosition: fit.pos,
+      isSecondaryFit: fit.isSecondary,
+      route,
+      feasibility,
+      feasibilityScore,
+      upgradeDelta,
+      tradeValue: tv.index,
+      estimatedCostLabel,
+      sellerContext,
+      reason,
+      compositeScore,
+    });
+  }
+
+  // 포지션 편중 방지(포지션당 최대 3명) + '대가 높음' 최대 2명 제한으로 현실적인 TOP 8 구성
+  scoredCandidates.sort((a, b) => b.compositeScore - a.compositeScore || b.feasibilityScore - a.feasibilityScore);
+  const recommendedTargets: RecommendedTargetItem[] = [];
+  const countByPos = new Map<Position, number>();
+  let blockbusterCount = 0;
+
+  for (const cand of scoredCandidates) {
+    if (recommendedTargets.length >= 8) break;
+    const posCnt = countByPos.get(cand.targetPosition) ?? 0;
+    if (posCnt >= 3) continue;
+    if (cand.route === '트레이드 (대가 높음)') {
+      if (blockbusterCount >= 2) continue;
+      blockbusterCount += 1;
+    }
+    countByPos.set(cand.targetPosition, posCnt + 1);
+    const { compositeScore: _ignored, ...cleanItem } = cand;
+    void _ignored;
+    recommendedTargets.push(cleanItem);
+  }
 
   const overuseAlerts = myPlayers.filter((p) => p.rosterTier === '1군' && (p.overuse?.riskLevel === '위험' || p.overuse?.riskLevel === '주의'));
 

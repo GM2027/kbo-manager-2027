@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { Activity, AlertTriangle, BarChart3, Crosshair, Flame, Shield, Target } from 'lucide-react';
 import { KBO_TEAMS } from '../data/kboTeams';
-import { buildAnalyticsReport, computeSalaryCapSummary } from '../engine/deepFranchise';
+import { buildAnalyticsReport, computeSalaryCapSummary, getTradeWindowStatus } from '../engine/deepFranchise';
+import { formatCompactPlayerPosition } from '../engine/positionEngine';
 import { CareerSave, Player } from '../types/kbo';
 import { TeamLogo } from './TeamLogo';
 
@@ -17,9 +18,11 @@ export const AnalyticsCenterView: React.FC<AnalyticsCenterViewProps> = ({
   onNavigateTab,
 }) => {
   const [subTab, setSubTab] = useState<'batters' | 'pitchers' | 'positions' | 'targets'>('batters');
+  const [targetRouteFilter, setTargetRouteFilter] = useState<'ALL' | 'DIRECT' | 'LIKELY_TRADE' | 'OTHER_TRADE'>('ALL');
 
   const report = useMemo(() => buildAnalyticsReport(career, career.playerTeamId), [career]);
   const cap = useMemo(() => computeSalaryCapSummary(career, career.playerTeamId), [career]);
+  const tradeWindow = useMemo(() => getTradeWindowStatus(career), [career]);
   const team = KBO_TEAMS[career.playerTeamId];
 
   const env = career.leagueEnv;
@@ -528,59 +531,158 @@ export const AnalyticsCenterView: React.FC<AnalyticsCenterViewProps> = ({
         );
       })()}
 
-      {/* Tab 4: Target Recommendations */}
-      {subTab === 'targets' && (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
-          <div className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white mb-3">
-            <Target className="w-4 h-4 text-indigo-500" />
-            <span>데이터 기반 취약 포지션 추천 영입 타깃</span>
-          </div>
-          {report.recommendedTargets.length === 0 ? (
-            <p className="text-xs text-slate-500">현재 추천 영입 타깃이 없습니다.</p>
-          ) : (
-            <div className="divide-y divide-slate-100 dark:divide-slate-800">
-              {report.recommendedTargets.map((item) => (
-                <div
-                  key={item.player.id}
-                  onClick={() => onSelectPlayer?.(item.player)}
-                  className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 dark:hover:bg-slate-800/40 px-2 rounded-lg cursor-pointer"
-                >
-                  <div className="flex items-center gap-3">
-                    <TeamLogo teamId={item.player.teamId} size="sm" />
-                    <div>
-                      <div className="text-xs font-bold text-slate-900 dark:text-white">
-                        {item.player.name}
-                        <span className="ml-1.5 text-slate-500 font-normal">
-                          {KBO_TEAMS[item.player.teamId].shortName} · {item.player.position} · 만 {item.player.age}세 · OVR{' '}
-                          {item.player.ability}
-                        </span>
-                      </div>
-                      <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{item.reason}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="font-mono-stats text-xs font-bold text-indigo-600 dark:text-indigo-400">
-                      시장지수 {item.tradeValue}
-                    </span>
-                    {onNavigateTab && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onNavigateTab('contracts');
-                        }}
-                        className="px-2.5 py-1 text-[11px] font-semibold rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
-                      >
-                        협상 이동
-                      </button>
-                    )}
-                  </div>
+      {/* Tab 4: Realistic Target Recommendations */}
+      {subTab === 'targets' && (() => {
+        const directRoutes = new Set(['FA 영입', '자유계약(방출)', '웨이버 클레임']);
+        const filteredTargets = report.recommendedTargets.filter((item) => {
+          if (targetRouteFilter === 'ALL') return true;
+          if (targetRouteFilter === 'DIRECT') return directRoutes.has(item.route);
+          if (targetRouteFilter === 'LIKELY_TRADE') return item.route === '트레이드 (유력)';
+          return item.route === '트레이드 (협상 가능)' || item.route === '트레이드 (대가 높음)';
+        });
+
+        return (
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <div className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white">
+                  <Target className="w-4 h-4 text-indigo-500" />
+                  <span>현실적 추천 영입 타깃 (성사 가능성 · 구단 잉여 · FA/방출 반영)</span>
                 </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  프랜차이즈 스타·트레이드 불가 핵심 유망주를 제외하고, 실제 영입 가능한 FA·방출·포지션 중복·예비 FA 매물만 선별합니다.
+                </p>
+              </div>
+              <span
+                className={`text-[11px] font-bold px-2.5 py-1 rounded-md border shrink-0 self-start ${
+                  tradeWindow.isOpen
+                    ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-700 dark:text-emerald-300'
+                    : 'bg-amber-500/10 border-amber-500/40 text-amber-700 dark:text-amber-300'
+                }`}
+              >
+                {tradeWindow.isOpen ? '트레이드 시장 개방' : '트레이드 마감 (FA·오프시즌 추진)'}
+              </span>
+            </div>
+
+            {/* Route Filter Pills */}
+            <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+              {[
+                { id: 'ALL', label: `전체 (${report.recommendedTargets.length})` },
+                {
+                  id: 'DIRECT',
+                  label: `FA·자유계약 (${report.recommendedTargets.filter((x) => directRoutes.has(x.route)).length})`,
+                },
+                {
+                  id: 'LIKELY_TRADE',
+                  label: `트레이드 유력 (${report.recommendedTargets.filter((x) => x.route === '트레이드 (유력)').length})`,
+                },
+                {
+                  id: 'OTHER_TRADE',
+                  label: `트레이드 협상 (${report.recommendedTargets.filter((x) => x.route === '트레이드 (협상 가능)' || x.route === '트레이드 (대가 높음)').length})`,
+                },
+              ].map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => setTargetRouteFilter(f.id as typeof targetRouteFilter)}
+                  className={`px-2.5 py-1 rounded-md font-semibold border transition-colors ${
+                    targetRouteFilter === f.id
+                      ? 'bg-indigo-600 border-indigo-600 text-white'
+                      : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  {f.label}
+                </button>
               ))}
             </div>
-          )}
-        </div>
-      )}
+
+            {filteredTargets.length === 0 ? (
+              <p className="text-xs text-slate-500 py-4 text-center">
+                선택한 조건에 맞는 현실적 영입 타깃이 없습니다.
+              </p>
+            ) : (
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                {filteredTargets.map((item) => {
+                  const routeBadgeClass =
+                    item.route === 'FA 영입' || item.route === '자유계약(방출)' || item.route === '웨이버 클레임'
+                      ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/40'
+                      : item.route === '트레이드 (유력)'
+                        ? 'bg-sky-500/15 text-sky-700 dark:text-sky-300 border-sky-500/40'
+                        : item.route === '트레이드 (협상 가능)'
+                          ? 'bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border-indigo-500/40'
+                          : 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/40';
+                  const feasBadgeClass =
+                    item.feasibility === '높음'
+                      ? 'text-emerald-600 dark:text-emerald-400'
+                      : item.feasibility === '보통'
+                        ? 'text-sky-600 dark:text-sky-400'
+                        : 'text-amber-600 dark:text-amber-400';
+
+                  return (
+                    <div
+                      key={item.player.id}
+                      onClick={() => onSelectPlayer?.(item.player)}
+                      className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/40 px-2.5 rounded-lg cursor-pointer"
+                    >
+                      <div className="flex items-start gap-3 min-w-0">
+                        <TeamLogo teamId={item.player.teamId} size="sm" />
+                        <div className="min-w-0 space-y-1">
+                          <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                            <span className="font-bold text-slate-900 dark:text-white">
+                              {item.player.name}
+                            </span>
+                            <span className="text-slate-500 font-normal">
+                              {item.player.rosterTier === 'FA'
+                                ? `FA (전 ${KBO_TEAMS[item.player.formerTeamId ?? item.player.teamId].shortName})`
+                                : `${KBO_TEAMS[item.player.teamId].shortName} · ${item.player.rosterTier}`}
+                              {' · '}
+                              {formatCompactPlayerPosition(item.player)}
+                              {' · '}만 {item.player.age}세
+                            </span>
+                            <span className="font-mono-stats font-bold text-orange-600 dark:text-orange-400">
+                              OVR {item.player.ability}/{item.player.potential}
+                            </span>
+                            <span className={`px-1.5 py-0.5 rounded border text-[10px] font-bold ${routeBadgeClass}`}>
+                              {item.route}
+                            </span>
+                            <span className={`text-[10px] font-bold font-mono-stats ${feasBadgeClass}`}>
+                              성사 {item.feasibility} ({item.feasibilityScore}%)
+                            </span>
+                          </div>
+                          <div className="text-[11px] text-slate-700 dark:text-slate-300">
+                            {item.reason}
+                          </div>
+                          <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono-stats">
+                            {item.estimatedCostLabel}
+                            {item.isSecondaryFit ? ` · 보강 포지션 ${item.targetPosition} 멀티 투입` : ''}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
+                        <span className="font-mono-stats text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                          시장지수 {item.tradeValue}
+                        </span>
+                        {onNavigateTab && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onNavigateTab('contracts');
+                            }}
+                            className="px-2.5 py-1 text-[11px] font-semibold rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
+                          >
+                            {directRoutes.has(item.route) ? 'FA·영입 이동' : '트레이드 이동'}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Legend Footer */}
       <div className="flex flex-wrap items-center gap-4 text-[11px] text-slate-500 dark:text-slate-400 px-1">
