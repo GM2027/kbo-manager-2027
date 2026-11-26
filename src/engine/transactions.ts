@@ -164,6 +164,17 @@ import {
   syncSeasonRookieEligibilityInPlace,
 } from './kboAwardsEngine';
 import {
+  evaluateForeignPlayerSeasonOutcome,
+  processForeignPlayersMlbExportInPlace,
+  quoteForeignPlayerRenewal,
+  renewForeignPlayerContract,
+} from './foreignLifecycleEngine';
+export {
+  evaluateForeignPlayerSeasonOutcome,
+  quoteForeignPlayerRenewal,
+  renewForeignPlayerContract,
+};
+import {
   canHoldPlayerMeeting,
   conductGmPlayerMeeting,
   getDissatisfactionLevel,
@@ -834,10 +845,15 @@ export function releaseForeignPlayer(
 
   const wasInLineup = t.lineupOrder.includes(playerId);
   const releaseDateIso = getCurrentCareerDate(next).isoDate;
-  const remainingKrw =
-    p.contract.currency === 'USD'
-      ? usdToKrwBillion(p.contract.annualSalary || 0)
-      : p.contract.annualSalary || 0;
+  const isOffseasonOrExpired =
+    next.phase === 'OFFSEASON' ||
+    p.contract.status === '만료' ||
+    (p.contract.yearsRemaining ?? 0) <= 0;
+  const remainingKrw = isOffseasonOrExpired
+    ? 0
+    : p.contract.currency === 'USD'
+    ? usdToKrwBillion(p.contract.annualSalary || 0)
+    : p.contract.annualSalary || 0;
   if (remainingKrw > 0) {
     next.finances.deadMoneyEntries = next.finances.deadMoneyEntries ?? [];
     next.finances.deadMoneyEntries.push({
@@ -861,7 +877,9 @@ export function releaseForeignPlayer(
     ...p.contract,
     status: '만료',
     yearsRemaining: 0,
-    note: `${next.season} 시즌 계약 해지 (웨이버 공시 · 잔여 보장 데드머니 ${remainingKrw.toFixed(2)}억 유지)`,
+    note: isOffseasonOrExpired
+      ? `${next.season} 시즌 종료 계약 해지 (재계약 포기 · 데드머니 없음)`
+      : `${next.season} 시즌 계약 해지 (웨이버 공시 · 잔여 보장 데드머니 ${remainingKrw.toFixed(2)}억 유지)`,
   };
   t.rotationOrder = t.rotationOrder.filter((id) => id !== playerId);
   t.bullpenOrder = t.bullpenOrder.filter((id) => id !== playerId);
@@ -877,8 +895,12 @@ export function releaseForeignPlayer(
     date: releaseDateIso,
     type: '계약',
     teamId,
-    summary: `외국인 계약 해지(웨이버 공시): ${p.name} [${p.category}]`,
-    detail: `${p.category} 보유 슬롯 1자리 확보 · 방출 잔여 보장액 ${remainingKrw.toFixed(2)}억 원은 데드머니 장부에 유지됩니다.`,
+    summary: isOffseasonOrExpired
+      ? `외국인 계약 해지(재계약 포기): ${p.name} [${p.category}]`
+      : `외국인 계약 해지(웨이버 공시): ${p.name} [${p.category}]`,
+    detail: isOffseasonOrExpired
+      ? `${p.category} 보유 슬롯 1자리 확보 · 오프시즌/만료 계약 해지로 잔여 데드머니 0억`
+      : `${p.category} 보유 슬롯 1자리 확보 · 방출 잔여 보장액 ${remainingKrw.toFixed(2)}억 원은 데드머니 장부에 유지됩니다.`,
   });
 
   next.version = bumpVersion(next.version);
@@ -4211,171 +4233,13 @@ export function advanceToNextSeason(career: CareerSave): {
   let offseasonDeclinedCount = 0;
 
   // =========================================================================
-  // #0. KBO 외국인·아시아쿼터 정상급 활약 선수 무조건 MLB 역수출 진출
-  //     (시즌 스탯 초기화 직전에 전 10개 구단 대상으로 판정)
+  // #0. KBO 외국인·아시아쿼터 정상급 활약 선수 자동 MLB 역수출 진출
+  //     (오프시즌 진입 시 이미 처리되지 않은 선수들을 시즌 스탯 초기화 직전 전 10구단 일괄 처리)
   // =========================================================================
-  const exportedForeignNames: string[] = [];
-  const pendingForeignMlbNews: Array<{
-    date: string;
-    category: 'MLB소식';
-    headline: string;
-    body: string;
-    teamId: TeamId;
-    isHighlight: boolean;
-  }> = [];
-  for (const p of Object.values(next.players)) {
-    if (p.rosterTier === '은퇴' || p.rosterTier === '해외이적') continue;
-    if (p.category !== '외국인' && p.category !== '아시아쿼터') continue;
-
-    let qualifiedForMlb = false;
-    let statSummary = '';
-    if (p.role === '투수') {
-      const ps = p.stats as PitcherStats;
-      const ip = (ps.outs ?? 0) / 3;
-      const era = calcERA(ps.ER, ps.outs);
-      const wins = ps.W ?? 0;
-      const losses = ps.L ?? 0;
-      const saves = ps.SV ?? 0;
-      const so = ps.SO ?? 0;
-      if (
-        (ip >= 110 && ((era !== null && era <= 3.15) || wins >= 14 || so >= 160)) ||
-        (ip >= 45 && saves >= 28 && era !== null && era <= 2.65)
-      ) {
-        qualifiedForMlb = true;
-        statSummary = `${wins}승 ${losses}패 ${saves > 0 ? `${saves}세이브 ` : ''}ERA ${era?.toFixed(2) ?? '-'} ${so}탈삼진`;
-      }
-    } else {
-      const bs = p.stats as BatterStats;
-      const ops = calcOPS(bs);
-      const avg = calcAVG(bs.H, bs.AB);
-      const hr = bs.HR ?? 0;
-      const rbi = bs.RBI ?? 0;
-      if (
-        (bs.PA ?? 0) >= 350 &&
-        ((ops !== null && ops >= 0.895) || hr >= 26 || (avg !== null && avg >= 0.32))
-      ) {
-        qualifiedForMlb = true;
-        statSummary = `타율 ${avg?.toFixed(3) ?? '-'} ${hr}홈런 ${rbi}타점 OPS ${ops?.toFixed(3) ?? '-'}`;
-      }
-    }
-
-    if (qualifiedForMlb) {
-      ensurePlayerRichMetadata(p);
-      commitSeasonStatsToCareer(p);
-      const originTeamId = p.teamId;
-      const mlbClub = rng.pick(MLB_CLUBS);
-      const mlbYears = p.age <= 30 ? rng.int(2, 3) : 2;
-      const mlbUsdMillions = Number(
-        Math.max(8, Math.min(36, Math.round((p.ability - 72) * 1.45 * mlbYears + rng.int(2, 6)))).toFixed(1)
-      );
-
-      p.rosterTier = '해외이적';
-      p.gameDayActive = false;
-      p.contract = {
-        ...p.contract,
-        status: '만료',
-        yearsRemaining: 0,
-        note: `${nextSeasonNum - 1} KBO 맹활약 후 ${mlbClub} MLB 역수출 (${mlbYears}년 $${mlbUsdMillions}M)`,
-      };
-      const t = next.teams[originTeamId];
-      if (t) {
-        t.lineupOrder = t.lineupOrder.filter((id) => id !== p.id);
-        t.benchOrder = t.benchOrder.filter((id) => id !== p.id);
-        t.rotationOrder = t.rotationOrder.filter((id) => id !== p.id);
-        t.bullpenOrder = t.bullpenOrder.filter((id) => id !== p.id);
-      }
-
-      recordMlbExportPlayer(next, p, mlbClub, mlbYears, mlbUsdMillions, `${nextSeasonNum - 1}-12-08`, '외국인역수출');
-      exportedForeignNames.push(`${p.name}(${KBO_TEAMS[originTeamId].shortName}→${mlbClub})`);
-
-      pendingForeignMlbNews.push({
-        date: `${nextSeasonNum - 1}-12-08`,
-        category: 'MLB소식',
-        headline: `[외국인 MLB 역수출 확정] ${KBO_TEAMS[originTeamId].shortName} ${p.name}, ${mlbClub}와 ${mlbYears}년 $${mlbUsdMillions}M 계약!`,
-        body: `지난 시즌 KBO에서 압도적 성적(${statSummary})을 남긴 외국인 선수 ${p.name}(${p.position})이 메이저리그 스카우트들의 만장일치 러브콜 끝에 ${mlbClub}와 ${mlbYears}년 총액 $${mlbUsdMillions}M 계약을 맺고 빅리그로 복귀·진출했습니다.`,
-        teamId: originTeamId,
-        isHighlight: true,
-      });
-
-      if (originTeamId === next.playerTeamId) {
-        next.transactionLogs.unshift({
-          id: `tx-for-mlb-${nextSeasonNum}-${p.id}`,
-          date: `${nextSeasonNum - 1}-12-08`,
-          type: '포스팅',
-          teamId: originTeamId,
-          summary: `[외국인 MLB 진출] ${p.name} → ${mlbClub} (${mlbYears}년 $${mlbUsdMillions}M)`,
-          detail: `시즌 압도적 활약(${statSummary})으로 MLB 역수출 확정 — 새 외국인 선수 영입 필요`,
-        });
-      } else {
-        // AI 구단은 이탈한 외국인 에이스/거포 자리를 차기 시즌 개막 전 신규 외국인 선수로 자동 보강
-        const repId = `ai-for-rep-${nextSeasonNum}-${originTeamId}-${p.id.slice(-4)}`;
-        const isP = p.role === '투수';
-        const firstPool = ['에릭', '카일', '브랜든', '루카스', '드류', '타일러', '로건', '마커스', '호세', '라울'];
-        const lastPool = ['페디', '켈리', '산체스', '모건', '해밀턴', '카스트로', '밀러', '베넷', '바르가스', '스콧'];
-        const repName = `${rng.pick(firstPool)} ${rng.pick(lastPool)}`;
-        const repAbil = rng.int(75, 81);
-        const repPlayer: Player = {
-          id: repId,
-          name: repName,
-          teamId: originTeamId,
-          category: p.category,
-          nationality: p.category === '아시아쿼터' ? '일본' : '미국',
-          previousLeagueClub: p.category === '아시아쿼터' ? 'NPB 퍼시픽리그 1군' : 'MLB 40인 · AAA 트리플A',
-          role: p.role,
-          position: p.position,
-          pitchRole: isP ? (p.position === 'SP' ? '선발' : '중간') : undefined,
-          age: rng.int(26, 31),
-          ability: repAbil,
-          potential: Math.min(86, repAbil + rng.int(2, 5)),
-          abilityStatus: '확정',
-          form: 0,
-          fatigue: 0,
-          lastPitchedRound: 0,
-          consecutiveAppearances: 0,
-          rosterTier: '1군',
-          gameDayActive: true,
-          uniformNumber: allocateTeamUniformNumber(
-            next.players,
-            originTeamId,
-            false,
-            undefined,
-            getTeamRetiredNumbers(next, originTeamId)
-          ),
-          contract: {
-            status: '확정',
-            currency: 'USD',
-            years: 1,
-            yearsRemaining: 1,
-            startSeason: nextSeasonNum,
-            endSeason: nextSeasonNum,
-            annualSalary: 850000,
-            signingBonus: 150000,
-            totalValue: 1000000,
-            note: `${nextSeasonNum} 외국인 MLB 이탈 대체 영입 ($1.0M)`,
-          },
-          injury: null,
-          morale: '만족',
-          trainingFocus: isP ? '구위' : '타격',
-          serviceYears: 0,
-          clubTenureSeasons: 1,
-          seasonRatingDelta: 0,
-          lastEvaluatedAtTeamGames: 0,
-          stats: isP ? emptyPitcherStats(false) : emptyBatterStats(false),
-          postseasonStats: isP ? emptyPitcherStats(false) : emptyBatterStats(false),
-          futuresStats: emptyFuturesStats(),
-          kboAdaptation: rng.int(65, 82),
-        };
-        ensurePlayerRichMetadata(repPlayer);
-        next.players[repId] = repPlayer;
-        if (isP) {
-          if (repPlayer.pitchRole === '선발' && t.rotationOrder.length < 5) t.rotationOrder.push(repId);
-          else t.bullpenOrder.push(repId);
-        } else {
-          t.benchOrder.push(repId);
-        }
-      }
-    }
-  }
+  processForeignPlayersMlbExportInPlace(next, rng, {
+    dateStr: `${nextSeasonNum - 1}-12-08`,
+    nextSeasonNum,
+  });
 
   for (const p of Object.values(next.players)) {
     if (p.rosterTier === '은퇴' || p.rosterTier === '해외이적') continue;
@@ -4614,7 +4478,9 @@ export function advanceToNextSeason(career: CareerSave): {
       continue;
     }
 
-    if (p.contract.yearsRemaining > 1) {
+    if (p.contract.status === '확정' && (p.contract.endSeason ?? 0) >= nextSeasonNum) {
+      p.contract.yearsRemaining = Math.max(1, (p.contract.endSeason ?? nextSeasonNum) - nextSeasonNum + 1);
+    } else if (p.contract.yearsRemaining > 1) {
       p.contract.yearsRemaining -= 1;
     } else if (p.contract.status === '확정') {
       if (p.teamId !== next.playerTeamId) {
@@ -5011,10 +4877,6 @@ export function advanceToNextSeason(career: CareerSave): {
       sp.yearsRemaining = rem;
       sp.status = '계약중';
     }
-  }
-
-  for (const mlbNews of pendingForeignMlbNews) {
-    pushNews(next, mlbNews);
   }
 
   pushNews(next, {

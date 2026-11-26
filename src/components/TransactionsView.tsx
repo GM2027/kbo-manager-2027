@@ -39,6 +39,7 @@ import {
 } from '../engine/recommendations';
 import {
   autoSignAiPendingDomesticContracts,
+  evaluateForeignPlayerSeasonOutcome,
   evaluateTradeProposal,
   executeTradeProposal,
   generateAiDomesticContract,
@@ -46,8 +47,10 @@ import {
   getForeignScoutMarket,
   getForeignSlotCounts,
   getMyDepartedFaPlayers,
+  quoteForeignPlayerRenewal,
   refreshVirtualForeignMarket,
   releaseForeignPlayer,
+  renewForeignPlayerContract,
   signDomesticContractOneClick,
   signExternalFaPlayer,
   signForeignCandidate,
@@ -396,6 +399,51 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
     });
   };
 
+  const handleRenewForeign = (playerId: string) => {
+    const fp = career.players[playerId];
+    if (!fp) return;
+    try {
+      setNotice(null);
+      const quote = quoteForeignPlayerRenewal(career, fp);
+      if (quote.alreadyRenewedForTarget) {
+        setNotice({ type: 'ok', text: `${fp.name} 선수는 이미 ${quote.targetSeason}시즌 계약 유지(재계약)가 확정되었습니다.` });
+        return;
+      }
+      const preview = previewContractSalaryCapImpact(career, {
+        title: `${fp.name} [${fp.category}] ${quote.targetSeason}시즌 계약 유지(재계약) 승인 ($${quote.suggestedTotalUsd.toLocaleString()} · ${quote.adjustmentLabel})`,
+        items: [
+          {
+            playerName: fp.name,
+            category: fp.category === '아시아쿼터' ? '아시아쿼터' : '외국인',
+            years: 1,
+            annualSalaryBillion: usdToKrwBillion(quote.suggestedSalaryUsd),
+            signingBonusBillion: quote.upfrontKrwBillion,
+            cashRequiredNowBillion: quote.upfrontKrwBillion,
+            isNewIncomingPlayer: false,
+          },
+        ],
+      });
+      setPendingContract({
+        preview,
+        confirmLabel: '단장 승인 · 계약 유지(재계약) 확정',
+        execute: () => {
+          try {
+            const { nextCareer, backupSnapshot, quote: confirmed } = renewForeignPlayerContract(career, playerId);
+            onUpdateCareer(nextCareer, backupSnapshot);
+            setNotice({
+              type: 'ok',
+              text: `${fp.name} ${confirmed.targetSeason}시즌 계약 유지(재계약) 확정! (총액 $${confirmed.suggestedTotalUsd.toLocaleString()} · ${confirmed.adjustmentLabel})`,
+            });
+          } catch (err) {
+            setNotice({ type: 'err', text: err instanceof Error ? err.message : '외국인 재계약 오류' });
+          }
+        },
+      });
+    } catch (err) {
+      setNotice({ type: 'err', text: err instanceof Error ? err.message : '외국인 재계약 견적 오류' });
+    }
+  };
+
   const handleReleaseForeign = (playerId: string) => {
     try {
       setNotice(null);
@@ -405,7 +453,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
       if (replaceId === playerId) setReplaceId('');
       setNotice({
         type: 'ok',
-        text: `${targetName} 선수와 계약을 해지(웨이버 공시)했습니다. 빈 슬롯에 신규 외국인 영입이 가능합니다.`,
+        text: `${targetName} 선수와 계약을 해지했습니다. 빈 슬롯에 신규 외국인 영입이 가능합니다.`,
       });
     } catch (err) {
       setNotice({ type: 'err', text: err instanceof Error ? err.message : '계약 해지 오류' });
@@ -2122,13 +2170,17 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                   현재 등록된 외국인·아시아쿼터 선수가 없습니다. 우측 마켓에서 영입하세요.
                 </div>
               ) : (
-                [...foreignSlots.regularPlayers, ...foreignSlots.asianPlayers].map((fp) => (
+                [...foreignSlots.regularPlayers, ...foreignSlots.asianPlayers].map((fp) => {
+                  const ev = evaluateForeignPlayerSeasonOutcome(fp);
+                  const quote = quoteForeignPlayerRenewal(career, fp);
+                  const totalUsdLabel = `$${(quote.suggestedTotalUsd / 1_000_000).toFixed(2)}M`;
+                  return (
                   <div
                     key={fp.id}
                     className="p-3 rounded border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/60 space-y-2"
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <div className="font-bold flex items-center gap-1.5 flex-wrap">
                           <button
                             type="button"
@@ -2145,6 +2197,27 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                               className="text-[10px] font-semibold text-slate-500"
                             />
                           )}
+                          {ev.tier === 'MLB자동진출' ? (
+                            <span className="px-1.5 py-0.5 rounded bg-indigo-600 text-white text-[10px] font-bold">
+                              MLB 자동 진출권
+                            </span>
+                          ) : ev.mlbLikelihood === '유력' ? (
+                            <span className="px-1.5 py-0.5 rounded bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 text-[10px] font-bold">
+                              MLB 진출 유력
+                            </span>
+                          ) : ev.tier === '부진_교체검토' ? (
+                            <span className="px-1.5 py-0.5 rounded bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 text-[10px] font-bold">
+                              부진 · 해지/유지 선택
+                            </span>
+                          ) : quote.alreadyRenewedForTarget ? (
+                            <span className="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold">
+                              {quote.targetSeason} 재계약 확정
+                            </span>
+                          ) : (
+                            <span className="px-1.5 py-0.5 rounded bg-slate-200/80 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-semibold">
+                              {ev.tier === '재계약추천' ? '재계약 추천' : '계약 평가중'}
+                            </span>
+                          )}
                         </div>
                         {fp.previousLeagueClub && (
                           <div className="text-[10px] font-semibold text-indigo-700 dark:text-indigo-300 mt-0.5 truncate">
@@ -2155,6 +2228,9 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                           {fp.position} · {fp.age}세 · 능력 {fp.ability}/{fp.potential} ·{' '}
                           {fp.contract.startSeason ?? career.season}~
                           {fp.contract.endSeason ?? career.season}시즌
+                        </div>
+                        <div className="text-[10px] text-slate-600 dark:text-slate-300 mt-0.5">
+                          시즌 평가: <span className="font-mono-stats font-semibold">{ev.statSummary}</span>
                         </div>
                         <div className="mt-1.5 space-y-0.5">
                           <div className="flex justify-between text-[10px] text-slate-500 font-mono-stats">
@@ -2172,31 +2248,80 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <button
+                        type="button"
+                        disabled={quote.alreadyRenewedForTarget}
+                        onClick={() => handleRenewForeign(fp.id)}
+                        title={
+                          quote.alreadyRenewedForTarget
+                            ? `${quote.targetSeason}시즌 계약 유지 완료`
+                            : `${quote.targetSeason}시즌 계약 유지 (${quote.adjustmentLabel} · 계약금 ${quote.upfrontKrwBillion}억)`
+                        }
+                        className={`flex-1 min-w-[110px] py-1 px-2 rounded text-[11px] font-bold ${
+                          quote.alreadyRenewedForTarget
+                            ? 'bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 cursor-default'
+                            : 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer'
+                        }`}
+                      >
+                        {quote.alreadyRenewedForTarget
+                          ? `${quote.targetSeason} 계약 유지 완료`
+                          : `계약 유지 (${totalUsdLabel})`}
+                      </button>
                       <button
                         type="button"
                         onClick={() => setReplaceId(replaceId === fp.id ? '' : fp.id)}
-                        className={`flex-1 py-1 rounded border text-[11px] font-semibold ${
+                        className={`px-2 py-1 rounded border text-[11px] font-semibold cursor-pointer ${
                           replaceId === fp.id
                             ? 'bg-amber-600 border-amber-600 text-white'
                             : 'border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'
                         }`}
                       >
-                        {replaceId === fp.id ? '교체 대상 지정됨' : '교체 지정'}
+                        {replaceId === fp.id ? '교체 대상' : '교체 지정'}
                       </button>
                       <button
                         type="button"
                         onClick={() => handleReleaseForeign(fp.id)}
-                        className="px-2.5 py-1 rounded border border-red-500/50 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white text-[11px] font-semibold inline-flex items-center gap-1"
+                        className="px-2 py-1 rounded border border-red-500/50 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white text-[11px] font-semibold inline-flex items-center gap-1 cursor-pointer"
                       >
                         <UserMinus className="w-3 h-3" />
                         <span>계약 해지</span>
                       </button>
                     </div>
                   </div>
-                ))
+                  );
+                })
               )}
             </div>
+
+            {(() => {
+              const foreignMlbExports = (career.mlbExports ?? []).filter(
+                (ex) => ex.exportRoute === '외국인역수출'
+              );
+              if (foreignMlbExports.length === 0) return null;
+              return (
+                <div className="pt-2.5 border-t border-slate-200 dark:border-slate-800 space-y-1.5 text-[11px]">
+                  <div className="font-bold text-indigo-700 dark:text-indigo-300">
+                    KBO → MLB 자동 역수출 외국인 ({foreignMlbExports.length}명)
+                  </div>
+                  <div className="space-y-1">
+                    {foreignMlbExports.slice(0, 5).map((ex) => (
+                      <div
+                        key={ex.id}
+                        className="px-2 py-1 rounded bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200/70 dark:border-indigo-800/60 flex items-center justify-between gap-1"
+                      >
+                        <span className="font-bold truncate">
+                          {ex.playerName} ({KBO_TEAMS[ex.fromKboTeamId]?.shortName ?? ex.fromKboTeamId})
+                        </span>
+                        <span className="font-mono-stats text-indigo-700 dark:text-indigo-300 shrink-0">
+                          → {ex.mlbTeam} ({ex.contractYears}년 ${ex.guaranteedUsdMillions}M)
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
           {(() => {

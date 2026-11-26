@@ -46,7 +46,13 @@ import {
   previewContractSalaryCapImpact,
 } from '../engine/salaryCapEngine';
 import { calcAVG, calcERA, computeStandings, formatIP } from '../engine/stats';
-import { approveAndStartNextSeasonFromOffseason } from '../engine/transactions';
+import {
+  approveAndStartNextSeasonFromOffseason,
+  quoteForeignPlayerRenewal,
+  releaseForeignPlayer,
+  renewForeignPlayerContract,
+  usdToKrwBillion,
+} from '../engine/transactions';
 import { BatterStats, CareerSave, OffseasonStep8, PitcherStats, SpringCampState } from '../types/kbo';
 import { ContractApprovalModal } from './ContractApprovalModal';
 import { CountryFlag, NationalityBadge } from './CountryFlag';
@@ -814,7 +820,7 @@ export const OffseasonFlowPanel: React.FC<OffseasonFlowPanelProps> = ({
                 <div className="flex items-center justify-between">
                   <div className="font-bold text-sky-700 dark:text-sky-300 flex items-center gap-1.5">
                     <Briefcase className="w-3.5 h-3.5" />
-                    <span>외국인·아시아쿼터 계약 만료 ({foreignExpiryAlerts.length}명)</span>
+                    <span>외국인·아시아쿼터 재계약 / 계약 해지 ({foreignExpiryAlerts.length}명)</span>
                   </div>
                   <button
                     type="button"
@@ -824,28 +830,127 @@ export const OffseasonFlowPanel: React.FC<OffseasonFlowPanelProps> = ({
                     외국인 시장 열기 →
                   </button>
                 </div>
+                {(() => {
+                  const myMlbExports = (career.mlbExports ?? []).filter(
+                    (e) =>
+                      e.exportRoute === '외국인역수출' &&
+                      e.fromKboTeamId === career.playerTeamId &&
+                      e.seasonExported >= career.season
+                  );
+                  if (myMlbExports.length === 0) return null;
+                  return (
+                    <div className="p-2 rounded bg-indigo-100/70 dark:bg-indigo-950/50 border border-indigo-300/70 dark:border-indigo-700 text-[11px] text-indigo-800 dark:text-indigo-200 font-semibold">
+                      MLB 자동 진출 이탈:{' '}
+                      {myMlbExports.map((e) => `${e.playerName} → ${e.mlbTeam} (${e.contractYears}년 $${e.guaranteedUsdMillions}M)`).join(', ')}
+                    </div>
+                  );
+                })()}
                 {foreignExpiryAlerts.length === 0 ? (
                   <p className="text-slate-500">만료 예정 외국인·아시아쿼터 선수가 없습니다.</p>
                 ) : (
-                  <div className="space-y-1.5">
-                    {foreignExpiryAlerts.map((item) => (
-                      <div key={item.player.id} className="flex items-center justify-between gap-2">
-                        <button
-                          type="button"
-                          onClick={() => onSelectPlayer?.(item.player.id)}
-                          className="inline-flex items-center gap-1.5 font-bold text-slate-900 dark:text-white hover:text-indigo-600 cursor-pointer"
+                  <div className="space-y-2">
+                    {foreignExpiryAlerts.map((item) => {
+                      const fp = item.player;
+                      const quote = quoteForeignPlayerRenewal(career, fp);
+                      const ev = quote.evaluation;
+                      return (
+                        <div
+                          key={fp.id}
+                          className="p-2 rounded bg-white/80 dark:bg-slate-900/70 border border-sky-200/70 dark:border-slate-800 space-y-1.5"
                         >
-                          <NationalityBadge nationality={item.player.nationality ?? '미국'} size="xs" showLabel={false} />
-                          <span>{item.player.name}</span>
-                          <span className="text-[10px] text-slate-500">
-                            ({item.player.position} · {item.player.nationality ?? '외국인'})
-                          </span>
-                        </button>
-                        <span className="font-mono-stats text-slate-600 dark:text-slate-300">
-                          {item.annualSalaryLabel}
-                        </span>
-                      </div>
-                    ))}
+                          <div className="flex items-center justify-between gap-2">
+                            <button
+                              type="button"
+                              onClick={() => onSelectPlayer?.(fp.id)}
+                              className="inline-flex items-center gap-1.5 font-bold text-slate-900 dark:text-white hover:text-indigo-600 cursor-pointer"
+                            >
+                              <NationalityBadge nationality={fp.nationality ?? '미국'} size="xs" showLabel={false} />
+                              <span>{fp.name}</span>
+                              <span className="text-[10px] text-slate-500">
+                                ({fp.position} · OVR {fp.ability})
+                              </span>
+                            </button>
+                            <span
+                              className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                                quote.alreadyRenewedForTarget
+                                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                                  : ev.tier === '부진_교체검토'
+                                  ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300'
+                                  : 'bg-sky-100 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300'
+                              }`}
+                            >
+                              {quote.alreadyRenewedForTarget
+                                ? `${quote.targetSeason} 재계약 완료`
+                                : ev.tier === '부진_교체검토'
+                                ? '부진 · 해지/할인유지'
+                                : '재계약 추천'}
+                            </span>
+                          </div>
+                          <div className="text-[10px] text-slate-500 font-mono-stats">
+                            {ev.statSummary} · 제안 ${(quote.suggestedTotalUsd / 1_000_000).toFixed(2)}M ({quote.adjustmentLabel})
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              disabled={quote.alreadyRenewedForTarget}
+                              onClick={() => {
+                                const preview = previewContractSalaryCapImpact(career, {
+                                  title: `${fp.name} ${quote.targetSeason}시즌 계약 유지(재계약) 승인`,
+                                  items: [
+                                    {
+                                      playerName: fp.name,
+                                      category: fp.category === '아시아쿼터' ? '아시아쿼터' : '외국인',
+                                      years: 1,
+                                      annualSalaryBillion: usdToKrwBillion(quote.suggestedSalaryUsd),
+                                      signingBonusBillion: quote.upfrontKrwBillion,
+                                      cashRequiredNowBillion: quote.upfrontKrwBillion,
+                                      isNewIncomingPlayer: false,
+                                    },
+                                  ],
+                                });
+                                setPendingContract({
+                                  preview,
+                                  confirmLabel: '단장 승인 · 계약 유지(재계약) 확정',
+                                  execute: () => {
+                                    try {
+                                      const { nextCareer, backupSnapshot } = renewForeignPlayerContract(career, fp.id);
+                                      onUpdateCareer(nextCareer, backupSnapshot);
+                                      markAutoSaved(`${fp.name} ${quote.targetSeason}시즌 계약 유지(재계약)를 확정했습니다.`);
+                                    } catch (e) {
+                                      setFeedback(e instanceof Error ? e.message : '외국인 재계약 오류');
+                                    }
+                                  },
+                                });
+                              }}
+                              className={`flex-1 py-1 rounded text-[11px] font-bold ${
+                                quote.alreadyRenewedForTarget
+                                  ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-300 cursor-default'
+                                  : 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer'
+                              }`}
+                            >
+                              {quote.alreadyRenewedForTarget
+                                ? '계약 유지 완료'
+                                : `계약 유지 ($${(quote.suggestedTotalUsd / 1_000_000).toFixed(2)}M)`}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                try {
+                                  const { nextCareer, backupSnapshot } = releaseForeignPlayer(career, fp.id);
+                                  onUpdateCareer(nextCareer, backupSnapshot);
+                                  markAutoSaved(`${fp.name} 계약을 해지했습니다 (오프시즌 데드머니 0억).`);
+                                } catch (e) {
+                                  setFeedback(e instanceof Error ? e.message : '외국인 계약 해지 오류');
+                                }
+                              }}
+                              className="px-2.5 py-1 rounded border border-rose-400/60 text-rose-600 dark:text-rose-400 hover:bg-rose-600 hover:text-white text-[11px] font-bold cursor-pointer"
+                            >
+                              계약 해지
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>

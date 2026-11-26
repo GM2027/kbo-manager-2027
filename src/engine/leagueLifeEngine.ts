@@ -36,6 +36,10 @@ import {
 } from '../types/kbo';
 import { getKboMinSalaryBillion } from '../data/v18Importer';
 import { advanceFaCompetitionRound, syncFaCompetitionMarketInPlace } from './faCompetitionEngine';
+import {
+  processAiClubsOffseasonForeignDecisionsInPlace,
+  processForeignPlayersMlbExportInPlace,
+} from './foreignLifecycleEngine';
 import { recordLeagueAcquisitionInPlace } from './leagueAcquisitionsEngine';
 import { isMilitaryServing } from './militaryEngine';
 import { SeededRng } from './rng';
@@ -2631,23 +2635,26 @@ export function processAiClubsOffseasonInPlace(career: CareerSave, rng: SeededRn
     }
   }
 
-  // 2. AI 구단 계약 만료 핵심 선수 재계약 (1군 핵심 국내·외국인)
+  // 2. AI 구단 계약 만료 국내 핵심 선수 재계약 + 외국인 MLB 역수출/재계약/계약해지·교체 처리
   for (const p of Object.values(career.players)) {
     if (p.teamId === career.playerTeamId) continue;
     if (p.rosterTier === '은퇴' || p.rosterTier === 'FA' || p.rosterTier === '해외이적') continue;
-    if (p.contract.yearsRemaining <= 1 || p.contract.status === '만료') {
-      if (p.category === '국내' && p.ability >= 74 && p.age <= 36) {
+    if (p.category === '국내' && (p.contract.yearsRemaining <= 1 || p.contract.status === '만료')) {
+      if (p.ability >= 74 && p.age <= 36) {
         p.contract.yearsRemaining = p.ability >= 82 ? 3 : 2;
         p.contract.endSeason = career.season + p.contract.yearsRemaining;
         p.contract.status = '확정';
         aiRenewals++;
-      } else if (p.category !== '국내' && p.ability >= 78 && p.age <= 35) {
-        p.contract.yearsRemaining = 1;
-        p.contract.endSeason = career.season + 1;
-        p.contract.status = '확정';
-        aiRenewals++;
       }
     }
+  }
+  const aiForeignRes = processAiClubsOffseasonForeignDecisionsInPlace(career, rng, {
+    dateStr: today,
+    nextSeasonNum: career.season + 1,
+  });
+  aiRenewals += aiForeignRes.renewedCount;
+  for (const fLog of aiForeignRes.logs) {
+    logs.push(fLog);
   }
 
   // 3. AI 9개 구단 FA 경쟁·재계약·보상 자동 진행 (공식 faCompetitionEngine 통합 연동 · 중복/무규정 계약 제거)
@@ -2742,8 +2749,15 @@ export function completeAndAdvanceOffseason8Step(
     next.currentDate = stepIso;
   }
 
-  // 5단계(선수 계약) 진입 시 국내 선수 연봉 요구액 자동 준비
+  // 5단계(선수 계약) 진입 시 정상급 외국인 MLB 자동 진출 반영 + 국내 선수 연봉 요구액 자동 준비
   if (targetStep === 'PLAYER_CONTRACTS') {
+    const mlbRng = new SeededRng(((next.rngState || next.seed) + next.season * 733) >>> 0);
+    processForeignPlayersMlbExportInPlace(next, mlbRng, {
+      dateStr: next.currentDate ?? `${next.season}-12-08`,
+      nextSeasonNum: next.season + 1,
+    });
+    next.rngState = mlbRng.getState();
+
     for (const p of Object.values(next.players)) {
       if (
         p.teamId === next.playerTeamId &&

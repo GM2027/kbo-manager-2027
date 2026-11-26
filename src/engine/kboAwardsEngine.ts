@@ -16,6 +16,7 @@ import {
   SeasonAwards,
   TeamId,
 } from '../types/kbo';
+import { processForeignPlayersMlbExportInPlace } from './foreignLifecycleEngine';
 import { SeededRng } from './rng';
 import {
   calcAVG,
@@ -1488,6 +1489,13 @@ export function confirmAwardsCeremonyAndEnterOffseason(career: CareerSave): {
   if (!next.offseasonStep8) {
     next.offseasonStep8 = 'SETTLEMENT';
   }
+  // 시즌 종료 오프시즌 진입 즉시 KBO 정상급 활약 외국인·아시아쿼터 선수 자동 MLB 역수출 처리 (전 10구단)
+  const mlbRng = new SeededRng(((next.rngState || next.seed) + next.season * 991) >>> 0);
+  processForeignPlayersMlbExportInPlace(next, mlbRng, {
+    dateStr: `${next.season}-11-12`,
+    nextSeasonNum: next.season + 1,
+  });
+  next.rngState = mlbRng.getState();
   next.updatedAt = new Date().toISOString();
   return { nextCareer: next, backupSnapshot };
 }
