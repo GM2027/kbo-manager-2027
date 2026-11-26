@@ -18,16 +18,20 @@ import {
   Home,
   Layers,
   Lightbulb,
+  Lock,
   LogOut,
   Moon,
   Newspaper,
   Play,
   Save,
   Search,
+  Settings,
   ShieldCheck,
+  Sliders,
   Sparkles,
   Sun,
   Trophy,
+  Unlock,
   Users,
   Volume2,
   VolumeX,
@@ -70,6 +74,7 @@ import { SeasonOpeningTransitionModal } from './SeasonOpeningTransitionModal';
 import { getPendingIncomingTradeOffers } from '../engine/incomingTradeEngine';
 import { DraftPostingAwardsView } from './DraftPostingAwardsView';
 import { FinancesSavesView } from './FinancesSavesView';
+import { GameEditorView } from './GameEditorView';
 import { KboAwardsCeremonyView } from './KboAwardsCeremonyView';
 import { LeagueHubView } from './LeagueHubView';
 import { NewsAndEventsView } from './NewsAndEventsView';
@@ -133,7 +138,8 @@ type NavTab =
   | 'hub'
   | 'leagueLife'
   | 'history'
-  | 'finances';
+  | 'finances'
+  | 'editor';
 
 interface DashboardProps {
   career: CareerSave;
@@ -254,11 +260,14 @@ const NAV_GROUPS: NavGroupItem[] = [
   },
   {
     id: 'finances',
-    label: '재정 · 세이브',
+    label: '재정 · 설정',
     section: '리그 · 관리',
     icon: Wallet,
     defaultTab: 'finances',
-    tabs: [{ id: 'finances', label: '재정 · 시설 · 세이브', icon: Wallet }],
+    tabs: [
+      { id: 'finances', label: '재정 · 시설 · 세이브', icon: Wallet },
+      { id: 'editor', label: '에디터 · 설정', icon: Sliders },
+    ],
   },
 ];
 
@@ -2752,6 +2761,142 @@ export const Dashboard: React.FC<DashboardProps> = ({
               onRenameCareer={onRenameCareer}
               onDeleteCareer={onDeleteCareer}
             />
+          )}
+
+          {activeTab === 'editor' && (
+            <div className="space-y-4">
+              {/* 게임 설정 · 에디터 제어 패널 */}
+              <div className="gm-card p-3.5 sm:p-4 space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-200 dark:border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <Settings className="w-4 h-4 team-accent-text" />
+                    <h2 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                      환경 설정 · 인게임 에디터
+                    </h2>
+                    <span
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        career.editorEnabled
+                          ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                          : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                      }`}
+                    >
+                      {career.editorEnabled ? '인게임 에디터 활성화' : '인게임 에디터 잠금'}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        onUpdateSettings({
+                          ...settings,
+                          theme: settings.theme === 'dark' ? 'light' : 'dark',
+                        })
+                      }
+                      className="px-2.5 py-1 rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold inline-flex items-center gap-1"
+                    >
+                      {settings.theme === 'dark' ? (
+                        <Sun className="w-3.5 h-3.5 text-amber-400" />
+                      ) : (
+                        <Moon className="w-3.5 h-3.5" />
+                      )}
+                      <span>{settings.theme === 'dark' ? '라이트 모드' : '다크 모드'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSoundModalOpen(true)}
+                      className="px-2.5 py-1 rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold inline-flex items-center gap-1"
+                    >
+                      <Volume2 className="w-3.5 h-3.5 text-orange-500" />
+                      <span>사운드 설정</span>
+                    </button>
+                    <label className="px-2.5 py-1 rounded border border-slate-200 dark:border-slate-700 inline-flex items-center gap-1.5 font-semibold cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={settings.showDetailedColumnsByDefault}
+                        onChange={(e) =>
+                          onUpdateSettings({
+                            ...settings,
+                            showDetailedColumnsByDefault: e.target.checked,
+                          })
+                        }
+                        className="w-3.5 h-3.5 accent-orange-600"
+                      />
+                      <span>세부 스탯 컬럼 기본 표시</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const nextEnabled = !career.editorEnabled;
+                        applyCareerUpdate({
+                          ...career,
+                          editorEnabled: nextEnabled,
+                        });
+                        handleNotify(
+                          nextEnabled
+                            ? '현재 세이브에서 인게임 에디터를 활성화했습니다. 수정 내역은 이 세이브에만 반영됩니다.'
+                            : '현재 세이브의 인게임 에디터를 잠금 처리했습니다.',
+                          'info'
+                        );
+                      }}
+                      className={`px-3 py-1 rounded font-bold inline-flex items-center gap-1 cursor-pointer ${
+                        career.editorEnabled
+                          ? 'border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                          : 'bg-orange-600 hover:bg-orange-500 text-white'
+                      }`}
+                    >
+                      {career.editorEnabled ? (
+                        <>
+                          <Lock className="w-3.5 h-3.5" />
+                          <span>에디터 잠그기</span>
+                        </>
+                      ) : (
+                        <>
+                          <Unlock className="w-3.5 h-3.5" />
+                          <span>에디터 활성화</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                  인게임 에디터의 모든 수정 사항은 <strong>현재 세이브 [{career.label}]</strong>에만 반영되며, 새 게임 기본 데이터베이스나 다른 세이브에는 영향을 주지 않습니다.
+                </p>
+              </div>
+
+              {career.editorEnabled ? (
+                <GameEditorView
+                  mode="INGAME"
+                  career={career}
+                  onUpdateCareer={applyCareerUpdate}
+                  onNotify={handleNotify}
+                />
+              ) : (
+                <div className="gm-card p-8 text-center space-y-3">
+                  <div className="w-11 h-11 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto">
+                    <Lock className="w-5 h-5 text-slate-500" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                      인게임 에디터가 잠겨 있습니다
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+                      게임 시작 시 정통 모드(인게임 에디터 미사용)로 설정되었거나 잠금 상태입니다. 필요 시 위 설정 버튼 또는 아래 버튼으로 현재 세이브의 인게임 에디터를 활성화할 수 있습니다.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      applyCareerUpdate({ ...career, editorEnabled: true });
+                      handleNotify('현재 세이브의 인게임 에디터를 활성화했습니다.', 'success');
+                    }}
+                    className="px-4 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Unlock className="w-3.5 h-3.5" />
+                    <span>현재 세이브에서 인게임 에디터 활성화</span>
+                  </button>
+                </div>
+              )}
+            </div>
           )}
             </motion.div>
           </AnimatePresence>

@@ -1,35 +1,51 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, Check, Play, Shield } from 'lucide-react';
+import { ArrowLeft, Check, Lock, Play, Shield, Sliders, Unlock } from 'lucide-react';
 import { TEAM_STARTING_CASH_BILLION } from '../data/financesData';
 import { FINAL_RANK_2026, FINAL_STANDINGS_2026_ORDER, KBO_TEAMS } from '../data/kboTeams';
 import { TEAM_UI_THEMES } from '../data/realKboHistories';
 import { DIFFICULTY_CONFIG } from '../engine/deepFranchise';
+import { countPreGameEditorChanges, loadPreGameEditorStore } from '../storage/editorStorage';
 import { GameDifficulty, TeamId } from '../types/kbo';
 import { TeamLogo } from './TeamLogo';
 
 interface NewGameWizardProps {
+  defaultEditorEnabled?: boolean;
   onCancel: () => void;
-  onConfirmStart: (teamId: TeamId, gmName: string, difficulty: GameDifficulty) => void;
+  onOpenPreGameEditor?: () => void;
+  onConfirmStart: (
+    teamId: TeamId,
+    gmName: string,
+    difficulty: GameDifficulty,
+    editorEnabled: boolean
+  ) => void;
   onPreviewTeamColor?: (teamId: TeamId) => void;
 }
 
 const DIFFICULTIES: GameDifficulty[] = ['보통', '어려움', '극한'];
 
 export const NewGameWizard: React.FC<NewGameWizardProps> = ({
+  defaultEditorEnabled = false,
   onCancel,
+  onOpenPreGameEditor,
   onConfirmStart,
   onPreviewTeamColor,
 }) => {
   const [selectedTeam, setSelectedTeam] = useState<TeamId>('삼성');
   const [gmName, setGmName] = useState('');
   const [difficulty, setDifficulty] = useState<GameDifficulty>('어려움');
+  const [editorEnabled, setEditorEnabled] = useState<boolean>(defaultEditorEnabled);
+  const preGameStore = loadPreGameEditorStore();
+  const preGameChangeCount = countPreGameEditorChanges(preGameStore);
 
   useEffect(() => {
     onPreviewTeamColor?.(selectedTeam);
   }, [selectedTeam, onPreviewTeamColor]);
 
   const teamInfo = KBO_TEAMS[selectedTeam];
-  const selectedCash = TEAM_STARTING_CASH_BILLION[selectedTeam];
+  const selectedCash =
+    typeof preGameStore.clubCashOverrides[selectedTeam] === 'number'
+      ? preGameStore.clubCashOverrides[selectedTeam]!
+      : TEAM_STARTING_CASH_BILLION[selectedTeam];
   const selectedTheme = TEAM_UI_THEMES[selectedTeam];
 
   return (
@@ -79,7 +95,10 @@ export const NewGameWizard: React.FC<NewGameWizardProps> = ({
             const info = KBO_TEAMS[tid];
             const rank2026 = FINAL_RANK_2026[tid];
             const isSelected = selectedTeam === tid;
-            const startingCash = TEAM_STARTING_CASH_BILLION[tid];
+            const startingCash =
+              typeof preGameStore.clubCashOverrides[tid] === 'number'
+                ? preGameStore.clubCashOverrides[tid]!
+                : TEAM_STARTING_CASH_BILLION[tid];
             return (
               <button
                 key={tid}
@@ -171,13 +190,89 @@ export const NewGameWizard: React.FC<NewGameWizardProps> = ({
           </div>
         </div>
 
+        {/* Editor Usage Selector */}
+        <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-md p-4 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
+              <Sliders className="w-4 h-4 team-accent-text" />
+              <span>에디터 사용 여부 선택</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                {preGameChangeCount > 0 ? (
+                  <span className="text-orange-600 dark:text-orange-400 font-bold">
+                    프리게임 수정 {preGameChangeCount}건 새 게임 자동 반영
+                  </span>
+                ) : (
+                  '프리게임 수정 없음 (기본 DB)'
+                )}
+              </span>
+              {onOpenPreGameEditor && (
+                <button
+                  type="button"
+                  onClick={onOpenPreGameEditor}
+                  className="px-2.5 py-1 rounded border border-orange-400/60 dark:border-orange-500/40 bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900/50 text-[11px] font-bold inline-flex items-center gap-1 cursor-pointer"
+                >
+                  <Sliders className="w-3 h-3" />
+                  <span>프리게임 에디터</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <button
+              type="button"
+              onClick={() => setEditorEnabled(false)}
+              className={`text-left p-3 rounded-md border transition-colors ${
+                !editorEnabled
+                  ? 'team-accent-border team-accent-soft'
+                  : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-extrabold text-slate-900 dark:text-white inline-flex items-center gap-1.5">
+                  <Lock className="w-3.5 h-3.5 text-slate-500" />
+                  <span>인게임 에디터 미사용 (정통 모드)</span>
+                </span>
+                {!editorEnabled && <Check className="w-3.5 h-3.5 team-accent-text" />}
+              </div>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                진행 중인 세이브의 선수 능력치·계약·재정 실시간 수정을 잠급니다. (프리게임 수정사항은 새 게임 시작 시 정상 반영)
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setEditorEnabled(true)}
+              className={`text-left p-3 rounded-md border transition-colors ${
+                editorEnabled
+                  ? 'team-accent-border team-accent-soft'
+                  : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-extrabold text-slate-900 dark:text-white inline-flex items-center gap-1.5">
+                  <Unlock className="w-3.5 h-3.5 text-orange-500" />
+                  <span>인게임 에디터 사용 허용</span>
+                </span>
+                {editorEnabled && <Check className="w-3.5 h-3.5 team-accent-text" />}
+              </div>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                시즌 진행 중 [재정 · 설정 → 에디터 · 설정]에서 선수·신규 생성·병역·계약·재정을 수정하고 이력 복구를 사용할 수 있습니다.
+              </p>
+            </button>
+          </div>
+        </div>
+
         {/* Selected Team + GM Name + Start CTA */}
         <div className="border team-accent-border bg-white dark:bg-slate-900 rounded-md p-4 sm:p-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <TeamLogo teamId={selectedTeam} size="md" />
             <div>
               <div className="text-xs text-slate-500 dark:text-slate-400">
-                선택 구단 · 난이도 {DIFFICULTY_CONFIG[difficulty].label}
+                선택 구단 · 난이도 {DIFFICULTY_CONFIG[difficulty].label} ·{' '}
+                {editorEnabled ? '인게임 에디터 ON' : '정통 모드 (에디터 OFF)'}
               </div>
               <div className="text-base font-bold">
                 {teamInfo.name} ·{' '}
@@ -206,7 +301,7 @@ export const NewGameWizard: React.FC<NewGameWizardProps> = ({
             </button>
             <button
               type="button"
-              onClick={() => onConfirmStart(selectedTeam, gmName, difficulty)}
+              onClick={() => onConfirmStart(selectedTeam, gmName, difficulty, editorEnabled)}
               className="px-5 py-2 text-sm font-bold rounded team-accent-bg flex items-center justify-center gap-1.5"
             >
               <Play className="w-4 h-4" />

@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { audioManager } from './audio/audioManager';
 import { ClubIntroAnimation } from './components/ClubIntroAnimation';
 import { Dashboard } from './components/Dashboard';
+import { GameEditorView } from './components/GameEditorView';
 import { NewGameWizard } from './components/NewGameWizard';
 import { TitleScreen } from './components/TitleScreen';
 import { createNewCareer } from './data/newGameTemplate';
@@ -21,10 +22,11 @@ import {
 } from './storage/careerStorage';
 import { AppSettings, CareerSave, GameDifficulty, TeamId } from './types/kbo';
 
-type ScreenState = 'TITLE' | 'NEW_GAME' | 'CLUB_INTRO' | 'CAREER';
+type ScreenState = 'TITLE' | 'NEW_GAME' | 'PREGAME_EDITOR' | 'CLUB_INTRO' | 'CAREER';
 
 export default function App() {
   const [screen, setScreen] = useState<ScreenState>('TITLE');
+  const [preGameEditorReturnTo, setPreGameEditorReturnTo] = useState<'TITLE' | 'NEW_GAME'>('TITLE');
   const [settings, setSettings] = useState<AppSettings>(() => loadSettings());
   const [activeCareer, setActiveCareer] = useState<CareerSave | null>(null);
   const [previewTeamId, setPreviewTeamId] = useState<TeamId>('LG');
@@ -79,14 +81,24 @@ export default function App() {
     saveSettings(next);
   };
 
-  const handleConfirmNewGame = (teamId: TeamId, gmName: string, difficulty: GameDifficulty = '어려움') => {
+  const handleConfirmNewGame = (
+    teamId: TeamId,
+    gmName: string,
+    difficulty: GameDifficulty = '어려움',
+    editorEnabled = false
+  ) => {
     archiveExistingCareersBeforeNewGame();
-    const created = createNewCareer({ teamId, gmName, difficulty });
+    const created = createNewCareer({ teamId, gmName, difficulty, editorEnabled });
     saveCareer(created);
     setActiveCareer(created);
     setScreen('CLUB_INTRO');
     setRefreshTick((t) => t + 1);
     setGlobalError(null);
+  };
+
+  const handleOpenPreGameEditor = (returnTo: 'TITLE' | 'NEW_GAME') => {
+    setPreGameEditorReturnTo(returnTo);
+    setScreen('PREGAME_EDITOR');
   };
 
   const handleContinueCareer = (careerId: string) => {
@@ -158,6 +170,7 @@ export default function App() {
               lastPlayedCareer={continueOptions.lastPlayedCareer}
               settings={settings}
               onStartNewGame={() => setScreen('NEW_GAME')}
+              onOpenPreGameEditor={() => handleOpenPreGameEditor('TITLE')}
               onContinueCareer={handleContinueCareer}
               onDeleteCareer={handleDeleteCareer}
               onRenameCareer={handleRenameCareer}
@@ -176,10 +189,34 @@ export default function App() {
             transition={{ duration: 0.2 }}
           >
             <NewGameWizard
+              defaultEditorEnabled={settings.editorDefaultEnabled ?? false}
               onCancel={() => setScreen('TITLE')}
+              onOpenPreGameEditor={() => handleOpenPreGameEditor('NEW_GAME')}
               onConfirmStart={handleConfirmNewGame}
               onPreviewTeamColor={setPreviewTeamId}
             />
+          </motion.div>
+        )}
+
+        {screen === 'PREGAME_EDITOR' && (
+          <motion.div
+            key="screen-pregame-editor"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            className="min-h-screen bg-slate-100/80 dark:bg-slate-950 text-slate-900 dark:text-slate-100"
+          >
+            <div className="h-1 w-full team-banner-grad" />
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+              <GameEditorView
+                mode="PREGAME"
+                onClose={() => {
+                  setScreen(preGameEditorReturnTo);
+                  setRefreshTick((t) => t + 1);
+                }}
+              />
+            </div>
           </motion.div>
         )}
 

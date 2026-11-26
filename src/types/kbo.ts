@@ -2661,6 +2661,16 @@ export interface CareerSave {
   lastNewsPrunedForSeason?: number;
   // 이벤트 애니메이션 1회 재생 완료 키 기록 (새로고침·세이브 재로딩 시 재재생 방지)
   playedAnimations?: string[];
+  /** 인게임 에디터 사용 허용 여부 (새 게임 시작 시 선택 · 설정에서 확인/관리) */
+  editorEnabled?: boolean;
+  /** 인게임 에디터 수정 내역 기록 */
+  editorHistory?: EditorChangeLogEntry[];
+  /** 인게임 에디터 원본 복구용 스냅샷 (최초 수정 전 원본 보관 · 신규 생성 선수는 null) */
+  editorOriginals?: {
+    players?: Record<string, Player | null>;
+    overseas?: Record<string, OverseasPlayerRecord>;
+    finances?: CareerSave['finances'];
+  };
 }
 
 export interface BenchCoachMeetingReport {
@@ -2888,7 +2898,42 @@ export interface LeaderboardEntry {
   note?: string;
 }
 
+export interface EditorFieldDiff {
+  field: string;
+  label: string;
+  before: string;
+  after: string;
+}
+
+export interface EditorChangeLogEntry {
+  id: string;
+  timestamp: string;
+  mode: 'PREGAME' | 'INGAME';
+  targetType: 'PLAYER' | 'NEW_PLAYER' | 'OVERSEAS' | 'FINANCES';
+  targetId: string;
+  targetLabel: string;
+  summary: string;
+  diffs: EditorFieldDiff[];
+  /** Undo 복구용 직전 스냅샷 */
+  prevSnapshot?: unknown;
+}
+
+export interface PreGameEditorStore {
+  version: 1;
+  updatedAt: string;
+  playerPatches: Record<string, Player>;
+  createdPlayers: Player[];
+  overseasPatches: Record<string, OverseasPlayerRecord>;
+  overseasReturnedToKbo?: Record<string, TeamId>;
+  clubCashOverrides: Partial<Record<TeamId, number>>;
+  clubBudgetCapOverrides: Partial<Record<TeamId, number>>;
+  clubFacilityOverrides: Partial<Record<TeamId, Partial<ClubInvestments>>>;
+  history: EditorChangeLogEntry[];
+}
+
 export interface AppSettings {
   theme: 'dark' | 'light';
   showDetailedColumnsByDefault: boolean;
+  /** 새 게임 시작 시 인게임 에디터 기본 허용 여부 */
+  editorDefaultEnabled?: boolean;
 }

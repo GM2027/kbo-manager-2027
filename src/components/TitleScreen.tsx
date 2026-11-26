@@ -9,6 +9,7 @@ import {
   Play,
   Plus,
   Settings,
+  Sliders,
   Sun,
   Trash2,
   Upload,
@@ -19,6 +20,7 @@ import {
 import { audioManager, AudioSettings } from '../audio/audioManager';
 import { KBO_TEAMS, TEAM_IDS } from '../data/kboTeams';
 import { CareerSummaryItem } from '../storage/careerStorage';
+import { countPreGameEditorChanges, loadPreGameEditorStore } from '../storage/editorStorage';
 import { AppSettings, GamePhase } from '../types/kbo';
 import { TeamLogo } from './TeamLogo';
 import { KboOfficialLogo } from './KboOfficialLogo';
@@ -31,6 +33,7 @@ interface TitleScreenProps {
   lastPlayedCareer: CareerSummaryItem | null;
   settings: AppSettings;
   onStartNewGame: () => void;
+  onOpenPreGameEditor?: () => void;
   onContinueCareer: (careerId: string) => void;
   onDeleteCareer: (careerId: string) => void;
   onRenameCareer: (careerId: string, newLabel: string) => void;
@@ -66,6 +69,7 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
   lastPlayedCareer,
   settings,
   onStartNewGame,
+  onOpenPreGameEditor,
   onContinueCareer,
   onDeleteCareer,
   onRenameCareer,
@@ -87,6 +91,7 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
 
   const isDark = settings.theme === 'dark';
   const latestTeam = lastPlayedCareer ? KBO_TEAMS[lastPlayedCareer.playerTeamId] : null;
+  const preGameChangeCount = countPreGameEditorChanges(loadPreGameEditorStore());
 
   const handleImportSubmit = () => {
     setImportError(null);
@@ -172,6 +177,22 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {onOpenPreGameEditor && (
+              <button
+                type="button"
+                onClick={onOpenPreGameEditor}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border border-orange-400/70 dark:border-orange-500/40 bg-orange-50/90 dark:bg-orange-950/50 text-orange-800 dark:text-orange-200 hover:bg-orange-100 dark:hover:bg-orange-900/60 transition-colors whitespace-nowrap cursor-pointer"
+                title="새 게임에 반영되는 프리게임 선수·구단 에디터"
+              >
+                <Sliders className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">프리게임 에디터</span>
+                {preGameChangeCount > 0 && (
+                  <span className="px-1.5 py-0.2 rounded-full bg-orange-600 text-white text-[10px] font-mono-stats">
+                    {preGameChangeCount}
+                  </span>
+                )}
+              </button>
+            )}
             <button
               type="button"
               onClick={() => setActiveModal('import')}
@@ -697,6 +718,57 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
                   }
                   className="w-4 h-4 accent-orange-600"
                 />
+              </div>
+
+              <div className="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                      <Sliders className="w-3.5 h-3.5 text-orange-500" />
+                      <span>프리게임 에디터</span>
+                      {preGameChangeCount > 0 && (
+                        <span className="px-1.5 py-0.5 rounded bg-orange-500/15 text-orange-700 dark:text-orange-300 text-[10px] font-mono-stats">
+                          수정 {preGameChangeCount}건 적용 대기
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">
+                      새 게임 시작 시 반영되는 KBO 선수·해외파·신규 선수·구단 재정 초기 DB를 편집합니다.
+                    </div>
+                  </div>
+                  {onOpenPreGameEditor && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveModal(null);
+                        onOpenPreGameEditor();
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold whitespace-nowrap cursor-pointer"
+                    >
+                      에디터 열기
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="font-bold text-slate-900 dark:text-white">새 게임 인게임 에디터 기본 허용</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">
+                      새 게임 시작 화면에서 인게임 에디터 사용 옵션을 기본 선택 상태로 둡니다.
+                    </div>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={Boolean(settings.editorDefaultEnabled)}
+                    onChange={(e) =>
+                      onUpdateSettings({
+                        ...settings,
+                        editorDefaultEnabled: e.target.checked,
+                      })
+                    }
+                    className="w-4 h-4 accent-orange-600"
+                  />
+                </div>
               </div>
 
               <div className="pt-3 border-t border-slate-200 dark:border-slate-800">

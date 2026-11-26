@@ -1,5 +1,6 @@
 import { ensureAmateurAndOverseasStateInPlace } from '../engine/amateurOverseasEngine';
 import { ensureDeepFranchiseState } from '../engine/deepFranchise';
+import { applyPreGameEditorStoreToNewCareerInPlace } from '../engine/editorEngine';
 import { ensureLeagueLifeStateInPlace } from '../engine/leagueLifeEngine';
 import { ensureGlobalPlayerRegistryInPlace } from '../engine/playerRegistry';
 import { generateRegularSeasonSchedule } from '../engine/schedule';
@@ -7,7 +8,8 @@ import {
   ensureSpecialFuturesRosters,
   injectUndraftedUlsanPlayersIntoDraft,
 } from '../engine/specialFuturesEngine';
-import { CareerSave, GameDifficulty, TeamId } from '../types/kbo';
+import { loadPreGameEditorStore } from '../storage/editorStorage';
+import { CareerSave, GameDifficulty, PreGameEditorStore, TeamId } from '../types/kbo';
 import { createFreshDraftState } from './draftPool';
 import { DEFAULT_INVESTMENTS, TEAM_STARTING_CASH_BILLION } from './financesData';
 import {
@@ -24,8 +26,19 @@ export function createNewCareer(params: {
   gmName?: string;
   seed?: number;
   difficulty?: GameDifficulty;
+  editorEnabled?: boolean;
+  skipPreGameEditor?: boolean;
+  preGameEditorStoreOverride?: PreGameEditorStore;
 }): CareerSave {
-  const { teamId, gmName, seed = Date.now() % 1000000, difficulty = '어려움' } = params;
+  const {
+    teamId,
+    gmName,
+    seed = Date.now() % 1000000,
+    difficulty = '어려움',
+    editorEnabled = false,
+    skipPreGameEditor = false,
+    preGameEditorStoreOverride,
+  } = params;
   const { players, teams, coaches, faCoaches, v18Summary } = buildAll10TeamsFromV18Dataset();
 
   // For a fresh new career, coaches start unconfirmed until STAFF step (or user confirms/changes them)
@@ -59,6 +72,9 @@ export function createNewCareer(params: {
     postponedRainoutGames: [],
     phase: 'INTRO',
     difficulty,
+    editorEnabled,
+    editorHistory: [],
+    editorOriginals: {},
     seed,
     rngState: seed,
     gamesPlayed: 0,
@@ -132,5 +148,20 @@ export function createNewCareer(params: {
   injectUndraftedUlsanPlayersIntoDraft(created, created.draftState);
   ensureLeagueLifeStateInPlace(created);
   sanitizeCareerOvrPotInPlace(created);
+
+  // 프리게임 에디터 수정 사항은 새 게임 초기 데이터에만 적용 (기존 세이브 불변)
+  if (!skipPreGameEditor) {
+    const pgStore = preGameEditorStoreOverride ?? loadPreGameEditorStore();
+    const appliedPreGameEdits = applyPreGameEditorStoreToNewCareerInPlace(created, pgStore);
+    if (appliedPreGameEdits > 0) {
+      created.transactionLogs.unshift({
+        id: `tx-pregame-editor-${Date.now()}`,
+        date: '2027-01-01',
+        type: '엔트리',
+        teamId,
+        summary: `프리게임 에디터 사용자 정의 데이터 ${appliedPreGameEdits}건 초기 반영 완료`,
+      });
+    }
+  }
   return created;
 }
