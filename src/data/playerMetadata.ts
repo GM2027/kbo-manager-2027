@@ -793,28 +793,50 @@ export function sanitizePlayerAgeAndServiceYearsInPlace(
   for (const p of Object.values(players)) {
     if (p.category !== '국내') continue;
 
-    // 1) 실제 KBO 나이가 2026 기준으로 등록되어 있고, 기존 세이브의 나이가 명백히 비정상인 경우에만 보정하지 않고
-    //    드래프트 입단 정보 누락/오류(예: 정준재 2024 대졸 입단) 보정
+    // 1) 드래프트 입단 정보 누락/오류 보정 (동명이인 신인·베테랑 충돌 방지 위해 출생연도 정합성 검증)
     const realDraft = REAL_PLAYER_DRAFT_INFO[p.name];
-    if (realDraft && (!p.acquisitionInfo || p.acquisitionInfo.draftYear !== realDraft.draftYear)) {
+    const isRealDraftAgeCompatible =
+      realDraft &&
+      typeof realDraft.draftYear === 'number' &&
+      (typeof p.birthYear === 'number'
+        ? realDraft.draftYear >= p.birthYear + 17 && realDraft.draftYear <= p.birthYear + 26
+        : Math.abs(currentSeason - realDraft.draftYear - Math.max(0, p.age - 19)) <= 6);
+    if (
+      realDraft &&
+      isRealDraftAgeCompatible &&
+      (!p.acquisitionInfo || p.acquisitionInfo.draftYear !== realDraft.draftYear)
+    ) {
       if (!p.rookieInfo) {
         p.acquisitionInfo = { ...realDraft };
       }
     }
 
-    // 2) 물리적·규정상 가능한 최대 1군 인정 시즌 계산 (고졸 만 19세 입단 기준 max = age - 19, 드래프트 연도 기준 max = season - draftYear)
-    const maxByAge = Math.max(0, p.age - 19);
-    const draftYear = p.acquisitionInfo?.draftYear;
-    const maxByDraft =
-      typeof draftYear === 'number' && draftYear >= 1995 && draftYear <= currentSeason
-        ? Math.max(0, currentSeason - draftYear)
-        : maxByAge;
+    // 2) 물리적·규정상 가능한 최대 1군 인정 시즌 계산
+    //    - birthYear 보유 시 생일 전후(만 나이) 흔들림 없이 연도 기준으로 산출 (빠른 1~2월생 조기입학 허용)
+    //    - birthYear 미보유 레거시/손상 세이브는 기존 age - 19 기준 적용
+    const birthMonth =
+      p.birthDate && /^\d{4}-\d{2}-\d{2}$/.test(p.birthDate) ? Number(p.birthDate.slice(5, 7)) : 6;
+    const isEarlyBorn = birthMonth <= 2;
+    const maxByBirthStrict =
+      typeof p.birthYear === 'number' && p.birthYear >= 1970
+        ? Math.max(0, currentSeason - (p.birthYear + (isEarlyBorn ? 18 : 19)))
+        : Math.max(0, p.age - 19);
+    const maxByBirthLoose =
+      typeof p.birthYear === 'number' && p.birthYear >= 1970
+        ? Math.max(0, currentSeason - (p.birthYear + 18))
+        : Math.max(0, p.age - 19);
+
+    const draftYear = p.draftYear ?? p.acquisitionInfo?.draftYear;
+    const hasValidDraftYear =
+      typeof draftYear === 'number' && draftYear >= 1995 && draftYear <= currentSeason;
+    const maxByDraft = hasValidDraftYear ? Math.max(0, currentSeason - draftYear) : maxByBirthStrict;
+    const maxByAge = hasValidDraftYear ? maxByBirthLoose : maxByBirthStrict;
     const hardMaxServiceYears = Math.min(maxByAge, maxByDraft);
 
-    // 3) 실존 2026 기준 연차가 있는 선수는 현실 기준 + 경과 시즌을 상한으로 적용
+    // 3) 실존 2026 기준 연차가 있는 선수는 현실 기준 + 경과 시즌을 상한으로 적용 (동명이인 충돌 방지)
     const realBase2026 = REAL_KBO_2026_SERVICE_YEARS[p.name];
     let targetSy = p.serviceYears;
-    if (realBase2026 !== undefined) {
+    if (realBase2026 !== undefined && (!realDraft || isRealDraftAgeCompatible)) {
       const expectedAtSeason = realBase2026 + seasonsElapsedSince2026;
       if (currentSeason === 2026) {
         targetSy = Math.min(hardMaxServiceYears, realBase2026);
@@ -823,7 +845,7 @@ export function sanitizePlayerAgeAndServiceYearsInPlace(
       }
     }
 
-    // 4) 모든 국내 선수는 나이와 입단연도 상한을 절대 초과할 수 없음 (예: 21세는 최대 2시즌, 23세는 최대 4시즌)
+    // 4) 모든 국내 선수는 나이와 입단연도 상한을 절대 초과할 수 없음
     if (targetSy > hardMaxServiceYears) {
       targetSy = hardMaxServiceYears;
     }

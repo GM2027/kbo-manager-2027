@@ -202,7 +202,7 @@ export const DraftPostingAwardsView: React.FC<DraftPostingAwardsViewProps> = ({
                       >
                         <div>
                           <div className="font-bold text-slate-900 dark:text-white">
-                            {rp.name} ({rp.position} · {rp.age}세 · {rp.serviceYears}년차 · OVR {rp.ability})
+                            {rp.name} ({rp.position} · {rp.age}세 · {rp.serviceYears <= 0 ? '신인' : `${rp.serviceYears}년차`} · OVR {rp.ability})
                           </div>
                           <div className="text-[11px] text-slate-500">
                             MLB 평가: <strong className="text-emerald-600 dark:text-emerald-400">{readiness.tier}</strong> ({readiness.acceptanceChancePct}%) · 예상 규모 {readiness.estimatedGuaranteeRange}

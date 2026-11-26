@@ -43,7 +43,12 @@ import {
   normalizeChampionHistory,
   TEAM_IDS,
 } from './kboTeams';
-import { REAL_KBO_HITTER_POSITIONS, resolveRealForeignNationality } from './playerMetadata';
+import {
+  REAL_KBO_HITTER_POSITIONS,
+  REAL_PLAYER_DRAFT_INFO,
+  resolveRealForeignNationality,
+  sanitizePlayerAgeAndServiceYearsInPlace,
+} from './playerMetadata';
 import {
   BASELINE_2027_ROOKIE_BONUS_TOP10,
   findRealPlayerClubProfile,
@@ -486,8 +491,137 @@ const V18_BY_SOURCE_ID: Map<string, RawV18Player> = new Map(
   V18_DATA.players.map((p) => [String(p.id).trim(), p])
 );
 
+/**
+ * v18 DB에서 2024~2026 최근 3년치만 수록되었거나(이적/특수 이력) 과거 1군 기록이 일부 누락된
+ * 실존 베테랑·군필 선수의 2027시즌 개막 전(2026 종료 기준) 실제 KBO 1군 인정 연차 보정 테이블
+ */
+const VERIFIED_2027_SERVICE_YEARS_BY_KEY: Record<string, number> = {
+  'LG::이민호': 4, // 2020 입단, 2020~2022 1군 + 2023 부상 + 2024~2025 사회복무요원 + 2026 복귀
+  'LG::이재원': 5, // 2018 입단, 2020~2023 1군 + 2024~2025 상무 + 2026 복귀
+  'LG::최지명': 6, // 최채흥 개명, 2018 대졸 입단, 상무 군필
+  'LG::김민수': 9, // 2014 대졸 입단 포수, 군필
+  'LG::장시환': 15, // 2007 입단 베테랑 투수
+  'LG::김정율': 2, // 2017 입단, 주로 2군
+  '한화::강백호': 9, // 2018 입단, 2018~2026 9시즌
+  '한화::정이황': 1, // 2019 입단, 주로 2군
+  'SSG::김재환': 15, // 2008 입단, 2016~2026 주전 포함
+  'SSG::최정': 22, // 2005 입단, 2005~2026 22시즌
+  '삼성::최형우': 20, // 2002 입단, 2008~2026 주전 + 2002/2004
+  '삼성::김태훈(투)': 11, // 2012 입단, 2015~2026 1군
+  '삼성::이승현(우)': 12, // 2010 입단, 2015~2026 1군
+  '삼성::이승현(좌)': 6, // 2021 입단, 2021~2026 1군 6시즌
+  '삼성::김태훈(타)': 5, // 2015 입단, 1군 백업/2군
+  'KT::한승혁': 12, // 2011 입단, 군필
+  'KT::김현수': 19, // 2006 입단, KBO 2006~2015(10) + 2018~2026(9)
+  'KT::최원준': 9, // 2016 입단, 상무(2022~2023) 제외 9시즌
+  'KIA::이태양': 13, // 2010 입단, 2012~2026 1군
+  '롯데::김영준': 2, // 1999년생, 주로 2군/군필
+  '키움::장재영': 4, // 2021 입단, 부상/투타전향
+  '키움::이주형': 4, // 2020 입단, 군필 후 2023~2026 1군
+};
+
+/**
+ * 2027시즌 개막 전(2027-01-01, 2026시즌 완료 기준) 실제 KBO 1군 인정 연차(serviceYears)를 산출합니다.
+ * - 기존 clubTenureSeasons(구단 근속 +1 포함) 오용으로 발생하던 25세 8년차·26세 9년차·이적 베테랑 저연차 오류를 근본 해결
+ * - 2027 신인 = 0년, 외국인/아시아쿼터 = 실제 KBO 1군 완료 시즌 수
+ * - 국내 선수 = career_by_year 1군 출장량 기반 KBO 145일 인정 연차 환산 + 입단연도/생년월일 물리 상한 준수
+ */
+export function computeRealisticServiceYears2027(
+  raw: RawV18Player,
+  teamId: TeamId,
+  role: '투수' | '타자',
+  birthYear: number,
+  birthDate: string | null,
+  historicalSeasons: V18SeasonStatRecord[]
+): number {
+  const isDrafted2027 = raw.status === 'drafted_2027' || raw.draft_year === 2027;
+  if (isDrafted2027) return 0;
+
+  // 외국인 / 아시아쿼터: 실제 KBO 1군 완료 시즌 수 (<= 2026)
+  if (raw.foreign_slot) {
+    const kboSeasons = new Set(
+      historicalSeasons
+        .filter((r) => typeof r.season === 'number' && r.season >= 2000 && r.season <= 2026)
+        .map((r) => r.season)
+    );
+    return kboSeasons.size;
+  }
+
+  // 물리적·규정상 가능한 최대 완료 시즌 상한 (2027-01-01 기준)
+  const birthMonth =
+    birthDate && /^\d{4}-\d{2}-\d{2}$/.test(birthDate) ? Number(birthDate.slice(5, 7)) : 6;
+  const isEarlyBorn = birthMonth <= 2; // 빠른 년생 조기입학 허용
+  const maxByBirthStrict = Math.max(0, 2027 - (birthYear + (isEarlyBorn ? 18 : 19)));
+  const maxByBirthLoose = Math.max(0, 2027 - (birthYear + 18));
+
+  const realDraftInfo = REAL_PLAYER_DRAFT_INFO[raw.name];
+  const safeRealDraftYear =
+    realDraftInfo?.draftYear && realDraftInfo.draftYear >= birthYear + 17
+      ? realDraftInfo.draftYear
+      : undefined;
+  const effDraftYear = raw.draft_year ?? safeRealDraftYear;
+
+  const hardMax =
+    typeof effDraftYear === 'number' && effDraftYear >= 1995 && effDraftYear <= 2027
+      ? Math.min(maxByBirthLoose, Math.max(0, 2027 - effDraftYear))
+      : maxByBirthStrict;
+
+  // 1) 부분 기록/특수 이력 실존 베테랑 검증 오버라이드
+  const overrideKey = `${teamId}::${raw.name}`;
+  if (VERIFIED_2027_SERVICE_YEARS_BY_KEY[overrideKey] !== undefined) {
+    return Math.max(0, Math.min(hardMax, VERIFIED_2027_SERVICE_YEARS_BY_KEY[overrideKey]));
+  }
+
+  // 2) 공식 연도별 1군 기록(career_by_year) 기반 KBO 인정 연차(145일=1시즌 근사) 합산
+  const bySeason = new Map<number, { g: number; pa: number; outs: number }>();
+  for (const r of historicalSeasons) {
+    if (typeof r.season !== 'number' || r.season < 2000 || r.season > 2026) continue;
+    const prev = bySeason.get(r.season) ?? { g: 0, pa: 0, outs: 0 };
+    const g = Number(r.G ?? 0);
+    const pa = Number(r.PA ?? r.AB ?? 0);
+    const outs = parseIpToOuts(r.IP);
+    bySeason.set(r.season, {
+      g: prev.g + (Number.isFinite(g) ? g : 0),
+      pa: prev.pa + (Number.isFinite(pa) ? pa : 0),
+      outs: prev.outs + outs,
+    });
+  }
+
+  let totalCredit = 0;
+  for (const { g, pa, outs } of bySeason.values()) {
+    if (role === '타자') {
+      if (g >= 55 || pa >= 150) totalCredit += 1.0;
+      else if (g >= 30 || pa >= 70) totalCredit += 0.75;
+      else if (g >= 12 || pa >= 25) totalCredit += 0.4;
+      else if (g >= 1) totalCredit += 0.15;
+    } else {
+      if (g >= 24 || outs >= 165) totalCredit += 1.0;
+      else if (g >= 12 || outs >= 84) totalCredit += 0.75;
+      else if (g >= 5 || outs >= 30) totalCredit += 0.4;
+      else if (g >= 1) totalCredit += 0.15;
+    }
+  }
+
+  let computed = bySeason.size > 0 ? Math.floor(totalCredit + 0.35) : 0;
+
+  // 공식 FA 공시 인정 연차 / 2027 FA 승인 선수 하한 정합성 유지
+  if (
+    typeof raw.fa_notice_2027?.recognized_years === 'number' &&
+    Number.isFinite(raw.fa_notice_2027.recognized_years)
+  ) {
+    computed = Math.max(computed, Math.round(raw.fa_notice_2027.recognized_years));
+  }
+  if (raw.fa_approved_2027) {
+    computed = Math.max(computed, Math.min(hardMax, 7));
+  }
+
+  return Math.max(0, Math.min(hardMax, computed));
+}
+
 function getDatabaseVersionRank(ver?: string): number {
   switch (ver) {
+    case 'v29_realistic_service_years':
+      return 29;
     case 'v28_ootp_detailed_ratings':
       return 28;
     case 'v27_unified_player_ratings':
@@ -1340,6 +1474,40 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
       ensureCareerOotpRatingsInPlace(career);
     }
 
+    // v29: 전 구단 실제 KBO 1군 인정 연차(serviceYears) 및 1군 등록일수 현실화 마이그레이션
+    // (기존 구단 근속 +1 오용으로 인한 25세 8년차·26세 9년차·이적 베테랑 저연차 오류 일괄 정상화, 에디터 수정 선수 보존)
+    if (getDatabaseVersionRank(career.databaseVersion) < 29) {
+      const editorTouchedIds = new Set(Object.keys(career.editorOriginals?.players ?? {}));
+      const seasonsElapsedSince2027 = Math.max(0, (career.season ?? 2027) - 2027);
+      for (const p of Object.values(career.players)) {
+        if (editorTouchedIds.has(p.id)) continue;
+        const src = p.v18SourceId ? V18_BY_SOURCE_ID.get(p.v18SourceId) : undefined;
+        if (!src) continue;
+        const origTeamId: TeamId = V18_TEAM_MAP[src.team] ?? p.teamId;
+        const { birthYear, birthDate } = computeAgeFor2027(src, '2027-01-01');
+        const hist =
+          p.historicalSeasons && p.historicalSeasons.length > 0
+            ? p.historicalSeasons
+            : buildHistoricalSeasonsFromRaw(src);
+        const base2027 = computeRealisticServiceYears2027(
+          src,
+          origTeamId,
+          p.role,
+          birthYear,
+          birthDate,
+          hist
+        );
+        const nextSy =
+          seasonsElapsedSince2027 > 0 && p.rosterTier === '1군'
+            ? base2027 + seasonsElapsedSince2027
+            : base2027;
+        p.serviceYears = Math.max(0, nextSy);
+        p.registrationDays = p.serviceYears * 145;
+      }
+      sanitizePlayerAgeAndServiceYearsInPlace(career.players, career.season ?? 2027);
+      career.databaseVersion = 'v29_realistic_service_years';
+    }
+
     // KBO 현역 선수단과 해외파 목록 간 중복 등록 상시 방지
     if (career.amateurAndOverseas?.overseasPlayers) {
       const activeKboKey = new Set<string>();
@@ -1537,6 +1705,14 @@ export function buildAll10TeamsFromV18Dataset(): {
     const clubTenureSeasons = mergedCareer.clubTenureSeasons;
     const isOneClubMan = mergedCareer.isOneClubMan;
     const careerTeamHistory: Player['careerTeamHistory'] = mergedCareer.history;
+    const realisticServiceYears = computeRealisticServiceYears2027(
+      raw,
+      teamId,
+      role,
+      birthYear,
+      birthDate,
+      historicalSeasons
+    );
 
     // 계약 정보 구성 (2027 최저연봉 3,300만 원 적용 · 공식 확인 외국인 보수 반영 · 미발표 FA 계약은 협상 대기 유지)
     const fm = raw.foreign_meta_2026;
@@ -1740,7 +1916,8 @@ export function buildAll10TeamsFromV18Dataset(): {
       injury: null,
       morale: '보통',
       trainingFocus: null,
-      serviceYears: isDrafted2027 ? 0 : Math.max(1, Math.min(18, clubTenureSeasons)),
+      serviceYears: realisticServiceYears,
+      registrationDays: realisticServiceYears * 145,
       clubTenureSeasons,
       careerSeasons,
       careerStats,

@@ -22,6 +22,7 @@ import {
   KBO_TEAMS,
   TEAM_IDS,
 } from './kboTeams';
+import { sanitizePlayerAgeAndServiceYearsInPlace } from './playerMetadata';
 import { buildReal2026SeasonHistorySummary } from './real2026SeasonArchive';
 import { buildAll10TeamsFromV18Dataset, sanitizeCareerOvrPotInPlace } from './v18Importer';
 
@@ -58,7 +59,7 @@ export function createNewCareer(params: {
     careerId: `career_${teamId}_${Date.now()}`,
     label: `${teamInfo.name} 2027 · 새 커리어`,
     version: 'v21.2027',
-    databaseVersion: 'v28_ootp_detailed_ratings',
+    databaseVersion: 'v29_realistic_service_years',
     lockedHistoricalSeasons: [2026],
     isPreservedMaster: false,
     isArchived: false,
@@ -151,6 +152,7 @@ export function createNewCareer(params: {
   ensureAmateurAndOverseasStateInPlace(created);
   injectUndraftedUlsanPlayersIntoDraft(created, created.draftState);
   ensureLeagueLifeStateInPlace(created);
+  sanitizePlayerAgeAndServiceYearsInPlace(created.players, 2027);
   sanitizeCareerOvrPotInPlace(created);
 
   // 프리게임 에디터 수정 사항은 새 게임 초기 데이터에만 적용 (기존 세이브 불변)

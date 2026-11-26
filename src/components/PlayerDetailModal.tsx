@@ -279,7 +279,8 @@ export const PlayerDetailModal: React.FC<PlayerDetailModalProps> = ({
                 </span>
                 <span>·</span>
                 <span className="font-mono-stats">
-                  만 {displayAge}세{player.birthYear ? ` (${player.birthYear}년생)` : ''} · {player.rosterTier} · 연차 {player.serviceYears}년
+                  만 {displayAge}세{player.birthYear ? ` (${player.birthYear}년생)` : ''} · {player.rosterTier} ·{' '}
+                  {player.serviceYears <= 0 ? '신인' : `연차 ${player.serviceYears}년`}
                 </span>
                 {player.kboOfficialId && (
                   <>

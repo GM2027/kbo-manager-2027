@@ -2372,9 +2372,9 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                   </div>
                 </div>
                 <div>
-                  <div className="text-slate-500 font-sans">연 나이 · 연차 · 피로</div>
+                  <div className="text-slate-500 font-sans">만 나이 · 연차 · 피로</div>
                   <div className="text-base font-extrabold mt-0.5">
-                    {selectedPlayer.age}세 · {selectedPlayer.serviceYears}년
+                    {selectedPlayer.age}세 · {selectedPlayer.serviceYears <= 0 ? '신인' : `${selectedPlayer.serviceYears}년`}
                   </div>
                   <div className="text-[11px] text-slate-400 font-sans mt-0.5">
                     누적 피로도 {selectedPlayer.fatigue}%
