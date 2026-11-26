@@ -1,7 +1,121 @@
 import { KBO_TEAMS } from '../data/kboTeams';
-import { CareerSave, Player, TeamId } from '../types/kbo';
+import { BatterStats, CareerSave, PitcherStats, Player, TeamId } from '../types/kbo';
 import { evaluateFranchiseStar } from './franchiseStarEngine';
 import { isMilitaryServing } from './militaryEngine';
+import { calcAVG, calcERA, calcOPS } from './stats';
+
+/**
+ * ISO 날짜(YYYY-MM-DD)에 지정 일수(예: 3일)를 안전하게 더합니다.
+ */
+export function addDaysToIsoDate(isoDate: string, days: number): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate.trim());
+  if (!m) return isoDate;
+  const dt = new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]) + days));
+  const y = dt.getUTCFullYear();
+  const mo = String(dt.getUTCMonth() + 1).padStart(2, '0');
+  const d = String(dt.getUTCDate()).padStart(2, '0');
+  return `${y}-${mo}-${d}`;
+}
+
+/**
+ * 선수의 이전 FA 취득(계약) 횟수 조회
+ * - 명시된 faQualificationCount 우선, 없으면 이력/계약 메모에서 추정
+ */
+export function getPriorFaQualificationCount(p: Player, currentSeason: number): number {
+  if (typeof p.faQualificationCount === 'number' && p.faQualificationCount >= 0) {
+    return p.faQualificationCount;
+  }
+  let inferred = 0;
+  if (Array.isArray(p.careerTeamHistory)) {
+    const faEvents = p.careerTeamHistory.filter(
+      (h) =>
+        (h.moveType === 'FA 이적' || h.moveType === 'FA 잔류') &&
+        h.fromSeason < currentSeason
+    );
+    inferred = Math.max(inferred, faEvents.length);
+  }
+  if (
+    inferred === 0 &&
+    typeof p.signedAsFaSeason === 'number' &&
+    p.signedAsFaSeason < currentSeason
+  ) {
+    inferred = 1;
+  }
+  if (
+    inferred === 0 &&
+    typeof p.contract.note === 'string' &&
+    p.contract.note.includes('FA') &&
+    (p.contract.startSeason ?? currentSeason) < currentSeason
+  ) {
+    inferred = 1;
+  }
+  return inferred;
+}
+
+/**
+ * KBO 공식 FA 등급 예외 규정 적용
+ * 1) 만 35세 이상 신규 FA(1회차): 연봉 순위와 무관하게 C등급
+ * 2) FA 재자격(2회차): 최대 B등급 (A등급 산정 시 B등급으로 하향)
+ * 3) 3회 이상 FA 재자격: C등급 자동 적용
+ */
+export function resolveKboFaGradeWithExceptions(
+  p: Player,
+  rawGrade: 'A' | 'B' | 'C',
+  currentSeason: number
+): { grade: 'A' | 'B' | 'C'; exceptionNote: string | null; priorFaCount: number } {
+  const priorFaCount = getPriorFaQualificationCount(p, currentSeason);
+
+  if (priorFaCount >= 2) {
+    return {
+      grade: 'C',
+      exceptionNote: '3회 이상 FA 재자격 예외 규정 (C등급 적용)',
+      priorFaCount,
+    };
+  }
+  if (priorFaCount === 0 && p.age >= 35) {
+    return {
+      grade: 'C',
+      exceptionNote: '만 35세 이상 신규 FA 예외 규정 (C등급 적용)',
+      priorFaCount,
+    };
+  }
+  if (priorFaCount === 1 && rawGrade === 'A') {
+    return {
+      grade: 'B',
+      exceptionNote: 'FA 재자격(2회차) 예외 규정 (최대 B등급 적용)',
+      priorFaCount,
+    };
+  }
+  return {
+    grade: rawGrade,
+    exceptionNote: null,
+    priorFaCount,
+  };
+}
+
+/**
+ * 보호선수 명단·보상선수 지명 화면용 선수 시즌 성적 요약 문자열
+ */
+export function formatFaPlayerSeasonStatsBrief(p: Player): string {
+  if (p.role === '투수') {
+    const ps = p.stats as PitcherStats;
+    const outs = ps?.outs ?? 0;
+    if (outs >= 3) {
+      const ip = (outs / 3).toFixed(1);
+      const era = calcERA(ps.ER ?? 0, outs);
+      const svStr = (ps.SV ?? 0) > 0 ? ` ${ps.SV}S` : (ps.HLD ?? 0) > 0 ? ` ${ps.HLD}H` : '';
+      return `${ps.W ?? 0}승${ps.L ?? 0}패${svStr} ${ip}이닝 ERA ${era !== null ? era.toFixed(2) : '-'} ${ps.SO ?? 0}K`;
+    }
+    return `1군 등판 대기 (${p.rosterTier})`;
+  }
+  const bs = p.stats as BatterStats;
+  if ((bs?.PA ?? 0) >= 1) {
+    const avg = calcAVG(bs.H ?? 0, bs.AB ?? 0);
+    const ops = calcOPS(bs);
+    return `타율 ${avg !== null ? avg.toFixed(3) : '-'} ${bs.HR ?? 0}HR ${bs.RBI ?? 0}타점 OPS ${ops !== null ? ops.toFixed(3) : '-'}`;
+  }
+  return `1군 출전 대기 (${p.rosterTier})`;
+}
 
 export type FaExemptCategory =
   | '당해연도FA'
@@ -336,6 +450,33 @@ export function scorePlayerForFaProtection(career: CareerSave, p: Player): numbe
 }
 
 /**
+ * 원소속 구단(AI/사용자 공용) 기준 개별 보상선수 후보 가치 점수 산출
+ * - 능력치, 잠재력, 나이, 원소속 구단 포지션 보강 필요도, 연봉 가성비 종합 반영
+ */
+export function scoreCompensationCandidateForTeam(
+  career: CareerSave,
+  p: Player,
+  pickingTeamId: TeamId
+): number {
+  const teamSamePos = Object.values(career.players)
+    .filter(
+      (x) =>
+        x.teamId === pickingTeamId &&
+        x.position === p.position &&
+        (x.rosterTier === '1군' || x.rosterTier === '2군')
+    )
+    .sort((a, b) => b.ability - a.ability);
+  const currentStarterOvr = teamSamePos[0]?.ability ?? 68;
+  const needBoost = Math.max(-4, Math.min(12, (p.ability - currentStarterOvr) * 0.9));
+  const ageVal = p.age <= 24 ? 14 : p.age <= 28 ? 7 : p.age <= 31 ? 0 : p.age >= 35 ? -15 : -6;
+  const salaryPenalty = Math.max(0, (p.contract.annualSalary - 3.5) * 1.6);
+  const roleBoost = p.role === '투수' ? 3 : 0;
+  return Number(
+    (p.ability * 1.05 + p.potential * 0.48 + ageVal + needBoost + roleBoost - salaryPenalty).toFixed(1)
+  );
+}
+
+/**
  * 원소속 구단(AI/사용자 공용)이 보호명단 외 보상 가능 선수 풀에서 최적 보상선수 1명 선택
  */
 export function selectBestCompensationPlayer(
@@ -344,21 +485,77 @@ export function selectBestCompensationPlayer(
   pickingTeamId: TeamId
 ): Player | null {
   if (unprotectedEligible.length === 0) return null;
-  void pickingTeamId;
-  const ranked = [...unprotectedEligible].sort((a, b) => {
-    const scoreA =
-      a.ability * 1.05 +
-      a.potential * 0.45 +
-      (a.age <= 25 ? 12 : a.age <= 29 ? 5 : a.age >= 35 ? -14 : -4) +
-      (a.role === '투수' ? 3 : 0);
-    const scoreB =
-      b.ability * 1.05 +
-      b.potential * 0.45 +
-      (b.age <= 25 ? 12 : b.age <= 29 ? 5 : b.age >= 35 ? -14 : -4) +
-      (b.role === '투수' ? 3 : 0);
-    return scoreB - scoreA;
-  });
+  const ranked = [...unprotectedEligible].sort(
+    (a, b) =>
+      scoreCompensationCandidateForTeam(career, b, pickingTeamId) -
+      scoreCompensationCandidateForTeam(career, a, pickingTeamId)
+  );
   return ranked[0] ?? null;
+}
+
+/**
+ * AI 구단의 보상 방식 자동 결정 (보상선수 + 보상금 vs 금전 보상만)
+ * - 최상위 미보호 선수의 가치(능력치·잠재력·팀 보강 필요도)와 추가 금전 보상(직전 연봉 100%) 및 구단 재정을 비교
+ */
+export function evaluateAiCompensationDecision(
+  career: CareerSave,
+  pickingTeamId: TeamId,
+  unprotectedEligible: Player[],
+  previousAnnualSalaryBillion: number,
+  grade: 'A' | 'B'
+): {
+  mode: 'PLAYER' | 'CASH_ONLY';
+  chosenPlayer: Player | null;
+  bestCandidate: Player | null;
+  reason: string;
+} {
+  const best = selectBestCompensationPlayer(career, unprotectedEligible, pickingTeamId);
+  if (!best) {
+    return {
+      mode: 'CASH_ONLY',
+      chosenPlayer: null,
+      bestCandidate: null,
+      reason: '보호명단 외 지명 가능한 선수가 없어 금전 보상으로 자동 전환',
+    };
+  }
+
+  const candScore = scoreCompensationCandidateForTeam(career, best, pickingTeamId);
+  const extraCashBillion = Math.max(0.33, previousAnnualSalaryBillion);
+  const teamPayrollEst = Object.values(career.players)
+    .filter(
+      (x) =>
+        x.teamId === pickingTeamId &&
+        x.category === '국내' &&
+        (x.rosterTier === '1군' || x.rosterTier === '2군')
+    )
+    .reduce((sum, x) => sum + (x.contract.annualSalary || 0), 0);
+  const financialCashPreference = teamPayrollEst >= 125 ? 6 : teamPayrollEst >= 105 ? 2 : 0;
+
+  const playerImpliedValueBillion = Math.max(
+    1.5,
+    (candScore - 96) * 0.65 + (best.potential >= 80 && best.age <= 25 ? 6.5 : 0)
+  );
+  const cashAdjustedThreshold = extraCashBillion + financialCashPreference * 0.45;
+
+  const preferCashOnly =
+    (best.ability < 69 && best.potential < 75 && extraCashBillion >= 2.5) ||
+    (extraCashBillion >= 10 && playerImpliedValueBillion < cashAdjustedThreshold * 0.82);
+
+  if (preferCashOnly) {
+    return {
+      mode: 'CASH_ONLY',
+      chosenPlayer: null,
+      bestCandidate: best,
+      reason: `금전 보상 선택 (${grade === 'A' ? '직전 연봉 300%' : '직전 연봉 200%'} · 추가 보상금 ${extraCashBillion.toFixed(1)}억이 미보호 최상위 후보 ${best.name} 가치 대비 유리)`,
+    };
+  }
+
+  return {
+    mode: 'PLAYER',
+    chosenPlayer: best,
+    bestCandidate: best,
+    reason: `보상선수 지명 (${best.name} · ${best.position} · ${best.age}세 · OVR ${best.ability}/POT ${best.potential}) + ${grade === 'A' ? '연봉 200%' : '연봉 100%'} 보상금`,
+  };
 }
 
 /**
@@ -376,6 +573,7 @@ export function resolveFaProtectionAndCompensationSelection(
     grade: 'A' | 'B' | 'C';
     submittedProtectedIds?: string[]; // 사용자 제출 ID (생략 시 AI 자동 20인/25인 보호)
     previousAnnualSalaryBillion: number;
+    manualDecision?: { mode: 'PLAYER'; playerId: string } | { mode: 'CASH_ONLY' };
   }
 ): {
   pool: TeamFaProtectionPool;
@@ -384,6 +582,7 @@ export function resolveFaProtectionAndCompensationSelection(
   chosenPlayer: Player | null;
   finalCashCompBillion: number;
   cashOnlyFallback: boolean;
+  decisionReason: string;
   summary: string;
 } {
   const faSeason = options.faSeason ?? career.season;
@@ -405,6 +604,7 @@ export function resolveFaProtectionAndCompensationSelection(
       chosenPlayer: null,
       finalCashCompBillion: cash,
       cashOnlyFallback: true,
+      decisionReason: 'C등급 규정상 보상선수 없이 금전 보상(직전 연봉 150%) 자동 처리',
       summary: `C등급 금전 보상 ${cash.toFixed(1)}억 원 정산 (보상선수 없음)`,
     };
   }
@@ -429,7 +629,34 @@ export function resolveFaProtectionAndCompensationSelection(
 
   const protectedSet = new Set(protectedIds);
   const unprotectedEligible = pool.selectableEligible.filter((p) => !protectedSet.has(p.id));
-  const chosenPlayer = selectBestCompensationPlayer(career, unprotectedEligible, fromTeamId);
+
+  let chosenPlayer: Player | null = null;
+  let decisionReason = '';
+
+  if (options.manualDecision) {
+    if (options.manualDecision.mode === 'CASH_ONLY') {
+      chosenPlayer = null;
+      decisionReason = `단장 선택: 보상선수 미지명 · 금전 보상만 수령 (${options.grade === 'A' ? '직전 연봉 300%' : '직전 연봉 200%'})`;
+    } else {
+      const targetId = options.manualDecision.playerId;
+      const target = unprotectedEligible.find((p) => p.id === targetId);
+      if (!target) {
+        throw new Error('지명한 선수는 보호명단 외 보상 대상이 아닙니다.');
+      }
+      chosenPlayer = target;
+      decisionReason = `단장 직접 지명: ${target.name} (${target.position} · OVR ${target.ability}/POT ${target.potential})`;
+    }
+  } else {
+    const aiDecision = evaluateAiCompensationDecision(
+      career,
+      fromTeamId,
+      unprotectedEligible,
+      prevSal,
+      options.grade
+    );
+    chosenPlayer = aiDecision.mode === 'PLAYER' ? aiDecision.chosenPlayer : null;
+    decisionReason = aiDecision.reason;
+  }
 
   if (chosenPlayer) {
     const cash = Number((prevSal * rule.cashWithPlayerRatio).toFixed(2));
@@ -440,19 +667,21 @@ export function resolveFaProtectionAndCompensationSelection(
       chosenPlayer,
       finalCashCompBillion: cash,
       cashOnlyFallback: false,
+      decisionReason,
       summary: `${options.grade}등급 보상: 보호선수 ${rule.protectionLimit}인(자동제외 ${pool.autoExempt.length}명 별도) 외 ${chosenPlayer.name} + 보상금 ${cash.toFixed(1)}억 원`,
     };
   }
 
-  // 보호 대상 외 선수가 없을 경우 KBO 규정상 금전만 보상(A: 300%, B: 200%)으로 자동 전환
+  // 보상선수 미지명 시 KBO 규정상 금전만 보상(A: 300%, B: 200%)
   const cashOnly = Number((prevSal * rule.cashOnlyRatio).toFixed(2));
   return {
     pool,
     protectedIds,
-    unprotectedEligible: [],
+    unprotectedEligible,
     chosenPlayer: null,
     finalCashCompBillion: cashOnly,
     cashOnlyFallback: true,
+    decisionReason,
     summary: `${options.grade}등급 금전 보상만 적용 (${KBO_TEAMS[fromTeamId]?.shortName ?? fromTeamId}에 연봉 ${Math.round(rule.cashOnlyRatio * 100)}% · ${cashOnly.toFixed(1)}억 원 정산)`,
   };
 }

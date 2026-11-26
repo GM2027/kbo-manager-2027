@@ -2,7 +2,10 @@ import { CareerSave } from '../types/kbo';
 import { addDaysIso } from './schedule';
 import { getCurrentCareerDate } from './salaryCapEngine';
 import { advanceFaCompetitionRound, syncFaCompetitionMarketInPlace } from './faCompetitionEngine';
-import { runAiClubsOverseasReturneeMarketInPlace } from './deepFranchise';
+import {
+  processExpiredFaCompensationDeadlinesInPlace,
+  runAiClubsOverseasReturneeMarketInPlace,
+} from './deepFranchise';
 
 export interface AnnualCalendarEvent {
   id: string;
@@ -382,6 +385,12 @@ export function advanceGameDateByDays(
       }
       next.lastAutoFaDate = endIso;
     }
+  }
+
+  // 3.5) FA 보호명단 제출(3일) 및 보상선수 지명(3일) 기한 만료 건 자동 처리
+  const faCompDeadlines = processExpiredFaCompensationDeadlinesInPlace(next, endIso, false);
+  for (const note of faCompDeadlines) {
+    eventsTriggered.push(`FA 보상 기한 자동 처리: ${note}`);
   }
 
   return { nextCareer: next, eventsTriggered };

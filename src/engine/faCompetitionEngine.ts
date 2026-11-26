@@ -13,8 +13,12 @@ import {
 } from '../types/kbo';
 import { recordMlbExportPlayer } from './franchiseSystems';
 import {
+  addDaysToIsoDate,
+  buildTeamFaProtectionPool,
   getKboFaCompensationRuleForSeason,
+  getPriorFaQualificationCount,
   resolveFaProtectionAndCompensationSelection,
+  resolveKboFaGradeWithExceptions,
 } from './faCompensationEngine';
 import { evaluateFranchiseStar } from './franchiseStarEngine';
 import { recordLeagueAcquisitionInPlace } from './leagueAcquisitionsEngine';
@@ -355,15 +359,14 @@ export function evaluateFaGradeAndComp(
   career: CareerSave,
   p: Player
 ): RealisticFaValuation {
-  const grade: 'A' | 'B' | 'C' =
+  const rawGrade: 'A' | 'B' | 'C' =
     p.contract.faGrade ??
-    (p.age >= 35
-      ? 'C'
-      : p.ability >= 82 || p.contract.annualSalary >= 5.0
+    (p.ability >= 82 || p.contract.annualSalary >= 5.0
       ? 'A'
       : p.ability >= 76 || p.contract.annualSalary >= 2.5
       ? 'B'
       : 'C');
+  const grade = resolveKboFaGradeWithExceptions(p, rawGrade, career.season).grade;
   const minSal = career.season >= 2027 ? 0.33 : 0.3;
   const prevSal = Math.max(minSal, p.previousAnnualSalary ?? p.contract.annualSalary ?? 1.0);
   const protectionLimit = grade === 'A' ? 20 : grade === 'B' ? 25 : 0;
@@ -1681,57 +1684,109 @@ function finalizeAiClubFaSigningInPlace(
   // - B등급: 25인 보호 외 1명 + 연봉 100% (또는 연봉 200%)
   // - C등급: 보상선수 없음 · 연봉 150% 금전 보상만 처리
   // - 자동 제외 대상(당해 FA 선수·신인·외국인/아시아쿼터·군보류·FA 보상 이적자)은 보호 인원 외 자동 보호
+  p.faQualificationCount = getPriorFaQualificationCount(p, career.season) + 1;
   let compSummary = '원소속팀 잔류 (보상 없음)';
   if (!isOriginalClub) {
     const prevAnnualSal = prevAnnualSalBeforeAiSign;
-    const compRes = resolveFaProtectionAndCompensationSelection(career, newTeamId, fromTeamId, {
-      faSeason: career.season,
-      signedPlayerId: p.id,
-      grade: comp.grade,
-      previousAnnualSalaryBillion: prevAnnualSal,
-    });
+    if ((comp.grade === 'A' || comp.grade === 'B') && fromTeamId === career.playerTeamId) {
+      // 사용자 구단 FA 이탈 시: 영입 AI 구단이 20인(A)/25인(B) 보호명단 제출 → 사용자 단장이 3일 내 직접 보상선수 또는 금전 보상 선택!
+      const rule = getKboFaCompensationRuleForSeason(career.season, comp.grade);
+      const pool = buildTeamFaProtectionPool(career, newTeamId, {
+        faSeason: career.season,
+        signedPlayerId: p.id,
+        grade: comp.grade,
+      });
+      const protectedIds = pool.selectableEligible.slice(0, rule.protectionLimit).map((x) => x.id);
+      const protectedSet = new Set(protectedIds);
+      const unprotectedCandidateIds = pool.selectableEligible
+        .filter((x) => !protectedSet.has(x.id))
+        .map((x) => x.id);
+      const cashWithPlayerBillion = Number((prevAnnualSal * rule.cashWithPlayerRatio).toFixed(2));
+      const cashOnlyBillion = Number((prevAnnualSal * rule.cashOnlyRatio).toFixed(2));
+      const pickDeadlineDate = addDaysToIsoDate(signDateIso, 3);
 
-    if (comp.grade === 'A' || comp.grade === 'B') {
-      const compPlayer = compRes.chosenPlayer;
-      if (compPlayer) {
-        if (career.teams[newTeamId]) {
-          career.teams[newTeamId].lineupOrder = career.teams[newTeamId].lineupOrder.filter((id) => id !== compPlayer.id);
-          career.teams[newTeamId].benchOrder = career.teams[newTeamId].benchOrder.filter((id) => id !== compPlayer.id);
-          career.teams[newTeamId].rotationOrder = career.teams[newTeamId].rotationOrder.filter((id) => id !== compPlayer.id);
-          career.teams[newTeamId].bullpenOrder = career.teams[newTeamId].bullpenOrder.filter((id) => id !== compPlayer.id);
-        }
-        compPlayer.teamId = fromTeamId;
-        compPlayer.rosterTier = '2군';
-        compPlayer.gameDayActive = false;
-        compPlayer.clubTenureSeasons = 1;
-        compPlayer.faCompensationTransferredSeason = career.season;
-        appendPlayerTeamHistoryInPlace(compPlayer, fromTeamId, career.season, `${p.name} FA 보상선수`, {
-          transferDate: signDateIso,
-          moveType: 'FA 보상선수',
-          fromTeamId: newTeamId,
-        });
-      }
-      compSummary = compRes.summary;
-      // 만약 원소속 구단이 사용자 구단이라면 현금 보상 입금
-      if (fromTeamId === career.playerTeamId && career.finances.cashBalanceBillion !== null) {
-        career.finances.cashBalanceBillion = Number(
-          (career.finances.cashBalanceBillion + compRes.finalCashCompBillion).toFixed(2)
-        );
-        career.finances.compensationReceivedBillion = Number(
-          ((career.finances.compensationReceivedBillion ?? 0) + compRes.finalCashCompBillion).toFixed(2)
-        );
-      }
+      if (!career.pendingFaCompensationPicks) career.pendingFaCompensationPicks = [];
+      career.pendingFaCompensationPicks.unshift({
+        id: `facomp-pick-${career.season}-${p.id}-${newTeamId}`,
+        signedPlayerId: p.id,
+        signedPlayerName: p.name,
+        acquiringTeamId: newTeamId,
+        fromTeamId,
+        faGrade: comp.grade,
+        protectionLimit: comp.grade === 'A' ? 20 : 25,
+        protectedIds,
+        unprotectedCandidateIds,
+        autoExemptCount: pool.autoExempt.length,
+        previousAnnualSalaryBillion: prevAnnualSal,
+        cashWithPlayerBillion,
+        cashOnlyBillion,
+        contractApprovedDate: signDateIso,
+        rosterSubmittedDate: signDateIso,
+        pickDeadlineDate,
+      });
+
+      compSummary = `${comp.grade}등급 보상 명단 수령 (${KBO_TEAMS[newTeamId].shortName} 보호 ${rule.protectionLimit}인 외 ${unprotectedCandidateIds.length}명 · ${pickDeadlineDate}까지 단장 직접 지명 대기)`;
     } else {
-      const cRule = getKboFaCompensationRuleForSeason(career.season, 'C');
-      const cCash = Number((prevAnnualSal * cRule.cashOnlyRatio).toFixed(2));
-      compSummary = `C등급 보상금 ${cCash.toFixed(1)}억 정산 (보상선수 없음)`;
-      if (fromTeamId === career.playerTeamId && career.finances.cashBalanceBillion !== null) {
-        career.finances.cashBalanceBillion = Number(
-          (career.finances.cashBalanceBillion + cCash).toFixed(2)
-        );
-        career.finances.compensationReceivedBillion = Number(
-          ((career.finances.compensationReceivedBillion ?? 0) + cCash).toFixed(2)
-        );
+      const compRes = resolveFaProtectionAndCompensationSelection(career, newTeamId, fromTeamId, {
+        faSeason: career.season,
+        signedPlayerId: p.id,
+        grade: comp.grade,
+        previousAnnualSalaryBillion: prevAnnualSal,
+      });
+
+      if (comp.grade === 'A' || comp.grade === 'B') {
+        const compPlayer = compRes.chosenPlayer;
+        if (compPlayer) {
+          if (career.teams[newTeamId]) {
+            career.teams[newTeamId].lineupOrder = career.teams[newTeamId].lineupOrder.filter((id) => id !== compPlayer.id);
+            career.teams[newTeamId].benchOrder = career.teams[newTeamId].benchOrder.filter((id) => id !== compPlayer.id);
+            career.teams[newTeamId].rotationOrder = career.teams[newTeamId].rotationOrder.filter((id) => id !== compPlayer.id);
+            career.teams[newTeamId].bullpenOrder = career.teams[newTeamId].bullpenOrder.filter((id) => id !== compPlayer.id);
+          }
+          compPlayer.teamId = fromTeamId;
+          compPlayer.rosterTier = compPlayer.ability >= 71 ? '1군' : '2군';
+          compPlayer.gameDayActive = compPlayer.rosterTier === '1군';
+          compPlayer.clubTenureSeasons = 1;
+          compPlayer.faCompensationTransferredSeason = career.season;
+          appendPlayerTeamHistoryInPlace(compPlayer, fromTeamId, career.season, `${p.name} FA 보상선수`, {
+            transferDate: signDateIso,
+            moveType: 'FA 보상선수',
+            fromTeamId: newTeamId,
+          });
+          recordLeagueAcquisitionInPlace(
+            career,
+            {
+              dedupeKey: `fa-comp-ai-${career.season}-${p.id}-${compPlayer.id}`,
+              season: career.season,
+              date: signDateIso,
+              category: 'FA',
+              playerId: compPlayer.id,
+              playerName: compPlayer.name,
+              position: compPlayer.position,
+              previousTeamLabel: `${KBO_TEAMS[newTeamId].shortName} (FA 보상선수)`,
+              acquiringTeamId: fromTeamId,
+              contractAmountLabel: `연봉 ${compPlayer.contract.annualSalary.toFixed(1)}억`,
+              note: `${p.name}(${comp.grade}등급) FA 보상선수 지명`,
+            },
+            { pushNewsAlert: false }
+          );
+        }
+        compSummary = compRes.summary;
+      } else {
+        const cRule = getKboFaCompensationRuleForSeason(career.season, 'C');
+        const cCash = Number((prevAnnualSal * cRule.cashOnlyRatio).toFixed(2));
+        compSummary = `C등급 보상금 ${cCash.toFixed(1)}억 정산 (보상선수 없음)`;
+        if (fromTeamId === career.playerTeamId && career.finances.cashBalanceBillion !== null) {
+          career.finances.cashBalanceBillion = Number(
+            (career.finances.cashBalanceBillion + cCash).toFixed(2)
+          );
+          career.finances.seasonRevenueBillion = Number(
+            (career.finances.seasonRevenueBillion + cCash).toFixed(2)
+          );
+          career.finances.compensationReceivedBillion = Number(
+            ((career.finances.compensationReceivedBillion ?? 0) + cCash).toFixed(2)
+          );
+        }
       }
     }
   }

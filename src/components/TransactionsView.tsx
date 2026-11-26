@@ -69,7 +69,12 @@ import {
   submitUserClubFaBid,
   syncAllClubsAutoFaBids,
 } from '../engine/faCompetitionEngine';
-import { buildTeamFaProtectionPool } from '../engine/faCompensationEngine';
+import {
+  buildTeamFaProtectionPool,
+  evaluateAiCompensationDecision,
+  formatFaPlayerSeasonStatsBrief,
+  scoreCompensationCandidateForTeam,
+} from '../engine/faCompensationEngine';
 import { formatCompactPlayerPosition } from '../engine/positionEngine';
 import { getMlbClubMeta, MlbTeamLogo } from './MlbTeamLogo';
 import {
@@ -79,6 +84,7 @@ import {
   confirmFaProtectionList,
   getOverseasReturneeContractTerms,
   getTradeWindowStatus,
+  resolveUserFaCompensationPick,
   signOverseasReturnee,
 } from '../engine/deepFranchise';
 import {
@@ -952,7 +958,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
             )}
           </div>
 
-          {/* Pending FA Compensation Protection Roster Panel (#27 · KBO 자동 제외 규정 완전 반영) */}
+          {/* Pending FA Compensation Protection Roster Panel (#27 · KBO 자동 제외 규정 + 3일 기한 + AI 추천) */}
           {career.pendingFaProtection && (() => {
             const pending = career.pendingFaProtection!;
             const faPool = buildTeamFaProtectionPool(career, career.playerTeamId, {
@@ -962,24 +968,35 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
             });
             const limit = faPool.protectionLimit;
             const eligibleIdSet = new Set(faPool.selectableEligible.map((p) => p.id));
-            const validSelected = protectedSelection.filter((id) => eligibleIdSet.has(id));
+            const aiRecommendedSet = new Set(
+              faPool.selectableEligible.slice(0, limit).map((p) => p.id)
+            );
+            const validSelected = Array.from(new Set(protectedSelection.filter((id) => eligibleIdSet.has(id)))).slice(0, limit);
+            const isAtLimit = validSelected.length >= limit;
             return (
               <div className="border border-amber-500/70 bg-amber-50/70 dark:bg-amber-950/30 rounded-md p-4 space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
-                    <div className="text-sm font-black text-amber-800 dark:text-amber-300">
-                      FA {pending.faGrade}등급 보상선수 보호명단 제출 필수 ({pending.signedPlayerName} 영입)
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-sm font-black text-amber-800 dark:text-amber-300">
+                        FA {pending.faGrade}등급 보상선수 보호명단 제출 필수 ({pending.signedPlayerName} 영입)
+                      </span>
+                      {pending.submissionDeadlineDate && (
+                        <span className="px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 text-[10px] font-bold font-mono-stats">
+                          제출 마감: {pending.submissionDeadlineDate} (3일 이내)
+                        </span>
+                      )}
                     </div>
                     <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-0.5">
                       {KBO_TEAMS[pending.fromTeamId].name}에 제출할 보호선수 최대{' '}
-                      <strong>{limit}명</strong>을 선택하세요 ({faPool.ruleSummary}).
+                      <strong>{limit}명</strong>을 직접 선택하세요 ({faPool.ruleSummary}).
                       <br />
                       <span className="text-emerald-700 dark:text-emerald-400 font-semibold">
-                        당해 FA 선수·신인·외국인/아시아쿼터·군보류·FA 보상 이적자({faPool.autoExempt.length}명)는 자동 보호(제외)되어 {limit}인 정원에 포함되지 않으며 지명 대상에서 제외됩니다.
+                        당해 FA 선수·신인·외국인/아시아쿼터·군보류·FA 보상 이적자({faPool.autoExempt.length}명)는 자동 제외(보호)되어 {limit}인 정원에 미포함되며 지명 불가합니다.
                       </span>
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-1.5">
                     <button
                       type="button"
                       onClick={() => {
@@ -988,31 +1005,40 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                           .map((p) => p.id);
                         setProtectedSelection(autoIds);
                       }}
-                      className="px-2.5 py-1.5 rounded border border-amber-600/60 font-bold text-amber-800 dark:text-amber-200"
+                      className="px-2.5 py-1.5 rounded border border-amber-600/60 bg-white dark:bg-slate-900 font-bold text-amber-800 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-900/40 cursor-pointer"
                     >
-                      상위 {limit}인 자동 채우기
+                      AI 추천 상위 {limit}인 일괄 선택
                     </button>
+                    {validSelected.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setProtectedSelection([])}
+                        className="px-2 py-1.5 rounded border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                      >
+                        초기화
+                      </button>
+                    )}
                     <button
                       type="button"
                       onClick={() => {
                         try {
-                          const { nextCareer, backupSnapshot, takenPlayerName } = confirmFaProtectionList(
-                            career,
-                            validSelected
-                          );
+                          const { nextCareer, backupSnapshot, takenPlayerName, cashPaidBillion, cashOnlyChosen } =
+                            confirmFaProtectionList(career, validSelected);
                           onUpdateCareer(nextCareer, backupSnapshot);
                           setProtectedSelection([]);
                           setNotice({
                             type: 'ok',
                             text: takenPlayerName
-                              ? `보호명단 제출 완료 — 상대 구단이 보상선수로 ${takenPlayerName}을(를) 지명했습니다.`
-                              : '보호명단 제출 및 금전 보상 정산이 완료되었습니다.',
+                              ? `보호명단 제출 완료 — ${KBO_TEAMS[pending.fromTeamId].shortName} 구단이 보상선수로 ${takenPlayerName} 지명 (+보상금 ${cashPaidBillion.toFixed(1)}억 정산)`
+                              : cashOnlyChosen
+                              ? `보호명단 제출 완료 — ${KBO_TEAMS[pending.fromTeamId].shortName} 구단이 보상선수 대신 금전 보상(${cashPaidBillion.toFixed(1)}억)을 선택했습니다.`
+                              : `보호명단 제출 및 금전 보상(${cashPaidBillion.toFixed(1)}억) 정산 완료`,
                           });
                         } catch (err) {
                           setNotice({ type: 'err', text: err instanceof Error ? err.message : '보호명단 오류' });
                         }
                       }}
-                      className="px-3.5 py-1.5 rounded bg-amber-600 hover:bg-amber-700 text-white font-bold"
+                      className="px-3.5 py-1.5 rounded bg-amber-600 hover:bg-amber-700 text-white font-bold cursor-pointer"
                     >
                       보호명단 최종 제출 ({validSelected.length}/{limit})
                     </button>
@@ -1031,21 +1057,24 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                   </div>
                   <span className="text-[11px] font-mono-stats text-amber-800 dark:text-amber-300 font-semibold">
                     보호 선택 {validSelected.length}/{limit}명 · 선택 가능 대상{' '}
-                    {faPool.selectableEligible.length}명 · 규정상 자동 보호(제외) {faPool.autoExempt.length}명
+                    {faPool.selectableEligible.length}명 · 자동 제외 {faPool.autoExempt.length}명
                   </span>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-1.5 max-h-64 overflow-y-auto overscroll-contain pr-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5 max-h-72 overflow-y-auto overscroll-contain pr-1">
                   {faPool.selectableEligible
                     .filter((p) => matchesQuery(protectionSearch, p.name, p.position, p.rosterTier))
                     .map((p) => {
                       const checked = validSelected.includes(p.id);
+                      const isAiRec = aiRecommendedSet.has(p.id);
+                      const disabledByLimit = !checked && isAtLimit;
                       return (
                         <button
                           key={p.id}
                           type="button"
+                          disabled={disabledByLimit}
                           onClick={() =>
                             setProtectedSelection((prev) => {
-                              const cleaned = prev.filter((id) => eligibleIdSet.has(id));
+                              const cleaned = Array.from(new Set(prev.filter((id) => eligibleIdSet.has(id))));
                               return checked
                                 ? cleaned.filter((id) => id !== p.id)
                                 : cleaned.length < limit
@@ -1053,17 +1082,38 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                                   : cleaned;
                             })
                           }
-                          className={`text-left px-2 py-1.5 rounded border text-[11px] ${
+                          className={`text-left px-2.5 py-2 rounded border text-[11px] transition-colors ${
                             checked
                               ? 'border-indigo-600 bg-indigo-600 text-white font-bold'
-                              : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900'
+                              : disabledByLimit
+                              ? 'border-slate-200 dark:border-slate-800 bg-slate-100/70 dark:bg-slate-900/40 text-slate-400 cursor-not-allowed'
+                              : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-indigo-400 cursor-pointer'
                           }`}
                         >
-                          <div className="truncate">
-                            {p.name} ({formatCompactPlayerPosition(p, 1)})
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="truncate font-bold">
+                              {p.name} ({formatCompactPlayerPosition(p, 1)} · {p.age}세)
+                            </span>
+                            <span className="flex items-center gap-1 shrink-0">
+                              {isAiRec && (
+                                <span
+                                  className={`px-1 py-0.2 rounded text-[9px] font-bold ${
+                                    checked
+                                      ? 'bg-white/20 text-white'
+                                      : 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
+                                  }`}
+                                >
+                                  AI 추천
+                                </span>
+                              )}
+                              <span className="font-mono-stats font-bold">
+                                {p.ability}/{p.potential}
+                              </span>
+                            </span>
                           </div>
-                          <div className="text-[10px] opacity-80 font-mono-stats">
-                            OVR {p.ability}/{p.potential} · {p.age}세 · {p.rosterTier}
+                          <div className="text-[10px] opacity-85 font-mono-stats mt-0.5 flex items-center justify-between gap-1">
+                            <span>연봉 {p.contract.annualSalary.toFixed(1)}억 · {p.rosterTier}</span>
+                            <span className="truncate">{formatFaPlayerSeasonStatsBrief(p)}</span>
                           </div>
                         </button>
                       );
@@ -1121,6 +1171,162 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
               </div>
             );
           })()}
+
+          {/* Pending FA Compensation Direct Pick Panel (사용자 구단 FA 이탈 시 상대 구단 보상 명단 직접 지명 · 3일 기한) */}
+          {(career.pendingFaCompensationPicks ?? []).length > 0 && (
+            <div className="space-y-3">
+              {(career.pendingFaCompensationPicks ?? []).map((pickCase) => {
+                const acqName = KBO_TEAMS[pickCase.acquiringTeamId].name;
+                const acqShort = KBO_TEAMS[pickCase.acquiringTeamId].shortName;
+                const candidates = pickCase.unprotectedCandidateIds
+                  .map((id) => career.players[id])
+                  .filter(
+                    (p): p is NonNullable<typeof p> =>
+                      Boolean(p && p.teamId === pickCase.acquiringTeamId)
+                  )
+                  .sort(
+                    (a, b) =>
+                      scoreCompensationCandidateForTeam(career, b, career.playerTeamId) -
+                      scoreCompensationCandidateForTeam(career, a, career.playerTeamId)
+                  );
+                const aiEval = evaluateAiCompensationDecision(
+                  career,
+                  career.playerTeamId,
+                  candidates,
+                  pickCase.previousAnnualSalaryBillion,
+                  pickCase.faGrade
+                );
+                return (
+                  <div
+                    key={pickCase.id}
+                    className="border border-indigo-500/70 bg-indigo-50/70 dark:bg-indigo-950/30 rounded-md p-4 space-y-3"
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm font-black text-indigo-800 dark:text-indigo-200">
+                            FA {pickCase.faGrade}등급 보상선수 직접 지명 ({pickCase.signedPlayerName} → {acqShort} 이적)
+                          </span>
+                          <span className="px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 text-[10px] font-bold font-mono-stats">
+                            선택 마감: {pickCase.pickDeadlineDate} (명단 수령 후 3일 이내)
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-0.5">
+                          {acqName}가 제출한 보호선수 {pickCase.protectionLimit}인(자동 제외 {pickCase.autoExemptCount}명 별도) 외 보상 대상{' '}
+                          <strong>{candidates.length}명</strong> 중 1명을 직접 지명(+보상금{' '}
+                          <strong className="font-mono-stats">{pickCase.cashWithPlayerBillion.toFixed(1)}억</strong>)하거나 금전 보상만(
+                          <strong className="font-mono-stats">{pickCase.cashOnlyBillion.toFixed(1)}억</strong>) 선택하세요.
+                        </p>
+                        <div className="text-[11px] text-indigo-700 dark:text-indigo-300 font-semibold mt-1">
+                          AI 추천 분석: {aiEval.reason}
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            try {
+                              const decision =
+                                aiEval.mode === 'PLAYER' && aiEval.chosenPlayer
+                                  ? ({ mode: 'PLAYER', playerId: aiEval.chosenPlayer.id } as const)
+                                  : ({ mode: 'CASH_ONLY' } as const);
+                              const res = resolveUserFaCompensationPick(career, pickCase.id, decision);
+                              onUpdateCareer(res.nextCareer, res.backupSnapshot);
+                              setNotice({ type: 'ok', text: res.summary });
+                            } catch (err) {
+                              setNotice({ type: 'err', text: err instanceof Error ? err.message : '보상 지명 오류' });
+                            }
+                          }}
+                          className="px-3 py-1.5 rounded bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold cursor-pointer"
+                        >
+                          AI 추천 자동 선택
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            try {
+                              const res = resolveUserFaCompensationPick(career, pickCase.id, {
+                                mode: 'CASH_ONLY',
+                              });
+                              onUpdateCareer(res.nextCareer, res.backupSnapshot);
+                              setNotice({ type: 'ok', text: res.summary });
+                            } catch (err) {
+                              setNotice({ type: 'err', text: err instanceof Error ? err.message : '금전 보상 오류' });
+                            }
+                          }}
+                          className="px-3 py-1.5 rounded border border-emerald-600/70 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-600 hover:text-white text-xs font-bold cursor-pointer"
+                        >
+                          금전 보상만 선택 ({pickCase.cashOnlyBillion.toFixed(1)}억 · {pickCase.faGrade === 'A' ? '300%' : '200%'})
+                        </button>
+                      </div>
+                    </div>
+
+                    {candidates.length === 0 ? (
+                      <p className="text-xs text-slate-500">
+                        보호명단 외 지명 가능한 선수가 없습니다. 우측 상단의 금전 보상만 선택 버튼을 눌러 정산하세요.
+                      </p>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-72 overflow-y-auto overscroll-contain pr-1">
+                        {candidates.map((cand) => {
+                          const isTopPick = aiEval.bestCandidate?.id === cand.id;
+                          return (
+                            <div
+                              key={cand.id}
+                              className={`p-2.5 rounded border text-[11px] flex flex-col justify-between gap-2 ${
+                                isTopPick
+                                  ? 'border-indigo-500 bg-white dark:bg-slate-900 shadow-xs'
+                                  : 'border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-900/80'
+                              }`}
+                            >
+                              <div>
+                                <div className="flex items-center justify-between gap-1">
+                                  <span className="font-bold truncate">
+                                    {cand.name} ({formatCompactPlayerPosition(cand, 1)} · {cand.age}세)
+                                  </span>
+                                  <span className="flex items-center gap-1 shrink-0">
+                                    {isTopPick && (
+                                      <span className="px-1 py-0.2 rounded bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-[9px] font-bold">
+                                        AI 추천
+                                      </span>
+                                    )}
+                                    <span className="font-mono-stats font-bold text-indigo-600 dark:text-indigo-400">
+                                      {cand.ability}/{cand.potential}
+                                    </span>
+                                  </span>
+                                </div>
+                                <div className="text-[10px] text-slate-500 font-mono-stats mt-0.5 flex items-center justify-between gap-1">
+                                  <span>연봉 {cand.contract.annualSalary.toFixed(1)}억 · {cand.rosterTier}</span>
+                                  <span className="truncate">{formatFaPlayerSeasonStatsBrief(cand)}</span>
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  try {
+                                    const res = resolveUserFaCompensationPick(career, pickCase.id, {
+                                      mode: 'PLAYER',
+                                      playerId: cand.id,
+                                    });
+                                    onUpdateCareer(res.nextCareer, res.backupSnapshot);
+                                    setNotice({ type: 'ok', text: res.summary });
+                                  } catch (err) {
+                                    setNotice({ type: 'err', text: err instanceof Error ? err.message : '보상선수 지명 오류' });
+                                  }
+                                }}
+                                className="w-full py-1 rounded bg-slate-900 dark:bg-indigo-600 hover:opacity-90 text-white text-[11px] font-bold cursor-pointer"
+                              >
+                                보상선수 지명 (+{pickCase.cashWithPlayerBillion.toFixed(1)}억)
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* Own Club Departed FA Players (자동 이탈 → 원소속 재계약 협상 · 보상 없음) */}
           {myDepartedFa.length > 0 && (

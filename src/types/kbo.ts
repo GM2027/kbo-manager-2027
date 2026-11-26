@@ -471,6 +471,7 @@ export interface Player {
   acquiredRound?: number;
   acquiredSeason?: number;
   signedAsFaSeason?: number;
+  faQualificationCount?: number;
   overseasInterest?: '없음' | '관심' | '적극희망';
   potentialTrend?: '급상승' | '안정' | '정체' | '하락';
   salaryNegotiationStatus?: '미협상' | '협상완료' | '조정신청' | '보류제외';
@@ -1099,6 +1100,29 @@ export interface FaProtectionPending {
   protectionLimit: 20 | 25;
   protectedIds: string[];
   cashCompBillion: number;
+  previousAnnualSalaryBillion?: number;
+  cashOnlyBillion?: number;
+  contractApprovedDate?: string;
+  submissionDeadlineDate?: string;
+}
+
+export interface FaCompensationPickPending {
+  id: string;
+  signedPlayerId: string;
+  signedPlayerName: string;
+  acquiringTeamId: TeamId;
+  fromTeamId: TeamId;
+  faGrade: 'A' | 'B';
+  protectionLimit: 20 | 25;
+  protectedIds: string[];
+  unprotectedCandidateIds: string[];
+  autoExemptCount: number;
+  previousAnnualSalaryBillion: number;
+  cashWithPlayerBillion: number;
+  cashOnlyBillion: number;
+  contractApprovedDate: string;
+  rosterSubmittedDate: string;
+  pickDeadlineDate: string;
 }
 
 export interface StaffPoachingOffer {
@@ -2789,6 +2813,7 @@ export interface CareerSave {
   aiOffseasonProcessedSeason?: number;
   aiOffseasonLogSummary?: string[];
   pendingFaProtection?: FaProtectionPending | null;
+  pendingFaCompensationPicks?: FaCompensationPickPending[];
   staffPoachingOffers?: StaffPoachingOffer[];
   gmJobOffers?: GmJobOffer[];
   retirementCeremonies?: RetirementCeremonyRecord[];

@@ -115,6 +115,7 @@ import {
   DIFFICULTY_CONFIG,
   ensureDeepFranchiseState,
   evaluatePlayerContractAcceptance,
+  processExpiredFaCompensationDeadlinesInPlace,
   reassignNonConflictingUniformNumber,
   runAiClubsOverseasReturneeMarketInPlace,
   validateTradeCompliance,
@@ -200,7 +201,11 @@ import {
   ensurePlayerPositionProficiencyInPlace,
   getPositionProficiency,
 } from './positionEngine';
-import { getKboFaCompensationRuleForSeason } from './faCompensationEngine';
+import {
+  addDaysToIsoDate,
+  getKboFaCompensationRuleForSeason,
+  getPriorFaQualificationCount,
+} from './faCompensationEngine';
 import { allocatePermanentPlayerId } from './playerRegistry';
 import { SeededRng } from './rng';
 import { generateRegularSeasonSchedule } from './schedule';
@@ -4062,6 +4067,7 @@ export function advanceToNextSeason(career: CareerSave): {
   settleSeasonCompetitiveBalance(next, finishedSeasonNum, `${finishedSeasonNum}-11-16`);
   // 미계약 잔여 FA 및 해외 복귀 선수들에 대한 AI 구단 오프시즌 최종 정리 (사용자 구단 자동 체결 없음)
   resolveRemainingAiFaCompetitionInPlace(next, `${finishedSeasonNum}-12-10`);
+  processExpiredFaCompensationDeadlinesInPlace(next, `${finishedSeasonNum}-12-12`, true);
   runAiClubsOverseasReturneeMarketInPlace(next, {
     dateStr: `${finishedSeasonNum}-12-10`,
     maxSignings: 3,
@@ -5279,6 +5285,7 @@ export function signExternalFaPlayer(
     p.rosterTier = '1군';
     p.gameDayActive = true;
     p.signedAsFaSeason = next.season;
+    p.faQualificationCount = getPriorFaQualificationCount(p, next.season) + 1;
     p.morale = '만족';
     p.contract = {
       status: '확정',
@@ -5317,6 +5324,7 @@ export function signExternalFaPlayer(
       next.finances.krwUnpaidBillion = Number((next.finances.krwUnpaidBillion + upFrontCash).toFixed(2));
     }
 
+    const today = getCurrentCareerDate(next).isoDate || `${next.season}-11-24`;
     const faSeasonRule = getKboFaCompensationRuleForSeason(next.season, listing.grade);
     let needsProtectionList = false;
     if (
@@ -5333,11 +5341,14 @@ export function signExternalFaPlayer(
         protectionLimit: listing.grade === 'A' ? 20 : 25,
         protectedIds: [],
         cashCompBillion: Number((prevAnnualSalBeforeSign * faSeasonRule.cashWithPlayerRatio).toFixed(2)),
+        previousAnnualSalaryBillion: prevAnnualSalBeforeSign,
+        cashOnlyBillion: Number((prevAnnualSalBeforeSign * faSeasonRule.cashOnlyRatio).toFixed(2)),
+        contractApprovedDate: today,
+        submissionDeadlineDate: addDaysToIsoDate(today, 3),
       };
       needsProtectionList = true;
     }
 
-    const today = `${next.season}-11-24`;
     next.transactionLogs.unshift({
       id: `tx-extfa-${Date.now()}`,
       date: today,
