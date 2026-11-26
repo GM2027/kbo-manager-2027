@@ -150,7 +150,7 @@ export const OotpRatingsPanel: React.FC<OotpRatingsPanelProps> = ({
           <div className="flex items-center gap-1.5">
             <Award className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
             <span className="font-extrabold text-xs text-slate-900 dark:text-white">
-              OOTP 세부 능력치 분석 (1~100 · 현재 / 잠재)
+              세부능력치 분석 (1~100 · 현재 / 잠재)
             </span>
           </div>
           <div className="flex items-center gap-1.5 text-[10px]">
