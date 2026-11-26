@@ -148,25 +148,127 @@ interface DashboardProps {
   onExitToTitle: () => void;
 }
 
-const NAV_ITEMS: { id: NavTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { id: 'home', label: '구단 홈', icon: Home },
-  { id: 'report', label: '경기 결과 리포트', icon: BarChart3 },
-  { id: 'news', label: '뉴스 · 사건 · 면담', icon: Newspaper },
-  { id: 'postseason', label: '포스트시즌 중계실', icon: Crown },
-  { id: 'awards', label: '시상식 · 수상 · 트로피', icon: Trophy },
-  { id: 'offseason', label: '오프시즌 단장실', icon: CalendarDays },
-  { id: 'standings', label: '순위 · 일정 · 타이틀 TOP 10', icon: Award },
-  { id: 'analytics', label: '데이터 분석센터', icon: BarChart3 },
-  { id: 'roster', label: '선수단 · 타순', icon: Users },
-  { id: 'contracts', label: '계약 · FA · 트레이드 · 웨이버', icon: Briefcase },
-  { id: 'acquisitions', label: '전체 구단 영입 현황', icon: ArrowLeftRight },
-  { id: 'draft', label: '드래프트 · 포스팅', icon: Sparkles },
-  { id: 'amateur', label: '아마추어 · 해외파 · 제107조', icon: Globe2 },
-  { id: 'hub', label: '퓨처스 · 병역 · 국대', icon: Layers },
-  { id: 'leagueLife', label: '은퇴 · 방출 · 군입대', icon: ClipboardCheck },
-  { id: 'history', label: '트로피 · 역사 · 유니폼 · 규정', icon: BookOpen },
-  { id: 'finances', label: '재정 · 시설 · 세이브', icon: Wallet },
+type NavGroupId =
+  | 'home'
+  | 'season'
+  | 'squad'
+  | 'frontOffice'
+  | 'prospects'
+  | 'leagueOps'
+  | 'records'
+  | 'finances';
+
+interface NavSubItem {
+  id: NavTab;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+}
+
+interface NavGroupItem {
+  id: NavGroupId;
+  label: string;
+  section: '구단 · 경기' | '프런트 · 전력' | '리그 · 관리';
+  icon: React.ComponentType<{ className?: string }>;
+  defaultTab: NavTab;
+  tabs: NavSubItem[];
+}
+
+const NAV_GROUPS: NavGroupItem[] = [
+  {
+    id: 'home',
+    label: '구단 홈',
+    section: '구단 · 경기',
+    icon: Home,
+    defaultTab: 'home',
+    tabs: [{ id: 'home', label: '구단 홈', icon: Home }],
+  },
+  {
+    id: 'season',
+    label: '경기 · 일정',
+    section: '구단 · 경기',
+    icon: CalendarDays,
+    defaultTab: 'standings',
+    tabs: [
+      { id: 'standings', label: '순위 · 일정 · 타이틀', icon: Award },
+      { id: 'report', label: '경기 결과 리포트', icon: BarChart3 },
+      { id: 'postseason', label: '포스트시즌 중계실', icon: Crown },
+    ],
+  },
+  {
+    id: 'squad',
+    label: '선수단 · 분석',
+    section: '구단 · 경기',
+    icon: Users,
+    defaultTab: 'roster',
+    tabs: [
+      { id: 'roster', label: '선수단 · 타순 · 육성', icon: Users },
+      { id: 'analytics', label: '데이터 분석센터', icon: BarChart3 },
+    ],
+  },
+  {
+    id: 'frontOffice',
+    label: '이적 · 계약',
+    section: '프런트 · 전력',
+    icon: Briefcase,
+    defaultTab: 'contracts',
+    tabs: [
+      { id: 'contracts', label: '계약 · FA · 트레이드 · 웨이버', icon: Briefcase },
+      { id: 'acquisitions', label: '전체 구단 영입 현황', icon: ArrowLeftRight },
+      { id: 'offseason', label: '오프시즌 단장실', icon: CalendarDays },
+    ],
+  },
+  {
+    id: 'prospects',
+    label: '드래프트 · 해외',
+    section: '프런트 · 전력',
+    icon: Sparkles,
+    defaultTab: 'draft',
+    tabs: [
+      { id: 'draft', label: '드래프트 · 포스팅', icon: Sparkles },
+      { id: 'amateur', label: '아마추어 · 해외파 · 제107조', icon: Globe2 },
+    ],
+  },
+  {
+    id: 'leagueOps',
+    label: '뉴스 · 리그운영',
+    section: '리그 · 관리',
+    icon: Newspaper,
+    defaultTab: 'news',
+    tabs: [
+      { id: 'news', label: '뉴스 · 사건 · 면담', icon: Newspaper },
+      { id: 'hub', label: '퓨처스 · 병역 · 국대', icon: Layers },
+      { id: 'leagueLife', label: '은퇴 · 방출 · 군입대', icon: ClipboardCheck },
+    ],
+  },
+  {
+    id: 'records',
+    label: '시상 · 기록실',
+    section: '리그 · 관리',
+    icon: Trophy,
+    defaultTab: 'awards',
+    tabs: [
+      { id: 'awards', label: '시상식 · 수상 · 트로피', icon: Trophy },
+      { id: 'history', label: '역사 · 트로피 · 유니폼 · 규정', icon: BookOpen },
+    ],
+  },
+  {
+    id: 'finances',
+    label: '재정 · 세이브',
+    section: '리그 · 관리',
+    icon: Wallet,
+    defaultTab: 'finances',
+    tabs: [{ id: 'finances', label: '재정 · 시설 · 세이브', icon: Wallet }],
+  },
 ];
+
+const TAB_TO_GROUP: Record<NavTab, NavGroupItem> = NAV_GROUPS.reduce((acc, grp) => {
+  for (const t of grp.tabs) {
+    acc[t.id] = grp;
+  }
+  return acc;
+}, {} as Record<NavTab, NavGroupItem>);
+
+const NAV_SECTIONS: NavGroupItem['section'][] = ['구단 · 경기', '프런트 · 전력', '리그 · 관리'];
 
 export const Dashboard: React.FC<DashboardProps> = ({
   career,
@@ -181,7 +283,37 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onDeleteCareer,
   onExitToTitle,
 }) => {
-  const [activeTab, setActiveTab] = useState<NavTab>('home');
+  const [activeTab, setActiveTabState] = useState<NavTab>('home');
+  const [lastTabByGroup, setLastTabByGroup] = useState<Partial<Record<NavGroupId, NavTab>>>({});
+  const setActiveTab = useCallback((nextTab: NavTab) => {
+    setActiveTabState(nextTab);
+    const grp = TAB_TO_GROUP[nextTab];
+    if (grp) {
+      setLastTabByGroup((prev) => (prev[grp.id] === nextTab ? prev : { ...prev, [grp.id]: nextTab }));
+    }
+  }, []);
+  const activeGroup = TAB_TO_GROUP[activeTab] ?? NAV_GROUPS[0];
+  const handleSelectNavGroup = useCallback(
+    (grp: NavGroupItem) => {
+      // 이미 해당 그룹 안에 있으면 기본 탭이 아닌 현재 탭 유지, 외부에서 진입 시 직전 서브탭 또는 상황별 우선 서브탭 진입
+      if (activeGroup.id === grp.id) return;
+      const remembered = lastTabByGroup[grp.id];
+      if (remembered) {
+        setActiveTab(remembered);
+        return;
+      }
+      if (grp.id === 'season' && career.phase === 'POSTSEASON') {
+        setActiveTab('postseason');
+        return;
+      }
+      if (grp.id === 'frontOffice' && career.phase === 'OFFSEASON') {
+        setActiveTab('offseason');
+        return;
+      }
+      setActiveTab(grp.defaultTab);
+    },
+    [activeGroup.id, career.phase, lastTabByGroup, setActiveTab]
+  );
   const [contractsSubTab, setContractsSubTab] = useState<TransactionsSubTab>('contracts');
   const [standingsSubTab, setStandingsSubTab] = useState<'standings' | 'leaders'>('standings');
   const [actionError, setActionError] = useState<string | null>(null);
@@ -979,97 +1111,144 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </header>
 
-      {/* Mobile Horizontal Nav */}
+      {/* Mobile Horizontal Grouped Nav (8 Clean Main Menus) */}
       <nav className="lg:hidden border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-x-auto">
         <div className="flex px-2 py-1.5 gap-1 min-w-max">
-          {NAV_ITEMS.map((item) => {
-            const active = activeTab === item.id;
+          {NAV_GROUPS.map((grp) => {
+            const Icon = grp.icon;
+            const active = activeGroup.id === grp.id;
+            const groupBadge =
+              grp.id === 'records' && isAwardsCeremonyPending
+                ? '진행'
+                : grp.id === 'frontOffice' && career.phase === 'OFFSEASON'
+                  ? `${offseasonReadiness.requiredCompletedCount}/${offseasonReadiness.requiredTotalCount}`
+                  : grp.id === 'frontOffice' && pendingIncomingTrades.length > 0
+                    ? String(pendingIncomingTrades.length)
+                    : grp.id === 'leagueOps' && pendingNewsBadge > 0
+                      ? String(pendingNewsBadge)
+                      : null;
             return (
               <button
-                key={item.id}
+                key={grp.id}
                 type="button"
-                onClick={() => setActiveTab(item.id)}
-                className={`px-3 py-1.5 text-xs font-semibold rounded whitespace-nowrap ${
+                onClick={() => handleSelectNavGroup(grp)}
+                className={`px-3 py-1.5 text-xs font-semibold rounded whitespace-nowrap inline-flex items-center gap-1.5 ${
                   active
                     ? 'team-accent-bg'
                     : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
-                {item.label}
+                <Icon className="w-3.5 h-3.5 shrink-0" />
+                <span>{grp.label}</span>
+                {groupBadge && (
+                  <span
+                    className={`px-1 py-0.2 rounded text-[10px] font-mono-stats font-bold ${
+                      active ? 'bg-white/25 text-white' : 'bg-orange-500/15 text-orange-700 dark:text-orange-300'
+                    }`}
+                  >
+                    {groupBadge}
+                  </span>
+                )}
               </button>
             );
           })}
         </div>
       </nav>
 
-      {/* Main Layout: Fixed Sidebar + Work Canvas */}
+      {/* Main Layout: Compact 8-Group Sidebar + Work Canvas */}
       <div className="flex-1 flex max-w-[1440px] w-full mx-auto">
-        <aside className="hidden lg:flex w-60 shrink-0 flex-col border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-3 space-y-1">
-          {NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
-            const active = activeTab === item.id;
+        <aside className="hidden lg:flex w-60 shrink-0 flex-col border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-3 space-y-3">
+          {NAV_SECTIONS.map((sec) => {
+            const groupsInSec = NAV_GROUPS.filter((g) => g.section === sec);
             return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setActiveTab(item.id)}
-                className={`w-full px-3 py-2 rounded text-xs font-semibold flex items-center justify-between gap-2 transition-colors ${
-                  active
-                    ? 'team-accent-bg'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                }`}
-              >
-                <span className="flex items-center gap-2.5 min-w-0">
-                  <Icon className="w-4 h-4 shrink-0" />
-                  <span className="truncate">{item.label}</span>
-                </span>
-                {item.id === 'awards' && isAwardsCeremonyPending && (
-                  <span
-                    className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                      active
-                        ? 'bg-white/25 text-white'
-                        : 'bg-amber-500 text-slate-950'
-                    }`}
-                  >
-                    진행
-                  </span>
-                )}
-                {item.id === 'offseason' && career.phase === 'OFFSEASON' && (
-                  <span
-                    className={`px-1.5 py-0.5 rounded text-[10px] font-mono-stats font-bold ${
-                      active
-                        ? 'bg-white/25 text-white'
-                        : offseasonReadiness.canApproveNextSeason
-                        ? 'bg-emerald-600 text-white'
-                        : 'team-accent-badge'
-                    }`}
-                  >
-                    {offseasonReadiness.requiredCompletedCount}/{offseasonReadiness.requiredTotalCount}
-                  </span>
-                )}
-                {item.id === 'news' && pendingNewsBadge > 0 && (
-                  <span
-                    className={`px-1.5 py-0.5 rounded text-[10px] font-mono-stats font-bold ${
-                      active
-                        ? 'bg-white/20 text-white'
-                        : 'team-accent-bg'
-                    }`}
-                  >
-                    {pendingNewsBadge}
-                  </span>
-                )}
-                {item.id === 'contracts' && pendingIncomingTrades.length > 0 && (
-                  <span
-                    className={`px-1.5 py-0.5 rounded text-[10px] font-mono-stats font-bold ${
-                      active
-                        ? 'bg-white/20 text-white'
-                        : 'bg-indigo-600 text-white'
-                    }`}
-                  >
-                    {pendingIncomingTrades.length}
-                  </span>
-                )}
-              </button>
+              <div key={sec} className="space-y-1">
+                <div className="px-2.5 text-[10px] font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase">
+                  {sec}
+                </div>
+                {groupsInSec.map((grp) => {
+                  const Icon = grp.icon;
+                  const active = activeGroup.id === grp.id;
+                  const subCount = grp.tabs.length;
+                  return (
+                    <button
+                      key={grp.id}
+                      type="button"
+                      onClick={() => handleSelectNavGroup(grp)}
+                      title={subCount > 1 ? grp.tabs.map((t) => t.label).join(' · ') : grp.label}
+                      className={`w-full px-3 py-2 rounded-md text-xs font-semibold flex items-center justify-between gap-2 transition-colors ${
+                        active
+                          ? 'team-accent-bg shadow-xs'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2.5 min-w-0">
+                        <Icon className="w-4 h-4 shrink-0" />
+                        <span className="truncate">{grp.label}</span>
+                      </span>
+                      <span className="flex items-center gap-1 shrink-0">
+                        {grp.id === 'season' && career.phase === 'POSTSEASON' && (
+                          <span
+                            className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                              active ? 'bg-white/25 text-white' : 'bg-amber-500 text-slate-950'
+                            }`}
+                          >
+                            PS
+                          </span>
+                        )}
+                        {grp.id === 'records' && isAwardsCeremonyPending && (
+                          <span
+                            className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                              active ? 'bg-white/25 text-white' : 'bg-amber-500 text-slate-950'
+                            }`}
+                          >
+                            진행
+                          </span>
+                        )}
+                        {grp.id === 'frontOffice' && career.phase === 'OFFSEASON' && (
+                          <span
+                            className={`px-1.5 py-0.5 rounded text-[10px] font-mono-stats font-bold ${
+                              active
+                                ? 'bg-white/25 text-white'
+                                : offseasonReadiness.canApproveNextSeason
+                                  ? 'bg-emerald-600 text-white'
+                                  : 'team-accent-badge'
+                            }`}
+                          >
+                            {offseasonReadiness.requiredCompletedCount}/{offseasonReadiness.requiredTotalCount}
+                          </span>
+                        )}
+                        {grp.id === 'frontOffice' && pendingIncomingTrades.length > 0 && (
+                          <span
+                            className={`px-1.5 py-0.5 rounded text-[10px] font-mono-stats font-bold ${
+                              active ? 'bg-white/20 text-white' : 'bg-indigo-600 text-white'
+                            }`}
+                          >
+                            {pendingIncomingTrades.length}
+                          </span>
+                        )}
+                        {grp.id === 'leagueOps' && pendingNewsBadge > 0 && (
+                          <span
+                            className={`px-1.5 py-0.5 rounded text-[10px] font-mono-stats font-bold ${
+                              active ? 'bg-white/20 text-white' : 'team-accent-bg'
+                            }`}
+                          >
+                            {pendingNewsBadge}
+                          </span>
+                        )}
+                        {subCount > 1 && (
+                          <span
+                            className={`text-[10px] font-mono-stats ${
+                              active ? 'text-white/75' : 'text-slate-400 dark:text-slate-500'
+                            }`}
+                          >
+                            {subCount}
+                          </span>
+                        )}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             );
           })}
 
@@ -1103,6 +1282,58 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </aside>
 
         <main className="flex-1 p-4 sm:p-6 min-w-0 space-y-4">
+          {/* Unified Sub-Tab Bar for Grouped Menus */}
+          {activeGroup.tabs.length > 1 && (
+            <div className="flex flex-wrap items-center justify-between gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-2 shadow-xs">
+              <div className="flex flex-wrap items-center gap-1.5">
+                {activeGroup.tabs.map((sub) => {
+                  const SubIcon = sub.icon;
+                  const isSubActive = activeTab === sub.id;
+                  const subBadge =
+                    sub.id === 'awards' && isAwardsCeremonyPending
+                      ? { text: '진행', cls: isSubActive ? 'bg-white/25 text-white' : 'bg-amber-500 text-slate-950' }
+                      : sub.id === 'offseason' && career.phase === 'OFFSEASON'
+                        ? {
+                            text: `${offseasonReadiness.requiredCompletedCount}/${offseasonReadiness.requiredTotalCount}`,
+                            cls: isSubActive
+                              ? 'bg-white/25 text-white'
+                              : offseasonReadiness.canApproveNextSeason
+                                ? 'bg-emerald-600 text-white'
+                                : 'team-accent-badge',
+                          }
+                        : sub.id === 'contracts' && pendingIncomingTrades.length > 0
+                          ? { text: String(pendingIncomingTrades.length), cls: isSubActive ? 'bg-white/25 text-white' : 'bg-indigo-600 text-white' }
+                          : sub.id === 'news' && pendingNewsBadge > 0
+                            ? { text: String(pendingNewsBadge), cls: isSubActive ? 'bg-white/25 text-white' : 'team-accent-bg' }
+                            : null;
+                  return (
+                    <button
+                      key={sub.id}
+                      type="button"
+                      onClick={() => setActiveTab(sub.id)}
+                      className={`px-3 py-1.5 rounded-md text-xs font-bold inline-flex items-center gap-1.5 transition-colors ${
+                        isSubActive
+                          ? 'team-accent-bg shadow-xs'
+                          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <SubIcon className="w-3.5 h-3.5 shrink-0" />
+                      <span>{sub.label}</span>
+                      {subBadge && (
+                        <span className={`px-1.5 py-0.2 rounded text-[10px] font-mono-stats font-bold ${subBadge.cls}`}>
+                          {subBadge.text}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+              <span className="hidden sm:inline text-[11px] font-semibold text-slate-400 dark:text-slate-500 pr-1">
+                {activeGroup.section} · {activeGroup.label}
+              </span>
+            </div>
+          )}
+
           {actionError && (
             <div className="p-3 rounded border border-red-500/40 bg-red-500/10 text-xs font-medium text-red-600 dark:text-red-400">
               {actionError}
