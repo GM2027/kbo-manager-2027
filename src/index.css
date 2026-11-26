@@ -4,11 +4,47 @@
 @layer base {
   html {
     font-family: 'Plus Jakarta Sans', 'Noto Sans KR', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   .font-mono-stats {
     font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
     font-variant-numeric: tabular-nums;
+  }
+
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+
+  /* Custom refined thin scrollbars (light & dark mode aware) */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
+  }
+  .dark * {
+    scrollbar-color: rgba(71, 85, 105, 0.65) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(148, 163, 184, 0.45);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(100, 116, 139, 0.72);
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background-color: rgba(71, 85, 105, 0.65);
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(100, 116, 139, 0.9);
   }
 }
 
@@ -53,11 +89,92 @@
 .team-accent-btn {
   background-color: var(--team-primary);
   color: var(--team-on-primary);
-  transition: filter 150ms ease, opacity 150ms ease, transform 150ms ease;
+  box-shadow: 0 1px 2px rgba(var(--team-primary-rgb), 0.25);
+  transition: filter 150ms ease, opacity 150ms ease, transform 120ms ease, box-shadow 150ms ease;
 }
 
 .team-accent-btn:hover:not(:disabled) {
-  filter: brightness(1.08);
+  filter: brightness(1.07);
+  box-shadow: 0 4px 12px -2px rgba(var(--team-primary-rgb), 0.38);
+}
+
+.team-accent-btn:active:not(:disabled) {
+  transform: translateY(0.5px) scale(0.985);
+}
+
+/* Executive KBO GM Surface & Card Polish */
+.gm-card {
+  background-color: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.92);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 14px -6px rgba(15, 23, 42, 0.06);
+  transition: border-color 160ms ease, box-shadow 180ms ease, transform 160ms ease;
+}
+
+.dark .gm-card {
+  background-color: rgba(15, 23, 42, 0.92);
+  border-color: rgba(30, 41, 59, 0.95);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 8px 20px -10px rgba(0, 0, 0, 0.55);
+}
+
+.gm-kpi-card {
+  position: relative;
+  overflow: hidden;
+  background-color: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 6px 16px -8px rgba(15, 23, 42, 0.08);
+  transition: border-color 160ms ease, box-shadow 180ms ease, transform 160ms ease;
+}
+
+.gm-kpi-card:hover {
+  border-color: rgba(var(--team-primary-rgb), 0.38);
+  box-shadow: 0 4px 16px -6px rgba(var(--team-primary-rgb), 0.16);
+  transform: translateY(-1px);
+}
+
+.dark .gm-kpi-card {
+  background-color: rgba(15, 23, 42, 0.94);
+  border-color: rgba(30, 41, 59, 0.95);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.dark .gm-kpi-card:hover {
+  border-color: rgba(var(--team-primary-rgb), 0.5);
+  box-shadow: 0 6px 20px -8px rgba(var(--team-primary-rgb), 0.22);
+}
+
+.gm-hero-banner {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 92% 18%, rgba(255, 255, 255, 0.16), transparent 46%),
+    linear-gradient(125deg, var(--team-banner-from) 0%, var(--team-banner-to) 100%);
+  color: #ffffff;
+  border-radius: 0.875rem;
+  box-shadow: 0 10px 26px -12px rgba(var(--team-primary-rgb), 0.45);
+}
+
+.gm-hero-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, transparent 45%, rgba(0, 0, 0, 0.16) 100%);
+  pointer-events: none;
+}
+
+.gm-subtab-bar {
+  background-color: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  backdrop-filter: blur(8px);
+}
+
+.dark .gm-subtab-bar {
+  background-color: rgba(15, 23, 42, 0.88);
+  border-color: rgba(30, 41, 59, 0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
 .team-accent-badge {

@@ -371,21 +371,33 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
   return (
     <div className="space-y-4">
       {/* Header Summary */}
-      <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-md p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="gm-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <TeamLogo teamId={teamId} size="md" />
+          <div className="p-1.5 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200/80 dark:border-slate-800 shrink-0">
+            <TeamLogo teamId={teamId} size="md" />
+          </div>
           <div>
-            <div className="flex items-center gap-2 text-base font-extrabold">
+            <div className="flex items-center gap-2 text-base font-extrabold tracking-tight">
               <Users className="w-4 h-4 team-accent-text" />
               <span>{KBO_TEAMS[teamId].name} 선수단 · 타순 · 육성</span>
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-mono-stats mt-0.5">
-              1군 등록 {firstTeamCount}/30명 · 2군 {futuresCount}명 · 육성 {devCount}명 · 당일 출장 {activeCount}/28명 · 부상 {injuredPlayers.length}명
+            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-xs text-slate-500 dark:text-slate-400 font-mono-stats mt-0.5">
+              <span>1군 등록 <strong className="text-slate-800 dark:text-slate-200">{firstTeamCount}</strong>/30명</span>
+              <span>·</span>
+              <span>2군 <strong className="text-slate-800 dark:text-slate-200">{futuresCount}</strong>명</span>
+              <span>·</span>
+              <span>육성 <strong className="text-slate-800 dark:text-slate-200">{devCount}</strong>명</span>
+              <span>·</span>
+              <span>당일 출장 <strong className="text-slate-800 dark:text-slate-200">{activeCount}</strong>/28명</span>
+              <span>·</span>
+              <span className={injuredPlayers.length > 0 ? 'text-rose-600 dark:text-rose-400 font-bold' : ''}>
+                부상 {injuredPlayers.length}명
+              </span>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-wrap rounded border border-slate-200 dark:border-slate-700 overflow-hidden text-xs self-start">
+        <div className="flex flex-wrap items-center gap-1 rounded-xl border border-slate-200/90 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-950/70 p-1 text-xs self-start">
           {[
             { id: 'lineup', label: '고정 타순 · 투수진' },
             { id: 'roster', label: `1군·2군·육성 (${futuresCount + devCount})` },
@@ -396,10 +408,10 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
               key={t.id}
               type="button"
               onClick={() => setSubTab(t.id as 'lineup' | 'roster' | 'growth' | 'injuries')}
-              className={`px-3 py-1.5 font-semibold ${
+              className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
                 subTab === t.id
-                  ? 'team-accent-bg'
-                  : 'hover:bg-slate-100 dark:hover:bg-slate-800'
+                  ? 'team-accent-bg shadow-xs'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-white/80 dark:hover:bg-slate-800/70'
               }`}
             >
               {t.label}
@@ -418,7 +430,7 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
           : null;
         const capFran = currentCaptain ? evaluateFranchiseStar(career, currentCaptain) : null;
         return (
-          <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-md px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="gm-card px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <span className="font-bold text-slate-900 dark:text-white">
                 선수단 주장:{' '}
@@ -435,17 +447,17 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                   임시 주장: {actingCaptain.name} ({lead?.actingCaptainReason ?? '주장 이탈 대행'})
                 </span>
               )}
-              <span className="text-slate-400">·</span>
+              <span className="text-slate-300 dark:text-slate-700">|</span>
               <span className="font-mono-stats text-slate-600 dark:text-slate-300">
-                베테랑 리더십 <strong>{lead?.veteranLeadership ?? 74}</strong> · 감독 관계{' '}
-                <strong>{lead?.managerRelation ?? 76}</strong> · 신인 적응{' '}
+                베테랑 리더십 <strong className="text-slate-900 dark:text-white">{lead?.veteranLeadership ?? 74}</strong> · 감독 관계{' '}
+                <strong className="text-slate-900 dark:text-white">{lead?.managerRelation ?? 76}</strong> · 신인 적응{' '}
                 <strong className="text-emerald-600 dark:text-emerald-400">
                   +{(lead?.rookieAdaptationBonus ?? 2)}
                 </strong>
               </span>
             </div>
             <div className="flex items-center gap-2 shrink-0">
-              <span className="text-[11px] text-slate-500">주장 선임:</span>
+              <span className="text-[11px] font-semibold text-slate-500">주장 선임:</span>
               <select
                 value={lead?.captainPlayerId ?? ''}
                 onChange={(e) => {
@@ -458,7 +470,7 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                     setNotice(err instanceof Error ? err.message : '주장 선임 오류');
                   }
                 }}
-                className="px-2.5 py-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-semibold text-xs"
+                className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-semibold text-xs shadow-2xs"
               >
                 <option value="">주장 선택</option>
                 {firstTeamDomestic.map((p) => {
@@ -476,7 +488,7 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
       })()}
 
       {notice && (
-        <div className="p-3 rounded border border-amber-500/40 bg-amber-500/10 text-xs font-medium text-amber-800 dark:text-amber-300">
+        <div className="p-3 rounded-xl border border-amber-500/40 bg-amber-500/10 text-xs font-medium text-amber-800 dark:text-amber-300">
           {notice}
         </div>
       )}
@@ -485,7 +497,7 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
       {subTab === 'lineup' && (
         <div className="space-y-4">
           {/* #11: Manager Pre-Game Lineup & Rotation Recommendation */}
-          <div className="border team-accent-surface rounded-md p-3.5 space-y-2.5 text-xs">
+          <div className="border team-accent-surface rounded-xl p-4 space-y-2.5 text-xs shadow-2xs">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="font-extrabold team-accent-text flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4" />

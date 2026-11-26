@@ -888,20 +888,20 @@ export const Dashboard: React.FC<DashboardProps> = ({
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-slate-100/80 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
       {/* Club Color Identity Accent Stripe (#4) */}
       <div className="h-1 w-full team-banner-grad shrink-0" />
       {/* 3-Zone Top Bar */}
-      <header className="sticky top-0 z-30 h-14 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/95 backdrop-blur px-4 flex items-center justify-between gap-3">
+      <header className="sticky top-0 z-30 h-15 border-b border-slate-200/90 dark:border-slate-800/90 bg-white/92 dark:bg-slate-900/92 backdrop-blur-md shadow-[0_1px_8px_rgba(15,23,42,0.04)] dark:shadow-[0_1px_12px_rgba(0,0,0,0.35)] px-4 flex items-center justify-between gap-3">
         {/* Left: In-Game Date + Team & Save Identity */}
         <div className="flex items-center gap-3 min-w-0">
           <div
-            className="flex items-center gap-1.5 pr-3 border-r border-slate-200 dark:border-slate-800 shrink-0"
+            className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-100/90 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/70 shrink-0"
             title={`${currentCalendarDate.koreanFullDate} · ${currentCalendarDate.phaseLabel}`}
           >
             <CalendarDays className="w-3.5 h-3.5 team-accent-text shrink-0" />
             <div className="leading-tight">
-              <div className="text-xs font-extrabold font-mono-stats text-slate-900 dark:text-white tracking-tight">
+              <div className="text-[11px] font-extrabold font-mono-stats text-slate-900 dark:text-white tracking-tight">
                 {currentCalendarDate.displayDate}
               </div>
               <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
@@ -912,10 +912,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
           <TeamLogo teamId={career.playerTeamId} size="sm" />
           <div className="min-w-0">
-            <div className="text-sm font-extrabold truncate flex items-center gap-1.5">
+            <div className="text-sm font-extrabold truncate flex items-center gap-1.5 tracking-tight">
               <span>{teamInfo.name}</span>
-              <span className="text-xs font-mono-stats font-semibold text-slate-500 dark:text-slate-400">
-                {career.season} · {career.version}
+              <span className="text-[11px] font-mono-stats font-bold px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                {career.season}
               </span>
               {actingManagerCoach && (
                 <span className="hidden sm:inline text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
@@ -928,11 +928,17 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 </span>
               )}
             </div>
-            <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono-stats truncate">
-              {myStanding?.wins ?? 0}승 {myStanding?.losses ?? 0}패
-              {myStanding && myStanding.draws > 0 ? ` ${myStanding.draws}무` : ''} ·{' '}
-              {career.gamesPlayed}/{career.totalRegularGames}경기 ·{' '}
-              {myStanding?.games ? `리그 ${myStanding.isTied ? '공동 ' : ''}${myStanding.rank}위` : '개막 대기'}
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono-stats truncate flex items-center gap-1.5 mt-0.5">
+              <span className="font-bold text-slate-700 dark:text-slate-200">
+                {myStanding?.wins ?? 0}승 {myStanding?.losses ?? 0}패
+                {myStanding && myStanding.draws > 0 ? ` ${myStanding.draws}무` : ''}
+              </span>
+              <span className="opacity-40">·</span>
+              <span>{career.gamesPlayed}/{career.totalRegularGames}G</span>
+              <span className="opacity-40">·</span>
+              <span className="font-semibold team-accent-text">
+                {myStanding?.games ? `리그 ${myStanding.isTied ? '공동 ' : ''}${myStanding.rank}위` : '개막 대기'}
+              </span>
             </div>
           </div>
         </div>
@@ -1253,38 +1259,53 @@ export const Dashboard: React.FC<DashboardProps> = ({
           })}
 
           {/* Compact Coaching Staff & Status Footer in Sidebar */}
-          <div className="mt-auto pt-4 border-t border-slate-200 dark:border-slate-800 text-[11px] space-y-1.5 text-slate-500 dark:text-slate-400">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-slate-700 dark:text-slate-200">코칭스태프</span>
-              <button
-                type="button"
-                onClick={() => {
-                  setContractsSubTab('coaches');
-                  setActiveTab('contracts');
-                }}
-                className="text-[11px] font-semibold text-orange-600 dark:text-orange-400 hover:underline"
-              >
-                영입·해지
-              </button>
+          <div className="mt-auto pt-3 border-t border-slate-200/80 dark:border-slate-800/80">
+            <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 text-[11px] space-y-1.5 text-slate-500 dark:text-slate-400">
+              <div className="flex items-center justify-between pb-1 border-b border-slate-200/70 dark:border-slate-800/80">
+                <span className="font-bold text-slate-800 dark:text-slate-200">코칭스태프</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setContractsSubTab('coaches');
+                    setActiveTab('contracts');
+                  }}
+                  className="text-[10px] font-bold team-accent-text hover:underline"
+                >
+                  영입·해지
+                </button>
+              </div>
+              {COACH_ROLES.map((role) => {
+                const found = (career.coaches[career.playerTeamId] ?? []).find((c) => c.role === role);
+                return (
+                  <div key={role} className="flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-1.5 truncate">
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                          found ? 'bg-emerald-500' : 'bg-amber-500'
+                        }`}
+                      />
+                      <span className="truncate">{role}</span>
+                    </span>
+                    <span
+                      className={
+                        found
+                          ? 'font-semibold text-slate-700 dark:text-slate-200 shrink-0'
+                          : 'font-bold text-amber-600 dark:text-amber-400 shrink-0'
+                      }
+                    >
+                      {found ? found.name : '공석'}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
-            {COACH_ROLES.map((role) => {
-              const found = (career.coaches[career.playerTeamId] ?? []).find((c) => c.role === role);
-              return (
-                <div key={role} className="flex justify-between">
-                  <span>{role}</span>
-                  <span className={found ? 'font-semibold text-slate-700 dark:text-slate-300' : 'text-amber-600'}>
-                    {found ? found.name : '공석'}
-                  </span>
-                </div>
-              );
-            })}
           </div>
         </aside>
 
         <main className="flex-1 p-4 sm:p-6 min-w-0 space-y-4">
           {/* Unified Sub-Tab Bar for Grouped Menus */}
           {activeGroup.tabs.length > 1 && (
-            <div className="flex flex-wrap items-center justify-between gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-2 shadow-xs">
+            <div className="gm-subtab-bar flex flex-wrap items-center justify-between gap-2 px-2.5 py-2">
               <div className="flex flex-wrap items-center gap-1.5">
                 {activeGroup.tabs.map((sub) => {
                   const SubIcon = sub.icon;
@@ -1311,10 +1332,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       key={sub.id}
                       type="button"
                       onClick={() => setActiveTab(sub.id)}
-                      className={`px-3 py-1.5 rounded-md text-xs font-bold inline-flex items-center gap-1.5 transition-colors ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 transition-all ${
                         isSubActive
-                          ? 'team-accent-bg shadow-xs'
-                          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                          ? 'team-accent-bg shadow-sm'
+                          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
                       }`}
                     >
                       <SubIcon className="w-3.5 h-3.5 shrink-0" />
@@ -1328,8 +1349,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   );
                 })}
               </div>
-              <span className="hidden sm:inline text-[11px] font-semibold text-slate-400 dark:text-slate-500 pr-1">
-                {activeGroup.section} · {activeGroup.label}
+              <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-semibold text-slate-400 dark:text-slate-500 pr-1.5">
+                <span>{activeGroup.section}</span>
+                <span className="opacity-50">/</span>
+                <span className="text-slate-600 dark:text-slate-300">{activeGroup.label}</span>
               </span>
             </div>
           )}
@@ -1435,57 +1458,139 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 />
               ) : (
                 <>
-                  {/* Compact Club Home KPI Row */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                    <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-md p-4">
-                      <div className="text-xs text-slate-500 dark:text-slate-400">시즌 성적 · 순위</div>
-                      <div className="text-xl font-extrabold font-mono-stats mt-1">
+                  {/* Club Executive Hero Briefing Banner */}
+                  <div className="gm-hero-banner px-5 py-4">
+                    <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div className="flex items-center gap-3.5 min-w-0">
+                        <div className="p-1.5 rounded-xl bg-white/95 shadow-md shrink-0">
+                          <TeamLogo teamId={career.playerTeamId} size="md" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold text-white/85">
+                            <span className="px-2 py-0.5 rounded-full bg-black/25 backdrop-blur-xs">
+                              {career.season} KBO 리그 · {currentCalendarDate.phaseLabel}
+                            </span>
+                            <span>{career.gmName} 단장실</span>
+                            <span>·</span>
+                            <span className="font-mono-stats">난이도 {career.difficulty ?? '어려움'}</span>
+                          </div>
+                          <h1 className="text-lg sm:text-xl font-black tracking-tight text-white mt-0.5 truncate">
+                            {teamInfo.name} 프런트 브리핑
+                          </h1>
+                          <div className="mt-1.5 flex items-center gap-2.5 max-w-md">
+                            <div className="flex-1 h-1.5 rounded-full bg-black/25 overflow-hidden">
+                              <div
+                                className="h-full rounded-full bg-white/90 transition-all duration-500"
+                                style={{
+                                  width: `${Math.min(100, Math.round((career.gamesPlayed / Math.max(1, career.totalRegularGames)) * 100))}%`,
+                                }}
+                              />
+                            </div>
+                            <span className="text-[11px] font-mono-stats font-bold text-white/90 shrink-0">
+                              정규시즌 {career.gamesPlayed}/{career.totalRegularGames}G (
+                              {Math.round((career.gamesPlayed / Math.max(1, career.totalRegularGames)) * 100)}%)
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab('roster')}
+                          className="px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs font-bold transition-colors"
+                        >
+                          선수단 · 타순
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab('analytics')}
+                          className="px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs font-bold transition-colors"
+                        >
+                          데이터 분석실
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab('contracts')}
+                          className="px-3 py-1.5 rounded-lg bg-white text-slate-900 hover:bg-white/90 text-xs font-extrabold shadow-sm transition-colors"
+                        >
+                          FA · 트레이드
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Executive Club Home KPI Row */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                    <div className="gm-kpi-card p-4">
+                      <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                        <span className="font-semibold flex items-center gap-1.5">
+                          <Trophy className="w-3.5 h-3.5 team-accent-text" />
+                          <span>시즌 성적 · 순위</span>
+                        </span>
+                        <span className="text-[10px] font-mono-stats font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                          {myStanding?.games ? `${myStanding.isTied ? '공동 ' : ''}${myStanding.rank}위` : '대기'}
+                        </span>
+                      </div>
+                      <div className="text-xl font-black font-mono-stats mt-2 tracking-tight text-slate-900 dark:text-white">
                         {myStanding?.wins ?? 0}승 {myStanding?.losses ?? 0}패
                         {myStanding && myStanding.draws > 0 ? ` ${myStanding.draws}무` : ''}
                       </div>
-                      <div className="text-xs text-slate-500 mt-1 font-mono-stats">
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-mono-stats">
                         {myStanding?.games
-                          ? `리그 ${myStanding.isTied ? '공동 ' : ''}${myStanding.rank}위 · 승률 ${myStanding.pct.toFixed(3)}`
+                          ? `승률 ${myStanding.pct.toFixed(3)} · 승차 ${myStanding.gb === 0 ? '선두' : myStanding.gb.toFixed(1)}`
                           : '0/144경기 (개막 준비)'}
                       </div>
                     </div>
 
-                    <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-md p-4">
+                    <div className="gm-kpi-card p-4">
                       <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                        <span>1군 · 2군 엔트리 · 부상</span>
+                        <span className="font-semibold flex items-center gap-1.5">
+                          <Users className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+                          <span>1군 · 2군 엔트리</span>
+                        </span>
                         <button
                           type="button"
                           onClick={() => setActiveTab('roster')}
-                          className="font-semibold text-orange-600 dark:text-orange-400 hover:underline"
+                          className="text-[11px] font-bold team-accent-text hover:underline"
                         >
                           콜업·강등
                         </button>
                       </div>
-                      <div className="text-xl font-extrabold font-mono-stats mt-1">
-                        1군 {firstCount}인 · 2군 {futuresCount}인
+                      <div className="text-xl font-black font-mono-stats mt-2 tracking-tight text-slate-900 dark:text-white">
+                        1군 {firstCount}인 <span className="text-sm font-bold text-slate-400">· 2군 {futuresCount}인</span>
                       </div>
-                      <div className="text-xs text-slate-500 mt-1">
-                        출장 {activeCount}인 · 부상 {injuredList.length}명 · 사기 {teamState.atmosphere}
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5 flex-wrap">
+                        <span>출장 {activeCount}인</span>
+                        <span className="opacity-40">·</span>
+                        <span className={injuredList.length > 0 ? 'text-rose-600 dark:text-rose-400 font-bold' : ''}>
+                          부상 {injuredList.length}명
+                        </span>
+                        <span className="opacity-40">·</span>
+                        <span>사기 {teamState.atmosphere}</span>
                       </div>
                     </div>
 
-                    <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-md p-4">
+                    <div className="gm-kpi-card p-4">
                       <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                        <span>구단 보유 현금 · 스폰서</span>
+                        <span className="font-semibold flex items-center gap-1.5">
+                          <Wallet className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                          <span>구단 보유 현금</span>
+                        </span>
                         <button
                           type="button"
                           onClick={() => setActiveTab('finances')}
-                          className="font-semibold text-orange-600 dark:text-orange-400 hover:underline"
+                          className="text-[11px] font-bold team-accent-text hover:underline"
                         >
                           투자·스폰서
                         </button>
                       </div>
-                      <div className="text-xl font-extrabold font-mono-stats mt-1 text-emerald-700 dark:text-emerald-400">
+                      <div className="text-xl font-black font-mono-stats mt-2 tracking-tight text-emerald-700 dark:text-emerald-400">
                         {career.finances.cashBalanceBillion === null
                           ? '자금 미편성'
                           : `${career.finances.cashBalanceBillion.toFixed(2)}억 원`}
                       </div>
-                      <div className="text-xs text-slate-500 mt-1 truncate font-mono-stats">
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate font-mono-stats">
                         {career.finances.sponsor ? (
                           <span className={career.finances.sponsor.status === '만료' ? 'text-red-600 dark:text-red-400 font-bold' : ''}>
                             {career.finances.sponsor.name}
@@ -1500,10 +1605,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       </div>
                     </div>
 
-                    <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-md p-4 flex flex-col justify-between">
+                    <div className="gm-kpi-card p-4 flex flex-col justify-between">
                       <div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400">다음 경기 일정</div>
-                        <div className="text-base font-extrabold mt-1">
+                        <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                          <CalendarDays className="w-3.5 h-3.5 team-accent-text" />
+                          <span>다음 경기 일정</span>
+                        </div>
+                        <div className="text-base font-black tracking-tight mt-1.5 text-slate-900 dark:text-white">
                           {career.phase === 'POSTSEASON' && career.postseason.currentSeries
                             ? career.postseason.currentSeries.label
                             : career.phase === 'OFFSEASON'
@@ -1532,11 +1640,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         )}
                       </div>
                       {career.phase === 'REGULAR_SEASON' && career.gamesPlayed < career.totalRegularGames && (
-                        <div className="mt-2 grid grid-cols-2 gap-1.5">
+                        <div className="mt-2.5 grid grid-cols-2 gap-1.5">
                           <button
                             type="button"
                             onClick={handleSimulateNextGame}
-                            className="py-1.5 rounded team-accent-outline text-xs font-bold flex items-center justify-center gap-1"
+                            className="py-1.5 rounded-lg team-accent-outline text-xs font-bold flex items-center justify-center gap-1"
                           >
                             <Play className="w-3 h-3" />
                             <span>1경기 진행</span>
@@ -1544,7 +1652,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           <button
                             type="button"
                             onClick={handleSimulateNextSeries}
-                            className="py-1.5 rounded team-accent-btn text-xs font-bold flex items-center justify-center gap-1"
+                            className="py-1.5 rounded-lg team-accent-btn text-xs font-bold flex items-center justify-center gap-1"
                           >
                             <CalendarDays className="w-3.5 h-3.5" />
                             <span>3연전 진행</span>
@@ -1555,7 +1663,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         <button
                           type="button"
                           onClick={handleSimulatePostseason}
-                          className="mt-2 w-full py-1.5 rounded team-accent-btn text-xs font-bold"
+                          className="mt-2.5 w-full py-1.5 rounded-lg team-accent-btn text-xs font-bold"
                         >
                           포스트시즌 1경기 진행
                         </button>
@@ -1565,8 +1673,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
                   {/* Owner Goal · Fan Sentiment · Coach Live Condition Strip */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                    <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-md px-3.5 py-2.5 flex items-center justify-between gap-2">
-                      <div className="min-w-0">
+                    <div className="gm-card px-4 py-3 flex items-center justify-between gap-3">
+                      <div className="min-w-0 flex-1">
                         <div className="text-[11px] text-slate-500 flex items-center gap-1">
                           <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                           <span>구단주 목표 · 신뢰도</span>
@@ -1578,18 +1686,30 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           </span>{' '}
                           · 신뢰 <span className="font-mono-stats">{ownerEval.ownerTrust}</span>
                         </div>
+                        <div className="mt-1.5 h-1.5 rounded-full bg-slate-200/80 dark:bg-slate-800 overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all ${
+                              ownerEval.ownerTrust >= 70
+                                ? 'bg-emerald-500'
+                                : ownerEval.ownerTrust >= 45
+                                  ? 'bg-amber-500'
+                                  : 'bg-rose-500'
+                            }`}
+                            style={{ width: `${Math.max(4, Math.min(100, ownerEval.ownerTrust))}%` }}
+                          />
+                        </div>
                       </div>
                       <button
                         type="button"
                         onClick={() => setActiveTab('news')}
-                        className="text-[11px] font-semibold team-accent-text hover:underline shrink-0"
+                        className="text-[11px] font-bold team-accent-text hover:underline shrink-0"
                       >
                         평가·이직
                       </button>
                     </div>
 
-                    <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-md px-3.5 py-2.5 flex items-center justify-between gap-2">
-                      <div className="min-w-0">
+                    <div className="gm-card px-4 py-3 flex items-center justify-between gap-3">
+                      <div className="min-w-0 flex-1">
                         <div className="text-[11px] text-slate-500 flex items-center gap-1">
                           <Heart className="w-3.5 h-3.5 text-rose-500" />
                           <span>팬 여론 · 티켓 정책</span>
@@ -1598,17 +1718,29 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           여론 <span className="font-mono-stats">{fanSentiment}/100</span> · 티켓{' '}
                           {career.finances.ticketPricePolicy ?? '표준'}
                         </div>
+                        <div className="mt-1.5 h-1.5 rounded-full bg-slate-200/80 dark:bg-slate-800 overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all ${
+                              fanSentiment >= 70
+                                ? 'bg-rose-500'
+                                : fanSentiment >= 45
+                                  ? 'bg-amber-500'
+                                  : 'bg-slate-400'
+                            }`}
+                            style={{ width: `${Math.max(4, Math.min(100, fanSentiment))}%` }}
+                          />
+                        </div>
                       </div>
                       <button
                         type="button"
                         onClick={() => setActiveTab('finances')}
-                        className="text-[11px] font-semibold team-accent-text hover:underline shrink-0"
+                        className="text-[11px] font-bold team-accent-text hover:underline shrink-0"
                       >
                         가격조정
                       </button>
                     </div>
 
-                    <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-md px-3.5 py-2.5 flex items-center justify-between gap-2">
+                    <div className="gm-card px-4 py-3 flex items-center justify-between gap-2">
                       <div className="min-w-0">
                         <div className="text-[11px] text-slate-500 flex items-center gap-1">
                           <ClipboardCheck className="w-3.5 h-3.5 team-accent-text" />
@@ -1630,7 +1762,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         <button
                           type="button"
                           onClick={() => handleQuickApplyCoachSwap(activeCoachSwap.id)}
-                          className="px-2.5 py-1 rounded team-accent-btn text-[11px] font-bold shrink-0"
+                          className="px-2.5 py-1 rounded-lg team-accent-btn text-[11px] font-bold shrink-0"
                         >
                           추천 교체
                         </button>
@@ -1638,7 +1770,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         <button
                           type="button"
                           onClick={() => setActiveTab('news')}
-                          className="text-[11px] font-semibold team-accent-text hover:underline shrink-0"
+                          className="text-[11px] font-bold team-accent-text hover:underline shrink-0"
                         >
                           보고함
                         </button>
@@ -2155,7 +2287,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
                   {/* Club Rivalry Summary Strip */}
                   {myRivalries.length > 0 && (
-                    <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-md p-4 space-y-2.5">
+                    <div className="gm-card p-4 space-y-3">
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="flex items-center gap-1.5 text-sm font-bold">
                           <Flame className="w-4 h-4 text-rose-600 dark:text-rose-400" />
@@ -2179,7 +2311,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           return (
                             <div
                               key={riv.id}
-                              className="p-3 rounded border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-950/50 space-y-1.5"
+                              className="p-3 rounded-lg border border-slate-200/80 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/50 hover:border-rose-300/70 dark:hover:border-rose-500/40 transition-colors space-y-1.5"
                             >
                               <div className="flex items-center justify-between gap-2">
                                 <div className="flex items-center gap-2 min-w-0">
@@ -2188,7 +2320,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                                     vs {KBO_TEAMS[oppId].shortName} · {riv.name}
                                   </span>
                                 </div>
-                                <span className="font-mono-stats text-[11px] font-bold text-rose-600 dark:text-rose-400 shrink-0">
+                                <span className="px-1.5 py-0.5 rounded-md bg-rose-500/10 text-rose-600 dark:text-rose-400 font-mono-stats text-[11px] font-bold shrink-0">
                                   열기 {riv.intensity}
                                 </span>
                               </div>
@@ -2211,9 +2343,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
                   {/* Two-Column Operational Summary: Fixed Vertical Lineup + Top 10 Standings */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-md p-4 space-y-2.5">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-bold">현재 선발 타순 (1~9번)</h3>
+                    <div className="gm-card p-4 space-y-2.5">
+                      <div className="flex items-center justify-between gap-2 pb-1 border-b border-slate-100 dark:border-slate-800/80">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm font-extrabold tracking-tight">현재 선발 타순 (1~9번)</h3>
+                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                            선수 클릭 시 상세
+                          </span>
+                        </div>
                         <button
                           type="button"
                           onClick={() => setActiveTab('roster')}
@@ -2222,48 +2359,81 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           타순 · 로테이션 편집
                         </button>
                       </div>
-                      <div className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+                      <div className="divide-y divide-slate-100 dark:divide-slate-800/70 text-xs">
                         {teamState.lineupOrder.map((pid, idx) => {
                           const p = career.players[pid];
                           if (!p) return null;
                           const pos = teamState.lineupPositions[p.id] ?? p.position;
+                          const isSecondaryPos = pos !== 'DH' && pos !== p.position;
+                          const ovrBadgeCls =
+                            p.ability >= 84
+                              ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30'
+                              : p.ability >= 74
+                              ? 'bg-emerald-500/12 text-emerald-700 dark:text-emerald-300 border-emerald-500/25'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700';
+                          const formCls =
+                            p.form >= 2
+                              ? 'text-emerald-600 dark:text-emerald-400'
+                              : p.form <= -2
+                              ? 'text-rose-600 dark:text-rose-400'
+                              : 'text-slate-400 dark:text-slate-500';
                           return (
-                            <div key={`${pid}-${idx}`} className="py-1.5 flex items-center justify-between gap-2">
+                            <button
+                              key={`${pid}-${idx}`}
+                              type="button"
+                              onClick={() => setSelectedPlayerId(p.id)}
+                              className="w-full py-2 px-1.5 -mx-1.5 rounded-md flex items-center justify-between gap-2 text-left hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                            >
                               <span className="font-semibold flex items-center gap-1.5 min-w-0 whitespace-nowrap">
-                                <span className="font-mono-stats team-accent-text shrink-0">
-                                  {idx + 1}.
+                                <span className="w-5 h-5 rounded-md team-accent-soft border text-[11px] font-mono-stats font-bold inline-flex items-center justify-center shrink-0">
+                                  {idx + 1}
                                 </span>
                                 {p.uniformNumber !== undefined && (
                                   <span className="font-mono-stats text-[11px] text-slate-400 shrink-0">
                                     #{p.uniformNumber}
                                   </span>
                                 )}
-                                <span className="truncate">{p.name}</span>
+                                <span className="truncate font-bold text-slate-900 dark:text-slate-100">
+                                  {p.name}
+                                </span>
                                 <FranchiseStarIcon active={isFranchiseStarPlayer(career, p)} />
                                 <PlayerForeignFlag player={p} />
                                 <span
-                                  className={`text-[11px] shrink-0 ${
+                                  className={`px-1.5 py-0.5 rounded text-[10px] font-bold shrink-0 ${
                                     pos === 'DH'
-                                      ? 'font-semibold text-amber-700 dark:text-amber-400'
-                                      : 'text-slate-500 font-normal'
+                                      ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                                      : isSecondaryPos
+                                      ? 'bg-sky-500/15 text-sky-700 dark:text-sky-300'
+                                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
                                   }`}
                                 >
                                   {pos === 'DH' && p.position !== 'DH' ? `${p.position}→DH` : pos}
                                 </span>
                                 <PlayerCompactTag career={career} player={p} />
                               </span>
-                              <span className="font-mono-stats text-slate-500 shrink-0">
-                                {p.ability}/{p.potential} ({p.form >= 0 ? `+${p.form}` : p.form})
+                              <span className="flex items-center gap-1.5 font-mono-stats shrink-0">
+                                <span className={`px-1.5 py-0.5 rounded border text-[11px] font-bold ${ovrBadgeCls}`}>
+                                  {p.ability}
+                                  <span className="opacity-65 font-medium">/{p.potential}</span>
+                                </span>
+                                <span className={`text-[11px] font-bold w-6 text-right ${formCls}`}>
+                                  {p.form >= 0 ? `+${p.form}` : p.form}
+                                </span>
                               </span>
-                            </div>
+                            </button>
                           );
                         })}
                       </div>
                     </div>
 
-                    <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-md p-4 space-y-2.5">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-bold">리그 순위 요약</h3>
+                    <div className="gm-card p-4 space-y-2.5">
+                      <div className="flex items-center justify-between gap-2 pb-1 border-b border-slate-100 dark:border-slate-800/80">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm font-extrabold tracking-tight">리그 순위 요약</h3>
+                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
+                            5강 PS 컷라인
+                          </span>
+                        </div>
                         <button
                           type="button"
                           onClick={() => setActiveTab('standings')}
@@ -2274,33 +2444,40 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       </div>
                       <div className="overflow-x-auto">
                         <table className="w-full text-xs text-left font-mono-stats">
-                          <thead className="border-b border-slate-200 dark:border-slate-800 text-slate-500">
+                          <thead className="bg-slate-50/90 dark:bg-slate-950/60 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400">
                             <tr>
-                              <th className="py-1.5 px-2 font-sans">순위</th>
-                              <th className="py-1.5 px-2 font-sans">구단</th>
-                              <th className="py-1.5 px-2 text-right font-sans">승</th>
-                              <th className="py-1.5 px-2 text-right font-sans">패</th>
-                              <th className="py-1.5 px-2 text-right font-sans">승률</th>
-                              <th className="py-1.5 px-2 text-right font-sans">게임차</th>
+                              <th className="py-2 px-2 font-sans font-semibold">순위</th>
+                              <th className="py-2 px-2 font-sans font-semibold">구단</th>
+                              <th className="py-2 px-2 text-right font-sans font-semibold">승</th>
+                              <th className="py-2 px-2 text-right font-sans font-semibold">패</th>
+                              <th className="py-2 px-2 text-right font-sans font-semibold">승률</th>
+                              <th className="py-2 px-2 text-right font-sans font-semibold">게임차</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                            {standings.map((r) => {
+                          <tbody className="divide-y divide-slate-100 dark:divide-slate-800/70">
+                            {standings.map((r, rowIdx) => {
                               const prevRank = career.previousStandingsRanks?.[r.teamId];
                               const rankDelta =
                                 typeof prevRank === 'number' && r.games > 0 ? prevRank - r.rank : 0;
+                              const isMyTeam = r.teamId === career.playerTeamId;
                               return (
                                 <tr
                                   key={r.teamId}
-                                  className={
-                                    r.teamId === career.playerTeamId
+                                  className={`transition-colors ${
+                                    isMyTeam
                                       ? 'team-accent-row font-bold'
+                                      : 'hover:bg-slate-50/80 dark:hover:bg-slate-800/40'
+                                  } ${
+                                    rowIdx === 4
+                                      ? 'border-b-2 border-b-emerald-500/45 dark:border-b-emerald-400/40'
                                       : ''
-                                  }
+                                  }`}
                                 >
-                                  <td className="py-1.5 px-2 whitespace-nowrap">
+                                  <td className="py-2 px-2 whitespace-nowrap">
                                     <div className="inline-flex items-center gap-1">
-                                      <span>{r.isTied ? `공동 ${r.rank}` : r.rank}</span>
+                                      <span className={r.rank <= 5 ? 'text-slate-900 dark:text-slate-100 font-bold' : 'text-slate-500'}>
+                                        {r.isTied ? `공동 ${r.rank}` : r.rank}
+                                      </span>
                                       {typeof prevRank === 'number' && r.games > 0 && (
                                         <span
                                           className={`text-[10px] font-bold ${
@@ -2321,16 +2498,20 @@ export const Dashboard: React.FC<DashboardProps> = ({
                                       )}
                                     </div>
                                   </td>
-                                  <td className="py-1.5 px-2 font-sans">
+                                  <td className="py-2 px-2 font-sans">
                                     <div className="flex items-center gap-2">
                                       <TeamLogo teamId={r.teamId} size="xs" />
-                                      <span>{KBO_TEAMS[r.teamId].shortName}</span>
+                                      <span className={isMyTeam ? 'font-extrabold' : 'font-semibold'}>
+                                        {KBO_TEAMS[r.teamId].shortName}
+                                      </span>
                                     </div>
                                   </td>
-                                  <td className="py-1.5 px-2 text-right">{r.wins}</td>
-                                  <td className="py-1.5 px-2 text-right">{r.losses}</td>
-                                  <td className="py-1.5 px-2 text-right">{r.pct.toFixed(3)}</td>
-                                  <td className="py-1.5 px-2 text-right">{r.gb === 0 ? '—' : r.gb.toFixed(1)}</td>
+                                  <td className="py-2 px-2 text-right">{r.wins}</td>
+                                  <td className="py-2 px-2 text-right">{r.losses}</td>
+                                  <td className="py-2 px-2 text-right">{r.pct.toFixed(3)}</td>
+                                  <td className="py-2 px-2 text-right text-slate-500 dark:text-slate-400">
+                                    {r.gb === 0 ? '—' : r.gb.toFixed(1)}
+                                  </td>
                                 </tr>
                               );
                             })}
