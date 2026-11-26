@@ -23,6 +23,7 @@ import { computeSeasonAwards } from '../engine/transactions';
 import { AwardEntry, CareerSave, Position, SeasonAwards, TeamId } from '../types/kbo';
 import { KoreanSeriesTrophyLogo } from './KoreanSeriesTrophyLogo';
 import { GoldenGloveIcon } from './GoldenGloveIcon';
+import { KboMvpTrophyIcon, KboRoyTrophyIcon } from './KboAwardTrophyIcons';
 import { TeamLogo } from './TeamLogo';
 
 interface KboAwardsCeremonyViewProps {
@@ -320,7 +321,7 @@ export const KboAwardsCeremonyView: React.FC<KboAwardsCeremonyViewProps> = ({
             <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2 font-bold text-sm text-slate-900 dark:text-white">
-                  <Trophy className="w-4 h-4 text-amber-500" />
+                  <KboMvpTrophyIcon size="sm" />
                   정규시즌 MVP 후보 TOP 10
                 </div>
                 <span className="text-[11px] text-slate-500 dark:text-slate-400">
@@ -371,7 +372,7 @@ export const KboAwardsCeremonyView: React.FC<KboAwardsCeremonyViewProps> = ({
             <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 p-4">
               <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
                 <div className="flex items-center gap-2 font-bold text-sm text-slate-900 dark:text-white">
-                  <Crown className="w-4 h-4 text-sky-500" />
+                  <KboRoyTrophyIcon size="sm" />
                   신인왕 후보 TOP 10 (기자단 AI 예상)
                 </div>
                 <span className="text-[11px] text-slate-500 dark:text-slate-400">
@@ -698,11 +699,12 @@ export const KboAwardsCeremonyView: React.FC<KboAwardsCeremonyViewProps> = ({
             <div className="kbo-gala-stage rounded-xl border-2 border-amber-400/75 p-5 text-white shadow-xl space-y-4 animate-award-enter">
               <div className="flex items-center justify-between gap-2">
                 <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-gradient-to-r from-amber-500 to-yellow-300 text-slate-950 text-xs font-black">
-                  <Crown className="w-3.5 h-3.5" />
+                  <KboMvpTrophyIcon size="xs" />
                   <span>{activeAwards.season} 정규시즌 MVP</span>
                 </div>
-                <span className="text-[11px] font-semibold text-amber-200/90">
-                  투·타 통합 리그 전체 1명
+                <span className="text-[11px] font-semibold text-amber-200/90 flex items-center gap-1.5">
+                  <span>투·타 통합 리그 전체 1명</span>
+                  <KboMvpTrophyIcon size="sm" />
                 </span>
               </div>
 
@@ -748,11 +750,12 @@ export const KboAwardsCeremonyView: React.FC<KboAwardsCeremonyViewProps> = ({
             <div className="kbo-gala-stage rounded-xl border border-emerald-400/55 p-5 text-white shadow-xl space-y-4 animate-award-enter">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-400 text-slate-950 text-xs font-black">
-                  <Star className="w-3.5 h-3.5" />
+                  <KboRoyTrophyIcon size="xs" />
                   <span>{activeAwards.season} KBO 신인왕</span>
                 </div>
-                <span className="text-[11px] font-semibold text-emerald-200/90">
-                  입단 6년 차 이내 · ≤30IP/≤60PA · 기자단 AI {activeAwards.rookiePressVoterCount ?? 100}인 투표
+                <span className="text-[11px] font-semibold text-emerald-200/90 flex items-center gap-1.5">
+                  <span>입단 6년 차 이내 · ≤30IP/≤60PA · 기자단 AI {activeAwards.rookiePressVoterCount ?? 100}인 투표</span>
+                  <KboRoyTrophyIcon size="sm" />
                 </span>
               </div>
 
@@ -967,7 +970,7 @@ export const KboAwardsCeremonyView: React.FC<KboAwardsCeremonyViewProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-lg p-4 space-y-2.5">
               <div className="text-sm font-extrabold flex items-center gap-1.5">
-                <Crown className="w-4 h-4 text-amber-500" />
+                <KboMvpTrophyIcon size="sm" />
                 <span>정규시즌 MVP 실시간 선두권 (0~100 정규화)</span>
               </div>
               {liveProjection.topMvp.length === 0 ? (
@@ -1004,7 +1007,7 @@ export const KboAwardsCeremonyView: React.FC<KboAwardsCeremonyViewProps> = ({
             <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-lg p-4 space-y-2.5">
               <div className="text-sm font-extrabold flex items-center justify-between gap-1.5">
                 <span className="flex items-center gap-1.5">
-                  <Star className="w-4 h-4 text-emerald-500" />
+                  <KboRoyTrophyIcon size="sm" />
                   <span>신인왕 공식 자격 후보 선두권 (기자단 AI 예상)</span>
                 </span>
                 <span className="text-[10px] font-normal text-slate-400">입단 6년 차 이내 · 나이 무관</span>
@@ -1102,9 +1105,21 @@ export const KboAwardsCeremonyView: React.FC<KboAwardsCeremonyViewProps> = ({
                   }`}
                 >
                   <span className="font-mono-stats font-black">{h.season} 시즌</span>
-                  <span className="text-[11px] text-slate-600 dark:text-slate-300">
-                    MVP: <strong>{h.mvp?.playerName ?? '-'}</strong> · 신인왕:{' '}
-                    <strong>{h.rookieOfYear?.playerName ?? '-'}</strong> · GG {h.goldenGloves.length}인
+                  <span className="text-[11px] text-slate-600 dark:text-slate-300 flex flex-wrap items-center gap-1.5">
+                    <span className="inline-flex items-center gap-1">
+                      <KboMvpTrophyIcon size="xs" />
+                      MVP: <strong>{h.mvp?.playerName ?? '-'}</strong>
+                    </span>
+                    <span>·</span>
+                    <span className="inline-flex items-center gap-1">
+                      <KboRoyTrophyIcon size="xs" />
+                      신인왕: <strong>{h.rookieOfYear?.playerName ?? '-'}</strong>
+                    </span>
+                    <span>·</span>
+                    <span className="inline-flex items-center gap-1">
+                      <GoldenGloveIcon size="xs" />
+                      GG {h.goldenGloves.length}인
+                    </span>
                   </span>
                 </button>
               ))}

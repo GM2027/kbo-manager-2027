@@ -4,6 +4,7 @@ import { audioManager, SoundEventId } from '../audio/audioManager';
 import { KBO_TEAMS } from '../data/kboTeams';
 import { AwardEntry, TeamId } from '../types/kbo';
 import { GoldenGloveIcon } from './GoldenGloveIcon';
+import { KboMvpTrophyIcon, KboRoyTrophyIcon } from './KboAwardTrophyIcons';
 import { KoreanSeriesTrophyLogo } from './KoreanSeriesTrophyLogo';
 import { TeamLogo } from './TeamLogo';
 
@@ -992,12 +993,19 @@ export const GameEventAnimations: React.FC<GameEventAnimationsProps> = ({
           className="animate-award-enter relative z-10 w-full max-w-lg rounded-2xl border border-white/20 bg-slate-950/88 p-6 sm:p-8 text-center shadow-[0_26px_70px_rgba(0,0,0,0.8)] space-y-4"
         >
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[11px] font-black tracking-[0.22em] uppercase" style={{ color: item.accent }}>
-            {stepIdx === 0 && event.mvp ? <Trophy className="w-3.5 h-3.5" /> : <Crown className="w-3.5 h-3.5" />}
+            {stepIdx === 0 && event.mvp ? <KboMvpTrophyIcon size="xs" /> : <KboRoyTrophyIcon size="xs" />}
             <span>{event.season} {item.badge}</span>
           </div>
 
-          <div className="mx-auto w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white p-3 flex items-center justify-center ring-4 shadow-xl" style={{ ['--tw-ring-color' as string]: team.primaryColor }}>
-            <TeamLogo teamId={item.entry.teamId} size="xl" bare className="w-full h-full" />
+          <div className="flex items-center justify-center gap-4">
+            {stepIdx === 0 && event.mvp ? (
+              <KboMvpTrophyIcon size="lg" className="drop-shadow-[0_6px_18px_rgba(250,204,21,0.45)]" />
+            ) : (
+              <KboRoyTrophyIcon size="lg" className="drop-shadow-[0_6px_18px_rgba(56,189,248,0.45)]" />
+            )}
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white p-3 flex items-center justify-center ring-4 shadow-xl" style={{ ['--tw-ring-color' as string]: team.primaryColor }}>
+              <TeamLogo teamId={item.entry.teamId} size="xl" bare className="w-full h-full" />
+            </div>
           </div>
 
           <div className="space-y-1">

@@ -27,6 +27,7 @@ import {
   evaluatePlayerTradeValuationDetailed,
 } from '../engine/franchiseStarEngine';
 import { evaluateOpeningDayRookieEligibility } from '../engine/kboAwardsEngine';
+import { KboRoyTrophyIcon } from './KboAwardTrophyIcons';
 import {
   computeYoYSalaryChange,
   countDistinctMlbSeasons,
@@ -447,6 +448,7 @@ export const PlayerDetailModal: React.FC<PlayerDetailModalProps> = ({
                 }`}
               >
                 <div className="flex items-center gap-2 min-w-0">
+                  {royElig.eligible && <KboRoyTrophyIcon size="xs" />}
                   <span
                     className={`px-2 py-0.5 rounded-full font-extrabold text-[10px] shrink-0 ${
                       royElig.eligible
