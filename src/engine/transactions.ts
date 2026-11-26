@@ -2646,6 +2646,12 @@ export function togglePitcherRotationSpot(
   const team = next.teams[next.playerTeamId];
   const p = next.players[pitcherId];
   const inRot = team.rotationOrder.includes(pitcherId);
+  const prevRot = [...team.rotationOrder];
+  const prevNormIdx =
+    prevRot.length > 0
+      ? (((team.nextStarterIdx ?? 0) % prevRot.length) + prevRot.length) % prevRot.length
+      : 0;
+  const prevNextStarterId = prevRot[prevNormIdx];
 
   if (inRot) {
     if (team.rotationOrder.length <= 3) {
@@ -2665,6 +2671,12 @@ export function togglePitcherRotationSpot(
     team.rotationOrder = [...team.rotationOrder, pitcherId];
     p.pitchRole = '선발';
     p.dissatisfaction = Math.max(0, (p.dissatisfaction ?? 20) - 5);
+  }
+
+  if (team.rotationOrder.length > 0) {
+    const keptIdx = prevNextStarterId ? team.rotationOrder.indexOf(prevNextStarterId) : -1;
+    team.nextStarterIdx =
+      keptIdx >= 0 ? keptIdx : prevNormIdx % team.rotationOrder.length;
   }
   next.updatedAt = new Date().toISOString();
   return next;

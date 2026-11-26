@@ -5153,6 +5153,7 @@ export function applyCoachFormRecommendation(
       tState.benchOrder.unshift(rec.outPlayerId);
     }
     if (next.players[rec.inPlayerId]) next.players[rec.inPlayerId].gameDayActive = true;
+    reconcileTeamLineupPositionsInPlace(next, next.playerTeamId);
   } else {
     const idx = tState.rotationOrder.indexOf(rec.outPlayerId);
     if (idx < 0) return next;
@@ -5586,6 +5587,54 @@ export function getManagerPreGameRecommendation(
   };
 }
 
+function resolvePreservedNextStarterIdx(
+  prevRot: string[],
+  prevNextStarterIdx: number,
+  newRot: string[],
+  players: Record<string, Player>,
+  gamesPlayed: number
+): number {
+  if (newRot.length === 0) return 0;
+  const normalizedPrevIdx =
+    prevRot.length > 0
+      ? ((prevNextStarterIdx % prevRot.length) + prevRot.length) % prevRot.length
+      : 0;
+  const prevNextStarterId = prevRot[normalizedPrevIdx];
+
+  // 1) 기존 다음 등판 예정 투수가 새 로테이션에도 포함되어 있으면 그 투수의 새 순번을 그대로 유지 (1선발 초기화 금지)
+  if (prevNextStarterId) {
+    const preservedIdx = newRot.indexOf(prevNextStarterId);
+    if (preservedIdx >= 0) {
+      return preservedIdx;
+    }
+  }
+
+  // 2) 기존 다음 등판 투수가 로테이션에서 제외된 경우: 같은 순번의 대체 투수가 충분한 휴식을 취했다면 그 순번 유지
+  const fallbackSlotIdx = normalizedPrevIdx % newRot.length;
+  const slotCandidate = players[newRot[fallbackSlotIdx]];
+  const slotRestGap =
+    gamesPlayed <= 0
+      ? 99
+      : gamesPlayed - (slotCandidate?.lastPitchedRound ?? -10);
+  if (slotRestGap >= 3 && !slotCandidate?.injury) {
+    return fallbackSlotIdx;
+  }
+
+  // 3) 같은 순번 투수가 최근 등판해 피로하다면 새 로테이션 중 가장 휴식이 충분한(가장 오래 전 등판한) 투수 선택
+  let bestIdx = fallbackSlotIdx;
+  let bestLastRound = Number.POSITIVE_INFINITY;
+  for (let i = 0; i < newRot.length; i++) {
+    const cand = players[newRot[i]];
+    if (cand?.injury) continue;
+    const lastR = cand?.lastPitchedRound ?? -10;
+    if (lastR < bestLastRound) {
+      bestLastRound = lastR;
+      bestIdx = i;
+    }
+  }
+  return bestIdx;
+}
+
 export function applyManagerPreGameRecommendation(
   career: CareerSave,
   mode: 'lineup' | 'rotation' | 'both'
@@ -5603,18 +5652,28 @@ export function applyManagerPreGameRecommendation(
         tState.lineupPositions[item.playerId] = item.assignedPosition;
         if (next.players[item.playerId]) next.players[item.playerId].gameDayActive = true;
       }
+      reconcileTeamLineupPositionsInPlace(next, myTeam);
       const allFirstHitters = Object.values(next.players)
         .filter((p) => p.teamId === myTeam && p.role === '타자' && p.rosterTier === '1군')
         .map((p) => p.id);
-      tState.benchOrder = allFirstHitters.filter((id) => !newOrder.includes(id));
+      tState.benchOrder = allFirstHitters.filter((id) => !tState.lineupOrder.includes(id));
     }
   }
 
   if (mode === 'rotation' || mode === 'both') {
     const newRot = rec.recommendedRotation.map((x) => x.playerId);
     if (newRot.length >= 3) {
+      const prevRot = [...tState.rotationOrder];
+      const prevNextIdx = tState.nextStarterIdx ?? 0;
       tState.rotationOrder = newRot;
-      tState.nextStarterIdx = 0;
+      // 다음 등판 예정 선발 투수 순번을 보존 (선발 일괄 적용 시 1선발로 강제 초기화되는 오류 방지)
+      tState.nextStarterIdx = resolvePreservedNextStarterIdx(
+        prevRot,
+        prevNextIdx,
+        newRot,
+        next.players,
+        next.gamesPlayed
+      );
       for (const pid of newRot) {
         if (next.players[pid]) {
           next.players[pid].pitchRole = '선발';
