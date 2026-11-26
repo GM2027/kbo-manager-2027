@@ -796,7 +796,13 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                           {myBid.years}년 총액 {myBid.totalBillion.toFixed(1)}억
                         </span>{' '}
                         <span className="text-[11px] text-slate-500">
-                          ({myBid.isOriginalClub ? '원소속 재계약 · 보상 없음' : `외부 FA ${neg.faGrade}등급`})
+                          (
+                          {myBid.isOriginalClub
+                            ? '원소속 재계약 · 보상 없음'
+                            : career.players[neg.playerId]?.releasedAfter2026
+                            ? '방출 자유계약 · 보상 없음'
+                            : `외부 FA ${neg.faGrade}등급`}
+                          )
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5">
@@ -817,22 +823,41 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                           onClick={() => {
                             const targetPlayer = career.players[neg.playerId];
                             if (!targetPlayer) return;
-                            const isOrig = (targetPlayer.formerTeamId ?? targetPlayer.teamId) === career.playerTeamId;
-                            const estSigningBonus = Number((myBid.totalBillion * 0.4).toFixed(2));
-                            const estAnnual = Number(
-                              ((myBid.totalBillion - estSigningBonus) / Math.max(1, myBid.years)).toFixed(2)
+                            const isOrig =
+                              (neg.formerTeamId ?? targetPlayer.formerTeamId ?? targetPlayer.teamId) ===
+                              career.playerTeamId;
+                            const isReleasedFreeAgent = Boolean(targetPlayer.releasedAfter2026);
+                            const exactBreakdown = calculateExactFaContractBreakdown(
+                              myBid.totalBillion,
+                              myBid.years,
+                              {
+                                age: targetPlayer.age,
+                                injuryHistoryCount: targetPlayer.injuryHistoryCount,
+                                season: career.season,
+                              }
                             );
+                            const matchedExt = !isOrig
+                              ? getExternalFaMarket(career).find((x) => x.player.id === neg.playerId)
+                              : undefined;
+                            const cComp =
+                              !isOrig && !isReleasedFreeAgent && (matchedExt?.grade ?? neg.faGrade) === 'C'
+                                ? (matchedExt?.cashCompBillion ?? 0)
+                                : 0;
                             const preview = previewContractSalaryCapImpact(career, {
-                              title: `${targetPlayer.name} ${isOrig ? '원소속 FA' : '외부 FA'} 최종 계약 승인 (${myBid.years}년 ${myBid.totalBillion.toFixed(1)}억 원)`,
+                              title: `${targetPlayer.name} ${isOrig ? '원소속 FA' : '외부 FA'} 최종 계약 승인 (${exactBreakdown.years}년 ${exactBreakdown.totalBillion.toFixed(1)}억 원)`,
                               items: [
                                 {
                                   existingPlayerId: targetPlayer.id,
                                   playerName: targetPlayer.name,
                                   category: '국내',
-                                  years: myBid.years,
-                                  annualSalaryBillion: estAnnual,
-                                  signingBonusBillion: estSigningBonus,
-                                  cashRequiredNowBillion: estSigningBonus,
+                                  years: exactBreakdown.years,
+                                  annualSalaryBillion: exactBreakdown.annualSalaryBillion,
+                                  signingBonusBillion: exactBreakdown.signingBonusBillion,
+                                  optionBonusExpectedBillion: Number(
+                                    (exactBreakdown.optionTotalBillion / Math.max(1, exactBreakdown.years)).toFixed(2)
+                                  ),
+                                  cashRequiredNowBillion: exactBreakdown.signingBonusBillion,
+                                  extraCompensationBillion: cComp,
                                 },
                               ],
                             });
@@ -841,12 +866,17 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                               confirmLabel: '단장 최종 FA 계약 확정 승인',
                               execute: () => {
                                 try {
+                                  setNotice(null);
                                   const res = signExternalFaPlayer(
                                     career,
                                     neg.playerId,
                                     myBid.years,
-                                    myBid.totalBillion
+                                    myBid.totalBillion,
+                                    { fromPendingApproval: true }
                                   );
+                                  if (res.accepted) {
+                                    setProtectedSelection([]);
+                                  }
                                   onUpdateCareer(res.nextCareer, res.backupSnapshot);
                                   setNotice({ type: res.accepted ? 'ok' : 'err', text: res.message });
                                 } catch (err) {

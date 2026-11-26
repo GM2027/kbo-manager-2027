@@ -1527,7 +1527,7 @@ export function evaluatePlayerContractAcceptance(
   fairTotalBillion: number
 ): { accepted: boolean; reason: string; rivalTeamId?: TeamId; competingBidBillion?: number } {
   ensureDeepFranchiseState(career);
-  const diff = DIFFICULTY_CONFIG[career.difficulty ?? '어려움'];
+  const diff = DIFFICULTY_CONFIG[career.difficulty ?? '어려움'] ?? DIFFICULTY_CONFIG['어려움'];
   const agent = player.agent ?? buildPlayerAgent(player);
   const standings = computeStandings(career.gamesLedger);
   const myRank = standings.find((r) => r.teamId === career.playerTeamId)?.rank ?? 5;

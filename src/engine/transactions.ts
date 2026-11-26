@@ -5070,18 +5070,30 @@ export interface ExternalFaListing {
 
 function buildFaListing(career: CareerSave, p: Player): ExternalFaListing | null {
   const q = computeFaQualification(career, p);
-  const grade = q.grade ?? p.contract.faGrade;
+  const negGrade = career.faCompetition?.negotiations[p.id]?.faGrade;
+  const grade =
+    q.grade ??
+    p.contract.faGrade ??
+    p.faApproved2027Grade ??
+    negGrade ??
+    (p.rosterTier === 'FA' ? 'C' : null);
   if (!grade) return null;
   const val = evaluateFaGradeAndComp(career, p);
-  const protectionLimit: 20 | 25 | null = grade === 'A' ? 20 : grade === 'B' ? 25 : null;
+  const protectionLimit: 20 | 25 | null = p.releasedAfter2026
+    ? null
+    : grade === 'A'
+    ? 20
+    : grade === 'B'
+    ? 25
+    : null;
   return {
     player: p,
     grade,
-    compensationRule: q.compensationRule,
+    compensationRule: p.releasedAfter2026 ? '방출 자유계약 (보상금·보상선수 없음)' : q.compensationRule,
     fairYears: val.fairYears,
     maxRealisticYears: val.maxRealisticYears,
     fairTotalBillion: val.fairTotalBillion,
-    cashCompBillion: val.cashCompBillion,
+    cashCompBillion: p.releasedAfter2026 ? 0 : val.cashCompBillion,
     protectionLimit,
     tierLabel: val.tierLabel,
     isMegaFranchise: val.isMegaFranchise,
@@ -5254,7 +5266,8 @@ export function signExternalFaPlayer(
   career: CareerSave,
   playerId: string,
   offerYears: number,
-  offerTotalBillion: number
+  offerTotalBillion: number,
+  options?: { fromPendingApproval?: boolean }
 ): {
   nextCareer: CareerSave;
   backupSnapshot: CareerSave;
@@ -5277,8 +5290,21 @@ export function signExternalFaPlayer(
 
     const p = next.players[playerId];
     if (!p) throw new Error('대상 FA 선수를 찾을 수 없습니다.');
-    const originTeam = p.formerTeamId ?? p.teamId;
+
+    const pendingNeg = next.faCompetition?.negotiations[playerId];
+    const pendingUserBid =
+      pendingNeg?.status === '단장승인대기' && pendingNeg.pendingWinnerTeamId === next.playerTeamId
+        ? pendingNeg.bids.find((b) => b.teamId === next.playerTeamId)
+        : undefined;
+    const isPendingGmApproval =
+      Boolean(pendingUserBid) &&
+      (Boolean(options?.fromPendingApproval) ||
+        (Math.round(offerYears) >= pendingUserBid!.years &&
+          offerTotalBillion >= pendingUserBid!.totalBillion - 0.05));
+
+    const originTeam = pendingNeg?.formerTeamId ?? p.formerTeamId ?? p.teamId;
     const isOwnFormerFa = p.rosterTier === 'FA' && originTeam === next.playerTeamId;
+    const isReleasedFreeAgent = Boolean(p.releasedAfter2026);
 
     if (!isOwnFormerFa && p.teamId === next.playerTeamId && p.rosterTier !== 'FA') {
       throw new Error('이미 우리 구단과 계약되어 있는 선수입니다 (중복 계약 방지).');
@@ -5286,15 +5312,21 @@ export function signExternalFaPlayer(
     if (p.signedAsFaSeason === next.season) {
       throw new Error('이미 올 시즌 FA 계약을 체결한 선수입니다 (중복 계약 방지).');
     }
-    if (!isOwnFormerFa && getTeamExternalFaSigningCount(next, next.playerTeamId) >= MAX_EXTERNAL_FA_PER_CLUB) {
+    if (
+      !isOwnFormerFa &&
+      !isReleasedFreeAgent &&
+      getTeamExternalFaSigningCount(next, next.playerTeamId) >= MAX_EXTERNAL_FA_PER_CLUB
+    ) {
       throw new Error(
         `KBO 규정상 단일 시즌 외부 FA 영입은 최대 ${MAX_EXTERNAL_FA_PER_CLUB}명까지 가능합니다. (원소속팀 FA 재계약은 제한 없음)`
       );
     }
 
-    const listing = isOwnFormerFa
-      ? getMyDepartedFaPlayers(next).find((x) => x.player.id === playerId)
-      : getExternalFaMarket(next).find((x) => x.player.id === playerId);
+    const listing =
+      (isOwnFormerFa
+        ? getMyDepartedFaPlayers(next).find((x) => x.player.id === playerId)
+        : getExternalFaMarket(next).find((x) => x.player.id === playerId)) ??
+      (p.rosterTier === 'FA' || isPendingGmApproval ? buildFaListing(next, p) : null);
     if (!listing) {
       throw new Error('현재 FA 자격을 충족하지 않은 선수입니다.');
     }
@@ -5304,9 +5336,13 @@ export function signExternalFaPlayer(
       franchiseScore: listing.franchiseScore,
       potential: p.potential,
     });
-    if (Math.round(offerYears) > maxRealisticYears) {
+    const effectiveMaxYears =
+      isPendingGmApproval && pendingUserBid
+        ? Math.max(maxRealisticYears, pendingUserBid.years)
+        : maxRealisticYears;
+    if (Math.round(offerYears) > effectiveMaxYears) {
       throw new Error(
-        `계약 기간 현실성 제한: 만 ${p.age}세 ${p.name} 선수의 최대 현실적 FA 계약 기간은 ${maxRealisticYears}년입니다.`
+        `계약 기간 현실성 제한: 만 ${p.age}세 ${p.name} 선수의 최대 현실적 FA 계약 기간은 ${effectiveMaxYears}년입니다.`
       );
     }
 
@@ -5316,24 +5352,28 @@ export function signExternalFaPlayer(
       season: next.season,
     });
     const signingBonus = exactBreakdown.signingBonusBillion;
-    const cComp = !isOwnFormerFa && listing.grade === 'C' ? listing.cashCompBillion : 0;
+    const cComp = !isOwnFormerFa && !isReleasedFreeAgent && listing.grade === 'C' ? listing.cashCompBillion : 0;
     const upFrontCash = Number((signingBonus + cComp).toFixed(2));
     if (next.finances.cashBalanceBillion !== null && next.finances.cashBalanceBillion < upFrontCash) {
       throw new Error(`계약금${cComp > 0 ? '+C등급 보상금' : ''}(${upFrontCash}억 원)이 보유 자금을 초과합니다.`);
     }
 
-    // Evaluate agent preference + difficulty rival bidding (#6, #23)
-    // 단, 샐러리캡 상한 초과만을 이유로 계약을 자동 취소하지 않습니다.
+    // 단장 최종 승인 대기(이미 선수가 우리 구단 제안을 최우선 수락한 상태)에서는 에이전트 재심사·경쟁 거절을 재실행하지 않고 즉시 체결
     const ownClubFairBase = listing.isMegaFranchise
       ? Number((listing.fairTotalBillion * 0.96).toFixed(1))
       : Number((listing.fairTotalBillion * 0.94).toFixed(1));
-    const evalRes = evaluatePlayerContractAcceptance(
-      next,
-      p,
-      offerTotalBillion,
-      offerYears,
-      isOwnFormerFa ? ownClubFairBase : listing.fairTotalBillion
-    );
+    const evalRes = isPendingGmApproval
+      ? {
+          accepted: true,
+          reason: `${p.name} 선수가 단장 최종 승인을 통해 ${exactBreakdown.years}년 총액 ${exactBreakdown.totalBillion.toFixed(1)}억 원 계약을 확정했습니다.`,
+        }
+      : evaluatePlayerContractAcceptance(
+          next,
+          p,
+          offerTotalBillion,
+          offerYears,
+          isOwnFormerFa ? ownClubFairBase : listing.fairTotalBillion
+        );
     if (!evalRes.accepted) {
       return {
         accepted: false,
@@ -5400,7 +5440,12 @@ export function signExternalFaPlayer(
 
     const faSeasonRule = getKboFaCompensationRuleForSeason(next.season, listing.grade);
     let needsProtectionList = false;
-    if (!isOwnFormerFa && faSeasonRule.playerCompensationAllowed && (listing.grade === 'A' || listing.grade === 'B')) {
+    if (
+      !isOwnFormerFa &&
+      !isReleasedFreeAgent &&
+      faSeasonRule.playerCompensationAllowed &&
+      (listing.grade === 'A' || listing.grade === 'B')
+    ) {
       next.pendingFaProtection = {
         signedPlayerId: p.id,
         signedPlayerName: p.name,
