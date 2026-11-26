@@ -377,14 +377,17 @@ export function evaluateFaGradeAndComp(
   // 2) 포지션 희소성 · 부상 이력 · 연령 곡선
   const positionScarcityMult = getPositionScarcityMultiplier(p);
   const injCount = p.injuryHistoryCount ?? 0;
+  const ootpDurability = p.ootpRatings?.personality?.durability;
+  const durabilityAdj = typeof ootpDurability === 'number' ? clamp((ootpDurability - 68) * 0.0022, -0.07, 0.06) : 0;
   const injuryMod = clamp(
     1 -
       Math.min(0.18, injCount * 0.04) -
       (p.injury ? 0.08 : 0) -
       (p.hiddenTrait === '유리몸' ? 0.1 : 0) +
-      (p.hiddenTrait === '철강왕' ? 0.05 : 0),
+      (p.hiddenTrait === '철강왕' ? 0.05 : 0) +
+      durabilityAdj,
     0.72,
-    1.05
+    1.07
   );
   const ageMult =
     p.age >= 39
@@ -785,7 +788,10 @@ export function scoreBidForPlayer(
 
   const moneyRatio = bid.totalBillion / Math.max(1, fairTotalBillion);
   const aavRatio = bid.annualBillion / Math.max(0.5, fairTotalBillion / Math.max(1, fairYears));
-  const moneyScore = clamp(moneyRatio * 54 + aavRatio * 15, 12, 114);
+  const ootpPers = p.ootpRatings?.personality;
+  const greedScale = ootpPers ? clamp(0.88 + (ootpPers.greed / 100) * 0.28, 0.88, 1.18) : 1.0;
+  const loyaltyAdj = ootpPers ? clamp((ootpPers.loyalty - 55) * 0.09, -3.5, 4.5) : 0;
+  const moneyScore = clamp((moneyRatio * 54 + aavRatio * 15) * greedScale, 12, 118);
   const yearsFit = isMegaFranchise
     ? bid.years >= 7
       ? 13
@@ -808,13 +814,12 @@ export function scoreBidForPlayer(
   const playTimeScore = (need / 100) * 14;
   const contentionBonus =
     (p.age >= 32 ? 0.14 : 0.09) * clubProfile.contentionScore;
-  // 핵심 프랜차이즈 스타는 원소속 구단 친숙도·상징성 가산이 높아, 타 구단은 더 좋은 조건을 제시해야 영입 가능
+  // 핵심 프랜차이즈 스타 + OOTP 충성심(loyalty) 반영 — 타 구단은 더 좋은 조건을 제시해야 영입 가능
   const originalBonus = bid.isOriginalClub
-    ? isMegaFranchise
-      ? franchiseScore >= 85
-        ? 9.0
-        : 7.5
-      : 5.5
+    ? Math.max(
+        1.5,
+        (isMegaFranchise ? (franchiseScore >= 85 ? 9.0 : 7.5) : 5.5) + loyaltyAdj
+      )
     : 0;
 
   const totalScore = Number(

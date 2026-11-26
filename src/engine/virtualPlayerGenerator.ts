@@ -1,6 +1,7 @@
 import { Player, Position, TeamId } from '../types/kbo';
 import { calculateKoreanFullAge, generateVirtualBirthDate } from './ageEngine';
 import { buildBattingProfile, buildHiddenTrait, buildPitchRepertoire, buildPlayerAgent } from './deepFranchise';
+import { ensurePlayerOotpRatingsInPlace } from './ootpRatingsEngine';
 import { SeededRng } from './rng';
 import { emptyBatterStats, emptyPitcherStats } from './stats';
 
@@ -109,5 +110,6 @@ export function createVirtualFuturesDepthPlayer(params: {
   }
   player.hiddenTrait = buildHiddenTrait(player);
   player.agent = buildPlayerAgent(player);
+  ensurePlayerOotpRatingsInPlace(player);
   return player;
 }

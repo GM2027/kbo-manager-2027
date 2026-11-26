@@ -43,6 +43,12 @@ import {
   validatePlayerEditorDraft,
 } from '../engine/editorEngine';
 import { isMilitaryServing } from '../engine/militaryEngine';
+import {
+  computeDerivedContactPair,
+  computeOotpBatterOverall,
+  computeOotpPitcherOverall,
+  evaluatePitcherRoleFit,
+} from '../engine/ootpRatingsEngine';
 import { ALL_FIELD_POSITIONS, formatCompactPlayerPosition } from '../engine/positionEngine';
 import {
   countPreGameEditorChanges,
@@ -158,6 +164,7 @@ export const GameEditorView: React.FC<GameEditorViewProps> = ({
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
   const [selectedOverseasId, setSelectedOverseasId] = useState<string | null>(null);
   const [playerEditSection, setPlayerEditSection] = useState<'bio' | 'ratings' | 'position' | 'contract'>('bio');
+  const [ootpEditTab, setOotpEditTab] = useState<'batting' | 'pitching' | 'defense' | 'baserunning' | 'personality'>('batting');
 
   const [playerDraft, setPlayerDraft] = useState<PlayerEditorDraft | null>(null);
   const [overseasDraft, setOverseasDraft] = useState<OverseasEditorDraft | null>(null);
@@ -1151,9 +1158,42 @@ export const GameEditorView: React.FC<GameEditorViewProps> = ({
                   </div>
                 )}
 
-                {/* Section 2: OVR / POT / Detailed Sub-Ratings */}
-                {playerEditSection === 'ratings' && (
-                  <div className="space-y-4 text-xs">
+                {/* Section 2: OVR / POT / OOTP Detailed Sub-Ratings */}
+                {playerEditSection === 'ratings' && (() => {
+                  const ootp = playerDraft.ootpRatings;
+                  const updateOotp = (updater: (prev: typeof ootp) => typeof ootp) => {
+                    setPlayerDraft({ ...playerDraft, ootpRatings: updater(ootp) });
+                  };
+                  const handleRecalcOvrPot = () => {
+                    if (playerDraft.role === '타자' && ootp.batting) {
+                      const nextOvr = computeOotpBatterOverall(
+                        ootp.batting,
+                        ootp.defense,
+                        ootp.baserunning,
+                        playerDraft.position,
+                        'cur',
+                        playerDraft.positionProficiency[playerDraft.position] ?? 85
+                      );
+                      const nextPot = Math.max(
+                        nextOvr,
+                        computeOotpBatterOverall(
+                          ootp.batting,
+                          ootp.defense,
+                          ootp.baserunning,
+                          playerDraft.position,
+                          'pot'
+                        )
+                      );
+                      setPlayerDraft({ ...playerDraft, ability: nextOvr, potential: nextPot });
+                    } else if (playerDraft.role === '투수' && ootp.pitching) {
+                      const isSp = playerDraft.position === 'SP' || playerDraft.pitchRole === '선발';
+                      const nextOvr = computeOotpPitcherOverall(ootp.pitching, isSp, 'cur');
+                      const nextPot = Math.max(nextOvr, computeOotpPitcherOverall(ootp.pitching, isSp, 'pot'));
+                      setPlayerDraft({ ...playerDraft, ability: nextOvr, potential: nextPot });
+                    }
+                  };
+                  return (
+                  <div className="space-y-3 text-xs">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800">
                       <label className="space-y-1">
                         <div className="flex justify-between font-bold">
@@ -1162,7 +1202,7 @@ export const GameEditorView: React.FC<GameEditorViewProps> = ({
                         </div>
                         <input
                           type="range"
-                          min={30}
+                          min={25}
                           max={99}
                           value={playerDraft.ability}
                           onChange={(e) => {
@@ -1204,54 +1244,538 @@ export const GameEditorView: React.FC<GameEditorViewProps> = ({
                           onChange={(e) => setPlayerDraft({ ...playerDraft, potential: Number(e.target.value) })}
                           className="w-full accent-emerald-600"
                         />
-                        <input
-                          type="number"
-                          min={1}
-                          max={99}
-                          value={playerDraft.potential}
-                          onChange={(e) => setPlayerDraft({ ...playerDraft, potential: Number(e.target.value) })}
-                          className="w-24 px-2 py-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-mono-stats"
-                        />
+                        <div className="flex items-center justify-between gap-2">
+                          <input
+                            type="number"
+                            min={1}
+                            max={99}
+                            value={playerDraft.potential}
+                            onChange={(e) => setPlayerDraft({ ...playerDraft, potential: Number(e.target.value) })}
+                            className="w-24 px-2 py-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-mono-stats"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleRecalcOvrPot}
+                            className="px-2.5 py-1 rounded border border-indigo-500/40 bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold text-[11px] hover:bg-indigo-500/20"
+                          >
+                            세부 기준 OVR/POT 재계산
+                          </button>
+                        </div>
                       </label>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                      {(playerDraft.role === '타자'
-                        ? ([
-                            ['contactProxy', '컨택 (Contact)'],
-                            ['powerProxy', '파워 (Power)'],
-                            ['eyeProxy', '선구안 (Eye)'],
-                            ['speedProxy', '주루 (Speed)'],
-                            ['defenseProxy', '수비 (Defense)'],
-                          ] as const)
-                        : ([
-                            ['stuffProxy', '구위 (Stuff)'],
-                            ['controlProxy', '제구 (Control)'],
-                            ['movementProxy', '무브먼트 (Movement)'],
-                            ['staminaProxy', '스태미나 (Stamina)'],
-                          ] as const)
-                      ).map(([key, label]) => (
-                        <label
-                          key={key}
-                          className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 space-y-1.5"
+                    {/* OOTP 세부 편집 서브 탭 */}
+                    <div className="flex flex-wrap gap-1.5">
+                      {(
+                        [
+                          { id: 'batting', label: '타격 (현재/잠재)' },
+                          { id: 'pitching', label: '투구 · 구종 · 구속' },
+                          { id: 'defense', label: '수비 (내야·외야·포수)' },
+                          { id: 'baserunning', label: '주루 (4항목)' },
+                          { id: 'personality', label: '성향 (7항목)' },
+                        ] as const
+                      ).map((t) => (
+                        <button
+                          key={t.id}
+                          type="button"
+                          onClick={() => setOotpEditTab(t.id)}
+                          className={`px-2.5 py-1 rounded border font-bold text-[11px] ${
+                            ootpEditTab === t.id
+                              ? 'bg-orange-600 text-white border-orange-600'
+                              : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                          }`}
                         >
-                          <div className="flex justify-between font-bold">
-                            <span>{label}</span>
-                            <span className="font-mono-stats">{playerDraft[key]}</span>
-                          </div>
-                          <input
-                            type="range"
-                            min={20}
-                            max={99}
-                            value={playerDraft[key]}
-                            onChange={(e) => setPlayerDraft({ ...playerDraft, [key]: Number(e.target.value) })}
-                            className="w-full accent-indigo-600"
-                          />
-                        </label>
+                          {t.label}
+                        </button>
                       ))}
                     </div>
+
+                    {/* OOTP 타격 세부 편집 */}
+                    {ootpEditTab === 'batting' && (
+                      ootp.batting ? (
+                        <div className="space-y-3">
+                          {(() => {
+                            const contactPair = computeDerivedContactPair(ootp.batting!);
+                            return (
+                              <div className="px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-between text-[11px]">
+                                <span className="font-bold text-indigo-700 dark:text-indigo-300">
+                                  파생 컨택 (BABIP + 삼진 회피 자동 산출)
+                                </span>
+                                <span className="font-mono-stats font-extrabold text-indigo-700 dark:text-indigo-300">
+                                  현재 {contactPair.cur} / 잠재 {contactPair.pot}
+                                </span>
+                              </div>
+                            );
+                          })()}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            {(
+                              [
+                                ['babip', 'BABIP (인플레이 안타)'],
+                                ['avoidK', '삼진 회피 (Avoid K)'],
+                                ['gapPower', '갭 파워 (2·3루타)'],
+                                ['hrPower', '홈런 파워'],
+                                ['eye', '선구안 (Eye)'],
+                                ['vsLHP', '좌완 상대 (vs LHP)'],
+                                ['vsRHP', '우완 상대 (vs RHP)'],
+                              ] as const
+                            ).map(([key, label]) => {
+                              const pair = ootp.batting![key];
+                              return (
+                                <div key={key} className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 space-y-1.5">
+                                  <div className="flex justify-between font-bold text-[11px]">
+                                    <span>{label}</span>
+                                    <span className="font-mono-stats">
+                                      <span className="text-orange-600 dark:text-orange-400">{pair.cur}</span> /{' '}
+                                      <span className="text-indigo-600 dark:text-indigo-400">{pair.pot}</span>
+                                    </span>
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <label className="flex items-center gap-1 text-[10px]">
+                                      <span className="text-slate-500 w-7">현재</span>
+                                      <input
+                                        type="number"
+                                        min={1}
+                                        max={100}
+                                        value={pair.cur}
+                                        onChange={(e) => {
+                                          const v = Math.max(1, Math.min(100, Number(e.target.value) || 1));
+                                          updateOotp((prev) => ({
+                                            ...prev,
+                                            batting: prev.batting
+                                              ? {
+                                                  ...prev.batting,
+                                                  [key]: { cur: v, pot: Math.max(v, prev.batting[key].pot) },
+                                                }
+                                              : null,
+                                          }));
+                                        }}
+                                        className="w-full px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-mono-stats"
+                                      />
+                                    </label>
+                                    <label className="flex items-center gap-1 text-[10px]">
+                                      <span className="text-slate-500 w-7">잠재</span>
+                                      <input
+                                        type="number"
+                                        min={pair.cur}
+                                        max={100}
+                                        value={pair.pot}
+                                        onChange={(e) => {
+                                          const v = Math.max(pair.cur, Math.min(100, Number(e.target.value) || pair.cur));
+                                          updateOotp((prev) => ({
+                                            ...prev,
+                                            batting: prev.batting
+                                              ? { ...prev.batting, [key]: { ...prev.batting[key], pot: v } }
+                                              : null,
+                                          }));
+                                        }}
+                                        className="w-full px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-mono-stats"
+                                      />
+                                    </label>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                            {(
+                              [
+                                ['sacBunt', '희생번트'],
+                                ['buntForHit', '기습번트'],
+                              ] as const
+                            ).map(([key, label]) => (
+                              <label key={key} className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 space-y-1">
+                                <div className="flex justify-between font-bold text-[11px]">
+                                  <span>{label}</span>
+                                  <span className="font-mono-stats">{ootp.batting![key]}</span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min={1}
+                                  max={100}
+                                  value={ootp.batting![key]}
+                                  onChange={(e) => {
+                                    const v = Number(e.target.value);
+                                    updateOotp((prev) => ({
+                                      ...prev,
+                                      batting: prev.batting ? { ...prev.batting, [key]: v } : null,
+                                    }));
+                                  }}
+                                  className="w-full accent-indigo-600"
+                                />
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="p-4 text-center text-slate-500 rounded-lg border border-dashed border-slate-300 dark:border-slate-700">
+                          투수 선수입니다. [투구 · 구종 · 구속] 탭에서 투구 세부 능력치를 수정하세요.
+                        </div>
+                      )
+                    )}
+
+                    {/* OOTP 투구·구종·구속 세부 편집 */}
+                    {ootpEditTab === 'pitching' && (
+                      ootp.pitching ? (
+                        <div className="space-y-3">
+                          {(() => {
+                            const fit = evaluatePitcherRoleFit(ootp.pitching!);
+                            return (
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-[11px]">
+                                <label className="space-y-0.5">
+                                  <span className="text-slate-500 font-semibold">평균 구속 (km/h)</span>
+                                  <input
+                                    type="number"
+                                    step="0.5"
+                                    min={120}
+                                    max={165}
+                                    value={ootp.pitching!.avgVelocityKmh}
+                                    onChange={(e) => {
+                                      const v = Number(e.target.value) || 140;
+                                      updateOotp((prev) => ({
+                                        ...prev,
+                                        pitching: prev.pitching
+                                          ? { ...prev.pitching, avgVelocityKmh: v, maxVelocityKmh: Math.max(v + 2, prev.pitching.maxVelocityKmh) }
+                                          : null,
+                                      }));
+                                    }}
+                                    className="w-full px-2 py-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-mono-stats"
+                                  />
+                                </label>
+                                <label className="space-y-0.5">
+                                  <span className="text-slate-500 font-semibold">최고 구속 (km/h)</span>
+                                  <input
+                                    type="number"
+                                    step="0.5"
+                                    min={125}
+                                    max={170}
+                                    value={ootp.pitching!.maxVelocityKmh}
+                                    onChange={(e) => {
+                                      const v = Number(e.target.value) || 145;
+                                      updateOotp((prev) => ({
+                                        ...prev,
+                                        pitching: prev.pitching ? { ...prev.pitching, maxVelocityKmh: v } : null,
+                                      }));
+                                    }}
+                                    className="w-full px-2 py-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-mono-stats"
+                                  />
+                                </label>
+                                <label className="space-y-0.5">
+                                  <span className="text-slate-500 font-semibold">땅볼 유도율 (%)</span>
+                                  <input
+                                    type="number"
+                                    min={20}
+                                    max={80}
+                                    value={ootp.pitching!.groundballRate}
+                                    onChange={(e) => {
+                                      const v = Number(e.target.value) || 48;
+                                      updateOotp((prev) => ({
+                                        ...prev,
+                                        pitching: prev.pitching ? { ...prev.pitching, groundballRate: v } : null,
+                                      }));
+                                    }}
+                                    className="w-full px-2 py-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-mono-stats"
+                                  />
+                                </label>
+                                <div className="space-y-0.5 font-mono-stats">
+                                  <span className="text-slate-500 font-sans font-semibold">선발 / 불펜 적합도</span>
+                                  <div className="py-1 font-extrabold text-indigo-600 dark:text-indigo-400">
+                                    선발 {fit.starterFit} · 불펜 {fit.relieverFit}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })()}
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            {(
+                              [
+                                ['stuff', '구위 (Stuff)'],
+                                ['movement', '무브먼트 (Movement)'],
+                                ['control', '제구력 (Control)'],
+                                ['hrPrevent', '피홈런 억제'],
+                                ['hitPrevent', '피안타 억제'],
+                                ['vsLHB', '좌타자 상대 (vs LHB)'],
+                                ['vsRHB', '우타자 상대 (vs RHB)'],
+                              ] as const
+                            ).map(([key, label]) => {
+                              const pair = ootp.pitching![key];
+                              return (
+                                <div key={key} className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 space-y-1.5">
+                                  <div className="flex justify-between font-bold text-[11px]">
+                                    <span>{label}</span>
+                                    <span className="font-mono-stats">
+                                      <span className="text-orange-600 dark:text-orange-400">{pair.cur}</span> /{' '}
+                                      <span className="text-indigo-600 dark:text-indigo-400">{pair.pot}</span>
+                                    </span>
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <label className="flex items-center gap-1 text-[10px]">
+                                      <span className="text-slate-500 w-7">현재</span>
+                                      <input
+                                        type="number"
+                                        min={1}
+                                        max={100}
+                                        value={pair.cur}
+                                        onChange={(e) => {
+                                          const v = Math.max(1, Math.min(100, Number(e.target.value) || 1));
+                                          updateOotp((prev) => ({
+                                            ...prev,
+                                            pitching: prev.pitching
+                                              ? {
+                                                  ...prev.pitching,
+                                                  [key]: { cur: v, pot: Math.max(v, prev.pitching[key].pot) },
+                                                }
+                                              : null,
+                                          }));
+                                        }}
+                                        className="w-full px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-mono-stats"
+                                      />
+                                    </label>
+                                    <label className="flex items-center gap-1 text-[10px]">
+                                      <span className="text-slate-500 w-7">잠재</span>
+                                      <input
+                                        type="number"
+                                        min={pair.cur}
+                                        max={100}
+                                        value={pair.pot}
+                                        onChange={(e) => {
+                                          const v = Math.max(pair.cur, Math.min(100, Number(e.target.value) || pair.cur));
+                                          updateOotp((prev) => ({
+                                            ...prev,
+                                            pitching: prev.pitching
+                                              ? { ...prev.pitching, [key]: { ...prev.pitching[key], pot: v } }
+                                              : null,
+                                          }));
+                                        }}
+                                        className="w-full px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-mono-stats"
+                                      />
+                                    </label>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                            {(
+                              [
+                                ['stamina', '체력 (Stamina)'],
+                                ['holdRunner', '주자 견제 (Hold)'],
+                              ] as const
+                            ).map(([key, label]) => (
+                              <label key={key} className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 space-y-1">
+                                <div className="flex justify-between font-bold text-[11px]">
+                                  <span>{label}</span>
+                                  <span className="font-mono-stats">{ootp.pitching![key]}</span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min={1}
+                                  max={100}
+                                  value={ootp.pitching![key]}
+                                  onChange={(e) => {
+                                    const v = Number(e.target.value);
+                                    updateOotp((prev) => ({
+                                      ...prev,
+                                      pitching: prev.pitching ? { ...prev.pitching, [key]: v } : null,
+                                    }));
+                                  }}
+                                  className="w-full accent-indigo-600"
+                                />
+                              </label>
+                            ))}
+                          </div>
+
+                          {/* 구종별 현재/잠재/구사율 편집 */}
+                          <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 space-y-2">
+                            <div className="font-bold text-[11px]">구사 구종별 능력치 (현재 / 잠재 / 구사율%)</div>
+                            <div className="space-y-1.5">
+                              {ootp.pitching!.pitches.map((pt, idx) => (
+                                <div key={`${pt.name}-${idx}`} className="grid grid-cols-12 gap-1.5 items-center text-[11px]">
+                                  <span className="col-span-3 font-bold truncate">{pt.name}</span>
+                                  <label className="col-span-3 flex items-center gap-1">
+                                    <span className="text-[10px] text-slate-400">현</span>
+                                    <input
+                                      type="number"
+                                      min={1}
+                                      max={100}
+                                      value={pt.cur}
+                                      onChange={(e) => {
+                                        const v = Math.max(1, Math.min(100, Number(e.target.value) || 1));
+                                        updateOotp((prev) => {
+                                          if (!prev.pitching) return prev;
+                                          const nextPitches = prev.pitching.pitches.map((item, i) =>
+                                            i === idx ? { ...item, cur: v, pot: Math.max(v, item.pot) } : item
+                                          );
+                                          return { ...prev, pitching: { ...prev.pitching, pitches: nextPitches } };
+                                        });
+                                      }}
+                                      className="w-full px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-mono-stats"
+                                    />
+                                  </label>
+                                  <label className="col-span-3 flex items-center gap-1">
+                                    <span className="text-[10px] text-slate-400">잠</span>
+                                    <input
+                                      type="number"
+                                      min={pt.cur}
+                                      max={100}
+                                      value={pt.pot}
+                                      onChange={(e) => {
+                                        const v = Math.max(pt.cur, Math.min(100, Number(e.target.value) || pt.cur));
+                                        updateOotp((prev) => {
+                                          if (!prev.pitching) return prev;
+                                          const nextPitches = prev.pitching.pitches.map((item, i) =>
+                                            i === idx ? { ...item, pot: v } : item
+                                          );
+                                          return { ...prev, pitching: { ...prev.pitching, pitches: nextPitches } };
+                                        });
+                                      }}
+                                      className="w-full px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-mono-stats"
+                                    />
+                                  </label>
+                                  <label className="col-span-3 flex items-center gap-1">
+                                    <span className="text-[10px] text-slate-400">%</span>
+                                    <input
+                                      type="number"
+                                      min={1}
+                                      max={100}
+                                      value={pt.usagePct}
+                                      onChange={(e) => {
+                                        const v = Math.max(1, Math.min(100, Number(e.target.value) || 5));
+                                        updateOotp((prev) => {
+                                          if (!prev.pitching) return prev;
+                                          const nextPitches = prev.pitching.pitches.map((item, i) =>
+                                            i === idx ? { ...item, usagePct: v } : item
+                                          );
+                                          return { ...prev, pitching: { ...prev.pitching, pitches: nextPitches } };
+                                        });
+                                      }}
+                                      className="w-full px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-mono-stats"
+                                    />
+                                  </label>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="p-4 text-center text-slate-500 rounded-lg border border-dashed border-slate-300 dark:border-slate-700">
+                          야수 선수입니다. [타격 (현재/잠재)] 탭에서 타격 세부 능력치를 수정하세요.
+                        </div>
+                      )
+                    )}
+
+                    {/* OOTP 수비 세부 편집 */}
+                    {ootpEditTab === 'defense' && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                        {(
+                          [
+                            ['infieldRange', '내야 범위'],
+                            ['infieldError', '내야 실책방지'],
+                            ['infieldArm', '내야 송구'],
+                            ['turnDP', '병살 처리'],
+                            ['outfieldRange', '외야 범위'],
+                            ['outfieldError', '외야 실책방지'],
+                            ['outfieldArm', '외야 송구'],
+                            ['catcherBlocking', '포수 블로킹'],
+                            ['catcherFraming', '포수 프레이밍'],
+                            ['catcherArm', '포수 송구'],
+                          ] as const
+                        ).map(([key, label]) => (
+                          <label key={key} className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 space-y-1">
+                            <div className="flex justify-between font-bold text-[11px]">
+                              <span>{label}</span>
+                              <span className="font-mono-stats">{ootp.defense[key]}</span>
+                            </div>
+                            <input
+                              type="range"
+                              min={1}
+                              max={100}
+                              value={ootp.defense[key]}
+                              onChange={(e) => {
+                                const v = Number(e.target.value);
+                                updateOotp((prev) => ({
+                                  ...prev,
+                                  defense: { ...prev.defense, [key]: v },
+                                }));
+                              }}
+                              className="w-full accent-emerald-600"
+                            />
+                          </label>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* OOTP 주루 세부 편집 */}
+                    {ootpEditTab === 'baserunning' && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        {(
+                          [
+                            ['speed', '주력 (Speed)'],
+                            ['stealTendency', '도루 시도 성향'],
+                            ['stealAbility', '도루 능력 (성공률)'],
+                            ['baserunning', '주루 판단력'],
+                          ] as const
+                        ).map(([key, label]) => (
+                          <label key={key} className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 space-y-1">
+                            <div className="flex justify-between font-bold text-[11px]">
+                              <span>{label}</span>
+                              <span className="font-mono-stats">{ootp.baserunning[key]}</span>
+                            </div>
+                            <input
+                              type="range"
+                              min={1}
+                              max={100}
+                              value={ootp.baserunning[key]}
+                              onChange={(e) => {
+                                const v = Number(e.target.value);
+                                updateOotp((prev) => ({
+                                  ...prev,
+                                  baserunning: { ...prev.baserunning, [key]: v },
+                                }));
+                              }}
+                              className="w-full accent-sky-600"
+                            />
+                          </label>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* OOTP 성향 세부 편집 */}
+                    {ootpEditTab === 'personality' && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                        {(
+                          [
+                            ['professionalism', '프로의식'],
+                            ['workEthic', '훈련 태도'],
+                            ['loyalty', '충성심'],
+                            ['greed', '금전 선호도'],
+                            ['leadership', '리더십'],
+                            ['adaptability', '적응력'],
+                            ['durability', '내구성'],
+                          ] as const
+                        ).map(([key, label]) => (
+                          <label key={key} className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 space-y-1">
+                            <div className="flex justify-between font-bold text-[11px]">
+                              <span>{label}</span>
+                              <span className="font-mono-stats">{ootp.personality[key]}</span>
+                            </div>
+                            <input
+                              type="range"
+                              min={1}
+                              max={100}
+                              value={ootp.personality[key]}
+                              onChange={(e) => {
+                                const v = Number(e.target.value);
+                                updateOotp((prev) => ({
+                                  ...prev,
+                                  personality: { ...prev.personality, [key]: v },
+                                }));
+                              }}
+                              className="w-full accent-amber-600"
+                            />
+                          </label>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                )}
+                  );
+                })()}
 
                 {/* Section 3: Positions, Proficiencies & Pitcher Role */}
                 {playerEditSection === 'position' && (

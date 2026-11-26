@@ -53,6 +53,11 @@ import {
   recordLeagueAcquisitionInPlace,
 } from './leagueAcquisitionsEngine';
 import { assignTeamBullpenRolesInPlace } from './pitchingUsageEngine';
+import {
+  ensureCareerOotpRatingsInPlace,
+  ensurePlayerOotpRatingsInPlace,
+  evolvePlayerOotpSubRatingsInPlace,
+} from './ootpRatingsEngine';
 import { reconcileTeamLineupPositionsInPlace } from './lineupValidationEngine';
 import { unlockUnclaimedFreeAgentsForNewSeasonInPlace } from './waiverEngine';
 import { resetRivalriesForNewSeason } from './rivalryEngine';
@@ -2014,6 +2019,7 @@ function addDraftedCandidateToCareer(
     postseasonStats: cand.role === '타자' ? emptyBatterStats(false) : emptyPitcherStats(false),
   };
   ensurePlayerRichMetadata(next.players[pid]);
+  ensurePlayerOotpRatingsInPlace(next.players[pid]);
   markUlsanPlayerDrafted(next, cand.name, teamId, `${ds.season}-09-15`);
   markAmateurOrOverseasDraftedInPlace(next, permId, teamId, ds.season);
 
@@ -4433,20 +4439,50 @@ export function advanceToNextSeason(career: CareerSave): {
 
     if (p.age <= growthMaxAge && p.potential - p.ability >= 3 && rng.next() < growthProb) {
       const gain = curve === '조기개화' && p.potential - p.ability >= 7 && rng.next() < 0.32 ? 2 : 1;
-      p.ability = Math.min(p.potential, p.ability + gain);
+      evolvePlayerOotpSubRatingsInPlace({
+        player: p,
+        season: nextSeasonNum,
+        date: `${nextSeasonNum}-02-15`,
+        ovrDelta: gain,
+        potDelta: 0,
+        reason: `비시즌 유망주 성장(${curve})`,
+        rng,
+      });
       offseasonGrownCount++;
     } else if (p.age <= 24 && injHist >= 2 && rng.next() < 0.35) {
-      p.potential = Math.max(p.ability, p.potential - 2);
+      evolvePlayerOotpSubRatingsInPlace({
+        player: p,
+        season: nextSeasonNum,
+        date: `${nextSeasonNum}-02-15`,
+        ovrDelta: 0,
+        potDelta: -2,
+        reason: '반복 부상 영향 비시즌 잠재력 정체',
+        rng,
+      });
       p.potentialTrend = '정체';
     } else if (p.age >= 37 + agingOffset || (p.age >= 35 + agingOffset && injHist >= 2)) {
       const drop = curve === '철강왕' ? 1 : rng.next() < 0.62 ? 2 : 1;
-      p.ability = Math.max(48, p.ability - drop);
-      p.potential = Math.max(p.ability, p.potential - drop);
+      evolvePlayerOotpSubRatingsInPlace({
+        player: p,
+        season: nextSeasonNum,
+        date: `${nextSeasonNum}-02-15`,
+        ovrDelta: -drop,
+        potDelta: -drop,
+        reason: `비시즌 베테랑 노쇠화(${p.age}세)`,
+        rng,
+      });
       p.potentialTrend = '하락';
       offseasonDeclinedCount++;
     } else if (p.age >= 33 + agingOffset && rng.next() < (curve === '철강왕' ? 0.4 : 0.58) + injHist * 0.08) {
-      p.ability = Math.max(52, p.ability - 1);
-      p.potential = Math.max(p.ability, p.potential - 1);
+      evolvePlayerOotpSubRatingsInPlace({
+        player: p,
+        season: nextSeasonNum,
+        date: `${nextSeasonNum}-02-15`,
+        ovrDelta: -1,
+        potDelta: -1,
+        reason: `비시즌 연령 저하(${p.age}세)`,
+        rng,
+      });
       p.potentialTrend = '하락';
       offseasonDeclinedCount++;
     }
@@ -4989,6 +5025,7 @@ export function advanceToNextSeason(career: CareerSave): {
   for (const tid of TEAM_IDS) {
     assignTeamBullpenRolesInPlace(next, tid);
   }
+  ensureCareerOotpRatingsInPlace(next);
 
   next.rngState = rng.getState();
   next.version = bumpVersion(next.version);

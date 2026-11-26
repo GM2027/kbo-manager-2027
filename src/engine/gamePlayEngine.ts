@@ -25,25 +25,40 @@ function clamp(v: number, lo: number, hi: number): number {
 }
 
 interface BatterSkills {
-  contact: number;
-  power: number;
-  discipline: number;
+  babip: number;
   avoidK: number;
+  gapPower: number;
+  hrPower: number;
+  eye: number;
+  vsLHP: number;
+  vsRHP: number;
+  sacBunt: number;
+  buntForHit: number;
   speed: number;
-  fielding: number;
+  stealTendency: number;
+  stealAbility: number;
+  baserunning: number;
+  batsHand: '우타' | '좌타' | '양타';
 }
 
 interface PitcherSkills {
   stuff: number;
   control: number;
-  hrPrevention: number;
-  runPrevention: number;
+  hrPrevent: number;
+  hitPrevent: number;
+  vsLHB: number;
+  vsRHB: number;
   stamina: number;
+  holdRunner: number;
+  groundballRate: number; // 25..75 (%)
+  throwsLeft: boolean;
 }
 
 function getBatterSkills(p: Player, formDelta: number, coachEdge: number): BatterSkills {
   const base = num(p.ability, 64);
   const b = p.v18Ratings?.batting;
+  const ob = p.ootpRatings?.batting;
+  const orun = p.ootpRatings?.baserunning;
   const fatiguePen = Math.max(0, num(p.fatigue, 0) - 52) * 0.11;
   // 부상 복귀 직후 재활·경기 감각 보정(기본 능력치와 별도 관리: rehabGamesLeft 감소에 따라 자연 회복)
   const rehabSharpnessPen = Math.min(6, Math.max(0, num(p.rehabGamesLeft, 0)) * 0.9);
@@ -58,15 +73,24 @@ function getBatterSkills(p: Player, formDelta: number, coachEdge: number): Batte
     adaptPen;
   const focusBat = p.trainingFocus === '타격' ? 1.4 : 0;
   const focusRun = p.trainingFocus === '주루' ? 2.0 : 0;
-  const focusDef = p.trainingFocus === '수비' ? 2.2 : 0;
+  const batsHand: '우타' | '좌타' | '양타' =
+    p.bats === 'L' ? '좌타' : p.bats === 'S' ? '양타' : p.bats === 'R' ? '우타' : (p.battingProfile?.bats ?? '우타');
 
   return {
-    contact: clamp(num(b?.contact, base) + formAdj + focusBat, 25, 99),
-    power: clamp(num(b?.power, base) + formAdj * 0.85 + focusBat, 20, 99),
-    discipline: clamp(num(b?.discipline, base) + formAdj * 0.7, 25, 99),
-    avoidK: clamp(num(b?.avoid_k, base) + formAdj * 0.75, 25, 99),
-    speed: clamp(num(b?.speed, base) + focusRun - fatiguePen * 0.4, 20, 99),
-    fielding: clamp(num(b?.fielding, base) + focusDef, 25, 99),
+    babip: clamp(num(ob?.babip.cur, num(b?.contact, base)) + formAdj + focusBat, 22, 99),
+    avoidK: clamp(num(ob?.avoidK.cur, num(b?.avoid_k, base)) + formAdj * 0.75 + focusBat * 0.5, 22, 99),
+    gapPower: clamp(num(ob?.gapPower.cur, num(b?.power, base)) + formAdj * 0.75 + focusBat * 0.6, 20, 99),
+    hrPower: clamp(num(ob?.hrPower.cur, num(b?.power, base)) + formAdj * 0.85 + focusBat, 20, 99),
+    eye: clamp(num(ob?.eye.cur, num(b?.discipline, base)) + formAdj * 0.7, 22, 99),
+    vsLHP: clamp(num(ob?.vsLHP.cur, base), 22, 99),
+    vsRHP: clamp(num(ob?.vsRHP.cur, base), 22, 99),
+    sacBunt: clamp(num(ob?.sacBunt, 55), 15, 99),
+    buntForHit: clamp(num(ob?.buntForHit, 45), 15, 99),
+    speed: clamp(num(orun?.speed, num(b?.speed, base)) + focusRun - fatiguePen * 0.4, 20, 99),
+    stealTendency: clamp(num(orun?.stealTendency, num(b?.steal_production, 48)) + focusRun * 0.6, 10, 99),
+    stealAbility: clamp(num(orun?.stealAbility, num(b?.steal_production, base)) + focusRun, 15, 99),
+    baserunning: clamp(num(orun?.baserunning, num(b?.speed, base)) + focusRun * 0.8, 20, 99),
+    batsHand,
   };
 }
 
@@ -79,6 +103,7 @@ function getPitcherSkills(
 ): PitcherSkills {
   const base = num(p.ability, 64);
   const pt = p.v18Ratings?.pitching;
+  const opt = p.ootpRatings?.pitching;
   const preFatiguePen = num(p.fatigue, 0) * 0.12 + Math.max(0, num(p.fatigue, 0) - 50) * 0.1;
   // 부상 복귀 직후 재활·경기 감각 보정(기본 능력치와 별도 관리: 경기 등판/시간 경과로 자동 회복)
   const rehabSharpnessPen = Math.min(6, Math.max(0, num(p.rehabGamesLeft, 0)) * 0.9);
@@ -87,7 +112,7 @@ function getPitcherSkills(
       ? (80 - num(p.kboAdaptation, 80)) * 0.15
       : 0;
   const stamina = clamp(
-    num(pt?.stamina_proxy, num(p.pitchRepertoire?.stamina, isStarter ? 68 : 48)),
+    num(opt?.stamina, num(pt?.stamina_proxy, num(p.pitchRepertoire?.stamina, isStarter ? 68 : 48))),
     30,
     99
   );
@@ -106,12 +131,32 @@ function getPitcherSkills(
     adaptPen -
     liveFatiguePen;
 
+  // 구종 완성도(상위 구종)를 구위(Stuff) 축에 1회 통합 반영 (중복 반영 방지)
+  let arsenalEdge = 0;
+  if (opt && opt.pitches.length > 0) {
+    const sorted = [...opt.pitches].map((x) => x.cur).sort((a, b) => b - a);
+    const topAvg =
+      isStarter && sorted.length >= 3
+        ? sorted[0] * 0.45 + sorted[1] * 0.32 + sorted[2] * 0.23
+        : sorted.length >= 2
+        ? sorted[0] * 0.58 + sorted[1] * 0.42
+        : sorted[0];
+    arsenalEdge = clamp((topAvg - opt.stuff.cur) * 0.25, -4, 4);
+  }
+  const throwsLeft =
+    p.pitchRepertoire?.throws === '좌투' || p.throws === 'L';
+
   return {
-    stuff: clamp(num(pt?.stuff, base) + formAdj + focusStuff, 25, 99),
-    control: clamp(num(pt?.control, num(p.pitchRepertoire?.command, base)) + formAdj + focusCtrl, 25, 99),
-    hrPrevention: clamp(num(pt?.hr_prevention, base) + formAdj * 0.85, 25, 99),
-    runPrevention: clamp(num(pt?.run_prevention, base) + formAdj * 0.9, 25, 99),
+    stuff: clamp(num(opt?.stuff.cur, num(pt?.stuff, base)) + arsenalEdge + formAdj + focusStuff, 22, 99),
+    control: clamp(num(opt?.control.cur, num(pt?.control, num(p.pitchRepertoire?.command, base))) + formAdj + focusCtrl, 22, 99),
+    hrPrevent: clamp(num(opt?.hrPrevent.cur, num(pt?.hr_prevention, base)) + formAdj * 0.85, 22, 99),
+    hitPrevent: clamp(num(opt?.hitPrevent.cur, num(pt?.run_prevention, base)) + formAdj * 0.9, 22, 99),
+    vsLHB: clamp(num(opt?.vsLHB.cur, base), 22, 99),
+    vsRHB: clamp(num(opt?.vsRHB.cur, base), 22, 99),
     stamina,
+    holdRunner: clamp(num(opt?.holdRunner, 60), 20, 99),
+    groundballRate: clamp(num(opt?.groundballRate, 49), 28, 72),
+    throwsLeft,
   };
 }
 
@@ -120,6 +165,9 @@ interface RunnerOnBase {
   responsiblePitcherId: string;
   isEarned: boolean;
   speed: number;
+  stealTendency: number;
+  stealAbility: number;
+  baserunning: number;
 }
 
 interface ActivePitcherRuntime {
@@ -306,15 +354,17 @@ function shouldHookCurrentPitcher(
   if (!hasRelieverAvailable) return false;
   const isStarter = pitcherRt.line.GS === 1;
   const pc = pitcherRt.line.PC;
-  const stamina = num(pitcherRt.player.v18Ratings?.pitching?.stamina_proxy, isStarter ? 68 : 48);
+  const opt = pitcherRt.player.ootpRatings?.pitching;
+  const stamina = num(opt?.stamina, num(pitcherRt.player.v18Ratings?.pitching?.stamina_proxy, isStarter ? 68 : 48));
+  const starterFitAdj = isStarter && opt ? clamp((opt.starterFit - 68) * 0.18, -8, 5) : 0;
   const preFatigue = num(pitcherRt.player.fatigue, 0);
   const diff = ownScore - oppScore;
 
   if (isStarter) {
     const pitchCap = clamp(
-      Math.round(88 + (stamina - 50) * 0.45 - preFatigue * 0.25 + (isPostseason ? 6 : 0)),
-      76,
-      112
+      Math.round(88 + (stamina - 50) * 0.45 + starterFitAdj - preFatigue * 0.25 + (isPostseason ? 6 : 0)),
+      72,
+      114
     );
     // 이닝 종료 시점 (outs === 0, 다음 이닝 시작 전 판단)
     if (outs === 0) {
@@ -574,23 +624,85 @@ export function simulateRealisticBaseballGame(
   let homeLosingPitcherId: string | null = null;
 
   const safePark = clamp(num(parkFactor, 1.0), 0.86, 1.16);
-  const safeEnv = clamp(num(envRunMult, 1.0) * num(ruleMods.runEnvMultiplier, 1.0), 0.88, 1.14);
+  const safeEnv = clamp(num(envRunMult, 1.0) * num(ruleMods.runEnvMultiplier, 1.0), 0.93, 1.07);
   const safeHrMult = clamp(num(weather?.hrMult, 1.0), 0.82, 1.2);
   const weatherCtrlDelta = clamp(num(weather?.pitchControlDelta, 0), -4, 4);
 
-  const getTeamDefenseMetrics = (side: SideRuntime): { avgDefense: number; errorRateMult: number } => {
+  const getTeamDefenseMetrics = (
+    side: SideRuntime
+  ): {
+    avgDefense: number;
+    errorRateMult: number;
+    infieldRange: number;
+    infieldError: number;
+    infieldArm: number;
+    turnDP: number;
+    outfieldRange: number;
+    outfieldError: number;
+    outfieldArm: number;
+    catcherBlocking: number;
+    catcherFraming: number;
+    catcherArm: number;
+  } => {
     const fielders = side.activeLineup.filter((s) => s.pos !== 'DH');
-    if (fielders.length === 0) return { avgDefense: 65, errorRateMult: 1.0 };
+    if (fielders.length === 0) {
+      return {
+        avgDefense: 65,
+        errorRateMult: 1.0,
+        infieldRange: 64,
+        infieldError: 64,
+        infieldArm: 64,
+        turnDP: 64,
+        outfieldRange: 64,
+        outfieldError: 64,
+        outfieldArm: 64,
+        catcherBlocking: 64,
+        catcherFraming: 64,
+        catcherArm: 64,
+      };
+    }
     let sumDef = 0;
     let sumErrMult = 0;
+    let ifR = 0, ifE = 0, ifA = 0, ifDP = 0, ifCnt = 0;
+    let ofR = 0, ofE = 0, ofA = 0, ofCnt = 0;
+    let cBlk = 64, cFrm = 64, cArm = 64;
+
     for (const s of fielders) {
       const eff = computeEffectiveFieldingAtPosition(s.player, s.pos);
       sumDef += eff.effectiveFielding;
       sumErrMult += eff.errorRateMult;
+      const d = s.player.ootpRatings?.defense;
+      const pen = eff.penalty;
+      if (s.pos === 'C') {
+        cBlk = clamp((d?.catcherBlocking ?? eff.baseFielding) - pen * 0.8, 20, 99);
+        cFrm = clamp((d?.catcherFraming ?? eff.baseFielding) - pen * 0.8, 20, 99);
+        cArm = clamp((d?.catcherArm ?? eff.baseFielding) - pen * 0.8, 20, 99);
+      } else if (s.pos === '1B' || s.pos === '2B' || s.pos === '3B' || s.pos === 'SS') {
+        ifR += clamp((d?.infieldRange ?? eff.baseFielding) - pen, 20, 99);
+        ifE += clamp((d?.infieldError ?? eff.baseFielding) - pen * 0.9, 20, 99);
+        ifA += clamp((d?.infieldArm ?? eff.baseFielding) - pen * 0.6, 20, 99);
+        ifDP += clamp((d?.turnDP ?? eff.baseFielding) - pen * 0.8, 20, 99);
+        ifCnt += 1;
+      } else if (s.pos === 'LF' || s.pos === 'CF' || s.pos === 'RF') {
+        ofR += clamp((d?.outfieldRange ?? eff.baseFielding) - pen, 20, 99);
+        ofE += clamp((d?.outfieldError ?? eff.baseFielding) - pen * 0.9, 20, 99);
+        ofA += clamp((d?.outfieldArm ?? eff.baseFielding) - pen * 0.6, 20, 99);
+        ofCnt += 1;
+      }
     }
     return {
       avgDefense: sumDef / fielders.length,
       errorRateMult: sumErrMult / fielders.length,
+      infieldRange: ifCnt > 0 ? ifR / ifCnt : 64,
+      infieldError: ifCnt > 0 ? ifE / ifCnt : 64,
+      infieldArm: ifCnt > 0 ? ifA / ifCnt : 64,
+      turnDP: ifCnt > 0 ? ifDP / ifCnt : 64,
+      outfieldRange: ofCnt > 0 ? ofR / ofCnt : 64,
+      outfieldError: ofCnt > 0 ? ofE / ofCnt : 64,
+      outfieldArm: ofCnt > 0 ? ofA / ofCnt : 64,
+      catcherBlocking: cBlk,
+      catcherFraming: cFrm,
+      catcherArm: cArm,
     };
   };
 
@@ -701,22 +813,17 @@ export function simulateRealisticBaseballGame(
     if (isTiebreakerInning) {
       const prev1 = batSide.activeLineup[(batSide.nextSlotIdx + 8) % 9]?.player;
       const prev2 = batSide.activeLineup[(batSide.nextSlotIdx + 7) % 9]?.player;
-      if (prev2) {
-        base2 = {
-          batterId: prev2.id,
-          responsiblePitcherId: defSide.currentPitcher.player.id,
-          isEarned: false,
-          speed: num(prev2.v18Ratings?.batting?.speed, prev2.ability),
-        };
-      }
-      if (prev1) {
-        base1 = {
-          batterId: prev1.id,
-          responsiblePitcherId: defSide.currentPitcher.player.id,
-          isEarned: false,
-          speed: num(prev1.v18Ratings?.batting?.speed, prev1.ability),
-        };
-      }
+      const makeTieRunner = (pl: Player): RunnerOnBase => ({
+        batterId: pl.id,
+        responsiblePitcherId: defSide.currentPitcher.player.id,
+        isEarned: false,
+        speed: num(pl.ootpRatings?.baserunning.speed, num(pl.v18Ratings?.batting?.speed, pl.ability)),
+        stealTendency: num(pl.ootpRatings?.baserunning.stealTendency, 48),
+        stealAbility: num(pl.ootpRatings?.baserunning.stealAbility, num(pl.v18Ratings?.batting?.speed, 55)),
+        baserunning: num(pl.ootpRatings?.baserunning.baserunning, num(pl.v18Ratings?.batting?.speed, 58)),
+      });
+      if (prev2) base2 = makeTieRunner(prev2);
+      if (prev1) base1 = makeTieRunner(prev1);
     }
 
     const teamDefMetrics = getTeamDefenseMetrics(defSide);
@@ -769,11 +876,18 @@ export function simulateRealisticBaseballGame(
       const pitcher = pitcherRt.player;
       const pitcherLine = pitcherRt.line;
 
-      // 도루 시도 판정 (1루 주자 존재, 2루 비어있고 2아웃 미만 · KBO 평균 팀당 ~80~115도루)
-      if (base1 && !base2 && outs < 2 && base1.speed >= 52) {
-        const attemptProb = clamp((base1.speed - 48) * 0.0045, 0.015, 0.15);
+      // 도루 시도 판정 (OOTP 도루 시도 성향 vs 투수 주자 견제 + 포수 송구/도루 저지)
+      const pitcherHold = num(pitcher.ootpRatings?.pitching?.holdRunner, 60);
+      if (base1 && !base2 && (outs < 2 || base1.stealTendency >= 62) && base1.stealTendency >= 42) {
+        const attemptProb = clamp(
+          (base1.stealTendency - 34) * 0.0068 - (pitcherHold - 62) * 0.0005,
+          0.02,
+          0.25
+        );
         if (rng.next() < attemptProb) {
-          const successProb = clamp(0.68 + (base1.speed - 60) * 0.0042, 0.56, 0.86);
+          const runnerStealSkill = base1.stealAbility * 0.72 + base1.speed * 0.28;
+          const defenseThrowSkill = pitcherHold * 0.44 + teamDefMetrics.catcherArm * 0.56;
+          const successProb = clamp(0.70 + (runnerStealSkill - defenseThrowSkill) * 0.0048, 0.48, 0.89);
           if (rng.next() < successProb) {
             const rLine = batSide.batterMap.get(base1.batterId);
             if (rLine) rLine.SB += 1;
@@ -785,6 +899,27 @@ export function simulateRealisticBaseballGame(
             pitcherLine.outs += 1;
             base1 = null;
             if (outs >= 3) break;
+          }
+        }
+      }
+
+      // 포수 블로킹 기반 폭투/포일 진루 판정 (드문 이벤트, 블로킹이 낮을수록 증가)
+      if ((base1 || base2 || base3) && outs < 3) {
+        const wpPbProb = clamp(0.0075 - (teamDefMetrics.catcherBlocking - 64) * 0.00014, 0.002, 0.018);
+        if (rng.next() < wpPbProb) {
+          if (base3) {
+            recordRunScored(batSide, defSide, isHomeBatting, base3, batterLine, false);
+            inningRuns += 1;
+            base3 = null;
+            if (checkWalkOff()) break;
+          }
+          if (base2 && !base3) {
+            base3 = base2;
+            base2 = null;
+          }
+          if (base1 && !base2) {
+            base2 = base1;
+            base1 = null;
           }
         }
       }
@@ -803,39 +938,55 @@ export function simulateRealisticBaseballGame(
         pitcherLine.GS === 1
       );
 
-      // KBO 최근 3시즌(2024~2026) 실측 분포 기반 타석 결과 확률 계산
+      // OOTP 좌/우 스플릿 매치업 1회 산출 (중복 반영 방지)
+      const batVsPitchSplit = pSkill.throwsLeft ? bSkill.vsLHP : bSkill.vsRHP;
+      const batterFacesAsLefty =
+        bSkill.batsHand === '양타' ? !pSkill.throwsLeft : bSkill.batsHand === '좌타';
+      const pitVsBatSplit = batterFacesAsLefty ? pSkill.vsLHB : pSkill.vsRHB;
+      const splitEdge = clamp((batVsPitchSplit - pitVsBatSplit) * 0.14, -4.5, 4.5);
+
+      // 포수 프레이밍(스트라이크 존 보정: 삼진 미세 상승, 볼넷 미세 감소 — 1회 반영)
+      const framingDelta = (teamDefMetrics.catcherFraming - 64) * 0.00024;
+
+      // KBO 최근 3시즌 실측 분포 기반 타석 결과 확률 계산 (각 세부 능력치 직교 1회 반영 — 컨택 중복 반영 금지!)
+      // 1) 삼진(SO): 투수 구위 vs 타자 삼진 회피 (BABIP/컨택 미중복)
       const pSO = clamp(
-        0.194 + (pSkill.stuff - bSkill.avoidK) * 0.0022 + (pSkill.control - 64) * 0.0005,
-        0.06,
-        0.42
+        0.194 + (pSkill.stuff - bSkill.avoidK - splitEdge * 0.5) * 0.0022 + framingDelta,
+        0.055,
+        0.43
       );
+      // 2) 볼넷(BB) / 사구(HBP): 타자 선구안 vs 투수 제구력
       const pBB = clamp(
-        (0.088 + (bSkill.discipline - pSkill.control) * 0.0016) * (0.94 + safeEnv * 0.06),
+        (0.088 + (bSkill.eye - pSkill.control) * 0.00165 - framingDelta * 0.8) * (0.94 + safeEnv * 0.06),
         0.025,
         0.21
       );
       const pHBP = clamp(0.012 + (64 - pSkill.control) * 0.00022, 0.005, 0.022);
+      // 3) 홈런(HR): 타자 홈런 파워 vs 투수 피홈런 억제
       const pHR = clamp(
-        (0.0215 + (bSkill.power - pSkill.hrPrevention) * 0.0005) *
+        (0.0215 + (bSkill.hrPower - pSkill.hrPrevent + splitEdge * 0.35) * 0.00052) *
           safePark *
           safeHrMult *
           safeEnv,
         0.0025,
-        0.09
+        0.092
       );
 
       const nonBipTotal = pSO + pBB + pHBP + pHR;
       const bipProb = Math.max(0.25, 1 - nonBipTotal);
 
-      // 수비력·구장·컨택/실점억제 반영 BABIP (KBO 팀당 평균 4.4~4.8점 · 리그 타율 .268~.273 유도)
+      // 4) 인플레이 안타(BABIP): 타자 BABIP vs 투수 피안타 억제 + 수비 범위(내야/외야 땅볼비율 가중)
+      const gbShare = clamp(pSkill.groundballRate / 100, 0.30, 0.70);
+      const weightedRangeDef =
+        teamDefMetrics.infieldRange * gbShare + teamDefMetrics.outfieldRange * (1 - gbShare);
       const babip = clamp(
-        (0.295 +
-          (bSkill.contact - pSkill.runPrevention) * 0.00165 -
-          (teamDefRating - 64) * 0.0013) *
+        (0.312 +
+          (bSkill.babip - pSkill.hitPrevent + splitEdge * 0.55) * 0.00165 -
+          (weightedRangeDef - 64) * 0.0012) *
           (0.95 + safePark * 0.05) *
           (0.94 + safeEnv * 0.06),
-        0.18,
-        0.40
+        0.19,
+        0.41
       );
 
       const pHitBip = bipProb * babip;
@@ -846,6 +997,80 @@ export function simulateRealisticBaseballGame(
       batterLine.PA += 1;
 
       const runsAreEarnedNow = !(errorOccurredThisInning && virtualOutsWithoutError >= 3);
+
+      // 0A) 접전 후반 무사 1루/1·2루 희생번트 작전 (OOTP 희생번트 능력치 반영)
+      const scoreDiffBat = batScoreNow - defScoreNow;
+      if (
+        inning >= 7 &&
+        Math.abs(scoreDiffBat) <= 2 &&
+        outs === 0 &&
+        base1 &&
+        !base3 &&
+        bSkill.sacBunt >= 62 &&
+        bSkill.hrPower <= 68 &&
+        rng.next() < clamp((bSkill.sacBunt - 52) * 0.0085, 0.04, 0.28)
+      ) {
+        pitcherLine.PC += rng.int(1, 3);
+        const sacSuccess = clamp(0.68 + (bSkill.sacBunt - 60) * 0.005, 0.55, 0.90);
+        if (rng.next() < sacSuccess) {
+          // 희생번트 성공 (타수 미포함, 주자 1베이스 진루)
+          outs += 1;
+          virtualOutsWithoutError += 1;
+          pitcherLine.outs += 1;
+          if (base2) {
+            base3 = base2;
+            base2 = base1;
+            base1 = null;
+          } else {
+            base2 = base1;
+            base1 = null;
+          }
+          continue;
+        }
+        // 실패 시 일반 인플레이 흐름으로 자연 진입하지 않고 포스아웃/실패 처리
+        batterLine.AB += 1;
+        outs += 1;
+        virtualOutsWithoutError += 1;
+        pitcherLine.outs += 1;
+        continue;
+      }
+
+      // 0B) 기습번트 안타 시도 (높은 기습번트 + 주력 선수, 주자 없거나 1루)
+      if (
+        !base2 &&
+        !base3 &&
+        bSkill.buntForHit >= 68 &&
+        bSkill.speed >= 68 &&
+        rng.next() < clamp((bSkill.buntForHit - 64) * 0.0014, 0.005, 0.032)
+      ) {
+        pitcherLine.PC += rng.int(1, 2);
+        batterLine.AB += 1;
+        const buntHitProb = clamp(
+          0.34 + (bSkill.buntForHit * 0.5 + bSkill.speed * 0.5 - teamDefMetrics.infieldRange * 0.6 - teamDefMetrics.infieldArm * 0.4) * 0.006,
+          0.18,
+          0.56
+        );
+        if (rng.next() < buntHitProb) {
+          batterLine.H += 1;
+          batterLine.TB += 1;
+          pitcherLine.H += 1;
+          if (base1) base2 = base1;
+          base1 = {
+            batterId: batter.id,
+            responsiblePitcherId: pitcher.id,
+            isEarned: runsAreEarnedNow,
+            speed: bSkill.speed,
+            stealTendency: bSkill.stealTendency,
+            stealAbility: bSkill.stealAbility,
+            baserunning: bSkill.baserunning,
+          };
+        } else {
+          outs += 1;
+          virtualOutsWithoutError += 1;
+          pitcherLine.outs += 1;
+        }
+        continue;
+      }
 
       // 1) 삼진 (SO)
       if (roll < pSO) {
@@ -876,6 +1101,9 @@ export function simulateRealisticBaseballGame(
           responsiblePitcherId: pitcher.id,
           isEarned: runsAreEarnedNow,
           speed: bSkill.speed,
+          stealTendency: bSkill.stealTendency,
+          stealAbility: bSkill.stealAbility,
+          baserunning: bSkill.baserunning,
         };
         if (base1 && base2 && base3) {
           recordRunScored(batSide, defSide, isHomeBatting, base3, batterLine, true);
@@ -916,6 +1144,9 @@ export function simulateRealisticBaseballGame(
           responsiblePitcherId: pitcher.id,
           isEarned: runsAreEarnedNow,
           speed: bSkill.speed,
+          stealTendency: bSkill.stealTendency,
+          stealAbility: bSkill.stealAbility,
+          baserunning: bSkill.baserunning,
         });
         base1 = null;
         base2 = null;
@@ -929,7 +1160,7 @@ export function simulateRealisticBaseballGame(
         continue;
       }
 
-      // 4) 인플레이 안타 (1B / 2B / 3B)
+      // 4) 인플레이 안타 (1B / 2B / 3B — 갭 파워·주력·주루 판단력·외야 송구 반영)
       if (roll < nonBipTotal + pHitBip) {
         batterLine.AB += 1;
         batterLine.H += 1;
@@ -937,11 +1168,19 @@ export function simulateRealisticBaseballGame(
         pitcherLine.PC += rng.int(2, 5);
 
         const doubleShare = clamp(
-          0.195 + (bSkill.power - 64) * 0.0022 + (bSkill.speed - 64) * 0.001 + (safePark - 1) * 0.08,
+          0.195 +
+            (bSkill.gapPower - 64) * 0.0024 +
+            (bSkill.speed - 64) * 0.0008 +
+            (bSkill.baserunning - 64) * 0.0005 +
+            (safePark - 1) * 0.08,
           0.1,
-          0.34
+          0.36
         );
-        const tripleShare = clamp(0.018 + (bSkill.speed - 64) * 0.0011, 0.004, 0.065);
+        const tripleShare = clamp(
+          0.017 + (bSkill.speed - 64) * 0.00085 + (bSkill.gapPower - 64) * 0.00045,
+          0.004,
+          0.068
+        );
         const hitRoll = rng.next();
 
         const batterRunner: RunnerOnBase = {
@@ -949,6 +1188,9 @@ export function simulateRealisticBaseballGame(
           responsiblePitcherId: pitcher.id,
           isEarned: runsAreEarnedNow,
           speed: bSkill.speed,
+          stealTendency: bSkill.stealTendency,
+          stealAbility: bSkill.stealAbility,
+          baserunning: bSkill.baserunning,
         };
 
         if (hitRoll < tripleShare) {
@@ -978,8 +1220,11 @@ export function simulateRealisticBaseballGame(
           }
           let next3: RunnerOnBase | null = null;
           if (base1) {
+            const rSkill = base1.baserunning * 0.55 + base1.speed * 0.45;
             const scoreFromFirst =
-              outs === 2 ? 0.62 : 0.36 + clamp((base1.speed - 64) * 0.008, -0.14, 0.22);
+              outs === 2
+                ? clamp(0.62 + (rSkill - teamDefMetrics.outfieldArm) * 0.005, 0.42, 0.85)
+                : clamp(0.36 + (rSkill - teamDefMetrics.outfieldArm) * 0.0065, 0.18, 0.65);
             if (rng.next() < scoreFromFirst) {
               recordRunScored(batSide, defSide, isHomeBatting, base1, batterLine, true);
               inningRuns += 1;
@@ -1000,8 +1245,11 @@ export function simulateRealisticBaseballGame(
           let next3: RunnerOnBase | null = null;
           let next2: RunnerOnBase | null = null;
           if (base2) {
+            const rSkill = base2.baserunning * 0.55 + base2.speed * 0.45;
             const scoreFromSecond =
-              outs === 2 ? 0.78 : 0.52 + clamp((base2.speed - 64) * 0.009, -0.15, 0.22);
+              outs === 2
+                ? clamp(0.78 + (rSkill - teamDefMetrics.outfieldArm) * 0.0045, 0.58, 0.94)
+                : clamp(0.52 + (rSkill - teamDefMetrics.outfieldArm) * 0.007, 0.30, 0.78);
             if (rng.next() < scoreFromSecond) {
               recordRunScored(batSide, defSide, isHomeBatting, base2, batterLine, true);
               inningRuns += 1;
@@ -1010,7 +1258,8 @@ export function simulateRealisticBaseballGame(
             }
           }
           if (base1) {
-            if (!next3 && rng.next() < clamp(0.24 + (base1.speed - 64) * 0.007, 0.1, 0.45)) {
+            const rSkill = base1.baserunning * 0.55 + base1.speed * 0.45;
+            if (!next3 && rng.next() < clamp(0.24 + (rSkill - teamDefMetrics.outfieldArm) * 0.006, 0.08, 0.48)) {
               next3 = base1;
             } else {
               next2 = base1;
@@ -1025,12 +1274,14 @@ export function simulateRealisticBaseballGame(
         continue;
       }
 
-      // 5) 인플레이 범타 (실책 / 땅볼·병살 / 뜬공·희생플라이 · 미숙 포지션 실책 배율 반영)
+      // 5) 인플레이 범타 (투수 땅볼유도율 · 내/외야 실책방지 · 병살 처리 · 외야 송구 반영)
       pitcherLine.PC += rng.int(1, 5);
+      const isGroundball = rng.next() < gbShare;
+      const relevantErrDef = isGroundball ? teamDefMetrics.infieldError : teamDefMetrics.outfieldError;
       const errProbOnBipOut = clamp(
-        (0.022 - (teamDefRating - 64) * 0.00035) * teamErrorMult,
-        0.009,
-        0.095
+        (0.019 - (relevantErrDef - 64) * 0.00032) * clamp(teamErrorMult, 0.85, 1.45),
+        0.008,
+        0.048
       );
 
       if (rng.next() < errProbOnBipOut) {
@@ -1058,17 +1309,20 @@ export function simulateRealisticBaseballGame(
           responsiblePitcherId: pitcher.id,
           isEarned: false,
           speed: bSkill.speed,
+          stealTendency: bSkill.stealTendency,
+          stealAbility: bSkill.stealAbility,
+          baserunning: bSkill.baserunning,
         };
         if (checkWalkOff()) break;
         continue;
       }
 
-      const isGroundball = rng.next() < 0.51;
       if (isGroundball) {
         batterLine.AB += 1;
-        // 병살타 판정 (1루 주자 존재 & 2아웃 미만)
+        // 병살타 판정 (1루 주자 존재 & 2아웃 미만 · 내야 병살 처리 + 내야 송구 vs 타자 주력)
         if (base1 && outs < 2) {
-          const dpProb = clamp(0.42 - (bSkill.speed - 64) * 0.005 + (teamDefRating - 64) * 0.003, 0.22, 0.58);
+          const dpSkill = teamDefMetrics.turnDP * 0.72 + teamDefMetrics.infieldArm * 0.28;
+          const dpProb = clamp(0.42 - (bSkill.speed - 64) * 0.0052 + (dpSkill - 64) * 0.0038, 0.20, 0.62);
           if (rng.next() < dpProb) {
             outs += 2;
             virtualOutsWithoutError += 2;
@@ -1090,20 +1344,23 @@ export function simulateRealisticBaseballGame(
         virtualOutsWithoutError += 1;
         pitcherLine.outs += 1;
         if (outs < 3) {
-          if (base3 && rng.next() < 0.34) {
+          if (base3 && rng.next() < clamp(0.34 + (base3.baserunning - 64) * 0.004, 0.22, 0.5)) {
             recordRunScored(batSide, defSide, isHomeBatting, base3, batterLine, true);
             inningRuns += 1;
             base3 = null;
             if (checkWalkOff()) break;
           }
-          if (base2 && !base3 && rng.next() < 0.45) {
+          if (base2 && !base3 && rng.next() < clamp(0.45 + (base2.baserunning - 64) * 0.004, 0.3, 0.62)) {
             base3 = base2;
             base2 = null;
           }
         }
       } else {
-        // 뜬공 (3루 주자 & 2아웃 미만 시 희생플라이 가능)
-        if (base3 && outs < 2 && rng.next() < 0.56) {
+        // 뜬공 (3루 주자 & 2아웃 미만 시 희생플라이: 주루판단+주력 vs 외야 송구)
+        const tagUpProb = base3
+          ? clamp(0.56 + (base3.baserunning * 0.5 + base3.speed * 0.5 - teamDefMetrics.outfieldArm) * 0.0055, 0.32, 0.78)
+          : 0;
+        if (base3 && outs < 2 && rng.next() < tagUpProb) {
           batterLine.SF += 1; // 희생플라이는 AB에 미포함
           outs += 1;
           virtualOutsWithoutError += 1;

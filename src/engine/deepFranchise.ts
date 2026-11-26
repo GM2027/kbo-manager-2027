@@ -1299,9 +1299,21 @@ export function computePlayerTradeValue(p: Player): {
       : p.hiddenTrait === '유리몸'
       ? -35
       : 0;
+  // OOTP 성향(훈련태도·내구성·리더십) 및 투수 보직 적합도 반영
+  const ootpPers = p.ootpRatings?.personality;
+  const ootpBonus = ootpPers
+    ? Math.round(
+        (ootpPers.durability - 65) * 0.45 +
+          (p.age <= 26 ? (ootpPers.workEthic - 60) * 0.4 : 0) +
+          (ootpPers.leadership - 65) * 0.18 +
+          (p.role === '투수' && (p.position === 'SP' || p.pitchRole === '선발') && p.ootpRatings?.pitching
+            ? (p.ootpRatings.pitching.starterFit - 68) * 0.35
+            : 0)
+      )
+    : 0;
   const injuryPenalty = p.injury ? -45 : 0;
 
-  const raw = (baseAbility + potentialUpside) * ageMultiplier * posScarcity * perfMod + contractPenalty + traitBonus + injuryPenalty;
+  const raw = (baseAbility + potentialUpside) * ageMultiplier * posScarcity * perfMod + contractPenalty + traitBonus + ootpBonus + injuryPenalty;
   const index = Math.max(15, Math.min(999, Math.round(raw)));
 
   const tierLabel =

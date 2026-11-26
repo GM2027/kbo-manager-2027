@@ -566,6 +566,158 @@ export interface Player {
   foreignReSignStatus?: '미협상' | '재계약완료' | '해외복귀' | '결별';
   /** 보직 변경으로 인한 최근 불만 사유 메모 */
   roleChangeDissatisfactionNote?: string;
+  /** OOTP 스타일 세부 능력치 시스템 (타격·투구·구종·수비·주루·성향·성장 이력 · 단일 진실 원천) */
+  ootpRatings?: OotpPlayerRatings;
+}
+
+export interface OotpRatingPair {
+  /** 현재 능력치 (1~100) */
+  cur: number;
+  /** 잠재력 (1~100, pot >= cur) */
+  pot: number;
+}
+
+export interface OotpBatterRatings {
+  /** 인플레이 타구 안타 능력 (BABIP, 1~100) */
+  babip: OotpRatingPair;
+  /** 삼진 회피 능력 (1~100) */
+  avoidK: OotpRatingPair;
+  /** 갭 파워 — 2루타·3루타 장타 생산 (1~100) */
+  gapPower: OotpRatingPair;
+  /** 홈런 파워 (1~100) */
+  hrPower: OotpRatingPair;
+  /** 선구안 — 볼넷 유도 (1~100) */
+  eye: OotpRatingPair;
+  /** 좌완 투수 상대 능력 (1~100) */
+  vsLHP: OotpRatingPair;
+  /** 우완 투수 상대 능력 (1~100) */
+  vsRHP: OotpRatingPair;
+  /** 희생번트 (1~100) */
+  sacBunt: number;
+  /** 기습번트 (1~100) */
+  buntForHit: number;
+  /** 실측 지표 기반 vs 추정값 구분 */
+  dataSource: 'verified' | 'estimated';
+}
+
+export interface OotpPitchItem {
+  name: PitchTypeName;
+  /** 구종 현재 완성도 (1~100) */
+  cur: number;
+  /** 구종 잠재력 (1~100) */
+  pot: number;
+  /** 구사율 (%) */
+  usagePct: number;
+  /** 확인된 실제 구종 vs 추정값 구분 */
+  source: 'verified' | 'estimated';
+}
+
+export interface OotpPitcherRatings {
+  /** 구위 — 탈삼진 및 구종 위력 (1~100) */
+  stuff: OotpRatingPair;
+  /** 무브먼트 — 볼 끝 변화·장타/안타 억제 기반 (1~100) */
+  movement: OotpRatingPair;
+  /** 제구력 — 볼넷 억제 (1~100) */
+  control: OotpRatingPair;
+  /** 피홈런 억제 (1~100) */
+  hrPrevent: OotpRatingPair;
+  /** 피안타 억제 — 인플레이 타구 억제 (1~100) */
+  hitPrevent: OotpRatingPair;
+  /** 좌타자 상대 능력 (1~100) */
+  vsLHB: OotpRatingPair;
+  /** 우타자 상대 능력 (1~100) */
+  vsRHB: OotpRatingPair;
+  /** 투수 체력 (1~100) */
+  stamina: number;
+  /** 주자 견제 능력 (1~100) */
+  holdRunner: number;
+  /** 평균 구속 (km/h) */
+  avgVelocityKmh: number;
+  /** 최고 구속 (km/h) */
+  maxVelocityKmh: number;
+  /** 땅볼 유도율 (25~75%) */
+  groundballRate: number;
+  /** 구사 구종 목록 (구종별 현재/잠재/구사율/실측여부) */
+  pitches: OotpPitchItem[];
+  /** 구종 구성·체력·능력치 기반 선발 적합도 (0~100) */
+  starterFit: number;
+  /** 구종 구성·구위·능력치 기반 불펜 적합도 (0~100) */
+  relieverFit: number;
+  /** 실측 구종·구속 기반 vs 추정값 구분 */
+  dataSource: 'verified' | 'estimated';
+}
+
+export interface OotpDefenseRatings {
+  /** 내야 수비 범위 (1~100) */
+  infieldRange: number;
+  /** 내야 실책 방지 (1~100) */
+  infieldError: number;
+  /** 내야 송구 (1~100) */
+  infieldArm: number;
+  /** 병살 처리 능력 (1~100) */
+  turnDP: number;
+  /** 외야 수비 범위 (1~100) */
+  outfieldRange: number;
+  /** 외야 실책 방지 (1~100) */
+  outfieldError: number;
+  /** 외야 송구 (1~100) */
+  outfieldArm: number;
+  /** 포수 블로킹 (1~100) */
+  catcherBlocking: number;
+  /** 포수 프레이밍 (1~100) */
+  catcherFraming: number;
+  /** 포수 송구·도루 저지 (1~100) */
+  catcherArm: number;
+}
+
+export interface OotpBaserunningRatings {
+  /** 주력 (1~100) */
+  speed: number;
+  /** 도루 시도 성향 (1~100) */
+  stealTendency: number;
+  /** 도루 능력·성공률 (1~100) */
+  stealAbility: number;
+  /** 주루 판단력·추가 진루 (1~100) */
+  baserunning: number;
+}
+
+export interface OotpPersonalityRatings {
+  /** 프로의식 (1~100) */
+  professionalism: number;
+  /** 훈련 태도 (1~100) */
+  workEthic: number;
+  /** 충성심 (1~100) */
+  loyalty: number;
+  /** 금전 선호도 (1~100) */
+  greed: number;
+  /** 리더십 (1~100) */
+  leadership: number;
+  /** 적응력 (1~100) */
+  adaptability: number;
+  /** 내구성 (1~100) */
+  durability: number;
+}
+
+export interface OotpGrowthHistoryEntry {
+  season: number;
+  date: string;
+  age: number;
+  prevOvr: number;
+  newOvr: number;
+  prevPot: number;
+  newPot: number;
+  changedFields: { label: string; prev: number; next: number; isPot?: boolean }[];
+  reason: string;
+}
+
+export interface OotpPlayerRatings {
+  version: number;
+  batting: OotpBatterRatings | null;
+  pitching: OotpPitcherRatings | null;
+  defense: OotpDefenseRatings;
+  baserunning: OotpBaserunningRatings;
+  personality: OotpPersonalityRatings;
+  growthHistory?: OotpGrowthHistoryEntry[];
 }
 
 export type PlayerGrowthCurveProfile = '조기개화' | '표준' | '대기만성' | '철강왕';

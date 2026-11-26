@@ -14,6 +14,7 @@ import {
   InjurySeverity,
   MilitaryStatus,
   MoraleState,
+  OotpPlayerRatings,
   OverseasLeagueLevel,
   OverseasPlayerRecord,
   Player,
@@ -33,6 +34,13 @@ import {
   ensurePlayerPositionProficiencyInPlace,
 } from './positionEngine';
 import { reconcileTeamLineupPositionsInPlace } from './lineupValidationEngine';
+import {
+  computeOotpOverall,
+  computeOotpPotential,
+  ensurePlayerOotpRatingsInPlace,
+  evaluatePitcherRoleFit,
+  syncLegacyRatingsFromOotpInPlace,
+} from './ootpRatingsEngine';
 import { getCurrentCareerDate } from './salaryCapEngine';
 import { emptyBatterStats, emptyPitcherStats } from './stats';
 
@@ -114,6 +122,8 @@ export interface PlayerEditorDraft {
   controlProxy: number;
   movementProxy: number;
   staminaProxy: number;
+  /** OOTP 스타일 전체 세부 능력치 (타격·투구·구종·수비·주루·성향) */
+  ootpRatings: OotpPlayerRatings;
   // Positions & Pitch Role
   position: Position;
   secondaryPositions: Position[];
@@ -213,6 +223,7 @@ function cloneObj<T>(val: T): T {
 }
 
 export function playerToEditorDraft(p: Player): PlayerEditorDraft {
+  const ootpCopy = cloneObj(ensurePlayerOotpRatingsInPlace(p));
   const bat = p.v18Ratings?.batting;
   const pit = p.v18Ratings?.pitching;
   return {
@@ -238,6 +249,7 @@ export function playerToEditorDraft(p: Player): PlayerEditorDraft {
     controlProxy: Math.round(pit?.control ?? p.ability),
     movementProxy: Math.round(pit?.hr_prevention ?? p.ability),
     staminaProxy: Math.round(pit?.stamina_proxy ?? (p.position === 'SP' ? 68 : 50)),
+    ootpRatings: ootpCopy,
     position: p.position,
     secondaryPositions: [...(p.secondaryPositions ?? [])],
     positionProficiency: { ...(p.positionProficiency ?? {}) },
@@ -438,6 +450,86 @@ export function validatePlayerEditorDraft(
   pushDiff('dissatisfaction', '불만도', origDraft.dissatisfaction, draft.dissatisfaction);
   pushDiff('hiddenTrait', '선수 특성', origDraft.hiddenTrait || '없음', draft.hiddenTrait || '없음');
 
+  // OOTP 세부 능력치 변경 비교
+  const oB = origDraft.ootpRatings;
+  const oA = draft.ootpRatings;
+  if (oB && oA) {
+    if (oB.batting && oA.batting) {
+      const batPairs: [keyof Pick<NonNullable<OotpPlayerRatings['batting']>, 'babip' | 'avoidK' | 'gapPower' | 'hrPower' | 'eye' | 'vsLHP' | 'vsRHP'>, string][] = [
+        ['babip', 'BABIP'],
+        ['avoidK', '삼진 회피'],
+        ['gapPower', '갭 파워'],
+        ['hrPower', '홈런 파워'],
+        ['eye', '선구안'],
+        ['vsLHP', '좌완 상대'],
+        ['vsRHP', '우완 상대'],
+      ];
+      for (const [k, label] of batPairs) {
+        pushDiff(`ootp.bat.${k}`, `타격:${label}`, `${oB.batting[k].cur}/${oB.batting[k].pot}`, `${oA.batting[k].cur}/${oA.batting[k].pot}`);
+      }
+      pushDiff('ootp.bat.sacBunt', '희생번트', oB.batting.sacBunt, oA.batting.sacBunt);
+      pushDiff('ootp.bat.buntForHit', '기습번트', oB.batting.buntForHit, oA.batting.buntForHit);
+    }
+    if (oB.pitching && oA.pitching) {
+      const pitPairs: [keyof Pick<NonNullable<OotpPlayerRatings['pitching']>, 'stuff' | 'movement' | 'control' | 'hrPrevent' | 'hitPrevent' | 'vsLHB' | 'vsRHB'>, string][] = [
+        ['stuff', '구위'],
+        ['movement', '무브먼트'],
+        ['control', '제구력'],
+        ['hrPrevent', '피홈런 억제'],
+        ['hitPrevent', '피안타 억제'],
+        ['vsLHB', '좌타 상대'],
+        ['vsRHB', '우타 상대'],
+      ];
+      for (const [k, label] of pitPairs) {
+        pushDiff(`ootp.pit.${k}`, `투구:${label}`, `${oB.pitching[k].cur}/${oB.pitching[k].pot}`, `${oA.pitching[k].cur}/${oA.pitching[k].pot}`);
+      }
+      pushDiff('ootp.pit.stamina', '투수 체력', oB.pitching.stamina, oA.pitching.stamina);
+      pushDiff('ootp.pit.holdRunner', '주자 견제', oB.pitching.holdRunner, oA.pitching.holdRunner);
+      pushDiff('ootp.pit.avgVelo', '평균 구속', oB.pitching.avgVelocityKmh, oA.pitching.avgVelocityKmh);
+      pushDiff('ootp.pit.maxVelo', '최고 구속', oB.pitching.maxVelocityKmh, oA.pitching.maxVelocityKmh);
+      pushDiff('ootp.pit.gbRate', '땅볼 유도율(%)', oB.pitching.groundballRate, oA.pitching.groundballRate);
+      const bPitchStr = oB.pitching.pitches.map((x) => `${x.name}:${x.cur}/${x.pot}(${x.usagePct}%)`).join(', ');
+      const aPitchStr = oA.pitching.pitches.map((x) => `${x.name}:${x.cur}/${x.pot}(${x.usagePct}%)`).join(', ');
+      pushDiff('ootp.pit.pitches', '구종 구성', bPitchStr, aPitchStr);
+    }
+    const defKeys: [keyof OotpPlayerRatings['defense'], string][] = [
+      ['infieldRange', '내야 범위'],
+      ['infieldError', '내야 실책방지'],
+      ['infieldArm', '내야 송구'],
+      ['turnDP', '병살 처리'],
+      ['outfieldRange', '외야 범위'],
+      ['outfieldError', '외야 실책방지'],
+      ['outfieldArm', '외야 송구'],
+      ['catcherBlocking', '포수 블로킹'],
+      ['catcherFraming', '포수 프레이밍'],
+      ['catcherArm', '포수 송구'],
+    ];
+    for (const [k, label] of defKeys) {
+      pushDiff(`ootp.def.${k}`, `수비:${label}`, oB.defense[k], oA.defense[k]);
+    }
+    const runKeys: [keyof OotpPlayerRatings['baserunning'], string][] = [
+      ['speed', '주력'],
+      ['stealTendency', '도루 시도성향'],
+      ['stealAbility', '도루 능력'],
+      ['baserunning', '주루 판단력'],
+    ];
+    for (const [k, label] of runKeys) {
+      pushDiff(`ootp.run.${k}`, `주루:${label}`, oB.baserunning[k], oA.baserunning[k]);
+    }
+    const persKeys: [keyof OotpPlayerRatings['personality'], string][] = [
+      ['professionalism', '프로의식'],
+      ['workEthic', '훈련 태도'],
+      ['loyalty', '충성심'],
+      ['greed', '금전 선호도'],
+      ['leadership', '리더십'],
+      ['adaptability', '적응력'],
+      ['durability', '내구성'],
+    ];
+    for (const [k, label] of persKeys) {
+      pushDiff(`ootp.pers.${k}`, `성향:${label}`, oB.personality[k], oA.personality[k]);
+    }
+  }
+
   return { valid: errors.length === 0, errors, warnings, diffs };
 }
 
@@ -550,44 +642,52 @@ export function applyPlayerEditToCareer(
   p.bats = draft.bats === '' ? null : draft.bats;
   p.uniformNumber = draft.uniformNumber === '' ? undefined : Math.round(Number(draft.uniformNumber));
 
+  const manualOvrPotChanged =
+    Math.round(draft.ability) !== original.ability ||
+    Math.round(draft.potential) !== original.potential;
+  const hasOotpDiff = check.diffs.some((d) => d.field.startsWith('ootp.'));
+
   p.ability = clamp(Math.round(draft.ability), 1, 99);
   p.potential = clamp(Math.max(p.ability, Math.round(draft.potential)), 1, 99);
-  const prevBat = p.v18Ratings?.batting;
-  const prevPit = p.v18Ratings?.pitching;
-  p.v18Ratings = {
-    overall: p.ability,
-    potential: p.potential,
-    batting:
-      p.role === '타자'
-        ? {
-            contact: clamp(Math.round(draft.contactProxy), 1, 99),
-            power: clamp(Math.round(draft.powerProxy), 1, 99),
-            discipline: clamp(Math.round(draft.eyeProxy), 1, 99),
-            avoid_k: prevBat?.avoid_k ?? clamp(Math.round(draft.contactProxy), 1, 99),
-            steal_production: prevBat?.steal_production ?? clamp(Math.round(draft.speedProxy), 1, 99),
-            availability: prevBat?.availability ?? 72,
-            fielding: clamp(Math.round(draft.defenseProxy), 1, 99),
-            arm: prevBat?.arm ?? clamp(Math.round(draft.defenseProxy), 1, 99),
-            speed: clamp(Math.round(draft.speedProxy), 1, 99),
-            injury_resistance: prevBat?.injury_resistance ?? 70,
-            overall_offense: p.ability,
-          }
-        : null,
-    pitching:
-      p.role === '투수'
-        ? {
-            stuff: clamp(Math.round(draft.stuffProxy), 1, 99),
-            control: clamp(Math.round(draft.controlProxy), 1, 99),
-            hr_prevention: clamp(Math.round(draft.movementProxy), 1, 99),
-            stamina_proxy: clamp(Math.round(draft.staminaProxy), 1, 99),
-            run_prevention: prevPit?.run_prevention ?? p.ability,
-            traffic_control: prevPit?.traffic_control ?? clamp(Math.round(draft.controlProxy), 1, 99),
-            clutch: prevPit?.clutch ?? p.ability,
-            injury_resistance: prevPit?.injury_resistance ?? 70,
-            overall_pitching: p.ability,
-          }
-        : null,
-  };
+
+  // OOTP 세부 능력치 반영 및 보직 적합도·레거시 v18Ratings/pitchRepertoire 즉시 동기화
+  const editedOotp = cloneObj(draft.ootpRatings);
+  if (editedOotp.batting) {
+    for (const k of ['babip', 'avoidK', 'gapPower', 'hrPower', 'eye', 'vsLHP', 'vsRHP'] as const) {
+      editedOotp.batting[k].cur = clamp(Math.round(editedOotp.batting[k].cur), 1, 100);
+      editedOotp.batting[k].pot = clamp(Math.max(editedOotp.batting[k].cur, Math.round(editedOotp.batting[k].pot)), editedOotp.batting[k].cur, 100);
+    }
+    editedOotp.batting.sacBunt = clamp(Math.round(editedOotp.batting.sacBunt), 1, 100);
+    editedOotp.batting.buntForHit = clamp(Math.round(editedOotp.batting.buntForHit), 1, 100);
+  }
+  if (editedOotp.pitching) {
+    for (const k of ['stuff', 'movement', 'control', 'hrPrevent', 'hitPrevent', 'vsLHB', 'vsRHB'] as const) {
+      editedOotp.pitching[k].cur = clamp(Math.round(editedOotp.pitching[k].cur), 1, 100);
+      editedOotp.pitching[k].pot = clamp(Math.max(editedOotp.pitching[k].cur, Math.round(editedOotp.pitching[k].pot)), editedOotp.pitching[k].cur, 100);
+    }
+    editedOotp.pitching.stamina = clamp(Math.round(editedOotp.pitching.stamina), 1, 100);
+    editedOotp.pitching.holdRunner = clamp(Math.round(editedOotp.pitching.holdRunner), 1, 100);
+    editedOotp.pitching.avgVelocityKmh = Number(clamp(editedOotp.pitching.avgVelocityKmh, 120, 165).toFixed(1));
+    editedOotp.pitching.maxVelocityKmh = Number(clamp(Math.max(editedOotp.pitching.avgVelocityKmh + 1, editedOotp.pitching.maxVelocityKmh), 122, 170).toFixed(1));
+    editedOotp.pitching.groundballRate = clamp(Math.round(editedOotp.pitching.groundballRate), 20, 80);
+    for (const pt of editedOotp.pitching.pitches) {
+      pt.cur = clamp(Math.round(pt.cur), 1, 100);
+      pt.pot = clamp(Math.max(pt.cur, Math.round(pt.pot)), pt.cur, 100);
+      pt.usagePct = clamp(Math.round(pt.usagePct), 1, 100);
+    }
+    const fit = evaluatePitcherRoleFit(editedOotp.pitching);
+    editedOotp.pitching.starterFit = fit.starterFit;
+    editedOotp.pitching.relieverFit = fit.relieverFit;
+  }
+  for (const k of Object.keys(editedOotp.defense) as (keyof OotpPlayerRatings['defense'])[]) {
+    editedOotp.defense[k] = clamp(Math.round(editedOotp.defense[k]), 1, 100);
+  }
+  for (const k of Object.keys(editedOotp.baserunning) as (keyof OotpPlayerRatings['baserunning'])[]) {
+    editedOotp.baserunning[k] = clamp(Math.round(editedOotp.baserunning[k]), 1, 100);
+  }
+  for (const k of Object.keys(editedOotp.personality) as (keyof OotpPlayerRatings['personality'])[]) {
+    editedOotp.personality[k] = clamp(Math.round(editedOotp.personality[k]), 1, 100);
+  }
 
   p.position = draft.position;
   if (p.role === '타자') {
@@ -606,6 +706,14 @@ export function applyPlayerEditToCareer(
   } else {
     p.pitchRole = draft.pitchRole;
   }
+
+  p.ootpRatings = editedOotp;
+  // OOTP 세부 능력치만 수정한 경우 포지션·보직 가중치 공식으로 OVR/POT 자동 재산출; OVR/POT를 직접 입력한 경우 사용자 지정값 존중
+  if (hasOotpDiff && !manualOvrPotChanged) {
+    p.ability = clamp(computeOotpOverall(p), 25, 99);
+    p.potential = clamp(Math.max(p.ability, computeOotpPotential(p)), p.ability, 99);
+  }
+  syncLegacyRatingsFromOotpInPlace(p, true);
 
   p.teamId = draft.teamId;
   if (prevTeamId !== draft.teamId) {
@@ -879,6 +987,7 @@ export function createNewPlayerInCareer(
   if (newPlayer.role === '타자') {
     ensurePlayerPositionProficiencyInPlace(newPlayer);
   }
+  ensurePlayerOotpRatingsInPlace(newPlayer);
 
   next.players[newPlayer.id] = newPlayer;
   if (!next.editorOriginals) next.editorOriginals = {};

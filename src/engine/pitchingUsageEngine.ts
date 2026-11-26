@@ -136,11 +136,16 @@ export function assignTeamBullpenRolesInPlace(
     return;
   }
 
-  // Score bullpen arms for leverage hierarchy
+  // Score bullpen arms for leverage hierarchy (OOTP 구위·불펜 적합도·제구 통합 반영)
   const scoreLeverage = (p: Player): number => {
+    const ootpP = p.ootpRatings?.pitching;
     const rep = p.pitchRepertoire;
-    const stuff = rep ? (rep.avgVelocityKmh - 142) * 1.4 + (rep.breakingSharpness - 72) * 0.22 : 0;
-    const cmd = rep ? (rep.command - 72) * 0.16 : 0;
+    const stuff = ootpP
+      ? (ootpP.stuff.cur - 65) * 0.28 + (ootpP.relieverFit - 65) * 0.14 + (ootpP.avgVelocityKmh - 142) * 0.8
+      : rep
+      ? (rep.avgVelocityKmh - 142) * 1.4 + (rep.breakingSharpness - 72) * 0.22
+      : 0;
+    const cmd = ootpP ? (ootpP.control.cur - 65) * 0.16 : rep ? (rep.command - 72) * 0.16 : 0;
     const ps = p.stats as PitcherStats;
     const outs = ps?.outs ?? 0;
     const era = outs >= 24 ? calcERA(ps.ER, outs) : null;

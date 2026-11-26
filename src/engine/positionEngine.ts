@@ -171,8 +171,29 @@ export function computeEffectiveFieldingAtPosition(
   errorRateMult: number;
   tierLabel: '주전급' | '보조적합' | '적응중' | '미숙(페널티)' | '지명타자';
 } {
+  const ootpDef = p.ootpRatings?.defense;
+  let rawBaseFielding = p.v18Ratings?.batting?.fielding ?? p.ability ?? 64;
+  if (ootpDef && pos !== 'DH') {
+    if (pos === 'C') {
+      rawBaseFielding = ootpDef.catcherFraming * 0.4 + ootpDef.catcherBlocking * 0.3 + ootpDef.catcherArm * 0.3;
+    } else if (pos === 'SS') {
+      rawBaseFielding = ootpDef.infieldRange * 0.42 + ootpDef.infieldError * 0.22 + ootpDef.infieldArm * 0.2 + ootpDef.turnDP * 0.16;
+    } else if (pos === '2B') {
+      rawBaseFielding = ootpDef.infieldRange * 0.36 + ootpDef.infieldError * 0.24 + ootpDef.turnDP * 0.28 + ootpDef.infieldArm * 0.12;
+    } else if (pos === '3B') {
+      rawBaseFielding = ootpDef.infieldRange * 0.3 + ootpDef.infieldError * 0.28 + ootpDef.infieldArm * 0.34 + ootpDef.turnDP * 0.08;
+    } else if (pos === '1B') {
+      rawBaseFielding = ootpDef.infieldError * 0.48 + ootpDef.infieldRange * 0.28 + ootpDef.turnDP * 0.14 + ootpDef.infieldArm * 0.1;
+    } else if (pos === 'CF') {
+      rawBaseFielding = ootpDef.outfieldRange * 0.56 + ootpDef.outfieldError * 0.24 + ootpDef.outfieldArm * 0.2;
+    } else if (pos === 'RF') {
+      rawBaseFielding = ootpDef.outfieldRange * 0.34 + ootpDef.outfieldError * 0.26 + ootpDef.outfieldArm * 0.4;
+    } else if (pos === 'LF') {
+      rawBaseFielding = ootpDef.outfieldRange * 0.4 + ootpDef.outfieldError * 0.34 + ootpDef.outfieldArm * 0.26;
+    }
+  }
   const baseFielding = clamp(
-    (p.v18Ratings?.batting?.fielding ?? p.ability ?? 64) + (p.trainingFocus === '수비' ? 2 : 0),
+    rawBaseFielding + (p.trainingFocus === '수비' ? 2 : 0),
     25,
     99
   );

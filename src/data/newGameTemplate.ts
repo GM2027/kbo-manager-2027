@@ -56,7 +56,7 @@ export function createNewCareer(params: {
     careerId: `career_${teamId}_${Date.now()}`,
     label: `${teamInfo.name} 2027 · 새 커리어`,
     version: 'v21.2027',
-    databaseVersion: 'v27_unified_player_ratings',
+    databaseVersion: 'v28_ootp_detailed_ratings',
     lockedHistoricalSeasons: [2026],
     isPreservedMaster: false,
     isArchived: false,

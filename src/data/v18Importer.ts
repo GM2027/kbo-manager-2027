@@ -25,6 +25,10 @@ import {
   getPositionProficiency,
 } from '../engine/positionEngine';
 import { reconcileAllTeamsLineupPositionsInPlace } from '../engine/lineupValidationEngine';
+import {
+  ensureCareerOotpRatingsInPlace,
+  ensurePlayerOotpRatingsInPlace,
+} from '../engine/ootpRatingsEngine';
 import { buildVerifiedOverseasBaseline } from './amateurAndOverseasData';
 import {
   VERIFIED_SANGMU_BIRTHDATES_BY_KEY,
@@ -474,6 +478,7 @@ export function enforceOvrPotInvariantInPlace(players: Record<string, Player>): 
       p.v18Ratings.potential = Math.max(p.v18Ratings.overall, Math.min(99, p.v18Ratings.potential));
       p.v18Ratings.overall = Math.min(p.v18Ratings.overall, p.v18Ratings.potential);
     }
+    ensurePlayerOotpRatingsInPlace(p);
   }
 }
 
@@ -483,6 +488,8 @@ const V18_BY_SOURCE_ID: Map<string, RawV18Player> = new Map(
 
 function getDatabaseVersionRank(ver?: string): number {
   switch (ver) {
+    case 'v28_ootp_detailed_ratings':
+      return 28;
     case 'v27_unified_player_ratings':
       return 27;
     case 'v26_feedback_roles_military_fa':
@@ -1324,6 +1331,15 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
       career.databaseVersion = 'v27_unified_player_ratings';
     }
 
+    // v28: OOTP 스타일 세부 능력치 시스템 마이그레이션 (기존 세이브 선수 ID·계약·기록·소속팀·에디터 수정 100% 보존)
+    if (getDatabaseVersionRank(career.databaseVersion) < 28) {
+      ensureCareerOotpRatingsInPlace(career);
+      career.databaseVersion = 'v28_ootp_detailed_ratings';
+    } else {
+      // 신규 영입/생성 선수 중 ootpRatings 누락분 안전 보정
+      ensureCareerOotpRatingsInPlace(career);
+    }
+
     // KBO 현역 선수단과 해외파 목록 간 중복 등록 상시 방지
     if (career.amateurAndOverseas?.overseasPlayers) {
       const activeKboKey = new Set<string>();
@@ -2036,6 +2052,9 @@ export function buildAll10TeamsFromV18Dataset(): {
   }
 
   enforceOvrPotInvariantInPlace(players);
+  for (const pl of Object.values(players)) {
+    ensurePlayerOotpRatingsInPlace(pl);
+  }
 
   return {
     players,

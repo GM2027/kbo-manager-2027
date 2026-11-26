@@ -130,11 +130,23 @@ function buildBatterTraits(p: Player, assignedPos: Position): BatterTraitVector 
   const trainingDefense = p.trainingFocus === '수비' ? 5 : 0;
   const trainingBat = p.trainingFocus === '타격' ? 2 : 0;
 
-  let obpPrior = clamp(baseEff + sprayContactAdj * 0.6 + (bp ? (bp.vsBreaking - 70) * 0.25 : 0) + (p.age >= 29 ? 2 : 0), 45, 99);
-  let eyePrior = clamp(baseEff + (bp ? (bp.vsBreaking - 68) * 0.45 : 0) + (p.hiddenTrait === '꾸준함' ? 4 : 0), 45, 99);
-  let speedPrior = clamp(68 + (posSpeedPrior[p.position] ?? 0) + ageSpeedAdj + trainingSpeed + (baseEff - 72) * 0.35, 35, 99);
-  let contactPrior = clamp(baseEff + sprayContactAdj + trainingBat + (p.hiddenTrait === '꾸준함' ? 3 : 0), 45, 99);
-  let powerPrior = clamp(baseEff + (posPowerPrior[p.position] ?? 0) + sprayPowerAdj + trainingBat, 42, 99);
+  const ob = p.ootpRatings?.batting;
+  const orun = p.ootpRatings?.baserunning;
+  let obpPrior = ob
+    ? clamp(ob.eye.cur * 0.52 + ob.babip.cur * 0.30 + ob.avoidK.cur * 0.18 + formDelta - fatiguePenalty, 40, 99)
+    : clamp(baseEff + sprayContactAdj * 0.6 + (bp ? (bp.vsBreaking - 70) * 0.25 : 0) + (p.age >= 29 ? 2 : 0), 45, 99);
+  let eyePrior = ob
+    ? clamp(ob.eye.cur + formDelta * 0.6, 40, 99)
+    : clamp(baseEff + (bp ? (bp.vsBreaking - 68) * 0.45 : 0) + (p.hiddenTrait === '꾸준함' ? 4 : 0), 45, 99);
+  let speedPrior = orun
+    ? clamp(orun.speed * 0.6 + orun.baserunning * 0.25 + orun.stealAbility * 0.15 + trainingSpeed, 25, 99)
+    : clamp(68 + (posSpeedPrior[p.position] ?? 0) + ageSpeedAdj + trainingSpeed + (baseEff - 72) * 0.35, 35, 99);
+  let contactPrior = ob
+    ? clamp(ob.babip.cur * 0.56 + ob.avoidK.cur * 0.44 + trainingBat + formDelta * 0.7, 40, 99)
+    : clamp(baseEff + sprayContactAdj + trainingBat + (p.hiddenTrait === '꾸준함' ? 3 : 0), 45, 99);
+  let powerPrior = ob
+    ? clamp(ob.hrPower.cur * 0.68 + ob.gapPower.cur * 0.32 + trainingBat + formDelta * 0.7, 35, 99)
+    : clamp(baseEff + (posPowerPrior[p.position] ?? 0) + sprayPowerAdj + trainingBat, 42, 99);
   let rbiClutchPrior = clamp(
     baseEff +
       (posPowerPrior[p.position] ?? 0) * 0.55 +

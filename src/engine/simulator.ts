@@ -10,6 +10,10 @@ import {
 } from '../data/kboTeams';
 import { enforceOvrPotInvariantInPlace } from '../data/v18Importer';
 import {
+  ensurePlayerOotpRatingsInPlace,
+  evolvePlayerOotpSubRatingsInPlace,
+} from './ootpRatingsEngine';
+import {
   advanceFaCompetitionRound,
   syncFaCompetitionMarketInPlace,
 } from './faCompetitionEngine';
@@ -293,9 +297,9 @@ export function computePlayerGameDayPerformanceDelta(
   const arc = player.seasonArc && player.seasonArc.season === career.season ? player.seasonArc : undefined;
   const arcDelta = arc ? (round <= 72 ? arc.firstHalfDelta : arc.secondHalfDelta) : 0;
 
-  // 4. 좌우투수 상성 (타자)
+  // 4. 좌우투수 상성 (타자 — OOTP 세부 좌/우 스플릿 보유 시 경기 엔진에서 직접 1회 반영하므로 중복 방지)
   let platoonDelta = 0;
-  if (player.role === '타자' && oppStarter) {
+  if (player.role === '타자' && oppStarter && !player.ootpRatings?.batting) {
     const bats = player.battingProfile?.bats ?? '우타';
     const throwsHand = oppStarter.pitchRepertoire?.throws ?? '우투';
     if (bats === '양타') {
@@ -1512,6 +1516,11 @@ function runTenGameGrowthEvaluation(
         (p.role === '타자' ? coachProf.hitCoachBonus : coachProf.pitchCoachBonus) + coachProf.managerBonus;
       const coachContribution = Number(roleCoachBonus.toFixed(2));
 
+      const ootpPers = ensurePlayerOotpRatingsInPlace(p).personality;
+      const workEthicEdge = (ootpPers.workEthic - 60) * 0.012; // -0.42..+0.45
+      const profEdge = (ootpPers.professionalism - 60) * 0.008;
+      const durabilityEdge = p.age >= 32 ? (ootpPers.durability - 65) * 0.009 : 0;
+
       const combined =
         perfScore +
         ageBias +
@@ -1519,7 +1528,10 @@ function runTenGameGrowthEvaluation(
         trainingBonus +
         coachContribution +
         effFacilityContrib +
-        rookieLeaderBoost -
+        rookieLeaderBoost +
+        workEthicEdge +
+        profEdge +
+        durabilityEdge -
         (p.age <= 25 && (p.injuryHistoryCount ?? 0) >= 2 ? 0.45 : 0) +
         (rng.next() - 0.5) * 0.65;
 
@@ -1570,7 +1582,6 @@ function runTenGameGrowthEvaluation(
       }
       if (delta === 0 && potDelta === 0) continue;
 
-      p.ability = nextAbility;
       p.seasonRatingDelta += delta;
 
       const reasonParts: string[] = [playingTimeNote];
@@ -1593,6 +1604,23 @@ function runTenGameGrowthEvaluation(
       if (facilityContribution > 0) {
         reasonParts.push(`아카데미 Lv.${academyLevel}(+${facilityContribution})`);
       }
+      if (ootpPers.workEthic >= 76 && delta > 0) {
+        reasonParts.push(`높은 훈련 태도(${ootpPers.workEthic})`);
+      }
+
+      // OOTP 개별 세부 능력치(현재·잠재·구종·수비·주루) 단계적 변화 + OVR/POT 공식 재산출 + 성장 이력 기록
+      // (p.potential은 위에서 이미 potDelta가 반영되어 있으므로 원복 후 evolvePlayerOotpSubRatingsInPlace에 전달)
+      p.ability = prevAbility;
+      p.potential = Math.max(prevAbility, p.potential - potDelta);
+      evolvePlayerOotpSubRatingsInPlace({
+        player: p,
+        season: career.season,
+        date,
+        ovrDelta: delta,
+        potDelta,
+        reason: reasonParts.join(' · '),
+        rng,
+      });
 
       logs.push({
         id: `gr-r${round}-${p.id}`,
