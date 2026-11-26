@@ -3,6 +3,7 @@ import { ensureDeepFranchiseState } from '../engine/deepFranchise';
 import { applyPreGameEditorStoreToNewCareerInPlace } from '../engine/editorEngine';
 import { syncFaCompetitionMarketInPlace } from '../engine/faCompetitionEngine';
 import { ensureLeagueLifeStateInPlace } from '../engine/leagueLifeEngine';
+import { reconcileAllTeamsLineupPositionsInPlace } from '../engine/lineupValidationEngine';
 import { ensureGlobalPlayerRegistryInPlace } from '../engine/playerRegistry';
 import { generateRegularSeasonSchedule } from '../engine/schedule';
 import {
@@ -165,7 +166,8 @@ export function createNewCareer(params: {
     }
   }
 
-  // 게임 시작 시점부터 KBO 10개 구단 전체 FA 자동 입찰 현황 즉시 활성화
+  // 게임 시작 시점부터 KBO 10개 구단 전체 FA 자동 입찰 현황 즉시 활성화 + 10개 구단 선발 9포지션 중복 0건 보장
   syncFaCompetitionMarketInPlace(created, '2027-01-01');
+  reconcileAllTeamsLineupPositionsInPlace(created);
   return created;
 }

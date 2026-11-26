@@ -27,6 +27,11 @@ import {
   optimizeBattingLineup,
 } from '../engine/lineupOptimizer';
 import {
+  fixMyTeamLineupPositions,
+  REQUIRED_STARTING_POSITIONS,
+  validateStartingLineup,
+} from '../engine/lineupValidationEngine';
+import {
   getRecommendedReleaseCandidates,
   getRecommendedRosterMoves,
 } from '../engine/recommendations';
@@ -715,9 +720,83 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                 </div>
               )}
 
+              {/* 선발 타자 9포지션 실시간 검증 & 중복 보정 스트립 */}
+              {(() => {
+                const lineupValidation = validateStartingLineup(career, teamId);
+                const posCounts = new Map<Position, number>();
+                for (const lp of lineupPlayers) {
+                  const ap = (teamState.lineupPositions[lp.id] ?? lp.position) as Position;
+                  posCounts.set(ap, (posCounts.get(ap) ?? 0) + 1);
+                }
+                return (
+                  <div
+                    className={`rounded-md border px-3 py-2 text-[11px] space-y-1.5 ${
+                      lineupValidation.isValid
+                        ? 'border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-950/20'
+                        : 'border-rose-500/50 bg-rose-50/70 dark:bg-rose-950/30'
+                    }`}
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span
+                        className={`font-bold ${
+                          lineupValidation.isValid
+                            ? 'text-emerald-700 dark:text-emerald-300'
+                            : 'text-rose-700 dark:text-rose-300'
+                        }`}
+                      >
+                        {lineupValidation.isValid
+                          ? `✓ ${lineupValidation.summary}`
+                          : `⚠ 라인업 점검 필요: ${lineupValidation.summary}`}
+                      </span>
+                      {!lineupValidation.isValid && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const fixed = fixMyTeamLineupPositions(career);
+                            onUpdateCareer(fixed.nextCareer, fixed.backupSnapshot);
+                            setNotice(
+                              fixed.report.isValid
+                                ? '선발 타자 9포지션 중복·누락을 자동 수정했습니다.'
+                                : `라인업 보정 완료 (${fixed.report.summary})`
+                            );
+                          }}
+                          className="px-2.5 py-0.5 rounded bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] cursor-pointer"
+                        >
+                          포지션 중복 자동 수정
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap items-center gap-1">
+                      {REQUIRED_STARTING_POSITIONS.map((reqPos) => {
+                        const cnt = posCounts.get(reqPos) ?? 0;
+                        return (
+                          <span
+                            key={reqPos}
+                            className={`px-1.5 py-0.5 rounded font-mono-stats text-[10px] font-bold border ${
+                              cnt === 1
+                                ? 'border-emerald-400/50 bg-white/80 dark:bg-slate-900/70 text-emerald-700 dark:text-emerald-300'
+                                : cnt > 1
+                                  ? 'border-rose-500 bg-rose-500/15 text-rose-700 dark:text-rose-300'
+                                  : 'border-amber-500/60 bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                            }`}
+                          >
+                            {reqPos}
+                            {cnt > 1 ? ` ×${cnt}` : cnt === 0 ? ' 누락' : ''}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
+
               <div className="divide-y divide-slate-100 dark:divide-slate-800 border border-slate-200 dark:border-slate-800 rounded">
                 {lineupPlayers.map((p, idx) => {
                   const pos = teamState.lineupPositions[p.id] ?? p.position;
+                  const samePosCount = lineupPlayers.filter(
+                    (lp) => (teamState.lineupPositions[lp.id] ?? lp.position) === pos
+                  ).length;
+                  const isDupPosRow = samePosCount > 1;
                   const onNationalDuty = isPlayerOnNationalTeamDuty(p, career.gamesPlayed);
                   const isDhOverride = pos === 'DH' && p.position !== 'DH';
                   const isNonPrimaryField = pos !== 'DH' && pos !== p.position;
@@ -745,7 +824,11 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                     <div
                       key={`${p.id}-${idx}`}
                       className={`px-3 py-2 flex flex-wrap items-center justify-between gap-2 text-xs hover:bg-slate-50 dark:hover:bg-slate-800/40 ${
-                        onNationalDuty ? 'bg-blue-500/5' : ''
+                        isDupPosRow
+                          ? 'bg-rose-500/10'
+                          : onNationalDuty
+                            ? 'bg-blue-500/5'
+                            : ''
                       }`}
                     >
                       <button

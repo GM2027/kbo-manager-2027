@@ -368,9 +368,10 @@ export function optimizeBattingLineup(
       if (starters.length >= 9) break;
       if (usedIds.has(p.id)) continue;
       const openPos = UNIQUE_FIELD_POSITIONS.find((pos) => !usedPositions.has(pos));
-      const chosenPos: Position = !usedPositions.has(p.position)
-        ? p.position
-        : openPos ?? (!usedPositions.has('DH') ? 'DH' : p.position);
+      const chosenPos: Position =
+        !usedPositions.has(p.position) && p.position !== 'SP' && p.position !== 'RP' && p.position !== 'CL'
+          ? p.position
+          : openPos ?? (!usedPositions.has('DH') ? 'DH' : UNIQUE_FIELD_POSITIONS[starters.length % UNIQUE_FIELD_POSITIONS.length]);
       starters.push({ player: p, assignedPos: chosenPos });
       usedIds.add(p.id);
       usedPositions.add(chosenPos);

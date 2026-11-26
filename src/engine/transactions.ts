@@ -53,6 +53,7 @@ import {
   recordLeagueAcquisitionInPlace,
 } from './leagueAcquisitionsEngine';
 import { assignTeamBullpenRolesInPlace } from './pitchingUsageEngine';
+import { reconcileTeamLineupPositionsInPlace } from './lineupValidationEngine';
 import { unlockUnclaimedFreeAgentsForNewSeasonInPlace } from './waiverEngine';
 import { resetRivalriesForNewSeason } from './rivalryEngine';
 import {
@@ -860,14 +861,7 @@ export function releaseForeignPlayer(
   t.benchOrder = t.benchOrder.filter((id) => id !== playerId);
 
   if (wasInLineup && t.lineupOrder.length < 9) {
-    const replacement = t.benchOrder
-      .map((id) => next.players[id])
-      .find((cand) => cand && cand.role === '타자' && cand.rosterTier === '1군' && !cand.injury);
-    if (replacement) {
-      t.lineupOrder.push(replacement.id);
-      t.benchOrder = t.benchOrder.filter((id) => id !== replacement.id);
-      t.lineupPositions[replacement.id] = replacement.position;
-    }
+    reconcileTeamLineupPositionsInPlace(next, teamId);
   }
 
   next.transactionLogs.unshift({
@@ -1104,6 +1098,7 @@ export function signForeignCandidate(
       if (t.lineupOrder.length < 9) {
         t.lineupOrder.push(newId);
         t.lineupPositions[newId] = candidate.position;
+        reconcileTeamLineupPositionsInPlace(next, teamId);
       } else {
         t.benchOrder.push(newId);
       }
@@ -2446,6 +2441,7 @@ export function callUpPlayer(career: CareerSave, playerId: string): CareerSave {
     if (t.lineupOrder.length < 9 && !p.injury) {
       t.lineupOrder.push(playerId);
       t.lineupPositions[playerId] = p.position;
+      reconcileTeamLineupPositionsInPlace(next, teamId);
     } else {
       t.benchOrder.push(playerId);
     }
@@ -2491,17 +2487,9 @@ export function demotePlayer(career: CareerSave, playerId: string): CareerSave {
   t.rotationOrder = t.rotationOrder.filter((id) => id !== playerId);
   t.bullpenOrder = t.bullpenOrder.filter((id) => id !== playerId);
 
-  // Auto-fill vacated lineup slot from healthy 1군 bench hitter
+  // Auto-fill vacated lineup slot from healthy 1군 bench hitter (ensuring 9 unique positions)
   if (wasInLineup && t.lineupOrder.length < 9) {
-    const benchCandidate = t.benchOrder
-      .map((id) => next.players[id])
-      .filter((x): x is Player => Boolean(x && x.role === '타자' && x.rosterTier === '1군' && !x.injury))
-      .sort((a, b) => b.ability - a.ability)[0];
-    if (benchCandidate) {
-      t.lineupOrder.push(benchCandidate.id);
-      t.benchOrder = t.benchOrder.filter((id) => id !== benchCandidate.id);
-      t.lineupPositions[benchCandidate.id] = benchCandidate.position;
-    }
+    reconcileTeamLineupPositionsInPlace(next, teamId);
   }
 
   next.transactionLogs.unshift({
@@ -2910,6 +2898,10 @@ export function setLineupSlot(
   }
 
   team.lineupPositions[playerId] = targetPos;
+  reconcileTeamLineupPositionsInPlace(next, next.playerTeamId, {
+    lockedPlayerId: playerId,
+    lockedPosition: targetPos,
+  });
   next.updatedAt = new Date().toISOString();
   return next;
 }
@@ -4824,6 +4816,7 @@ export function advanceToNextSeason(career: CareerSave): {
       t.benchOrder = t.benchOrder.filter((id) => id !== candidate.id);
       t.lineupPositions[candidate.id] = candidate.position;
     }
+    reconcileTeamLineupPositionsInPlace(next, tid);
 
     while (t.rotationOrder.length < 5) {
       const regularCand = Object.values(next.players)

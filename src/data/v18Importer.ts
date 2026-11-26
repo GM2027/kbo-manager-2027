@@ -24,6 +24,7 @@ import {
   ensurePlayerPositionProficiencyInPlace,
   getPositionProficiency,
 } from '../engine/positionEngine';
+import { reconcileAllTeamsLineupPositionsInPlace } from '../engine/lineupValidationEngine';
 import { buildVerifiedOverseasBaseline } from './amateurAndOverseasData';
 import {
   VERIFIED_SANGMU_BIRTHDATES_BY_KEY,
@@ -1342,6 +1343,8 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
 
     // 세이브 로드 시마다 현재 게임 날짜·생년월일 기준으로 전체 만 나이 일괄 동기화
     syncAllAgesToDateInPlace(career);
+    // 세이브 로드 시마다 10개 구단 선발 타자 라인업 9포지션 중복·누락 자동 검증 및 보정 (이미 정상인 라인업은 불변)
+    reconcileAllTeamsLineupPositionsInPlace(career);
   }
 }
 

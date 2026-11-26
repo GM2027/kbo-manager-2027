@@ -32,6 +32,7 @@ import {
   ALL_FIELD_POSITIONS,
   ensurePlayerPositionProficiencyInPlace,
 } from './positionEngine';
+import { reconcileTeamLineupPositionsInPlace } from './lineupValidationEngine';
 import { getCurrentCareerDate } from './salaryCapEngine';
 import { emptyBatterStats, emptyPitcherStats } from './stats';
 
@@ -498,11 +499,15 @@ function syncPlayerToTeamOrdersInPlace(career: CareerSave, p: Player, prevTeamId
   } else {
     const inLineup = ts.lineupOrder.includes(p.id);
     if (inLineup) {
-      // Ensure assigned position is valid if primary changed
+      // Ensure assigned position is valid & unique if primary changed
       if (!ts.lineupPositions[p.id]) ts.lineupPositions[p.id] = p.position;
+      reconcileTeamLineupPositionsInPlace(career, p.teamId);
     } else if (!ts.benchOrder.includes(p.id)) {
       ts.benchOrder.push(p.id);
     }
+  }
+  if (prevTeamId && prevTeamId !== p.teamId) {
+    reconcileTeamLineupPositionsInPlace(career, prevTeamId);
   }
 }
 

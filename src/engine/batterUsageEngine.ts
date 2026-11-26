@@ -13,6 +13,7 @@ import {
   computeEffectiveFieldingAtPosition,
   getPositionProficiency,
 } from './positionEngine';
+import { reconcileGameStarterPositionsInPlace } from './lineupValidationEngine';
 import { SeededRng } from './rng';
 import { calcAVG, calcOPS } from './stats';
 
@@ -411,6 +412,7 @@ export function buildRealisticGameLineupAndBench(
 
   const rotationNotes: string[] = [];
   const starters = baseStarters.slice(0, 9);
+  reconcileGameStarterPositionsInPlace(starters);
 
   // 2) Natural Pre-Game Starting Rotation (Rest / Backup Catcher / Platoon / Long-Idle Opportunity)
   // Cap swaps so core regulars stay ~118-138 GS over 144G and still qualify cleanly for batting titles (446+ PA)
@@ -555,6 +557,9 @@ export function buildRealisticGameLineupAndBench(
       }
     }
   }
+
+  // 최종 경기 출전 직전 선발 9명 수비 포지션 중복 0건 보장
+  reconcileGameStarterPositionsInPlace(starters);
 
   // Ensure bench only contains valid eligible non-starter 1군 hitters
   const starterIdSet = new Set(starters.map((s) => s.player.id));

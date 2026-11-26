@@ -79,6 +79,8 @@ import {
   REAL_MILITARY_EXEMPT_PLAYERS,
 } from '../data/playerMetadata';
 import { optimizeBattingLineup } from './lineupOptimizer';
+import { reconcileTeamLineupPositionsInPlace } from './lineupValidationEngine';
+import { ALL_HITTER_LINEUP_POSITIONS } from './positionEngine';
 import {
   canPlayerEnlistMilitary,
   isEligibleForMandatoryEnlistment,
@@ -217,11 +219,17 @@ export function validateUniqueLineup(
   for (const pid of lineupOrder) {
     const p = players[pid];
     if (!p) continue;
-    const pos = lineupPositions[pid] ?? p.position;
-    if (pos !== 'DH' && pos !== p.position) {
+    if (p.role !== '타자') {
       return {
         valid: false,
-        error: `${p.name} 선수는 자연 포지션(${p.position}) 또는 지명타자(DH)로만 선발 출전할 수 있습니다.`,
+        error: `${p.name} 선수는 투수이므로 선발 타자 라인업에 배치할 수 없습니다.`,
+      };
+    }
+    const pos = lineupPositions[pid] ?? p.position;
+    if (!ALL_HITTER_LINEUP_POSITIONS.includes(pos)) {
+      return {
+        valid: false,
+        error: `${p.name} 선수의 배치 포지션(${pos})이 유효한 야수/DH 포지션이 아닙니다.`,
       };
     }
     const prevName = seen.get(pos);
@@ -1015,6 +1023,7 @@ export function applyCoachSwapRecommendation(
         t.benchOrder.push(slump.id);
       }
     }
+    reconcileTeamLineupPositionsInPlace(next, next.playerTeamId);
   } else if (slump.role === '투수' && rec.role === '투수') {
     const rotIdx = t.rotationOrder.indexOf(slump.id);
     const bpIdx = t.bullpenOrder.indexOf(slump.id);
@@ -1652,6 +1661,7 @@ export function resolvePlayerComplaint(
         tState.lineupOrder.push(p.id);
         tState.lineupPositions[p.id] = p.position;
         tState.benchOrder = tState.benchOrder.filter((id) => id !== p.id);
+        reconcileTeamLineupPositionsInPlace(next, myTeam);
       }
       p.morale = '만족';
       p.form = Math.min(5, p.form + 1);
@@ -3512,6 +3522,7 @@ export function processLeagueManagerFiringsAndOtherClubGms(
           } else if (t.lineupOrder.length < 9) {
             t.lineupOrder.push(newId);
             t.lineupPositions[newId] = replacement.position;
+            reconcileTeamLineupPositionsInPlace(next, tid);
           } else {
             t.benchOrder.push(newId);
           }
