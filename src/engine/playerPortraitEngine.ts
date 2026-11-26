@@ -477,6 +477,8 @@ export interface ResolvedPlayerPortrait {
   cacheKey: string;
   fromCache: boolean;
   badgeLabel: string;
+  credit?: string;
+  license?: string;
 }
 
 /**
@@ -500,7 +502,9 @@ export async function resolvePlayerPortraitAsync(
       uniformKey,
       cacheKey: `${identityKey}::licensed`,
       fromCache: true,
-      badgeLabel: 'KBO 공식',
+      badgeLabel: '실제 프로필',
+      credit: licensed.credit,
+      license: licensed.license,
     };
   }
 

@@ -1,0 +1,5592 @@
+{
+  "generatedAt": "2026-11-26T15:35:55.338Z",
+  "policyComplianceNote": "나무위키 이미지 CDN(i.namu.wiki/robots.txt -> HTTP 403 Forbidden) 및 제한적 이용(KBO·구단·언론사 저작권) 이미지의 무단 자동 수집을 차단하고, 자동 수집·재배포가 공식 허용된 위키미디어 공용(Wikimedia Commons CC BY / CC BY-SA / CC0 / Public Domain) 검증 이미지만 수집했습니다. 사진이 없거나 비자유 저작물인 선수는 기본 구단 유니폼 실루엣을 적용합니다.",
+  "totals": {
+    "totalRealPlayers": 744,
+    "appliedCount": 115,
+    "missingOrFailedCount": 629,
+    "successRatePct": 15.5,
+    "downloadedNew": 2,
+    "reusedExisting": 113,
+    "licenseRejected": 0,
+    "downloadFailed": 0
+  },
+  "byClub": {
+    "LG": {
+      "teamId": "LG",
+      "folder": "public/portraits/kbo/LG",
+      "totalRealPlayers": 75,
+      "appliedCount": 10,
+      "missingOrFailedCount": 65,
+      "successRatePct": 13.3
+    },
+    "한화": {
+      "teamId": "한화",
+      "folder": "public/portraits/kbo/HH",
+      "totalRealPlayers": 77,
+      "appliedCount": 10,
+      "missingOrFailedCount": 67,
+      "successRatePct": 13
+    },
+    "SSG": {
+      "teamId": "SSG",
+      "folder": "public/portraits/kbo/SSG",
+      "totalRealPlayers": 78,
+      "appliedCount": 12,
+      "missingOrFailedCount": 66,
+      "successRatePct": 15.4
+    },
+    "삼성": {
+      "teamId": "삼성",
+      "folder": "public/portraits/kbo/SS",
+      "totalRealPlayers": 75,
+      "appliedCount": 20,
+      "missingOrFailedCount": 55,
+      "successRatePct": 26.7
+    },
+    "NC": {
+      "teamId": "NC",
+      "folder": "public/portraits/kbo/NC",
+      "totalRealPlayers": 73,
+      "appliedCount": 6,
+      "missingOrFailedCount": 67,
+      "successRatePct": 8.2
+    },
+    "KT": {
+      "teamId": "KT",
+      "folder": "public/portraits/kbo/KT",
+      "totalRealPlayers": 73,
+      "appliedCount": 7,
+      "missingOrFailedCount": 66,
+      "successRatePct": 9.6
+    },
+    "롯데": {
+      "teamId": "롯데",
+      "folder": "public/portraits/kbo/LT",
+      "totalRealPlayers": 74,
+      "appliedCount": 13,
+      "missingOrFailedCount": 61,
+      "successRatePct": 17.6
+    },
+    "KIA": {
+      "teamId": "KIA",
+      "folder": "public/portraits/kbo/KIA",
+      "totalRealPlayers": 74,
+      "appliedCount": 13,
+      "missingOrFailedCount": 61,
+      "successRatePct": 17.6
+    },
+    "두산": {
+      "teamId": "두산",
+      "folder": "public/portraits/kbo/OB",
+      "totalRealPlayers": 72,
+      "appliedCount": 15,
+      "missingOrFailedCount": 57,
+      "successRatePct": 20.8
+    },
+    "키움": {
+      "teamId": "키움",
+      "folder": "public/portraits/kbo/WO",
+      "totalRealPlayers": 73,
+      "appliedCount": 9,
+      "missingOrFailedCount": 64,
+      "successRatePct": 12.3
+    }
+  },
+  "failedOrMissingPlayers": [
+    {
+      "permanentId": "KBO-PL-321248",
+      "kboOfficialId": "66112",
+      "name": "김기연",
+      "teamId": "두산",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-374179",
+      "kboOfficialId": "69238",
+      "name": "김대한",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-119302",
+      "name": "김도윤",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-725863",
+      "kboOfficialId": "52267",
+      "name": "김동준",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-222583",
+      "name": "김동환",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-878093",
+      "kboOfficialId": "67246",
+      "name": "김명신",
+      "teamId": "두산",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-931585",
+      "kboOfficialId": "68200",
+      "name": "김민규",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-214723",
+      "kboOfficialId": "53554",
+      "name": "김민석",
+      "teamId": "두산",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-907050",
+      "kboOfficialId": "65269",
+      "name": "김민혁",
+      "teamId": "두산",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-769131",
+      "kboOfficialId": "53262",
+      "name": "김유성",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-579059",
+      "kboOfficialId": "63257",
+      "name": "김인태",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-516600",
+      "kboOfficialId": "68830",
+      "name": "김정우",
+      "teamId": "두산",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-258463",
+      "name": "김주오",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-391538",
+      "name": "김준우",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-734613",
+      "name": "김지우",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-884546",
+      "name": "김지윤",
+      "teamId": "두산",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-371155",
+      "kboOfficialId": "55221",
+      "name": "김한중",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-428576",
+      "kboOfficialId": "68269",
+      "name": "김호준",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-427267",
+      "kboOfficialId": "53204",
+      "name": "박민준",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-723460",
+      "kboOfficialId": "68249",
+      "name": "박신지",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-575221",
+      "kboOfficialId": "65639",
+      "name": "박정수",
+      "teamId": "두산",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-892394",
+      "name": "박준서",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-103227",
+      "kboOfficialId": "55252",
+      "name": "박준순",
+      "teamId": "두산",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-317482",
+      "name": "박지호",
+      "teamId": "두산",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-381761",
+      "kboOfficialId": "50204",
+      "name": "박지훈",
+      "teamId": "두산",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-438104",
+      "kboOfficialId": "64646",
+      "name": "박찬호",
+      "teamId": "두산",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-428872",
+      "kboOfficialId": "67266",
+      "name": "박치국",
+      "teamId": "두산",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-650769",
+      "kboOfficialId": "56241",
+      "name": "서준오",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-405082",
+      "name": "설재민",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "unverified_identity_no_birthyear_or_team"
+    },
+    {
+      "permanentId": "KBO-PL-555237",
+      "name": "신우열",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-554908",
+      "name": "심건보",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-531595",
+      "kboOfficialId": "51203",
+      "name": "안재석",
+      "teamId": "두산",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-633608",
+      "kboOfficialId": "64153",
+      "name": "양석환",
+      "teamId": "두산",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-244787",
+      "kboOfficialId": "55215",
+      "name": "양재훈",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-261570",
+      "name": "여동건",
+      "teamId": "두산",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-500618",
+      "kboOfficialId": "50208",
+      "name": "오명진",
+      "teamId": "두산",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-540005",
+      "kboOfficialId": "53296",
+      "name": "윤준호",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-829058",
+      "kboOfficialId": "52202",
+      "name": "윤태호",
+      "teamId": "두산",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-406713",
+      "name": "이민준",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-740671",
+      "kboOfficialId": "52204",
+      "name": "이병헌",
+      "teamId": "두산",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-346232",
+      "name": "이석영",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-966661",
+      "name": "이승민",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-857972",
+      "kboOfficialId": "66291",
+      "name": "이영하",
+      "teamId": "두산",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-580377",
+      "kboOfficialId": "77211",
+      "name": "이용찬",
+      "teamId": "두산",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-605699",
+      "kboOfficialId": "67207",
+      "name": "이유찬",
+      "teamId": "두산",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-854005",
+      "kboOfficialId": "50262",
+      "name": "이주엽",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-858379",
+      "name": "이주호",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-642334",
+      "kboOfficialId": "54236",
+      "name": "임종성",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-785678",
+      "kboOfficialId": "54214",
+      "name": "전다민",
+      "teamId": "두산",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-150276",
+      "name": "정현우",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-648627",
+      "name": "조한결",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-355862",
+      "name": "최우인",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-541691",
+      "kboOfficialId": "50206",
+      "name": "최종인",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-124457",
+      "kboOfficialId": "56215",
+      "name": "최주형",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-909872",
+      "kboOfficialId": "53259",
+      "name": "최준호",
+      "teamId": "두산",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-738357",
+      "kboOfficialId": "52206",
+      "name": "최지강",
+      "teamId": "두산",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-906604",
+      "kboOfficialId": "66233",
+      "name": "홍성호",
+      "teamId": "두산",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-866186",
+      "kboOfficialId": "69517",
+      "name": "고승민",
+      "teamId": "롯데",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-256993",
+      "kboOfficialId": "65522",
+      "name": "김강현",
+      "teamId": "롯데",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-692314",
+      "name": "김규민",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-167752",
+      "kboOfficialId": "52504",
+      "name": "김동혁",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-170144",
+      "kboOfficialId": "55502",
+      "name": "김동현",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-545861",
+      "kboOfficialId": "77564",
+      "name": "김민성",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-585984",
+      "kboOfficialId": "76430",
+      "name": "김상수",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-530107",
+      "kboOfficialId": "52514",
+      "name": "김세민",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-111774",
+      "name": "김시후",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-327328",
+      "name": "김영준",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-133374",
+      "kboOfficialId": "51516",
+      "name": "김진욱",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-224724",
+      "name": "김진호",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-583503",
+      "kboOfficialId": "56595",
+      "name": "김한홀",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-150291",
+      "kboOfficialId": "51551",
+      "name": "나승엽",
+      "teamId": "롯데",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-806270",
+      "name": "박근서",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-629220",
+      "name": "박서진",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-703524",
+      "kboOfficialId": "64021",
+      "name": "박세웅",
+      "teamId": "롯데",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-541047",
+      "kboOfficialId": "66047",
+      "name": "박세진",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-507069",
+      "kboOfficialId": "62802",
+      "name": "박승욱",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-431894",
+      "kboOfficialId": "60559",
+      "name": "박시영",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-584325",
+      "kboOfficialId": "55563",
+      "name": "박재엽",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-693293",
+      "kboOfficialId": "56536",
+      "name": "박정민",
+      "teamId": "롯데",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-205496",
+      "kboOfficialId": "54503",
+      "name": "박준우",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-234823",
+      "kboOfficialId": "69594",
+      "name": "박진",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-323821",
+      "kboOfficialId": "55530",
+      "name": "박찬형",
+      "teamId": "롯데",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-721235",
+      "name": "배종윤",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-817170",
+      "kboOfficialId": "51528",
+      "name": "손성빈",
+      "teamId": "롯데",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-628819",
+      "kboOfficialId": "50150",
+      "name": "손호영",
+      "teamId": "롯데",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-850419",
+      "kboOfficialId": "51594",
+      "name": "송재영",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-712666",
+      "kboOfficialId": "56567",
+      "name": "신동건",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-577831",
+      "kboOfficialId": "69508",
+      "name": "신윤후",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-972846",
+      "name": "원지우",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-164060",
+      "kboOfficialId": "61102",
+      "name": "유강남",
+      "teamId": "롯데",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-323242",
+      "kboOfficialId": "67588",
+      "name": "윤성빈",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-399119",
+      "name": "윤승민",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-899004",
+      "kboOfficialId": "52530",
+      "name": "이민석",
+      "teamId": "롯데",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-670450",
+      "kboOfficialId": "56563",
+      "name": "이서준",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-145488",
+      "kboOfficialId": "55503",
+      "name": "이영재",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-336380",
+      "kboOfficialId": "56554",
+      "name": "이준서",
+      "teamId": "롯데",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-315335",
+      "kboOfficialId": "53562",
+      "name": "이진하",
+      "teamId": "롯데",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-205927",
+      "kboOfficialId": "55511",
+      "name": "이태경",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-383837",
+      "name": "이현민",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "unverified_identity_no_birthyear_or_team"
+    },
+    {
+      "permanentId": "KBO-PL-509713",
+      "kboOfficialId": "54598",
+      "name": "이호준",
+      "teamId": "롯데",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-539468",
+      "name": "임성준",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-449270",
+      "kboOfficialId": "64340",
+      "name": "임지열",
+      "teamId": "롯데",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-426762",
+      "kboOfficialId": "68507",
+      "name": "장두성",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-468333",
+      "kboOfficialId": "54551",
+      "name": "전미르",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-395151",
+      "kboOfficialId": "68205",
+      "name": "전민재",
+      "teamId": "롯데",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-938695",
+      "name": "정문혁",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-613083",
+      "kboOfficialId": "68518",
+      "name": "정보근",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-931419",
+      "kboOfficialId": "68556",
+      "name": "정성종",
+      "teamId": "롯데",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-252994",
+      "kboOfficialId": "54537",
+      "name": "정현수",
+      "teamId": "롯데",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-738449",
+      "kboOfficialId": "52516",
+      "name": "조세진",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-878651",
+      "name": "최수완",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-937904",
+      "kboOfficialId": "68036",
+      "name": "최이준",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-475626",
+      "kboOfficialId": "50556",
+      "name": "최준용",
+      "teamId": "롯데",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-106713",
+      "kboOfficialId": "62884",
+      "name": "최항",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-807209",
+      "kboOfficialId": "68525",
+      "name": "한동희",
+      "teamId": "롯데",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-796929",
+      "kboOfficialId": "52568",
+      "name": "한태양",
+      "teamId": "롯데",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-478021",
+      "kboOfficialId": "68260",
+      "name": "현도훈",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-195326",
+      "kboOfficialId": "50596",
+      "name": "홍민기",
+      "teamId": "롯데",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-533260",
+      "name": "김다운",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-385900",
+      "kboOfficialId": "54401",
+      "name": "김대호",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-396829",
+      "kboOfficialId": "69442",
+      "name": "김도환",
+      "teamId": "삼성",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-129324",
+      "name": "김민훈",
+      "teamId": "삼성",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-624533",
+      "name": "김상호",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-818350",
+      "kboOfficialId": "67449",
+      "name": "김성윤",
+      "teamId": "삼성",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-824529",
+      "kboOfficialId": "52430",
+      "name": "김영웅",
+      "teamId": "삼성",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-977522",
+      "name": "김용휘",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-120086",
+      "name": "김우경",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-456813",
+      "kboOfficialId": "53400",
+      "name": "김재상",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-953151",
+      "kboOfficialId": "65132",
+      "name": "김재성",
+      "teamId": "삼성",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-188285",
+      "name": "김태훈(타)",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-408371",
+      "name": "김태훈(투)",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-537232",
+      "kboOfficialId": "51463",
+      "name": "김현준",
+      "teamId": "삼성",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-290425",
+      "kboOfficialId": "56415",
+      "name": "미야지",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "아시아쿼터",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-721587",
+      "kboOfficialId": "64468",
+      "name": "박계범",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-205145",
+      "kboOfficialId": "62244",
+      "name": "박세혁",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-516571",
+      "name": "박용재",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-590045",
+      "kboOfficialId": "53411",
+      "name": "박진우",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-430922",
+      "kboOfficialId": "55455",
+      "name": "배찬승",
+      "teamId": "삼성",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-194395",
+      "kboOfficialId": "77446",
+      "name": "백정현",
+      "teamId": "삼성",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-804606",
+      "name": "서승환",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-527867",
+      "kboOfficialId": "55438",
+      "name": "심재훈",
+      "teamId": "삼성",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-453856",
+      "name": "양도근",
+      "teamId": "삼성",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-156423",
+      "kboOfficialId": "69403",
+      "name": "양우현",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-241076",
+      "kboOfficialId": "61268",
+      "name": "양현",
+      "teamId": "삼성",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-607536",
+      "name": "원상윤",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-555042",
+      "kboOfficialId": "69428",
+      "name": "이병헌",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-862158",
+      "kboOfficialId": "50464",
+      "name": "이승민",
+      "teamId": "삼성",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-369524",
+      "name": "이승현",
+      "teamId": "삼성",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-917467",
+      "name": "이승현(우)",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-447970",
+      "name": "이승현(좌)",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-247257",
+      "kboOfficialId": "63492",
+      "name": "이재익",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-236101",
+      "kboOfficialId": "52415",
+      "name": "이재현",
+      "teamId": "삼성",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-977640",
+      "kboOfficialId": "51460",
+      "name": "이재희",
+      "teamId": "삼성",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-789058",
+      "kboOfficialId": "51407",
+      "name": "이창용",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-996728",
+      "name": "이호범",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-138435",
+      "kboOfficialId": "53455",
+      "name": "이호성",
+      "teamId": "삼성",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-228561",
+      "kboOfficialId": "62754",
+      "name": "임기영",
+      "teamId": "삼성",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-912798",
+      "name": "임영주",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-689222",
+      "kboOfficialId": "63202",
+      "name": "장승현",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-858697",
+      "kboOfficialId": "56460",
+      "name": "장찬희",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-105932",
+      "kboOfficialId": "65586",
+      "name": "전병우",
+      "teamId": "삼성",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-825106",
+      "kboOfficialId": "54467",
+      "name": "정민성",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-902748",
+      "kboOfficialId": "56469",
+      "name": "정재훈",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-595464",
+      "name": "조승우",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-338742",
+      "kboOfficialId": "55435",
+      "name": "차승준",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-562208",
+      "name": "차유주",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-222017",
+      "kboOfficialId": "67421",
+      "name": "최지광",
+      "teamId": "삼성",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-481580",
+      "kboOfficialId": "68501",
+      "name": "최하늘",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-646999",
+      "kboOfficialId": "55440",
+      "name": "함수호",
+      "teamId": "삼성",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-362327",
+      "kboOfficialId": "50430",
+      "name": "홍원표",
+      "teamId": "삼성",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-851640",
+      "kboOfficialId": "67005",
+      "name": "홍현빈",
+      "teamId": "삼성",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-826358",
+      "name": "황동재",
+      "teamId": "삼성",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-571774",
+      "name": "황우영",
+      "teamId": "삼성",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-483693",
+      "name": "고영우",
+      "teamId": "키움",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-531838",
+      "kboOfficialId": "53312",
+      "name": "김건희",
+      "teamId": "키움",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-938708",
+      "name": "김경록",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-691089",
+      "name": "김대승",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-747314",
+      "kboOfficialId": "53164",
+      "name": "김동규",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-697640",
+      "kboOfficialId": "53344",
+      "name": "김동헌",
+      "teamId": "키움",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-453415",
+      "name": "김민서",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-620168",
+      "name": "김민준",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-871182",
+      "kboOfficialId": "50304",
+      "name": "김병휘",
+      "teamId": "키움",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-872892",
+      "kboOfficialId": "66018",
+      "name": "김선기",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-900193",
+      "kboOfficialId": "51301",
+      "name": "김성진",
+      "teamId": "키움",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-977459",
+      "kboOfficialId": "54368",
+      "name": "김연주",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-744912",
+      "kboOfficialId": "65898",
+      "name": "김웅빈",
+      "teamId": "키움",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-832590",
+      "kboOfficialId": "54319",
+      "name": "김윤하",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-400752",
+      "name": "김정현",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-465278",
+      "kboOfficialId": "56326",
+      "name": "김지석",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-517814",
+      "kboOfficialId": "64984",
+      "name": "김태진",
+      "teamId": "키움",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-311684",
+      "kboOfficialId": "53305",
+      "name": "박성빈",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-286911",
+      "name": "박세준",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-279006",
+      "kboOfficialId": "52305",
+      "name": "박수종",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-941182",
+      "kboOfficialId": "53301",
+      "name": "박윤성",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-168580",
+      "kboOfficialId": "55394",
+      "name": "박정훈",
+      "teamId": "키움",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-780869",
+      "kboOfficialId": "69328",
+      "name": "박주성",
+      "teamId": "키움",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-397276",
+      "kboOfficialId": "50357",
+      "name": "박주홍",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-102236",
+      "kboOfficialId": "56318",
+      "name": "박준현",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-143568",
+      "kboOfficialId": "56337",
+      "name": "박지성",
+      "teamId": "키움",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-103626",
+      "kboOfficialId": "63512",
+      "name": "박진형",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-289199",
+      "kboOfficialId": "52348",
+      "name": "박찬혁",
+      "teamId": "키움",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-958858",
+      "kboOfficialId": "56304",
+      "name": "박한결",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-490261",
+      "kboOfficialId": "51761",
+      "name": "배동현",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-619750",
+      "name": "배정호",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-675430",
+      "kboOfficialId": "54394",
+      "name": "송지후",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-773016",
+      "kboOfficialId": "68341",
+      "name": "안우진",
+      "teamId": "키움",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-857247",
+      "kboOfficialId": "55370",
+      "name": "양현종",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-505112",
+      "kboOfficialId": "55392",
+      "name": "어준서",
+      "teamId": "키움",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-431350",
+      "kboOfficialId": "55393",
+      "name": "여동욱",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-695458",
+      "kboOfficialId": "55339",
+      "name": "염승원",
+      "teamId": "키움",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-635806",
+      "kboOfficialId": "67116",
+      "name": "오석주",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-807432",
+      "kboOfficialId": "56334",
+      "name": "와일스",
+      "teamId": "키움",
+      "rosterTier": "1군",
+      "category": "외국인",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-864284",
+      "name": "원성준",
+      "teamId": "키움",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-633141",
+      "kboOfficialId": "76118",
+      "name": "원종현",
+      "teamId": "키움",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-974397",
+      "kboOfficialId": "52395",
+      "name": "윤석원",
+      "teamId": "키움",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-864180",
+      "name": "이원영",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-242147",
+      "name": "이주형",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-702378",
+      "kboOfficialId": "55301",
+      "name": "이준우",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-860681",
+      "kboOfficialId": "56366",
+      "name": "이태양",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-107745",
+      "kboOfficialId": "78135",
+      "name": "이형종",
+      "teamId": "키움",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-188953",
+      "kboOfficialId": "64346",
+      "name": "임병욱",
+      "teamId": "키움",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-439213",
+      "kboOfficialId": "55382",
+      "name": "임진묵",
+      "teamId": "키움",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-106828",
+      "name": "장재영",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-298932",
+      "kboOfficialId": "54362",
+      "name": "전준표",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-422273",
+      "kboOfficialId": "56345",
+      "name": "정다훈",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-667769",
+      "kboOfficialId": "55377",
+      "name": "정세영",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-172094",
+      "kboOfficialId": "68242",
+      "name": "정철원",
+      "teamId": "키움",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-723123",
+      "kboOfficialId": "55313",
+      "name": "정현우",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-618412",
+      "kboOfficialId": "69360",
+      "name": "조영건",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-749058",
+      "name": "조희성",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-238267",
+      "kboOfficialId": "69332",
+      "name": "주성원",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-859667",
+      "name": "최우준",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-760650",
+      "kboOfficialId": "56338",
+      "name": "최재영",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-282199",
+      "kboOfficialId": "76267",
+      "name": "최주환",
+      "teamId": "키움",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-645768",
+      "kboOfficialId": "68362",
+      "name": "추재현",
+      "teamId": "키움",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-644062",
+      "kboOfficialId": "64350",
+      "name": "하영민",
+      "teamId": "키움",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-257947",
+      "name": "하현승",
+      "teamId": "키움",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-265990",
+      "kboOfficialId": "56769",
+      "name": "강건우",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-802990",
+      "kboOfficialId": "55764",
+      "name": "권민규",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-654703",
+      "name": "권현규",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-315517",
+      "name": "김기중",
+      "teamId": "한화",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-620424",
+      "kboOfficialId": "54705",
+      "name": "김도빈",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-520076",
+      "kboOfficialId": "65764",
+      "name": "김민우",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-596053",
+      "kboOfficialId": "50710",
+      "name": "김범준",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-857759",
+      "kboOfficialId": "53754",
+      "name": "김서현",
+      "teamId": "한화",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-717506",
+      "name": "김우성",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-375926",
+      "kboOfficialId": "63765",
+      "name": "김종수",
+      "teamId": "한화",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-220690",
+      "kboOfficialId": "66704",
+      "name": "김태연",
+      "teamId": "한화",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-307229",
+      "kboOfficialId": "69737",
+      "name": "노시환",
+      "teamId": "한화",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-969429",
+      "kboOfficialId": "53764",
+      "name": "문현빈",
+      "teamId": "한화",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-816805",
+      "name": "민주홍",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-243813",
+      "kboOfficialId": "66707",
+      "name": "박상언",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-348664",
+      "kboOfficialId": "67703",
+      "name": "박상원",
+      "teamId": "한화",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-331312",
+      "kboOfficialId": "53706",
+      "name": "박재규",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-533127",
+      "kboOfficialId": "50709",
+      "name": "박정현",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-162914",
+      "name": "박준영",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-881737",
+      "name": "박찬희",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-431192",
+      "kboOfficialId": "69974",
+      "name": "배민서",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-243788",
+      "kboOfficialId": "55798",
+      "name": "배승수",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-245760",
+      "name": "서승운",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-952175",
+      "name": "성재우",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-256030",
+      "kboOfficialId": "64006",
+      "name": "심우준",
+      "teamId": "한화",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-310398",
+      "name": "양수호",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-122865",
+      "name": "양진후",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-610100",
+      "kboOfficialId": "65056",
+      "name": "엄상백",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-888290",
+      "kboOfficialId": "56712",
+      "name": "에르난데스",
+      "teamId": "한화",
+      "rosterTier": "1군",
+      "category": "외국인",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-757217",
+      "kboOfficialId": "56754",
+      "name": "오재원",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-734000",
+      "kboOfficialId": "54702",
+      "name": "원종혁",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-186817",
+      "kboOfficialId": "69766",
+      "name": "유로결",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-492769",
+      "kboOfficialId": "52765",
+      "name": "유민",
+      "teamId": "한화",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-648167",
+      "kboOfficialId": "69213",
+      "name": "윤산흠",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-641003",
+      "kboOfficialId": "69205",
+      "name": "이교훈",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-145123",
+      "kboOfficialId": "65703",
+      "name": "이도윤",
+      "teamId": "한화",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-330720",
+      "kboOfficialId": "65616",
+      "name": "이민우",
+      "teamId": "한화",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-561727",
+      "kboOfficialId": "55710",
+      "name": "이민재",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-666266",
+      "kboOfficialId": "65117",
+      "name": "이상규",
+      "teamId": "한화",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-270990",
+      "name": "이상혁",
+      "teamId": "한화",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-310993",
+      "kboOfficialId": "55712",
+      "name": "이승현",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-894038",
+      "name": "이우재",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-486640",
+      "kboOfficialId": "68700",
+      "name": "이원석",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-476979",
+      "name": "이준우",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-225207",
+      "name": "이준호",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-620631",
+      "kboOfficialId": "66657",
+      "name": "이진영",
+      "teamId": "한화",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-182997",
+      "kboOfficialId": "62951",
+      "name": "이형범",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-908146",
+      "kboOfficialId": "50704",
+      "name": "임종찬",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-877843",
+      "kboOfficialId": "51762",
+      "name": "장규현",
+      "teamId": "한화",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-291312",
+      "name": "전현동",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-232699",
+      "kboOfficialId": "51764",
+      "name": "정민규",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-137717",
+      "kboOfficialId": "55743",
+      "name": "정우주",
+      "teamId": "한화",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-424889",
+      "name": "정이황",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-104592",
+      "kboOfficialId": "79192",
+      "name": "채은성",
+      "teamId": "한화",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-759382",
+      "name": "최수홍",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-938532",
+      "kboOfficialId": "53705",
+      "name": "최원준",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-747179",
+      "kboOfficialId": "56793",
+      "name": "최유빈",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-120796",
+      "kboOfficialId": "50707",
+      "name": "최인호",
+      "teamId": "한화",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-521171",
+      "kboOfficialId": "54730",
+      "name": "페라자",
+      "teamId": "한화",
+      "rosterTier": "1군",
+      "category": "외국인",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-373739",
+      "kboOfficialId": "56797",
+      "name": "하동준",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-480993",
+      "name": "한서구",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-338135",
+      "kboOfficialId": "55767",
+      "name": "한지윤",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-898701",
+      "kboOfficialId": "69706",
+      "name": "허관회",
+      "teamId": "한화",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-404638",
+      "kboOfficialId": "52764",
+      "name": "허인서",
+      "teamId": "한화",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-189157",
+      "kboOfficialId": "56724",
+      "name": "화이트",
+      "teamId": "한화",
+      "rosterTier": "1군",
+      "category": "외국인",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-694130",
+      "kboOfficialId": "54795",
+      "name": "황영묵",
+      "teamId": "한화",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-328484",
+      "kboOfficialId": "54729",
+      "name": "황준서",
+      "teamId": "한화",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-982367",
+      "name": "곽병진",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-903115",
+      "kboOfficialId": "66614",
+      "name": "김규성",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-507223",
+      "kboOfficialId": "69620",
+      "name": "김기훈",
+      "teamId": "KIA",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-720124",
+      "kboOfficialId": "60337",
+      "name": "김대유",
+      "teamId": "KIA",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-880166",
+      "kboOfficialId": "52605",
+      "name": "김도영",
+      "teamId": "KIA",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-925250",
+      "kboOfficialId": "56637",
+      "name": "김민규",
+      "teamId": "KIA",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-523422",
+      "kboOfficialId": "65769",
+      "name": "김범수",
+      "teamId": "KIA",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-683669",
+      "kboOfficialId": "63894",
+      "name": "김사윤",
+      "teamId": "KIA",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-179077",
+      "kboOfficialId": "67610",
+      "name": "김석환",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-535963",
+      "kboOfficialId": "78603",
+      "name": "김선빈",
+      "teamId": "KIA",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-156072",
+      "name": "김선빈",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-683908",
+      "kboOfficialId": "68928",
+      "name": "김시훈",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-728744",
+      "name": "김영준",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-896391",
+      "kboOfficialId": "55646",
+      "name": "김정엽",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-358736",
+      "kboOfficialId": "78122",
+      "name": "김태군",
+      "teamId": "KIA",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-864739",
+      "kboOfficialId": "55610",
+      "name": "김태형",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-915629",
+      "kboOfficialId": "69516",
+      "name": "김현수",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-155090",
+      "name": "김현수",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-325486",
+      "kboOfficialId": "54640",
+      "name": "네일",
+      "teamId": "KIA",
+      "rosterTier": "1군",
+      "category": "외국인",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-392125",
+      "name": "노민혁",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-702561",
+      "kboOfficialId": "50657",
+      "name": "박민",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-216193",
+      "kboOfficialId": "52634",
+      "name": "박상준",
+      "teamId": "KIA",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-153896",
+      "kboOfficialId": "55636",
+      "name": "박재현",
+      "teamId": "KIA",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-167621",
+      "kboOfficialId": "67609",
+      "name": "박정우",
+      "teamId": "KIA",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-120263",
+      "kboOfficialId": "54610",
+      "name": "성영탁",
+      "teamId": "KIA",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-153951",
+      "name": "소재휘",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-911899",
+      "kboOfficialId": "69636",
+      "name": "오선우",
+      "teamId": "KIA",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-557788",
+      "kboOfficialId": "55633",
+      "name": "올러",
+      "teamId": "KIA",
+      "rosterTier": "1군",
+      "category": "외국인",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-105291",
+      "name": "유제민",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-647123",
+      "kboOfficialId": "50604",
+      "name": "유지성",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-677435",
+      "kboOfficialId": "52667",
+      "name": "윤도현",
+      "teamId": "KIA",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-343754",
+      "kboOfficialId": "53613",
+      "name": "윤영철",
+      "teamId": "KIA",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-120354",
+      "kboOfficialId": "68619",
+      "name": "윤중현",
+      "teamId": "KIA",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-612394",
+      "kboOfficialId": "53615",
+      "name": "이도현",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-672719",
+      "kboOfficialId": "55632",
+      "name": "이성원",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-641110",
+      "name": "이세민",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-411799",
+      "kboOfficialId": "51648",
+      "name": "이의리",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-565948",
+      "name": "이종걸",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-115499",
+      "kboOfficialId": "65665",
+      "name": "이준영",
+      "teamId": "KIA",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-559357",
+      "name": "이진관",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-598770",
+      "kboOfficialId": "64560",
+      "name": "이창진",
+      "teamId": "KIA",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-915777",
+      "kboOfficialId": "60768",
+      "name": "이태양",
+      "teamId": "KIA",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-593916",
+      "name": "이호민",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-503584",
+      "kboOfficialId": "55663",
+      "name": "이호민",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-966204",
+      "kboOfficialId": "68504",
+      "name": "이호연",
+      "teamId": "KIA",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-516096",
+      "kboOfficialId": "50641",
+      "name": "장재혁",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-662711",
+      "kboOfficialId": "66609",
+      "name": "전상현",
+      "teamId": "KIA",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-225462",
+      "name": "정찬화",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-878706",
+      "kboOfficialId": "50662",
+      "name": "정해영",
+      "teamId": "KIA",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-251911",
+      "kboOfficialId": "53659",
+      "name": "정해원",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-760342",
+      "kboOfficialId": "55926",
+      "name": "정현창",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-961465",
+      "name": "지민혁",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-946243",
+      "kboOfficialId": "65464",
+      "name": "최정용",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-569312",
+      "kboOfficialId": "62700",
+      "name": "하주석",
+      "teamId": "KIA",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-474142",
+      "kboOfficialId": "52628",
+      "name": "한승연",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-591485",
+      "kboOfficialId": "51994",
+      "name": "한재승",
+      "teamId": "KIA",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-277444",
+      "kboOfficialId": "68646",
+      "name": "한준수",
+      "teamId": "KIA",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-215077",
+      "kboOfficialId": "61643",
+      "name": "홍건희",
+      "teamId": "KIA",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-699797",
+      "kboOfficialId": "55267",
+      "name": "홍민규",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-136662",
+      "kboOfficialId": "65610",
+      "name": "황대인",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-251312",
+      "kboOfficialId": "52641",
+      "name": "황동하",
+      "teamId": "KIA",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-937101",
+      "kboOfficialId": "53006",
+      "name": "강건",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-926889",
+      "kboOfficialId": "69064",
+      "name": "강민성",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-303326",
+      "kboOfficialId": "50066",
+      "name": "강현우",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-258454",
+      "name": "고준혁",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-117041",
+      "kboOfficialId": "51003",
+      "name": "권동진",
+      "teamId": "KT",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-477929",
+      "name": "권성준",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-489261",
+      "name": "김건휘",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-176034",
+      "name": "김단",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-164828",
+      "name": "김동영",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-485100",
+      "kboOfficialId": "55040",
+      "name": "김동현",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-992131",
+      "kboOfficialId": "54097",
+      "name": "김민석",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-589991",
+      "kboOfficialId": "65048",
+      "name": "김민수",
+      "teamId": "KT",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-690207",
+      "kboOfficialId": "64004",
+      "name": "김민혁",
+      "teamId": "KT",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-877044",
+      "name": "김병준",
+      "teamId": "KT",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-227325",
+      "kboOfficialId": "79402",
+      "name": "김상수",
+      "teamId": "KT",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-662218",
+      "kboOfficialId": "53029",
+      "name": "김정운",
+      "teamId": "KT",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-755965",
+      "name": "김지민",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-777624",
+      "name": "김지율",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-215143",
+      "kboOfficialId": "53036",
+      "name": "류현인",
+      "teamId": "KT",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-294230",
+      "kboOfficialId": "67419",
+      "name": "문용익",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-624650",
+      "kboOfficialId": "55046",
+      "name": "박건우",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-116199",
+      "kboOfficialId": "52060",
+      "name": "박영현",
+      "teamId": "KT",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-171682",
+      "kboOfficialId": "56066",
+      "name": "박지훈",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-950790",
+      "kboOfficialId": "64166",
+      "name": "배정대",
+      "teamId": "KT",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-949902",
+      "kboOfficialId": "65516",
+      "name": "배제성",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-148793",
+      "kboOfficialId": "56036",
+      "name": "보쉴리",
+      "teamId": "KT",
+      "rosterTier": "1군",
+      "category": "외국인",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-896079",
+      "kboOfficialId": "50030",
+      "name": "소형준",
+      "teamId": "KT",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-980747",
+      "kboOfficialId": "69041",
+      "name": "손동현",
+      "teamId": "KT",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-820976",
+      "kboOfficialId": "56011",
+      "name": "스기모토",
+      "teamId": "KT",
+      "rosterTier": "1군",
+      "category": "아시아쿼터",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-699656",
+      "name": "안우석",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-829629",
+      "kboOfficialId": "50901",
+      "name": "안인산",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-916440",
+      "kboOfficialId": "67006",
+      "name": "안치영",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-430270",
+      "kboOfficialId": "52001",
+      "name": "안현민",
+      "teamId": "KT",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-137611",
+      "kboOfficialId": "55005",
+      "name": "오서진",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-289341",
+      "kboOfficialId": "50859",
+      "name": "오원석",
+      "teamId": "KT",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-968060",
+      "kboOfficialId": "64504",
+      "name": "오윤석",
+      "teamId": "KT",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-292848",
+      "kboOfficialId": "54063",
+      "name": "원상현",
+      "teamId": "KT",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-981585",
+      "kboOfficialId": "51013",
+      "name": "유준규",
+      "teamId": "KT",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-431934",
+      "kboOfficialId": "56006",
+      "name": "이강민",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-657852",
+      "kboOfficialId": "69054",
+      "name": "이상동",
+      "teamId": "KT",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-145379",
+      "name": "이승원",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-633043",
+      "name": "이원재",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-814489",
+      "kboOfficialId": "56005",
+      "name": "이재원",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-919900",
+      "kboOfficialId": "67807",
+      "name": "이정범",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-722301",
+      "kboOfficialId": "67048",
+      "name": "이정현",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-786606",
+      "kboOfficialId": "67644",
+      "name": "이정훈",
+      "teamId": "KT",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-249687",
+      "name": "이지효",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-525586",
+      "kboOfficialId": "68896",
+      "name": "이채호",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-627515",
+      "name": "임상우",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-461074",
+      "kboOfficialId": "69113",
+      "name": "임준형",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-914931",
+      "kboOfficialId": "78548",
+      "name": "장성우",
+      "teamId": "KT",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-675788",
+      "kboOfficialId": "64115",
+      "name": "장준원",
+      "teamId": "KT",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-568356",
+      "kboOfficialId": "66706",
+      "name": "장진혁",
+      "teamId": "KT",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-944731",
+      "kboOfficialId": "69047",
+      "name": "전용주",
+      "teamId": "KT",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-649738",
+      "kboOfficialId": "68089",
+      "name": "조대현",
+      "teamId": "KT",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-786284",
+      "name": "조영우",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-225487",
+      "kboOfficialId": "64768",
+      "name": "조이현",
+      "teamId": "KT",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-885949",
+      "kboOfficialId": "65060",
+      "name": "주권",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-306559",
+      "kboOfficialId": "79140",
+      "name": "최동환",
+      "teamId": "KT",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-802054",
+      "name": "최민상",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-936893",
+      "name": "최민영",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-704458",
+      "kboOfficialId": "51007",
+      "name": "최성민",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-166427",
+      "kboOfficialId": "66606",
+      "name": "최원준",
+      "teamId": "KT",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-413836",
+      "kboOfficialId": "63722",
+      "name": "한승택",
+      "teamId": "KT",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-160064",
+      "kboOfficialId": "61666",
+      "name": "한승혁",
+      "teamId": "KT",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-669729",
+      "kboOfficialId": "51058",
+      "name": "한차현",
+      "teamId": "KT",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-446681",
+      "kboOfficialId": "69100",
+      "name": "구본혁",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-274900",
+      "name": "권우준",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-466540",
+      "name": "김건",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-196621",
+      "name": "김동주",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-572477",
+      "name": "김동현",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-764098",
+      "kboOfficialId": "64793",
+      "name": "김민수",
+      "teamId": "LG",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-226721",
+      "name": "김서준",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-748383",
+      "name": "김성우",
+      "teamId": "LG",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-210224",
+      "kboOfficialId": "69105",
+      "name": "김성진",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-117813",
+      "kboOfficialId": "55167",
+      "name": "김영우",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-405250",
+      "kboOfficialId": "64596",
+      "name": "김유영",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-158083",
+      "name": "김정율",
+      "teamId": "LG",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-178091",
+      "kboOfficialId": "66162",
+      "name": "김주성",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-708648",
+      "kboOfficialId": "65411",
+      "name": "김주온",
+      "teamId": "LG",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-868736",
+      "kboOfficialId": "62558",
+      "name": "김준태",
+      "teamId": "LG",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-720886",
+      "kboOfficialId": "75867",
+      "name": "김진성",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-902264",
+      "kboOfficialId": "51154",
+      "name": "김진수",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-359031",
+      "kboOfficialId": "54166",
+      "name": "김현종",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-477833",
+      "kboOfficialId": "69102",
+      "name": "문보경",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-415975",
+      "kboOfficialId": "68119",
+      "name": "문성주",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-257153",
+      "kboOfficialId": "52121",
+      "name": "문정빈",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-775138",
+      "kboOfficialId": "55164",
+      "name": "박관우",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-425918",
+      "kboOfficialId": "79365",
+      "name": "박동원",
+      "teamId": "LG",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-859083",
+      "kboOfficialId": "53139",
+      "name": "박명근",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-327672",
+      "kboOfficialId": "55121",
+      "name": "박시원",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-658700",
+      "name": "박준성",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-397757",
+      "name": "박현민",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-305742",
+      "kboOfficialId": "63145",
+      "name": "배재준",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-800377",
+      "kboOfficialId": "65109",
+      "name": "백승현",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-689714",
+      "name": "서영준",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-202293",
+      "kboOfficialId": "68159",
+      "name": "성동현",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-606079",
+      "kboOfficialId": "54156",
+      "name": "손용준",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-857177",
+      "kboOfficialId": "67143",
+      "name": "손주영",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-664124",
+      "kboOfficialId": "51111",
+      "name": "송승기",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-446499",
+      "kboOfficialId": "68110",
+      "name": "송찬의",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-494119",
+      "kboOfficialId": "65207",
+      "name": "신민재",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-745365",
+      "kboOfficialId": "56165",
+      "name": "양우진",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-510571",
+      "kboOfficialId": "51526",
+      "name": "우강훈",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-118992",
+      "name": "우명현",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-669487",
+      "kboOfficialId": "55348",
+      "name": "웰스",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "아시아쿼터",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-665353",
+      "kboOfficialId": "50106",
+      "name": "유영찬",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-338549",
+      "name": "윤예성",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-159520",
+      "name": "이동욱",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-100850",
+      "kboOfficialId": "50126",
+      "name": "이민호",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-507582",
+      "kboOfficialId": "51100",
+      "name": "이영빈",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-300968",
+      "kboOfficialId": "61145",
+      "name": "이우찬",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-825553",
+      "kboOfficialId": "68106",
+      "name": "이재원",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-269506",
+      "kboOfficialId": "69134",
+      "name": "이정용",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-355716",
+      "name": "이정호",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-137876",
+      "kboOfficialId": "52154",
+      "name": "이주헌",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-144239",
+      "kboOfficialId": "69108",
+      "name": "이지강",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-449649",
+      "name": "이하람",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-422006",
+      "kboOfficialId": "61101",
+      "name": "임찬규",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-470837",
+      "name": "임호윤",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-363907",
+      "kboOfficialId": "63950",
+      "name": "장현식",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-919721",
+      "name": "전율빈",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-278234",
+      "kboOfficialId": "51163",
+      "name": "조건희",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-104522",
+      "name": "조범규",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-765496",
+      "kboOfficialId": "52149",
+      "name": "조원태",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-210117",
+      "kboOfficialId": "50054",
+      "name": "천성호",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-416761",
+      "kboOfficialId": "52103",
+      "name": "최원영",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-626651",
+      "kboOfficialId": "68419",
+      "name": "최지명",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-468055",
+      "name": "추세현",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-912837",
+      "kboOfficialId": "55130",
+      "name": "톨허스트",
+      "teamId": "LG",
+      "rosterTier": "1군",
+      "category": "외국인",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-335188",
+      "kboOfficialId": "50108",
+      "name": "함창건",
+      "teamId": "LG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-625287",
+      "name": "강인규",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-338692",
+      "kboOfficialId": "54908",
+      "name": "고승완",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-670018",
+      "kboOfficialId": "56949",
+      "name": "고준휘",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-172325",
+      "kboOfficialId": "63963",
+      "name": "권희동",
+      "teamId": "NC",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-226989",
+      "name": "권희재",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-348764",
+      "kboOfficialId": "56952",
+      "name": "김건",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-956328",
+      "kboOfficialId": "52995",
+      "name": "김녹원",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-243362",
+      "name": "김민규",
+      "teamId": "NC",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-621458",
+      "name": "김민찬",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-679091",
+      "name": "김세훈",
+      "teamId": "NC",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-500542",
+      "kboOfficialId": "68900",
+      "name": "김영규",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-768718",
+      "kboOfficialId": "64580",
+      "name": "김재열",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-492982",
+      "kboOfficialId": "51903",
+      "name": "김정호",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-361507",
+      "kboOfficialId": "51907",
+      "name": "김주원",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-511773",
+      "kboOfficialId": "67954",
+      "name": "김진호",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-516715",
+      "kboOfficialId": "50992",
+      "name": "김태경",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-730443",
+      "kboOfficialId": "55995",
+      "name": "김태훈",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-731851",
+      "kboOfficialId": "50902",
+      "name": "김한별",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-609760",
+      "kboOfficialId": "68912",
+      "name": "김형준",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-366575",
+      "name": "김호승",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-296943",
+      "kboOfficialId": "51344",
+      "name": "김휘집",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-570099",
+      "kboOfficialId": "66965",
+      "name": "도태훈",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-939902",
+      "kboOfficialId": "55903",
+      "name": "라일리",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "외국인",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-898925",
+      "kboOfficialId": "65949",
+      "name": "류진욱",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-988001",
+      "name": "마진혁",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-112711",
+      "kboOfficialId": "53973",
+      "name": "목지훈",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-626175",
+      "name": "박보승",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-690332",
+      "kboOfficialId": "50996",
+      "name": "박시원",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-132499",
+      "name": "박시후",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-280746",
+      "kboOfficialId": "69994",
+      "name": "박지한",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-162537",
+      "kboOfficialId": "64995",
+      "name": "배재환",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-456314",
+      "name": "서찬혁",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-835240",
+      "kboOfficialId": "69995",
+      "name": "서호철",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-814866",
+      "kboOfficialId": "54904",
+      "name": "손주환",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-348644",
+      "name": "신민우",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-554197",
+      "kboOfficialId": "68902",
+      "name": "신민혁",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-570010",
+      "kboOfficialId": "53919",
+      "name": "신영우",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-324730",
+      "kboOfficialId": "56909",
+      "name": "신재인",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-580213",
+      "kboOfficialId": "64022",
+      "name": "안중열",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-489044",
+      "kboOfficialId": "68904",
+      "name": "오영수",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-309701",
+      "kboOfficialId": "51991",
+      "name": "오장한",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-567417",
+      "kboOfficialId": "51996",
+      "name": "오태양",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-268358",
+      "name": "우주로",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-926375",
+      "kboOfficialId": "54906",
+      "name": "원종해",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-873841",
+      "kboOfficialId": "50092",
+      "name": "윤준혁",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-309651",
+      "name": "이세민",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-415200",
+      "kboOfficialId": "60263",
+      "name": "이재학",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-853778",
+      "name": "이정찬",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-420090",
+      "kboOfficialId": "52992",
+      "name": "이준혁",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-454323",
+      "kboOfficialId": "56932",
+      "name": "이희성",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-491541",
+      "kboOfficialId": "63959",
+      "name": "임정호",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-109119",
+      "name": "임준원",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-962239",
+      "kboOfficialId": "52902",
+      "name": "임지민",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-474952",
+      "kboOfficialId": "69969",
+      "name": "전사민",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-723135",
+      "kboOfficialId": "52903",
+      "name": "조민석",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-497818",
+      "kboOfficialId": "67905",
+      "name": "천재환",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-356260",
+      "kboOfficialId": "66920",
+      "name": "최성영",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-795634",
+      "kboOfficialId": "56967",
+      "name": "최요한",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-359847",
+      "kboOfficialId": "54903",
+      "name": "최우석",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-534182",
+      "kboOfficialId": "69992",
+      "name": "최정원",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-327552",
+      "kboOfficialId": "56966",
+      "name": "테일러",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "외국인",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-709998",
+      "kboOfficialId": "68639",
+      "name": "하준영",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-229306",
+      "kboOfficialId": "64101",
+      "name": "한석현",
+      "teamId": "NC",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-951601",
+      "kboOfficialId": "50903",
+      "name": "한재환",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-252763",
+      "kboOfficialId": "56904",
+      "name": "허윤",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-113909",
+      "kboOfficialId": "50600",
+      "name": "홍종표",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-126472",
+      "name": "황성현",
+      "teamId": "NC",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-612867",
+      "name": "곽도현",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-934445",
+      "kboOfficialId": "51867",
+      "name": "김건우",
+      "teamId": "SSG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-107928",
+      "name": "김규민",
+      "teamId": "SSG",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-511406",
+      "kboOfficialId": "68043",
+      "name": "김민",
+      "teamId": "SSG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-330045",
+      "kboOfficialId": "62864",
+      "name": "김민식",
+      "teamId": "SSG",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-736232",
+      "kboOfficialId": "56840",
+      "name": "김민준",
+      "teamId": "SSG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-887401",
+      "kboOfficialId": "53893",
+      "name": "김민준",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-404114",
+      "name": "김성민",
+      "teamId": "SSG",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-630577",
+      "kboOfficialId": "62934",
+      "name": "김성욱",
+      "teamId": "SSG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-977365",
+      "kboOfficialId": "67900",
+      "name": "김수윤",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-164992",
+      "kboOfficialId": "56846",
+      "name": "김요셉",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-183934",
+      "kboOfficialId": "69825",
+      "name": "김창평",
+      "teamId": "SSG",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-671525",
+      "kboOfficialId": "52803",
+      "name": "김태윤",
+      "teamId": "SSG",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-255764",
+      "kboOfficialId": "65343",
+      "name": "김택형",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-154938",
+      "kboOfficialId": "50007",
+      "name": "문상준",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-113800",
+      "kboOfficialId": "62869",
+      "name": "문승원",
+      "teamId": "SSG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-565680",
+      "kboOfficialId": "54802",
+      "name": "박기호",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-146845",
+      "name": "박성빈",
+      "teamId": "SSG",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-143567",
+      "kboOfficialId": "67893",
+      "name": "박성한",
+      "teamId": "SSG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-881924",
+      "kboOfficialId": "50812",
+      "name": "박시후",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-931128",
+      "kboOfficialId": "60841",
+      "name": "박종훈",
+      "teamId": "SSG",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-323992",
+      "kboOfficialId": "54805",
+      "name": "박지환",
+      "teamId": "SSG",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-153782",
+      "name": "방재상",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-568009",
+      "kboOfficialId": "69839",
+      "name": "백승건",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-647995",
+      "kboOfficialId": "52804",
+      "name": "석정우",
+      "teamId": "SSG",
+      "rosterTier": "FA",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-930277",
+      "kboOfficialId": "53898",
+      "name": "송영진",
+      "teamId": "SSG",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-532843",
+      "name": "신동현",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-251288",
+      "kboOfficialId": "66662",
+      "name": "신범수",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-703910",
+      "kboOfficialId": "55860",
+      "name": "신지환",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-872496",
+      "name": "신형승",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-289798",
+      "kboOfficialId": "66864",
+      "name": "안상현",
+      "teamId": "SSG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-152942",
+      "kboOfficialId": "60558",
+      "name": "오태곤",
+      "teamId": "SSG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-517591",
+      "name": "왕지훈",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-882549",
+      "name": "용석민",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-219455",
+      "name": "유은종",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-179562",
+      "kboOfficialId": "52867",
+      "name": "윤태현",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-399100",
+      "kboOfficialId": "64861",
+      "name": "이건욱",
+      "teamId": "SSG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-290480",
+      "kboOfficialId": "52868",
+      "name": "이기순",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-772789",
+      "kboOfficialId": "53892",
+      "name": "이로운",
+      "teamId": "SSG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-383219",
+      "kboOfficialId": "54806",
+      "name": "이승민",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-637931",
+      "name": "이시언",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-872066",
+      "name": "이윤성",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-136544",
+      "kboOfficialId": "55832",
+      "name": "이율예",
+      "teamId": "SSG",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-268949",
+      "kboOfficialId": "52807",
+      "name": "임근우",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-334242",
+      "name": "장민제",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "not_baseball_player"
+    },
+    {
+      "permanentId": "KBO-PL-912607",
+      "name": "장재율",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-359506",
+      "kboOfficialId": "51895",
+      "name": "장지훈",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-518109",
+      "kboOfficialId": "52809",
+      "name": "전영준",
+      "teamId": "SSG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-383181",
+      "name": "전의산",
+      "teamId": "SSG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-943946",
+      "kboOfficialId": "66858",
+      "name": "정동윤",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-585716",
+      "kboOfficialId": "54812",
+      "name": "정준재",
+      "teamId": "SSG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-566473",
+      "kboOfficialId": "51897",
+      "name": "조병현",
+      "teamId": "SSG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-851465",
+      "kboOfficialId": "51809",
+      "name": "조요한",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-777946",
+      "name": "조용준",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "unverified_identity_no_birthyear_or_team"
+    },
+    {
+      "permanentId": "KBO-PL-463403",
+      "kboOfficialId": "51865",
+      "name": "조형우",
+      "teamId": "SSG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-754278",
+      "kboOfficialId": "69804",
+      "name": "채현우",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-416161",
+      "name": "천범석",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_wikipedia_article"
+    },
+    {
+      "permanentId": "KBO-PL-141899",
+      "kboOfficialId": "68856",
+      "name": "최민준",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-123538",
+      "kboOfficialId": "55894",
+      "name": "최윤석",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-322761",
+      "kboOfficialId": "68868",
+      "name": "최준우",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-732157",
+      "kboOfficialId": "50854",
+      "name": "최지훈",
+      "teamId": "SSG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-832003",
+      "name": "최현석",
+      "teamId": "SSG",
+      "rosterTier": "대기",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-629305",
+      "kboOfficialId": "68092",
+      "name": "한두솔",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-866179",
+      "kboOfficialId": "62895",
+      "name": "한유섬",
+      "teamId": "SSG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-665516",
+      "kboOfficialId": "50840",
+      "name": "현원회",
+      "teamId": "SSG",
+      "rosterTier": "2군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    },
+    {
+      "permanentId": "KBO-PL-225016",
+      "kboOfficialId": "55897",
+      "name": "홍대인",
+      "teamId": "SSG",
+      "rosterTier": "1군",
+      "category": "국내",
+      "reason": "no_open_licensed_portrait_on_wiki_or_wikidata"
+    }
+  ]
+}

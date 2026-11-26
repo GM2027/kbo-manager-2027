@@ -1,4 +1,9 @@
 import { Player, TeamId } from '../types/kbo';
+import { resolvePublicAssetUrl } from '../utils/assetUrl';
+import {
+  BUNDLED_REAL_PLAYER_PORTRAITS,
+  KBO_OFFICIAL_ID_TO_PORTRAIT_PID,
+} from './licensedRealPortraits';
 
 export type PortraitUniformKey = TeamId | '상무' | 'FA' | 'RETIRED';
 
@@ -217,32 +222,49 @@ export interface LicensedRealPortraitEntry {
   url: string;
   credit: string;
   license: string;
+  sourceUrl?: string;
 }
 
 /**
  * 사용 권한이 공식 확보된 실존 KBO 선수 프로필 사진 레지스트리
- * - 키: KBO 공식 ID(kboOfficialId) 또는 영구 ID(permanentId)
- * - 저작권·초상권 준수를 위해 무단 외부 크롤링 URL은 포함하지 않으며,
- *   공식 라이선스 에셋(public/portraits/kbo/*) 또는 에디터로 등록된 허가 이미지 URL만 적용합니다.
+ * - 키: 영구 ID(permanentId) 또는 KBO 공식 ID(kboOfficialId)
+ * - Wikimedia Commons 오픈 라이선스(CC BY / CC BY-SA / CC0 / Public Domain) 검증 이미지가
+ *   구단별 폴더(public/portraits/kbo/{LG,HH,SSG,SS,NC,KT,LT,KIA,OB,WO}/)에 로컬 저장되어 자동 매칭됩니다.
+ * - FA·트레이드 이적 이후에도 permanentId 기준으로 동일 선수의 실제 사진이 유지됩니다.
  */
-export const LICENSED_REAL_PLAYER_PORTRAITS: Record<string, LicensedRealPortraitEntry> = {};
+export const LICENSED_REAL_PLAYER_PORTRAITS: Record<string, LicensedRealPortraitEntry> =
+  BUNDLED_REAL_PLAYER_PORTRAITS;
 
 /**
  * 실존 선수의 사용 권한 확보된 공식 사진 URL 조회 (없으면 null 반환)
+ * - GitHub Pages 및 로컬 개발 환경 모두에서 동작하도록 resolvePublicAssetUrl을 적용합니다.
  */
 export function resolveLicensedRealPlayerPhoto(player: Player): LicensedRealPortraitEntry | null {
   if (player.licensedPhotoUrl && player.licensedPhotoUrl.trim().length > 0) {
     return {
-      url: player.licensedPhotoUrl.trim(),
+      url: resolvePublicAssetUrl(player.licensedPhotoUrl.trim()),
       credit: '사용자 등록 공식 프로필',
       license: 'verified-custom',
     };
   }
-  if (player.kboOfficialId && LICENSED_REAL_PLAYER_PORTRAITS[player.kboOfficialId]) {
-    return LICENSED_REAL_PLAYER_PORTRAITS[player.kboOfficialId];
-  }
   if (player.permanentId && LICENSED_REAL_PLAYER_PORTRAITS[player.permanentId]) {
-    return LICENSED_REAL_PLAYER_PORTRAITS[player.permanentId];
+    const entry = LICENSED_REAL_PLAYER_PORTRAITS[player.permanentId];
+    return {
+      ...entry,
+      url: resolvePublicAssetUrl(entry.url),
+    };
+  }
+  if (player.kboOfficialId) {
+    const mappedPid = KBO_OFFICIAL_ID_TO_PORTRAIT_PID[player.kboOfficialId];
+    const entry =
+      LICENSED_REAL_PLAYER_PORTRAITS[player.kboOfficialId] ??
+      (mappedPid ? LICENSED_REAL_PLAYER_PORTRAITS[mappedPid] : undefined);
+    if (entry) {
+      return {
+        ...entry,
+        url: resolvePublicAssetUrl(entry.url),
+      };
+    }
   }
   return null;
 }

@@ -87,7 +87,7 @@ export const PlayerPortrait: React.FC<PlayerPortraitProps> = ({
       className={`relative shrink-0 ${SIZE_CLASSES[size]} rounded-lg overflow-hidden border border-slate-300/90 dark:border-slate-700 bg-slate-900 shadow-sm select-none`}
       title={
         resolved?.sourceType === 'licensed_real' && !imgFailed
-          ? `${player.name} 공식 KBO 프로필 사진`
+          ? `${player.name} 실존 선수 프로필 (${resolved.license ?? 'CC'} · ${resolved.credit ?? 'Wikimedia Commons'})`
           : resolved?.sourceType === 'ai_virtual' && !imgFailed
           ? `${player.name} AI 프로필 (${uniformKey} 유니폼 · 고유 ID 영구 연결)`
           : `${player.name} 기본 선수 실루엣 (${uniformKey} 유니폼)`

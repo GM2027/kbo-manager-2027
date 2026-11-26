@@ -6,7 +6,8 @@
 export function resolvePublicAssetUrl(url: string): string {
   if (!url) return url;
   if (/^(https?:|data:|blob:)/i.test(url)) return url;
-  const base = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '');
+  const metaEnv = (import.meta as { env?: { BASE_URL?: string } }).env;
+  const base = (metaEnv?.BASE_URL || '/').replace(/\/+$/, '');
   if (url.startsWith('/')) {
     if (base && url.startsWith(`${base}/`)) return url;
     return `${base}${url}`;
