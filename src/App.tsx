@@ -11,6 +11,7 @@ import { TEAM_UI_THEMES } from './data/realKboHistories';
 import {
   archiveExistingCareersBeforeNewGame,
   deleteSavedCareer,
+  hydrateCareersFromIndexedDb,
   importCareerJson,
   listContinueOptions,
   loadCareerById,
@@ -32,6 +33,12 @@ export default function App() {
   const [previewTeamId, setPreviewTeamId] = useState<TeamId>('LG');
   const [refreshTick, setRefreshTick] = useState(0);
   const [globalError, setGlobalError] = useState<string | null>(null);
+
+  useEffect(() => {
+    void hydrateCareersFromIndexedDb().then((count) => {
+      if (count > 0) setRefreshTick((t) => t + 1);
+    });
+  }, []);
 
   useEffect(() => {
     const cleanUnlock = audioManager.installGlobalUnlock();

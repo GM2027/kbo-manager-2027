@@ -327,6 +327,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [contractsSubTab, setContractsSubTab] = useState<TransactionsSubTab>('contracts');
   const [standingsSubTab, setStandingsSubTab] = useState<'standings' | 'leaders'>('standings');
   const [actionError, setActionError] = useState<string | null>(null);
+  const [quickSaveDone, setQuickSaveDone] = useState(false);
   const [toast, setToast] = useState<{ text: string; tone: 'info' | 'success' | 'error' } | null>(
     null
   );
@@ -1122,6 +1123,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
               const ok = saveCareer(career);
               const now = new Date();
               const hhmm = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+              if (ok) {
+                setQuickSaveDone(true);
+                window.setTimeout(() => setQuickSaveDone(false), 2000);
+              }
               handleNotify(
                 ok
                   ? `현재 커리어 [${career.label}]를 즉시 저장했습니다 (${hhmm}).`
@@ -1129,11 +1134,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 ok ? 'success' : 'error'
               );
             }}
-            className="px-2.5 py-1.5 text-xs font-semibold rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1"
+            className={`px-2.5 py-1.5 text-xs font-semibold rounded border flex items-center gap-1 cursor-pointer transition-colors ${
+              quickSaveDone
+                ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
+                : 'border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
             title="즉시 빠른 저장"
           >
             <Save className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-            <span className="hidden md:inline">빠른 저장</span>
+            <span className="hidden md:inline">{quickSaveDone ? '저장됨 ✓' : '빠른 저장'}</span>
           </button>
 
           <button
