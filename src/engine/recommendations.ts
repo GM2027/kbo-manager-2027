@@ -1,3 +1,4 @@
+import { getRookieDraftScheduleInfo } from './calendarEngine';
 import { isMilitaryServing } from './militaryEngine';
 import { getTeamSponsorChoices } from '../data/financesData';
 import { KBO_TEAMS } from '../data/kboTeams';
@@ -120,14 +121,15 @@ export function getClubGmRecommendations(career: CareerSave): GmRecommendationIt
     });
   }
 
-  // 5) Draft open
-  if (!career.draftState.completed && career.draftState.currentRound <= 4) {
+  // 5) Draft open (공식 드래프트 날짜 도달 시에만 진행 가능 추천 노출)
+  const draftSchedule = getRookieDraftScheduleInfo(career);
+  if (draftSchedule.isOpen && !career.draftState.completed && career.draftState.currentRound <= 4) {
     recs.push({
       id: 'rec-draft',
-      priority: '전략',
+      priority: '긴급',
       category: '드래프트',
-      title: `${career.draftState.season} 신인 드래프트 ${career.draftState.currentRound}라운드 진행 가능`,
-      description: `1~4라운드 구단 차례에서 스카우트 추천 유망주를 지명하고 2군 육성 풀을 강화하세요.`,
+      title: `${career.draftState.season} KBO 신인 드래프트 개막 · ${career.draftState.currentRound}라운드 진행`,
+      description: `공식 드래프트 개최일(${draftSchedule.formattedDate})이 도래했습니다. 구단 차례에서 스카우트 추천 유망주를 지명하세요.`,
       targetTab: 'draft',
       ctaLabel: '드래프트 보드 이동',
     });

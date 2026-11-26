@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { Award, Crown, FastForward, Play, Search, Sparkles, StepForward, X } from 'lucide-react';
+import { Award, CalendarClock, Crown, FastForward, Lock, Play, Search, Sparkles, StepForward, X } from 'lucide-react';
 import { audioManager } from '../audio/audioManager';
 import { getRecommendedDraftCandidates } from '../data/draftPool';
 import { KBO_TEAMS } from '../data/kboTeams';
 import { TEAM_UI_THEMES } from '../data/realKboHistories';
+import { getRookieDraftScheduleInfo } from '../engine/calendarEngine';
 import {
   advanceDraftUntilUserTurn,
   autoCompleteRemainingDraft,
@@ -51,8 +52,10 @@ export const DraftBoardPanel: React.FC<DraftBoardPanelProps> = ({
   } | null>(null);
 
   const ds = career.draftState;
-  // Expanded manual picking to ALL 1~11 rounds (110 picks total)
-  const isManualRounds = !ds.completed && ds.currentRound <= 11;
+  const draftSchedule = getRookieDraftScheduleInfo(career);
+  const isDraftLocked = draftSchedule.isLockedBeforeDate;
+  // Expanded manual picking to ALL 1~11 rounds (110 picks total), unlocked strictly from official draft date
+  const isManualRounds = !ds.completed && !isDraftLocked && ds.currentRound <= 11;
   const activeRoundOrder =
     ds.currentRound === 1 && ds.round1DraftOrder && ds.round1DraftOrder.length === ds.draftOrder.length
       ? ds.round1DraftOrder
@@ -115,6 +118,10 @@ export const DraftBoardPanel: React.FC<DraftBoardPanelProps> = ({
   const latestPick = ds.picks.length > 0 ? ds.picks[ds.picks.length - 1] : null;
 
   const handleStepOne = () => {
+    if (isDraftLocked) {
+      setNotice(`${draftSchedule.draftClassYear} KBO 신인 드래프트는 ${draftSchedule.formattedDate}(D-${draftSchedule.daysRemaining}일)에 개막됩니다.`);
+      return;
+    }
     try {
       setNotice(null);
       const prevCount = ds.picks.length;
@@ -128,6 +135,10 @@ export const DraftBoardPanel: React.FC<DraftBoardPanelProps> = ({
   };
 
   const handleAdvanceToUser = () => {
+    if (isDraftLocked) {
+      setNotice(`${draftSchedule.draftClassYear} KBO 신인 드래프트는 ${draftSchedule.formattedDate}(D-${draftSchedule.daysRemaining}일)에 개막됩니다.`);
+      return;
+    }
     try {
       setNotice(null);
       const prevCount = ds.picks.length;
@@ -144,6 +155,10 @@ export const DraftBoardPanel: React.FC<DraftBoardPanelProps> = ({
   };
 
   const handlePickCandidate = (candId: number) => {
+    if (isDraftLocked) {
+      setNotice(`${draftSchedule.draftClassYear} KBO 신인 드래프트는 ${draftSchedule.formattedDate}(D-${draftSchedule.daysRemaining}일)에 개막됩니다.`);
+      return;
+    }
     try {
       setNotice(null);
       const prevCount = ds.picks.length;
@@ -157,6 +172,10 @@ export const DraftBoardPanel: React.FC<DraftBoardPanelProps> = ({
   };
 
   const handleAutoRemaining = () => {
+    if (isDraftLocked) {
+      setNotice(`${draftSchedule.draftClassYear} KBO 신인 드래프트는 ${draftSchedule.formattedDate}(D-${draftSchedule.daysRemaining}일)에 개막됩니다.`);
+      return;
+    }
     try {
       setNotice(null);
       const prevCount = ds.picks.length;
@@ -387,16 +406,75 @@ export const DraftBoardPanel: React.FC<DraftBoardPanelProps> = ({
       </AnimatePresence>
 
       {notice && (
-        <div className="p-3 rounded border border-amber-500/40 bg-amber-500/10 text-xs font-medium text-amber-800 dark:text-amber-300">
+        <div className="p-3 rounded-lg border border-amber-500/40 bg-amber-500/10 text-xs font-medium text-amber-800 dark:text-amber-300">
           {notice}
         </div>
       )}
 
+      {/* Official Draft Date Lock & Countdown Banner (Before September 15) */}
+      {isDraftLocked && (
+        <div className="rounded-xl border border-amber-500/40 bg-gradient-to-r from-amber-500/12 via-orange-500/8 to-slate-50 dark:from-amber-500/15 dark:via-orange-500/10 dark:to-slate-900 p-4 space-y-3">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-700 dark:text-amber-300 shrink-0">
+                <Lock className="w-5 h-5" />
+              </div>
+              <div className="space-y-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-800 dark:text-amber-200 text-[10px] font-extrabold tracking-wide">
+                    공식 개최일 전 지명 잠금
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-mono-stats text-[11px] font-black">
+                    D-{draftSchedule.daysRemaining}
+                  </span>
+                </div>
+                <div className="text-sm font-black text-slate-900 dark:text-white">
+                  {draftSchedule.draftClassYear} KBO 신인 드래프트 개막 대기 중 ({draftSchedule.formattedDate} 예정)
+                </div>
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                  현재 날짜(<span className="font-mono-stats font-bold">{draftSchedule.currentDate}</span>) 기준 공식 신인 드래프트 날짜(매년 9월 15일)에 도달하기 전까지는 픽 진행·직접 지명·자동 지명이 잠겨 있습니다. 날짜가 되면 <strong>신인 드래프트 개막 애니메이션과 함께 자동으로 드래프트 보드로 이동</strong>하며, 개막 전에는 <strong>유망주 정밀 스카우팅 및 지명 순번 확인</strong>을 미리 진행할 수 있습니다.
+                </p>
+              </div>
+            </div>
+
+            <div className="shrink-0 md:text-right space-y-1 bg-white/80 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800 rounded-lg px-3.5 py-2.5">
+              <div className="flex items-center md:justify-end gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                <CalendarClock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                <span>공식 드래프트 개최일</span>
+              </div>
+              <div className="font-mono-stats text-base font-black text-slate-900 dark:text-white">
+                {draftSchedule.dotDate}
+              </div>
+              <div className="font-mono-stats text-[11px] font-bold text-amber-700 dark:text-amber-300">
+                개막까지 {draftSchedule.daysRemaining}일 남음
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-[11px] font-mono-stats text-slate-500 dark:text-slate-400">
+              <span>드래프트 개막 카운트다운 진행률</span>
+              <span className="font-bold text-amber-700 dark:text-amber-300">{draftSchedule.progressPct}%</span>
+            </div>
+            <div className="h-2 w-full rounded-full bg-slate-200/80 dark:bg-slate-800 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-300"
+                style={{ width: `${draftSchedule.progressPct}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Top Status & Step-by-Step Controls */}
-      <div className="border border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/70 rounded-md p-4 space-y-3">
+      <div className="border border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/70 rounded-xl p-4 space-y-3">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            {currentPickingTeam ? (
+            {isDraftLocked ? (
+              <div className="w-9 h-9 rounded-lg border border-amber-500/40 flex items-center justify-center bg-amber-500/10 text-amber-600 dark:text-amber-400 shrink-0">
+                <Lock className="w-4 h-4" />
+              </div>
+            ) : currentPickingTeam ? (
               <TeamLogo teamId={currentPickingTeam} size="md" />
             ) : (
               <div className="w-9 h-9 rounded border border-slate-300 dark:border-slate-700 flex items-center justify-center bg-white dark:bg-slate-900">
@@ -410,6 +488,16 @@ export const DraftBoardPanel: React.FC<DraftBoardPanelProps> = ({
               <div className="text-sm font-extrabold mt-0.5 flex flex-wrap items-center gap-2">
                 {ds.completed ? (
                   <span>드래프트 11라운드 전체 완료 (총 {ds.picks.length}명 지명)</span>
+                ) : isDraftLocked ? (
+                  <>
+                    <span className="text-amber-700 dark:text-amber-300">
+                      개막 대기 중 ({draftSchedule.formattedDate} 자동 개막)
+                    </span>
+                    <span>·</span>
+                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                      사전 스카우팅 및 1라운드 지명 순번 열람 모드
+                    </span>
+                  </>
                 ) : currentPickingTeam ? (
                   <>
                     <span className="font-mono-stats">
@@ -443,41 +531,50 @@ export const DraftBoardPanel: React.FC<DraftBoardPanelProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-2 shrink-0">
-            {isManualRounds && !isUserTurn && (
+            {isDraftLocked ? (
+              <div className="px-3.5 py-2 text-xs font-bold rounded-lg border border-amber-500/40 bg-amber-500/10 text-amber-800 dark:text-amber-300 flex items-center gap-1.5 cursor-not-allowed select-none">
+                <Lock className="w-3.5 h-3.5" />
+                <span>개막일({draftSchedule.dotDate})부터 지명 가능 · D-{draftSchedule.daysRemaining}</span>
+              </div>
+            ) : (
               <>
-                <button
-                  type="button"
-                  onClick={handleStepOne}
-                  className="px-3 py-2 text-xs font-bold rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1.5"
-                >
-                  <StepForward className="w-3.5 h-3.5" />
-                  <span>다음 1픽 진행</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleAdvanceToUser}
-                  className="px-3.5 py-2 text-xs font-bold rounded bg-orange-600 hover:bg-orange-700 text-white flex items-center gap-1.5"
-                >
-                  <Play className="w-3.5 h-3.5" />
-                  <span>내 구단 차례까지 진행</span>
-                </button>
+                {isManualRounds && !isUserTurn && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleStepOne}
+                      className="px-3 py-2 text-xs font-bold rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1.5"
+                    >
+                      <StepForward className="w-3.5 h-3.5" />
+                      <span>다음 1픽 진행</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleAdvanceToUser}
+                      className="px-3.5 py-2 text-xs font-bold rounded bg-orange-600 hover:bg-orange-700 text-white flex items-center gap-1.5"
+                    >
+                      <Play className="w-3.5 h-3.5" />
+                      <span>내 구단 차례까지 진행</span>
+                    </button>
+                  </>
+                )}
+                {!ds.completed && (
+                  <button
+                    type="button"
+                    onClick={handleAutoRemaining}
+                    className="px-3 py-2 text-xs font-semibold rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1.5"
+                  >
+                    <FastForward className="w-3.5 h-3.5" />
+                    <span>
+                      {ds.picks.length === 0
+                        ? '전체 자동 지명 (1~11R)'
+                        : ds.currentRound >= 5
+                        ? '5~11R 자동 지명 완료'
+                        : '잔여 전체 자동 지명 (~11R)'}
+                    </span>
+                  </button>
+                )}
               </>
-            )}
-            {!ds.completed && (
-              <button
-                type="button"
-                onClick={handleAutoRemaining}
-                className="px-3 py-2 text-xs font-semibold rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1.5"
-              >
-                <FastForward className="w-3.5 h-3.5" />
-                <span>
-                  {ds.picks.length === 0
-                    ? '전체 자동 지명 (1~11R)'
-                    : ds.currentRound >= 5
-                    ? '5~11R 자동 지명 완료'
-                    : '잔여 전체 자동 지명 (~11R)'}
-                </span>
-              </button>
             )}
             {ds.completed && onCompletedAction}
           </div>
@@ -497,7 +594,7 @@ export const DraftBoardPanel: React.FC<DraftBoardPanelProps> = ({
         )}
 
         {/* Visual 10-team round order indicator with Pick Provenance (#13) */}
-        {isManualRounds && (
+        {!ds.completed && ds.currentRound <= 11 && (
           <div className="grid grid-cols-5 sm:grid-cols-10 gap-1.5 pt-2 border-t border-slate-200 dark:border-slate-800 text-[11px]">
             {activeRoundOrder.map((origTid, idx) => {
               const slotNum = idx + 1;
@@ -506,8 +603,8 @@ export const DraftBoardPanel: React.FC<DraftBoardPanelProps> = ({
               );
               const ownerTid = prov?.ownerTeamId ?? origTid;
               const isTraded = Boolean(prov && prov.ownerTeamId !== prov.originalTeamId);
-              const isCurrent = slotNum === ds.currentPickInRound;
-              const isDone = slotNum < ds.currentPickInRound;
+              const isCurrent = !isDraftLocked && slotNum === ds.currentPickInRound;
+              const isDone = !isDraftLocked && slotNum < ds.currentPickInRound;
               const isMine = ownerTid === career.playerTeamId;
               const hasR1Penalty =
                 ds.currentRound === 1 &&
@@ -620,7 +717,11 @@ export const DraftBoardPanel: React.FC<DraftBoardPanelProps> = ({
               </span>
             </div>
             <span className="text-[11px] text-slate-500 dark:text-slate-400">
-              {isUserTurn ? '현재 우리 구단 지명 차례 — 즉시 지명 가능' : '내 구단 차례 도달 시 즉시 지명 가능'}
+              {isDraftLocked
+                ? `개막일(${draftSchedule.dotDate} · D-${draftSchedule.daysRemaining}) 이후 지명 가능`
+                : isUserTurn
+                ? '현재 우리 구단 지명 차례 — 즉시 지명 가능'
+                : '내 구단 차례 도달 시 즉시 지명 가능'}
             </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
@@ -662,15 +763,15 @@ export const DraftBoardPanel: React.FC<DraftBoardPanelProps> = ({
                     </span>
                     <button
                       type="button"
-                      disabled={!isUserTurn}
+                      disabled={!isUserTurn || isDraftLocked}
                       onClick={() => handlePickCandidate(c.id)}
                       className={`px-2.5 py-1 rounded text-[11px] font-bold ${
-                        isUserTurn
+                        isUserTurn && !isDraftLocked
                           ? 'bg-orange-600 hover:bg-orange-700 text-white'
                           : 'border border-slate-200 dark:border-slate-700 text-slate-400 cursor-not-allowed'
                       }`}
                     >
-                      {isUserTurn ? '즉시 지명' : '대기'}
+                      {isDraftLocked ? '개막 대기' : isUserTurn ? '즉시 지명' : '대기'}
                     </button>
                   </div>
                 </div>
@@ -851,15 +952,15 @@ export const DraftBoardPanel: React.FC<DraftBoardPanelProps> = ({
                             )}
                             <button
                               type="button"
-                              disabled={!isUserTurn}
+                              disabled={!isUserTurn || isDraftLocked}
                               onClick={() => handlePickCandidate(c.id)}
                               className={`px-2.5 py-1 rounded font-semibold ${
-                                isUserTurn
+                                isUserTurn && !isDraftLocked
                                   ? 'bg-orange-600 hover:bg-orange-700 text-white'
                                   : 'border border-slate-200 dark:border-slate-700 text-slate-400 cursor-not-allowed'
                               }`}
                             >
-                              {isUserTurn ? '지명' : '대기'}
+                              {isDraftLocked ? '개막 대기' : isUserTurn ? '지명' : '대기'}
                             </button>
                           </div>
                         </td>

@@ -15,6 +15,74 @@ export interface AnnualCalendarEvent {
   isMajorDeadline?: boolean;
 }
 
+export interface RookieDraftScheduleInfo {
+  scheduledDate: string; // YYYY-MM-DD (e.g. '2027-09-15')
+  formattedDate: string; // e.g. '2027년 9월 15일'
+  dotDate: string; // e.g. '2027.09.15'
+  currentDate: string; // YYYY-MM-DD
+  draftClassYear: number; // e.g. 2028
+  daysRemaining: number; // 0 when date reached
+  progressPct: number; // 0..100 from opening day to draft date
+  isCompleted: boolean;
+  isSpecialOnboardingDraft: boolean;
+  isDateReached: boolean;
+  isOpen: boolean;
+  isLockedBeforeDate: boolean;
+}
+
+function diffIsoDays(fromIso: string, toIso: string): number {
+  const [fy, fm, fd] = fromIso.split('-').map(Number);
+  const [ty, tm, td] = toIso.split('-').map(Number);
+  const fromMs = Date.UTC(fy, (fm || 1) - 1, fd || 1);
+  const toMs = Date.UTC(ty, (tm || 1) - 1, td || 1);
+  return Math.round((toMs - fromMs) / 86_400_000);
+}
+
+/**
+ * KBO 신인 드래프트 공식 개최일(매년 9월 15일) 기준 개막·잠금 판정
+ * - 공식 개최일 이전에는 스카우팅·순번 확인만 가능하고 지명(픽 진행)은 잠금 처리
+ * - 공식 개최일 도달(또는 포스트시즌·오프시즌 진입) 시 자동 개방
+ */
+export function getRookieDraftScheduleInfo(career: CareerSave): RookieDraftScheduleInfo {
+  const season = career.season;
+  const scheduledDate = `${season}-09-15`;
+  const currentDate = getCurrentCareerDate(career).isoDate;
+  const draftClassYear = career.draftState?.season ?? career.draftClassYear ?? (season >= 2027 ? season + 1 : season);
+  const isCompleted = Boolean(career.draftState?.completed);
+  const isSpecialOnboardingDraft =
+    career.phase === 'SPECIAL_DRAFT' && !career.draftCompletedSeasons?.includes(season);
+  const isDateReached =
+    currentDate >= scheduledDate ||
+    career.phase === 'POSTSEASON' ||
+    career.phase === 'OFFSEASON';
+  const daysRemaining = isDateReached ? 0 : Math.max(1, diffIsoDays(currentDate, scheduledDate));
+
+  const openingDate = career.schedule?.[0]?.dates?.[0] ?? `${season}-03-27`;
+  const totalSpan = Math.max(1, diffIsoDays(openingDate, scheduledDate));
+  const elapsed = Math.max(0, diffIsoDays(openingDate, currentDate));
+  const progressPct = isDateReached
+    ? 100
+    : Math.max(0, Math.min(99, Math.round((elapsed / totalSpan) * 100)));
+
+  const isOpen = !isCompleted && (isSpecialOnboardingDraft || isDateReached);
+  const isLockedBeforeDate = !isCompleted && !isOpen;
+
+  return {
+    scheduledDate,
+    formattedDate: `${season}년 9월 15일`,
+    dotDate: `${season}.09.15`,
+    currentDate,
+    draftClassYear,
+    daysRemaining,
+    progressPct,
+    isCompleted,
+    isSpecialOnboardingDraft,
+    isDateReached,
+    isOpen,
+    isLockedBeforeDate,
+  };
+}
+
 /**
  * 2027 개정 KBO 규정 기준 선수 참가활동기간 판정 (1월 25일 ~ 11월 23일)
  */

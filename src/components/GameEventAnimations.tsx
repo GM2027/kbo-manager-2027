@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Award, Crown, FastForward, Sparkles, Trophy } from 'lucide-react';
+import { ArrowRight, Award, CalendarClock, Crown, FastForward, Sparkles, Trophy } from 'lucide-react';
 import { audioManager, SoundEventId } from '../audio/audioManager';
 import { KBO_TEAMS } from '../data/kboTeams';
 import { AwardEntry, TeamId } from '../types/kbo';
@@ -8,6 +8,16 @@ import { KoreanSeriesTrophyLogo } from './KoreanSeriesTrophyLogo';
 import { TeamLogo } from './TeamLogo';
 
 export type GameEventAnimationPayload =
+  | {
+      id: string;
+      type: 'ROOKIE_DRAFT_OPENING';
+      draftSeason: number;
+      draftDate: string;
+      playerTeamId: TeamId;
+      playerFirstRoundPickNo: number;
+      firstRoundOrder: TeamId[];
+      topProspects: { name: string; position: string; school: string; grade: string }[];
+    }
   | {
       id: string;
       type: 'MEGA_FA_DEAL';
@@ -205,6 +215,8 @@ export const GameEventAnimations: React.FC<GameEventAnimationsProps> = ({
 
   const durationMs = useMemo(() => {
     switch (event.type) {
+      case 'ROOKIE_DRAFT_OPENING':
+        return 4600;
       case 'MEGA_FA_DEAL':
         return 2700;
       case 'BLOCKBUSTER_TRADE':
@@ -224,6 +236,8 @@ export const GameEventAnimations: React.FC<GameEventAnimationsProps> = ({
 
   const eventSoundId: SoundEventId = useMemo(() => {
     switch (event.type) {
+      case 'ROOKIE_DRAFT_OPENING':
+        return 'rookie_draft';
       case 'MEGA_FA_DEAL':
         return 'mega_fa_deal';
       case 'BLOCKBUSTER_TRADE':
@@ -290,6 +304,181 @@ export const GameEventAnimations: React.FC<GameEventAnimationsProps> = ({
     audioManager.stopEvent(eventSoundId);
     onComplete(event.id);
   };
+
+  // 0. KBO 신인 드래프트 공식 개막 애니메이션 (날짜 도달 시 자동 연출 후 드래프트장 입장)
+  if (event.type === 'ROOKIE_DRAFT_OPENING') {
+    const myTeam = KBO_TEAMS[event.playerTeamId];
+    return (
+      <div
+        className="fixed inset-0 z-[95] flex items-center justify-center overflow-hidden select-none px-4 text-white"
+        style={{
+          background: `radial-gradient(circle at 50% 24%, rgba(251,191,36,0.28) 0%, ${myTeam.primaryColor}38 38%, rgba(7,11,22,0.97) 72%, #03050a 100%)`,
+        }}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${event.draftSeason} KBO 신인 드래프트 공식 개막`}
+      >
+        {/* 무대 스포트라이트 배경 빔 */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-[780px] h-[340px] rounded-full blur-3xl opacity-35"
+          style={{
+            background: `linear-gradient(90deg, transparent, ${myTeam.primaryColor}, #FACC15, transparent)`,
+          }}
+        />
+
+        <button
+          type="button"
+          data-no-click-sound="true"
+          onClick={handleSkipAll}
+          className="absolute top-5 right-5 z-20 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-white/25 bg-white/10 hover:bg-white/20 text-xs font-bold text-white backdrop-blur-sm cursor-pointer"
+        >
+          <span>바로 입장</span>
+          <FastForward className="w-3.5 h-3.5" />
+        </button>
+
+        <div className="animate-award-enter relative z-10 w-full max-w-2xl rounded-2xl border border-amber-400/45 bg-slate-950/88 backdrop-blur-md p-6 sm:p-8 shadow-[0_32px_90px_rgba(0,0,0,0.85)] space-y-5 overflow-hidden">
+          <div
+            aria-hidden="true"
+            className="absolute top-0 inset-x-0 h-1.5"
+            style={{
+              backgroundImage: `linear-gradient(90deg, ${myTeam.primaryColor}, #FACC15, #F97316, ${myTeam.primaryColor})`,
+            }}
+          />
+
+          {/* 상단 중계 배지 */}
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/15 border border-amber-300/40 text-amber-200 text-[11px] font-extrabold tracking-[0.18em] uppercase">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>KBO OFFICIAL ROOKIE DRAFT · LIVE</span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 text-xs font-mono-stats font-bold text-slate-300">
+              <CalendarClock className="w-3.5 h-3.5 text-amber-300" />
+              <span>{event.draftDate}</span>
+            </div>
+          </div>
+
+          {/* 메인 타이틀 */}
+          <div className="text-center space-y-1.5 pt-1">
+            <div className="text-xs font-extrabold tracking-[0.25em] text-amber-300/90 uppercase">
+              THE FUTURE OF KBO LEAGUE BEGINS NOW
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black tracking-tight bg-gradient-to-r from-white via-amber-100 to-amber-300 bg-clip-text text-transparent">
+              {event.draftSeason} KBO 신인 드래프트 개막
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-300">
+              전면 드래프트 1~11라운드 · 10개 구단 110명 지명 무대가 공식 오픈되었습니다
+            </p>
+          </div>
+
+          {/* 우리 구단 1라운드 지명 순번 카드 */}
+          <div
+            className="rounded-xl border p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+            style={{
+              borderColor: `${myTeam.primaryColor}88`,
+              background: `linear-gradient(120deg, ${myTeam.primaryColor}2e 0%, rgba(15,23,42,0.85) 100%)`,
+            }}
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="w-14 h-14 rounded-xl bg-white p-1.5 flex items-center justify-center shadow-lg shrink-0">
+                <TeamLogo teamId={event.playerTeamId} size="lg" bare className="w-full h-full" />
+              </div>
+              <div>
+                <div className="text-[11px] font-bold text-amber-200 uppercase tracking-wider">
+                  {myTeam.name} 드래프트 지명 현황
+                </div>
+                <div className="text-lg sm:text-xl font-black text-white mt-0.5">
+                  {event.playerFirstRoundPickNo > 0
+                    ? `1라운드 전체 #${event.playerFirstRoundPickNo}순위 지명권 보유`
+                    : '1라운드 지명권 트레이드 이동 · 2~11R 지명 대기'}
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-400/15 border border-amber-300/40 text-amber-200 text-xs font-extrabold shrink-0">
+              <Crown className="w-4 h-4" />
+              <span>전 라운드 직접·자동 지명</span>
+            </div>
+          </div>
+
+          {/* 1라운드 10개 구단 지명 순서 스트립 */}
+          <div className="space-y-1.5">
+            <div className="text-[11px] font-bold text-slate-400 flex items-center justify-between">
+              <span>1라운드 전체 지명 순번</span>
+              <span className="font-mono-stats text-amber-300">1R #1 → #10</span>
+            </div>
+            <div className="grid grid-cols-5 sm:grid-cols-10 gap-1.5 text-[11px] font-mono-stats">
+              {event.firstRoundOrder.map((tid, i) => {
+                const isMine = tid === event.playerTeamId;
+                return (
+                  <div
+                    key={`${tid}-${i}`}
+                    className={`rounded-lg border px-1.5 py-1.5 text-center transition-all ${
+                      isMine
+                        ? 'border-amber-300 bg-amber-400/25 text-amber-100 font-black scale-[1.03] shadow-sm'
+                        : 'border-white/12 bg-white/5 text-slate-300'
+                    }`}
+                  >
+                    <div className="text-[10px] opacity-75">#{i + 1}</div>
+                    <div className="font-sans font-bold truncate">{tid}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 주목할 최대어 유망주 TOP 3 */}
+          {event.topProspects.length > 0 && (
+            <div className="space-y-1.5">
+              <div className="text-[11px] font-bold text-slate-400">현장 초청 최대어 유망주 TOP 3</div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                {event.topProspects.map((pr, idx) => (
+                  <div
+                    key={`${pr.name}-${idx}`}
+                    className="rounded-lg border border-white/12 bg-white/5 px-3 py-2 flex items-center justify-between gap-2 text-xs"
+                  >
+                    <div className="min-w-0">
+                      <div className="font-extrabold text-white truncate">
+                        {pr.name}{' '}
+                        <span className="font-mono-stats text-amber-300 text-[11px]">{pr.position}</span>
+                      </div>
+                      <div className="text-[10px] text-slate-400 truncate">{pr.school}</div>
+                    </div>
+                    <span className="px-1.5 py-0.5 rounded bg-amber-400/20 border border-amber-300/40 text-amber-200 font-mono-stats text-[10px] font-black shrink-0">
+                      {pr.grade}급
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 자동 전환 바 & 입장 CTA */}
+          <div className="pt-1 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex-1 space-y-1.5">
+              <div className="text-[11px] text-slate-300 font-medium">
+                잠시 후 신인 드래프트 보드로 자동 이동합니다...
+              </div>
+              <div className="h-1.5 w-full rounded-full bg-white/15 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-amber-400 to-orange-500 kbo-anim-progress"
+                  style={{ ['--anim-ms' as string]: `${durationMs}ms` }}
+                />
+              </div>
+            </div>
+            <button
+              type="button"
+              data-no-click-sound="true"
+              onClick={handleSkipAll}
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:brightness-110 text-slate-950 font-black text-xs inline-flex items-center justify-center gap-1.5 shadow-lg cursor-pointer shrink-0 transition"
+            >
+              <span>신인 드래프트장 입장하기</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // 1. FA 대형 계약 애니메이션
   if (event.type === 'MEGA_FA_DEAL') {

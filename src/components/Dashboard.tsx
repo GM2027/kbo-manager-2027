@@ -59,7 +59,8 @@ import {
 } from '../engine/simulator';
 import { computeStandings } from '../engine/stats';
 import { acknowledgeChampionEvent } from '../engine/transactions';
-import { getCurrentCareerDate } from '../engine/salaryCapEngine';
+import { getRookieDraftScheduleInfo } from '../engine/calendarEngine';
+import { getCurrentCareerDate, getDraftPickingTeamForSlot } from '../engine/salaryCapEngine';
 import { CareerSummaryItem, saveCareer } from '../storage/careerStorage';
 import { AppSettings, CareerSave, GameRecord, OffseasonStep, TeamId } from '../types/kbo';
 import { AnalyticsCenterView } from './AnalyticsCenterView';
@@ -331,6 +332,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
     toSeason: number;
   } | null>(null);
   const [eventAnimQueue, setEventAnimQueue] = useState<GameEventAnimationPayload[]>([]);
+  const [draftFocusNonce, setDraftFocusNonce] = useState(0);
   const [soundModalOpen, setSoundModalOpen] = useState(false);
   const [audioSettings, setAudioSettings] = useState<AudioSettings>(() => audioManager.getSettings());
 
@@ -565,6 +567,46 @@ export const Dashboard: React.FC<DashboardProps> = ({
           }
         }
 
+        // 8-B. KBO 신인 드래프트 공식 개최일 도달 시 개막 애니메이션 1회 자동 실행 & 드래프트장 자동 이동
+        const prevDraftInfo = getRookieDraftScheduleInfo(prev);
+        const nextDraftInfo = getRookieDraftScheduleInfo(next);
+        const draftOpenKey = `rookie-draft-open-${next.season}-${next.draftState.season}`;
+        if (
+          !next.draftState.completed &&
+          nextDraftInfo.isOpen &&
+          !nextDraftInfo.isSpecialOnboardingDraft &&
+          (prevDraftInfo.isLockedBeforeDate ||
+            (prevDraftInfo.currentDate < nextDraftInfo.scheduledDate &&
+              nextDraftInfo.currentDate >= nextDraftInfo.scheduledDate)) &&
+          !played.has(draftOpenKey)
+        ) {
+          played.add(draftOpenKey);
+          const firstRoundOrder: TeamId[] = Array.from({ length: 10 }, (_, idx) =>
+            getDraftPickingTeamForSlot(next.draftState, 1, idx + 1)
+          );
+          const playerFirstRoundPickNo = firstRoundOrder.indexOf(next.playerTeamId) + 1;
+          const topProspects = [...next.draftState.candidates]
+            .filter((c) => !c.draftedBy)
+            .sort((a, b) => b.potential * 0.65 + b.ability - (a.potential * 0.65 + a.ability))
+            .slice(0, 3)
+            .map((c) => ({
+              name: c.name,
+              position: c.position,
+              school: c.school,
+              grade: c.scoutGrade ?? 'S',
+            }));
+          queued.unshift({
+            id: draftOpenKey,
+            type: 'ROOKIE_DRAFT_OPENING',
+            draftSeason: next.draftState.season,
+            draftDate: nextDraftInfo.formattedDate,
+            playerTeamId: next.playerTeamId,
+            playerFirstRoundPickNo,
+            firstRoundOrder,
+            topProspects,
+          });
+        }
+
         // 9. 일반 계약 체결 효과음 (대형 FA 애니메이션이 이미 큐에 없는 확정 계약 체결 시 1회)
         const hasMegaFaQueued = queued.some((q) => q.type === 'MEGA_FA_DEAL');
         if (!hasMegaFaQueued) {
@@ -662,42 +704,52 @@ export const Dashboard: React.FC<DashboardProps> = ({
     (sourceCareer: CareerSave) => {
       try {
         setActionError(null);
+        const wasDraftLocked = getRookieDraftScheduleInfo(sourceCareer).isLockedBeforeDate;
         const { nextCareer, backupSnapshot } = simulateNextRegularGame(sourceCareer);
+        const didDraftJustOpen =
+          wasDraftLocked && getRookieDraftScheduleInfo(nextCareer).isOpen;
         applyCareerUpdate(nextCareer, backupSnapshot);
-        const newGames = nextCareer.lastSeriesReport?.playerTeamGames ?? [];
-        if (newGames.length > 0) {
-          setMatchAnimState({
-            title: nextCareer.lastSeriesReport?.title || `${nextCareer.season} 정규시즌 1경기 결과`,
-            games: newGames,
-          });
+        if (!didDraftJustOpen) {
+          const newGames = nextCareer.lastSeriesReport?.playerTeamGames ?? [];
+          if (newGames.length > 0) {
+            setMatchAnimState({
+              title: nextCareer.lastSeriesReport?.title || `${nextCareer.season} 정규시즌 1경기 결과`,
+              games: newGames,
+            });
+          }
+          setActiveTab('report');
         }
-        setActiveTab('report');
       } catch (err) {
         setActionError(err instanceof Error ? err.message : '1경기 진행 오류');
       }
     },
-    [applyCareerUpdate]
+    [applyCareerUpdate, setActiveTab]
   );
 
   const runRegularSeriesNow = useCallback(
     (sourceCareer: CareerSave) => {
       try {
         setActionError(null);
+        const wasDraftLocked = getRookieDraftScheduleInfo(sourceCareer).isLockedBeforeDate;
         const { nextCareer, backupSnapshot } = simulateNextRegularSeries(sourceCareer);
+        const didDraftJustOpen =
+          wasDraftLocked && getRookieDraftScheduleInfo(nextCareer).isOpen;
         applyCareerUpdate(nextCareer, backupSnapshot);
-        const newGames = nextCareer.lastSeriesReport?.playerTeamGames ?? [];
-        if (newGames.length > 0) {
-          setMatchAnimState({
-            title: nextCareer.lastSeriesReport?.title || `${nextCareer.season} 정규시즌 3연전 결과`,
-            games: newGames,
-          });
+        if (!didDraftJustOpen) {
+          const newGames = nextCareer.lastSeriesReport?.playerTeamGames ?? [];
+          if (newGames.length > 0) {
+            setMatchAnimState({
+              title: nextCareer.lastSeriesReport?.title || `${nextCareer.season} 정규시즌 3연전 결과`,
+              games: newGames,
+            });
+          }
+          setActiveTab('report');
         }
-        setActiveTab('report');
       } catch (err) {
         setActionError(err instanceof Error ? err.message : '경기 진행 오류');
       }
     },
-    [applyCareerUpdate]
+    [applyCareerUpdate, setActiveTab]
   );
 
   const handleSimulateNextGame = () => {
@@ -708,10 +760,24 @@ export const Dashboard: React.FC<DashboardProps> = ({
     runRegularSeriesNow(career);
   };
 
-  const handleCompleteEventAnim = useCallback((eventId: string) => {
-    setEventAnimQueue((prev) => prev.filter((item) => item.id !== eventId));
-  }, []);
+  const handleCompleteEventAnim = useCallback(
+    (eventId: string) => {
+      setEventAnimQueue((prev) => prev.filter((item) => item.id !== eventId));
+      if (eventId.startsWith('rookie-draft-open-')) {
+        setMatchAnimState(null);
+        setDraftFocusNonce((n) => n + 1);
+        setActiveTab('draft');
+        setToast({
+          text: `${career.draftState.season} KBO 신인 드래프트가 공식 개막되었습니다! 지명을 진행해 주세요.`,
+          tone: 'success',
+        });
+      }
+    },
+    [career.draftState.season, setActiveTab]
+  );
 
+  const draftScheduleInfo = useMemo(() => getRookieDraftScheduleInfo(career), [career]);
+  const isRookieDraftOpenLive = draftScheduleInfo.isOpen && !career.draftState.completed;
   const offseasonReadiness = useMemo(() => getOffseason8StepReadiness(career), [career]);
   const isAwardsCeremonyPending = career.pendingAwardsCeremonySeason === career.season;
 
@@ -1124,15 +1190,17 @@ export const Dashboard: React.FC<DashboardProps> = ({
             const Icon = grp.icon;
             const active = activeGroup.id === grp.id;
             const groupBadge =
-              grp.id === 'records' && isAwardsCeremonyPending
-                ? '진행'
-                : grp.id === 'frontOffice' && career.phase === 'OFFSEASON'
-                  ? `${offseasonReadiness.requiredCompletedCount}/${offseasonReadiness.requiredTotalCount}`
-                  : grp.id === 'frontOffice' && pendingIncomingTrades.length > 0
-                    ? String(pendingIncomingTrades.length)
-                    : grp.id === 'leagueOps' && pendingNewsBadge > 0
-                      ? String(pendingNewsBadge)
-                      : null;
+              grp.id === 'prospects' && isRookieDraftOpenLive
+                ? '개막'
+                : grp.id === 'records' && isAwardsCeremonyPending
+                  ? '진행'
+                  : grp.id === 'frontOffice' && career.phase === 'OFFSEASON'
+                    ? `${offseasonReadiness.requiredCompletedCount}/${offseasonReadiness.requiredTotalCount}`
+                    : grp.id === 'frontOffice' && pendingIncomingTrades.length > 0
+                      ? String(pendingIncomingTrades.length)
+                      : grp.id === 'leagueOps' && pendingNewsBadge > 0
+                        ? String(pendingNewsBadge)
+                        : null;
             return (
               <button
                 key={grp.id}
@@ -1199,6 +1267,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
                             }`}
                           >
                             PS
+                          </span>
+                        )}
+                        {grp.id === 'prospects' && isRookieDraftOpenLive && (
+                          <span
+                            className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold animate-pulse ${
+                              active ? 'bg-white/25 text-white' : 'bg-emerald-500 text-white'
+                            }`}
+                          >
+                            개막
                           </span>
                         )}
                         {grp.id === 'records' && isAwardsCeremonyPending && (
@@ -2622,6 +2699,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               onUpdateCareer={applyCareerUpdate}
               onSelectPlayer={setSelectedPlayerId}
               onOpenAwardsCeremony={() => setActiveTab('awards')}
+              focusDraftNonce={draftFocusNonce}
             />
           )}
 

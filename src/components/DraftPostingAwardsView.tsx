@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Plane, Sparkles, Trophy, Wallet } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Lock, Plane, Sparkles, Trophy, Wallet } from 'lucide-react';
+import { getRookieDraftScheduleInfo } from '../engine/calendarEngine';
 import {
   calculateMlbPostingFeeUsd,
   claimPostingFeeToCash,
@@ -17,6 +18,7 @@ interface DraftPostingAwardsViewProps {
   onUpdateCareer: (next: CareerSave, backup?: CareerSave) => void;
   onSelectPlayer?: (playerId: string) => void;
   onOpenAwardsCeremony?: () => void;
+  focusDraftNonce?: number;
 }
 
 export const DraftPostingAwardsView: React.FC<DraftPostingAwardsViewProps> = ({
@@ -24,10 +26,18 @@ export const DraftPostingAwardsView: React.FC<DraftPostingAwardsViewProps> = ({
   onUpdateCareer,
   onSelectPlayer,
   onOpenAwardsCeremony,
+  focusDraftNonce,
 }) => {
   const [subTab, setSubTab] = useState<'draft' | 'posting'>('draft');
   const [notice, setNotice] = useState<string | null>(null);
   const [calcGuaranteeM, setCalcGuaranteeM] = useState<number>(60);
+  const draftSchedule = getRookieDraftScheduleInfo(career);
+
+  useEffect(() => {
+    if (focusDraftNonce && focusDraftNonce > 0) {
+      setSubTab('draft');
+    }
+  }, [focusDraftNonce]);
 
   const postingCandidates = Object.values(career.players)
     .filter(
@@ -92,16 +102,33 @@ export const DraftPostingAwardsView: React.FC<DraftPostingAwardsViewProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-md p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="gm-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-base font-extrabold">신인 드래프트 · MLB 포스팅</h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-base font-extrabold">신인 드래프트 · MLB 포스팅</h2>
+            {draftSchedule.isLockedBeforeDate ? (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/35 text-amber-800 dark:text-amber-300 font-mono-stats text-[11px] font-bold">
+                <Lock className="w-3 h-3" />
+                <span>{draftSchedule.dotDate} 개막 · D-{draftSchedule.daysRemaining}</span>
+              </span>
+            ) : draftSchedule.isOpen ? (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-700 dark:text-emerald-300 text-[11px] font-extrabold animate-pulse">
+                <Sparkles className="w-3 h-3" />
+                <span>드래프트 개막 진행 중</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-bold">
+                <span>{career.draftState.season} 드래프트 완료</span>
+              </span>
+            )}
+          </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             {career.draftState.season} 신인 지명 명단(1~11라운드) 및 7시즌 이상 MLB 포스팅 이적료 규약을 관리합니다.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 self-start">
-          <div className="flex rounded border border-slate-200 dark:border-slate-700 overflow-hidden text-xs">
+        <div className="flex flex-wrap items-center gap-2 self-start shrink-0">
+          <div className="flex rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden text-xs shrink-0">
             {[
               { id: 'draft', label: '신인 드래프트', icon: Sparkles },
               { id: 'posting', label: 'MLB 포스팅', icon: Plane },
@@ -112,13 +139,13 @@ export const DraftPostingAwardsView: React.FC<DraftPostingAwardsViewProps> = ({
                   key={t.id}
                   type="button"
                   onClick={() => setSubTab(t.id as 'draft' | 'posting')}
-                  className={`px-3 py-1.5 font-semibold flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 font-semibold flex items-center gap-1.5 whitespace-nowrap ${
                     subTab === t.id
                       ? 'team-accent-bg'
                       : 'hover:bg-slate-100 dark:hover:bg-slate-800'
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5" />
+                  <Icon className="w-3.5 h-3.5 shrink-0" />
                   <span>{t.label}</span>
                 </button>
               );
@@ -128,9 +155,9 @@ export const DraftPostingAwardsView: React.FC<DraftPostingAwardsViewProps> = ({
             <button
               type="button"
               onClick={onOpenAwardsCeremony}
-              className="px-3 py-1.5 rounded border border-amber-500/50 bg-amber-500/10 text-amber-800 dark:text-amber-300 hover:bg-amber-500 hover:text-slate-950 text-xs font-bold flex items-center gap-1.5 transition-colors"
+              className="px-3 py-1.5 rounded-lg border border-amber-500/50 bg-amber-500/10 text-amber-800 dark:text-amber-300 hover:bg-amber-500 hover:text-slate-950 text-xs font-bold flex items-center gap-1.5 whitespace-nowrap shrink-0 transition-colors"
             >
-              <Trophy className="w-3.5 h-3.5" />
+              <Trophy className="w-3.5 h-3.5 shrink-0" />
               <span>KBO 공식 시상식</span>
             </button>
           )}

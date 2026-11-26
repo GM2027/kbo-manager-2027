@@ -1,4 +1,5 @@
 import { resolveAgeAtDate, syncAllAgesToDateInPlace } from './ageEngine';
+import { getRookieDraftScheduleInfo } from './calendarEngine';
 import { isMilitaryServing } from './militaryEngine';
 import {
   buildCoachSubRatings,
@@ -2111,6 +2112,18 @@ function selectAiDraftCandidate(ds: CareerSave['draftState'], rng: SeededRng) {
   return available[pickIdx];
 }
 
+function assertRookieDraftDateOpen(career: CareerSave): void {
+  // 기존 단위테스트(INTRO 초기 상태) 호환은 유지하되, 실제 게임 진행(정규시즌 및 온보딩 진행 단계)에서는
+  // 공식 신인 드래프트 날짜(9월 15일) 이전 픽 진행을 엔진 레벨에서 원천 차단한다.
+  if (career.phase === 'INTRO') return;
+  const info = getRookieDraftScheduleInfo(career);
+  if (info.isLockedBeforeDate) {
+    throw new Error(
+      `${info.draftClassYear} KBO 신인 드래프트는 공식 개최일(${info.formattedDate} · D-${info.daysRemaining}일)부터 진행할 수 있습니다.`
+    );
+  }
+}
+
 /**
  * Advances exactly ONE AI draft pick across ALL rounds (1R~11R).
  * Stops and throws if it is currently the user's pick.
@@ -2118,6 +2131,7 @@ function selectAiDraftCandidate(ds: CareerSave['draftState'], rng: SeededRng) {
 export function stepNextDraftPick(
   career: CareerSave
 ): { nextCareer: CareerSave; backupSnapshot: CareerSave } {
+  assertRookieDraftDateOpen(career);
   const dsCur = career.draftState;
   if (dsCur.completed || dsCur.currentRound > 11) {
     throw new Error('1~11라운드 신인 드래프트가 모두 종료되었습니다.');
@@ -2152,6 +2166,7 @@ export function stepNextDraftPick(
 export function advanceDraftUntilUserTurn(
   career: CareerSave
 ): { nextCareer: CareerSave; backupSnapshot: CareerSave } {
+  assertRookieDraftDateOpen(career);
   const backupSnapshot = cloneCareer(career);
   const next = cloneCareer(career);
   const ds = next.draftState;
@@ -2183,6 +2198,7 @@ export function pickDraftCandidateForUser(
   career: CareerSave,
   candidateId: number
 ): { nextCareer: CareerSave; backupSnapshot: CareerSave } {
+  assertRookieDraftDateOpen(career);
   const backupSnapshot = cloneCareer(career);
   const next = cloneCareer(career);
   const ds = next.draftState;
@@ -2234,6 +2250,7 @@ export function autoCompleteRemainingDraft(career: CareerSave): {
   nextCareer: CareerSave;
   backupSnapshot: CareerSave;
 } {
+  assertRookieDraftDateOpen(career);
   const backupSnapshot = cloneCareer(career);
   const next = cloneCareer(career);
   const ds = next.draftState;
