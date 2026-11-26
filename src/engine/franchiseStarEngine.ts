@@ -302,8 +302,45 @@ export function computeClubFranchiseMerchandise(
 }
 
 // =============================================================================
-// 3. FRANCHISE STAR LONG-TERM SPECIAL CONTRACT (장기 잔류 특별 재계약)
+// 3. FRANCHISE STAR LONG-TERM / VETERAN EXTENSION CONTRACT (장기 잔류·베테랑 재계약)
 // =============================================================================
+
+export interface FranchiseContractYearRange {
+  minYears: number;
+  maxYears: number;
+  defaultYears: number;
+  isVeteranShortTerm: boolean;
+}
+
+/**
+ * 프랜차이즈 스타 연장 계약의 현실적 기간 범위 산출
+ * - 만 35세 이상 고령 베테랑: 현실적으로 1~2년 단기 계약만 허용 (장기계약 제시 금지)
+ * - 만 33~34세 준베테랑: 1~4년 범위
+ * - 만 32세 이하 전성기 프랜차이즈 스타: 3~6년 장기계약 허용
+ */
+export function getFranchiseContractYearRange(
+  age: number,
+  ability = 75
+): FranchiseContractYearRange {
+  if (age >= 38) {
+    return { minYears: 1, maxYears: 2, defaultYears: 1, isVeteranShortTerm: true };
+  }
+  if (age >= 35) {
+    return {
+      minYears: 1,
+      maxYears: 2,
+      defaultYears: ability >= 80 ? 2 : 1,
+      isVeteranShortTerm: true,
+    };
+  }
+  if (age === 34) {
+    return { minYears: 1, maxYears: 3, defaultYears: 2, isVeteranShortTerm: false };
+  }
+  if (age === 33) {
+    return { minYears: 2, maxYears: 4, defaultYears: 3, isVeteranShortTerm: false };
+  }
+  return { minYears: 3, maxYears: 6, defaultYears: 5, isVeteranShortTerm: false };
+}
 
 export function proposeFranchiseLongTermContract(
   career: CareerSave,
@@ -317,7 +354,7 @@ export function proposeFranchiseLongTermContract(
     throw new Error('소속 구단 선수를 찾을 수 없습니다.');
   }
   if (target.category !== '국내') {
-    throw new Error('프랜차이즈 스타 장기 특별 계약은 국내 선수에게만 제안할 수 있습니다.');
+    throw new Error('프랜차이즈 스타 특별 연장 계약은 국내 선수에게만 제안할 수 있습니다.');
   }
   const assessment = evaluateFranchiseStar(career, target);
   if (assessment.tier === '일반') {
@@ -325,8 +362,13 @@ export function proposeFranchiseLongTermContract(
       `${target.name} 선수는 아직 프랜차이즈 스타 등급(준프랜차이즈 이상)에 도달하지 않았습니다. (현재 소속 ${assessment.tenureSeasons}시즌 · 종합 ${assessment.score}점)`
     );
   }
-  if (years < 4 || years > 6) {
-    throw new Error('프랜차이즈 스타 장기 특별 계약은 4~6년 범위로 제안해야 합니다.');
+  const yearRange = getFranchiseContractYearRange(target.age, target.ability);
+  if (years < yearRange.minYears || years > yearRange.maxYears) {
+    throw new Error(
+      yearRange.isVeteranShortTerm
+        ? `계약 기간 현실성 제한: 만 ${target.age}세 ${target.name} 선수는 고령 베테랑으로 현실적인 ${yearRange.minYears}~${yearRange.maxYears}년 계약만 제안할 수 있습니다.`
+        : `만 ${target.age}세 ${target.name} 선수의 프랜차이즈 연장 계약은 ${yearRange.minYears}~${yearRange.maxYears}년 범위로 제안해야 합니다.`
+    );
   }
 
   // 프랜차이즈 스타 원클럽 충성 할인(약 8~12%) 반영한 최소 수용 기준
@@ -337,9 +379,11 @@ export function proposeFranchiseLongTermContract(
 
   if (offeredTotal < minAcceptedTotal) {
     throw new Error(
-      `${target.name}(${assessment.tier}) 선수가 장기 잔류 의사는 있으나 조건이 부족하다고 판단했습니다. (제안 ${offeredTotal.toFixed(1)}억 / 최소 희망 총액 약 ${minAcceptedTotal.toFixed(1)}억)`
+      `${target.name}(${assessment.tier}) 선수가 잔류 의사는 있으나 조건이 부족하다고 판단했습니다. (제안 ${offeredTotal.toFixed(1)}억 / 최소 희망 총액 약 ${minAcceptedTotal.toFixed(1)}억)`
     );
   }
+
+  const contractKindLabel = yearRange.isVeteranShortTerm ? '베테랑 재계약' : '장기계약';
 
   const { nextCareer, backupSnapshot } = executeAtomicCareerMutation(career, (draft) => {
     const p = draft.players[playerId];
@@ -377,7 +421,7 @@ export function proposeFranchiseLongTermContract(
       endSeason: draft.season + years - 1,
       isFAEligible: false,
       faGrade: null,
-      note: `${draft.season} 프랜차이즈 스타 장기 연장(${years}년 ${offeredTotal}억 · ${assessment.tier})`,
+      note: `${draft.season} 프랜차이즈 스타 ${contractKindLabel}(${years}년 ${offeredTotal}억 · ${assessment.tier})`,
     };
     p.franchiseLongTermSigned = true;
     p.morale = '만족';
@@ -387,15 +431,15 @@ export function proposeFranchiseLongTermContract(
     team.fanSentiment = Math.min(100, (team.fanSentiment ?? 65) + 6);
     team.clubReputation = Math.min(100, (team.clubReputation ?? 70) + 5);
     team.popularity = Math.min(100, team.popularity + 3);
-    team.fanSentimentReason = `프랜차이즈 스타 ${p.name} ${years}년 장기 재계약 성사`;
+    team.fanSentimentReason = `프랜차이즈 스타 ${p.name} ${years}년 ${contractKindLabel} 성사`;
 
     draft.transactionLogs.unshift({
       id: `tx-fran-ext-${Date.now()}`,
       date: isoDate,
       type: '계약',
       teamId: draft.playerTeamId,
-      summary: `프랜차이즈 스타 장기계약: ${p.name}(${assessment.tier}) ${years}년 총 ${offeredTotal}억 (연봉 ${annualSalaryBillion}억 · 계약금 ${signingBonusBillion}억)`,
-      detail: '팬 지지율 +6 · 구단 평판 +5 · KBO 경쟁균형세 다년계약 자동 산정식 반영 (예외 선수 지정은 별도 관리)',
+      summary: `프랜차이즈 스타 ${contractKindLabel}: ${p.name}(${assessment.tier}) ${years}년 총 ${offeredTotal}억 (연봉 ${annualSalaryBillion}억 · 계약금 ${signingBonusBillion}억)`,
+      detail: '팬 지지율 +6 · 구단 평판 +5 · KBO 경쟁균형세 계약 산정식 반영 (예외 선수 지정은 별도 관리)',
     });
 
     draft.newsFeed = [
@@ -404,8 +448,10 @@ export function proposeFranchiseLongTermContract(
         season: draft.season,
         date: isoDate,
         category: '이적·계약' as const,
-        headline: `[종신 선언] ${KBO_TEAMS[draft.playerTeamId].shortName}, 프랜차이즈 스타 ${p.name}과 ${years}년 ${offeredTotal}억 장기 연장`,
-        body: `${KBO_TEAMS[draft.playerTeamId].name}이 구단 상징 ${p.name}(${assessment.tier} · 소속 ${assessment.tenureSeasons}시즌) 선수와 ${years}년 총액 ${offeredTotal}억 원(계약금 ${signingBonusBillion}억 포함)에 특별 장기계약을 체결했습니다. 팬들은 구단의 레전드 예우에 뜨거운 환호를 보내고 있습니다.`,
+        headline: yearRange.isVeteranShortTerm
+          ? `[베테랑 잔류] ${KBO_TEAMS[draft.playerTeamId].shortName}, 레전드 ${p.name}과 ${years}년 ${offeredTotal}억 재계약`
+          : `[종신 선언] ${KBO_TEAMS[draft.playerTeamId].shortName}, 프랜차이즈 스타 ${p.name}과 ${years}년 ${offeredTotal}억 장기 연장`,
+        body: `${KBO_TEAMS[draft.playerTeamId].name}이 구단 상징 ${p.name}(${assessment.tier} · 소속 ${assessment.tenureSeasons}시즌) 선수와 ${years}년 총액 ${offeredTotal}억 원(계약금 ${signingBonusBillion}억 포함)에 ${contractKindLabel}을 체결했습니다. 팬들은 구단의 레전드 예우에 뜨거운 환호를 보내고 있습니다.`,
         teamId: draft.playerTeamId,
         isHighlight: true,
       },
@@ -417,7 +463,7 @@ export function proposeFranchiseLongTermContract(
   return {
     nextCareer,
     backupSnapshot,
-    message: `${target.name}(${assessment.tier}) 선수와 ${years}년 총 ${offeredTotal}억 원 프랜차이즈 장기계약을 체결했습니다! (팬 지지율 +6 · 구단 평판 +5)`,
+    message: `${target.name}(${assessment.tier}) 선수와 ${years}년 총 ${offeredTotal}억 원 프랜차이즈 ${contractKindLabel}을 체결했습니다! (팬 지지율 +6 · 구단 평판 +5)`,
   };
 }
 

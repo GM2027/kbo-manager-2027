@@ -25,7 +25,10 @@ import { getAnnualKboCapBillion, getCurrentCareerDate } from './salaryCapEngine'
 import { calcAVG, calcERA, calcOPS, computeStandings } from './stats';
 
 /**
- * 현실적 FA 최대 계약 기간 산출 (고령 일반 선수는 장기계약 제한, 초특급 프랜차이즈 스타는 6~10년 장기계약 허용)
+ * 현실적 FA 최대 계약 기간 산출
+ * - 만 35세 이상 고령 선수: 등급·스타 여부와 무관하게 현실적으로 1~2년만 허용
+ * - 만 34세 준베테랑: 일반 최대 2년 (초특급만 예외적 최대 3년)
+ * - 만 33세 이하 초특급 프랜차이즈 스타: 6~10년 초대형 장기계약 허용
  */
 export function getMaxRealisticFaYears(
   age: number,
@@ -37,17 +40,17 @@ export function getMaxRealisticFaYears(
     ((options?.franchiseScore ?? 0) >= 75 &&
       (ability >= 86 || (ability >= 80 && (options?.potential ?? ability) >= 86 && age <= 28)));
 
-  if (isMega && age <= 34) {
+  if (age >= 38) return ability >= 84 ? 2 : 1;
+  if (age >= 35) return ability >= 76 ? 2 : 1;
+  if (age === 34) return isMega && ability >= 86 ? 3 : 2;
+
+  if (isMega && age <= 33) {
     if (age <= 27) return 10;
     if (age <= 29) return 9;
     if (age <= 31) return 8;
-    if (age <= 33) return 7;
-    return 5;
+    return 7;
   }
 
-  if (age >= 38) return ability >= 84 ? 2 : 1;
-  if (age >= 36) return ability >= 76 ? 2 : 1;
-  if (age >= 34) return ability >= 82 ? 3 : 2;
   if (age >= 32) return ability >= 80 ? 4 : 3;
   if (age >= 30) return ability >= 82 ? 5 : 4;
   return ability >= 83 ? 6 : 5;
@@ -442,24 +445,30 @@ export function evaluateFaGradeAndComp(
     potential: p.potential,
   });
   const rawFairYears =
-    tierLabel === '초특급 프랜차이즈'
+    p.age >= 37
+      ? 1
+      : p.age >= 35
+      ? p.ability >= 78
+        ? 2
+        : 1
+      : p.age === 34
+      ? isMegaFranchise
+        ? 3
+        : 2
+      : tierLabel === '초특급 프랜차이즈'
       ? p.age <= 25
         ? 9
         : p.age <= 27
         ? 8
         : p.age <= 29
         ? 7
-        : p.age <= 33
-        ? 6
-        : 5
+        : 6
       : tierLabel === '정상급 특급'
       ? p.age <= 28
         ? 6
         : p.age <= 31
         ? 5
-        : p.age <= 33
-        ? 4
-        : 3
+        : 4
       : tierLabel === '핵심 주전'
       ? p.age <= 31
         ? 4
@@ -469,11 +478,7 @@ export function evaluateFaGradeAndComp(
         ? 3
         : 2
       : tierLabel === '베테랑'
-      ? p.age >= 37
-        ? 1
-        : 2
-      : p.age >= 34
-      ? 1
+      ? 2
       : 2;
   const fairYears = clamp(rawFairYears, 1, maxRealisticYears);
 
@@ -1891,7 +1896,10 @@ export function submitUserClubFaBid(
     : isOriginalClub
     ? 0.88
     : 0.94;
-  const minAcceptYears = comp.isMegaFranchise ? Math.min(5, Math.max(4, comp.fairYears - 2)) : 1;
+  const minAcceptYears =
+    comp.isMegaFranchise && p.age <= 33
+      ? Math.min(maxRealisticYears, Math.min(5, Math.max(4, comp.fairYears - 2)))
+      : 1;
   const meetsThreshold =
     totalBillion >= comp.fairTotalBillion * minAcceptRatio && years >= minAcceptYears;
   const mlbBeatsUser = Boolean(

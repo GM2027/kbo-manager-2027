@@ -92,6 +92,7 @@ import {
 import {
   evaluateFranchiseStar,
   evaluateLegendTradeAvailability,
+  getFranchiseContractYearRange,
   getTeamFranchiseStars,
   proposeFranchiseLongTermContract,
 } from '../engine/franchiseStarEngine';
@@ -1639,10 +1640,10 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
                       <div className="text-sm font-extrabold text-amber-800 dark:text-amber-300">
-                        프랜차이즈 스타 장기 특별 재계약 (4~6년 · 원클럽 충성 할인 적용)
+                        프랜차이즈 스타 특별 재계약 (전성기 3~6년 · 만 35세+ 베테랑 1~2년 · 원클럽 충성 할인)
                       </div>
                       <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-0.5">
-                        소속 기간·통산 기록·공헌도로 선정된 프랜차이즈 스타와 장기 잔류 계약을 체결하면 팬 지지율과 구단 평판이 상승합니다. (샐러리캡 예외 선수 지정과는 별도 관리)
+                        소속 기간·통산 기록·공헌도로 선정된 프랜차이즈 스타와 재계약을 체결하면 팬 지지율과 구단 평판이 상승합니다. 고령 베테랑(만 35세 이상)은 현실적으로 1~2년 단기 계약만 제안할 수 있습니다.
                       </p>
                     </div>
                     <span className="font-mono-stats text-[11px] text-amber-800 dark:text-amber-200 font-bold px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30">
@@ -1681,14 +1682,30 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                     {filteredFranchiseStars.map((star, idx) => {
                       const p = career.players[star.playerId];
                       if (!p) return null;
-                      const years = franYearsMap[p.id] ?? 5;
+                      const yearRange = getFranchiseContractYearRange(p.age, p.ability);
+                      const rawSelectedYears = franYearsMap[p.id] ?? yearRange.defaultYears;
+                      const years = Math.max(
+                        yearRange.minYears,
+                        Math.min(yearRange.maxYears, rawSelectedYears)
+                      );
+                      const yearOptions = Array.from(
+                        { length: yearRange.maxYears - yearRange.minYears + 1 },
+                        (_, i) => yearRange.minYears + i
+                      );
                       const defaultAnnual = Math.max(3, Number(((p.ability - 65) * 0.58).toFixed(1)));
-                      const defaultBonus = Math.max(2, Number((defaultAnnual * years * 0.25).toFixed(1)));
+                      const defaultBonus =
+                        years === 1
+                          ? 0
+                          : Math.max(
+                              yearRange.isVeteranShortTerm ? 0.5 : 2,
+                              Number((defaultAnnual * years * (yearRange.isVeteranShortTerm ? 0.18 : 0.25)).toFixed(1))
+                            );
                       const annualVal = Number(franAnnualMap[p.id] ?? defaultAnnual);
                       const bonusVal = Number(franBonusMap[p.id] ?? defaultBonus);
                       const safeAnnual = Number.isFinite(annualVal) && annualVal > 0 ? annualVal : defaultAnnual;
                       const safeBonus = Number.isFinite(bonusVal) && bonusVal >= 0 ? bonusVal : defaultBonus;
                       const estTotal = Number((safeAnnual * years + safeBonus).toFixed(1));
+                      const contractKindLabel = yearRange.isVeteranShortTerm ? '베테랑 재계약' : '장기계약';
 
                       return (
                         <div
@@ -1716,9 +1733,14 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                               <span className="font-mono-stats text-slate-500 shrink-0">
                                 {p.position} · {p.age}세 · OVR {p.ability} · {star.tenureSeasons}시즌
                               </span>
+                              {yearRange.isVeteranShortTerm && (
+                                <span className="px-1.5 py-0.5 rounded bg-slate-200/80 dark:bg-slate-800 text-[10px] font-bold text-slate-700 dark:text-slate-300 shrink-0">
+                                  베테랑 1~2년
+                                </span>
+                              )}
                               {p.franchiseLongTermSigned && (
                                 <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 shrink-0">
-                                  · 장기계약
+                                  · {contractKindLabel}
                                 </span>
                               )}
                             </div>
@@ -1743,9 +1765,11 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                               }
                               className="px-2 py-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-mono-stats"
                             >
-                              <option value={4}>4년</option>
-                              <option value={5}>5년</option>
-                              <option value={6}>6년</option>
+                              {yearOptions.map((y) => (
+                                <option key={y} value={y}>
+                                  {y}년
+                                </option>
+                              ))}
                             </select>
                             <span className="text-slate-500">연봉</span>
                             <input
@@ -1778,7 +1802,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                               type="button"
                               onClick={() => {
                                 const preview = previewContractSalaryCapImpact(career, {
-                                  title: `${p.name}(${star.tier}) 프랜차이즈 장기계약 (${years}년 총 ${estTotal}억)`,
+                                  title: `${p.name}(${star.tier}) 프랜차이즈 ${contractKindLabel} (${years}년 총 ${estTotal}억)`,
                                   items: [
                                     {
                                       existingPlayerId: p.id,
@@ -1793,7 +1817,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                                 });
                                 setPendingContract({
                                   preview,
-                                  confirmLabel: '단장 승인 · 프랜차이즈 장기계약 체결',
+                                  confirmLabel: `단장 승인 · 프랜차이즈 ${contractKindLabel} 체결`,
                                   execute: () => {
                                     try {
                                       setNotice(null);
@@ -1809,7 +1833,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                                     } catch (err) {
                                       setNotice({
                                         type: 'err',
-                                        text: err instanceof Error ? err.message : '장기계약 제안 오류',
+                                        text: err instanceof Error ? err.message : `${contractKindLabel} 제안 오류`,
                                       });
                                     }
                                   },
@@ -1817,7 +1841,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                               }}
                               className="px-2.5 py-1 rounded bg-amber-600 hover:bg-amber-700 text-white font-bold"
                             >
-                              장기계약 제안
+                              {yearRange.isVeteranShortTerm ? '재계약 제안' : '장기계약 제안'}
                             </button>
                           </div>
                         </div>

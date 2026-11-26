@@ -1574,7 +1574,7 @@ export function evaluatePlayerContractAcceptance(
   if (agent.prefersBigMarket) {
     preferenceScore += isMyBigMarket ? 7 : -9;
   }
-  if (agent.persona === '장기보장 선호') {
+  if (agent.persona === '장기보장 선호' && player.age < 35) {
     preferenceScore += offerYears >= 4 ? 10 : offerYears <= 2 ? -12 : 0;
   }
   if (player.teamId === career.playerTeamId) {
@@ -1613,7 +1613,7 @@ export function evaluatePlayerContractAcceptance(
     const cause =
       agent.prefersContender && myRank >= 7
         ? '우승권 전력을 최우선으로 고려하고 있어'
-        : agent.persona === '장기보장 선호' && offerYears < 3
+        : agent.persona === '장기보장 선호' && player.age < 35 && offerYears < 3
         ? '최소 3년 이상 장기 보장 조건을 원해'
         : !isMyBigMarket && agent.prefersBigMarket
         ? '수도권·대형 시장 구단 이적을 선호해'

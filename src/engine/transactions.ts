@@ -481,7 +481,7 @@ export function generateAiDomesticContract(p: Player): AiDomesticContractQuote {
   let rationale = '2군 육성·최저연봉 기준 산정';
 
   if (effectiveScore >= 85) {
-    years = p.age >= 35 ? 2 : 4;
+    years = p.age >= 38 ? 1 : p.age >= 35 ? 2 : 4;
     annual = Number(((10.5 + (effectiveScore - 85) * 1.45) * posDemandMult * injPenalty).toFixed(1));
     bonus = Number((years >= 3 ? annual * 0.85 : annual * 0.4).toFixed(1));
     optionType = p.age <= 31 ? '선수옵션' : '구단옵션';
@@ -4564,7 +4564,14 @@ export function advanceToNextSeason(career: CareerSave): {
       p.rosterTier = p.ability >= 70 ? '1군' : '2군';
       p.gameDayActive = p.rosterTier === '1군';
       p.signedAsFaSeason = nextSeasonNum;
-      const years = p.age >= 35 ? 2 : 3;
+      const years =
+        p.age >= 37
+          ? 1
+          : p.age >= 35
+          ? p.ability >= 78
+            ? 2
+            : 1
+          : Math.min(3, getMaxRealisticFaYears(p.age, p.ability));
       const annual = Number(Math.max(1.5, (p.ability - 66) * 0.65).toFixed(1));
       p.contract = {
         status: '확정',
