@@ -2697,6 +2697,8 @@ export interface FaClubBid {
   submittedDate: string;
   score: number;
   note: string;
+  /** 자동 입찰 엔진이 제출한 입찰 여부 (사용자 구단 자동 입찰 구분용) */
+  isAutoBid?: boolean;
 }
 
 export interface MlbOverseasFaOffer {
@@ -2743,6 +2745,8 @@ export interface FaCompetitionState {
   round: number;
   externalSigningsByTeam: Partial<Record<TeamId, number>>;
   negotiations: Record<string, FaMarketNegotiation>;
+  /** 사용자 구단도 AI 9개 구단과 함께 자동 입찰에 참여할지 여부 (기본 true · 단장 최종 승인 후 체결) */
+  autoBidForUserClub?: boolean;
 }
 
 export type LeagueAcquisitionCategory =

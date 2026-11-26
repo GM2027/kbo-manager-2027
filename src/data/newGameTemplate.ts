@@ -1,6 +1,7 @@
 import { ensureAmateurAndOverseasStateInPlace } from '../engine/amateurOverseasEngine';
 import { ensureDeepFranchiseState } from '../engine/deepFranchise';
 import { applyPreGameEditorStoreToNewCareerInPlace } from '../engine/editorEngine';
+import { syncFaCompetitionMarketInPlace } from '../engine/faCompetitionEngine';
 import { ensureLeagueLifeStateInPlace } from '../engine/leagueLifeEngine';
 import { ensureGlobalPlayerRegistryInPlace } from '../engine/playerRegistry';
 import { generateRegularSeasonSchedule } from '../engine/schedule';
@@ -163,5 +164,8 @@ export function createNewCareer(params: {
       });
     }
   }
+
+  // 게임 시작 시점부터 KBO 10개 구단 전체 FA 자동 입찰 현황 즉시 활성화
+  syncFaCompetitionMarketInPlace(created, '2027-01-01');
   return created;
 }

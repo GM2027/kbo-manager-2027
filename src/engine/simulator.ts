@@ -9,6 +9,10 @@ import {
   upsertChampionRecord,
 } from '../data/kboTeams';
 import { enforceOvrPotInvariantInPlace } from '../data/v18Importer';
+import {
+  advanceFaCompetitionRound,
+  syncFaCompetitionMarketInPlace,
+} from './faCompetitionEngine';
 import { simulateRealisticBaseballGame } from './gamePlayEngine';
 import { optimizeBattingLineup } from './lineupOptimizer';
 import {
@@ -2185,6 +2189,30 @@ function simulateRegularGames(
   }
   generateVerifiedSeriesRecapNews(next, playerTeamGames, seriesDate);
   checkCareerMilestonesAndRecords(next, seriesDate);
+
+  // 시즌 초반 미계약 FA 잔여 시 전 구단 자동 입찰·계약 1라운드 자동 진행 (사용자 구단 최종 승인 보호)
+  if (next.gamesPlayed <= 45 && next.lastAutoFaDate !== seriesDate) {
+    const hasOpenFreeAgents = Object.values(next.players).some(
+      (p) => (p.rosterTier === 'FA' || p.contract.status === 'FA') && p.signedAsFaSeason !== next.season
+    );
+    if (hasOpenFreeAgents) {
+      syncFaCompetitionMarketInPlace(next, seriesDate);
+      const stillActive = Object.values(next.faCompetition?.negotiations ?? {}).some(
+        (n) => n.status === '입찰중'
+      );
+      if (stillActive) {
+        const autoFa = advanceFaCompetitionRound(next);
+        next.players = autoFa.nextCareer.players;
+        next.teams = autoFa.nextCareer.teams;
+        next.finances = autoFa.nextCareer.finances;
+        next.faCompetition = autoFa.nextCareer.faCompetition;
+        next.newsFeed = autoFa.nextCareer.newsFeed;
+        next.leagueAcquisitions = autoFa.nextCareer.leagueAcquisitions;
+        next.transactionLogs = autoFa.nextCareer.transactionLogs;
+      }
+      next.lastAutoFaDate = seriesDate;
+    }
+  }
 
   const seriesRec = `${winsInSeries}승 ${lossesInSeries}패${drawsInSeries > 0 ? ` ${drawsInSeries}무` : ''}`;
   const modeLabel =

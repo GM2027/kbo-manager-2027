@@ -334,14 +334,13 @@ export function advanceGameDateByDays(
     }
   }
 
-  // 3) FA 시장 자동 진행 (11월~익년 2월 스토브리그/개막 준비 기간 & FA 선수 존재 시, FA 화면 미접속 상태에서도 자동 작동)
+  // 3) FA 시장 자동 진행 (스토브리그·개막 준비·시즌 초반 미계약 FA 존재 시, FA 화면 미접속 상태에서도 전 구단 자동 입찰·계약 진행)
   const monthNum = Number(endIso.slice(5, 7));
   const isFaWindow =
-    next.phase === 'OFFSEASON' ||
-    monthNum === 11 ||
-    monthNum === 12 ||
-    monthNum === 1 ||
-    monthNum === 2;
+    next.phase !== 'POSTSEASON' &&
+    (next.phase === 'OFFSEASON' ||
+      monthNum >= 11 ||
+      monthNum <= 5);
   const hasFreeAgents = Object.values(next.players).some(
     (p) => p.rosterTier === 'FA' || p.contract.status === 'FA'
   );
@@ -349,7 +348,7 @@ export function advanceGameDateByDays(
   if (isFaWindow && hasFreeAgents && next.lastAutoFaDate !== endIso) {
     // 1~3일 경과당 FA 1라운드 자동 진행 (사용자 구단 계약은 최종 승인 대기 상태 유지)
     const roundsToRun = Math.max(1, Math.min(3, Math.ceil(safeDays / 3)));
-    syncFaCompetitionMarketInPlace(next);
+    syncFaCompetitionMarketInPlace(next, endIso);
     for (let r = 0; r < roundsToRun; r++) {
       const stillActive =
         next.faCompetition &&

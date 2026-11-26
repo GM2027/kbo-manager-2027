@@ -924,11 +924,11 @@ function finalizeOverseasFaMlbSigningInPlace(
 }
 
 /**
- * FA 경쟁 상태 초기화 및 10개 구단 + 해외 FA MLB 자동 평가·입찰 동기화 (기존 세이브 호환)
+ * FA 경쟁 상태 초기화 및 전체 10개 구단 + 해외 FA MLB 자동 평가·입찰 동기화 (기존 세이브 호환)
  */
 export function syncFaCompetitionMarketInPlace(
   career: CareerSave,
-  dateStr = `${career.season}-11-18`
+  dateStr = getCurrentCareerDate(career).isoDate
 ): FaCompetitionState {
   if (!career.faCompetition || career.faCompetition.season !== career.season) {
     career.faCompetition = {
@@ -936,9 +936,13 @@ export function syncFaCompetitionMarketInPlace(
       round: 1,
       externalSigningsByTeam: {},
       negotiations: {},
+      autoBidForUserClub: career.faCompetition?.autoBidForUserClub ?? true,
     };
   }
   const state = career.faCompetition;
+  if (state.autoBidForUserClub === undefined) {
+    state.autoBidForUserClub = true;
+  }
   const standings = computeStandings(career.gamesLedger);
   const rankByTeam = new Map<TeamId, number>();
   standings.forEach((row, idx) => rankByTeam.set(row.teamId, idx + 1));
@@ -974,7 +978,7 @@ export function syncFaCompetitionMarketInPlace(
       continue;
     }
 
-    // 9개 AI 구단(원소속 구단 포함!)이 모든 FA 선수를 평가하고 예산·필요도·능력치 기반 자동 입찰
+    // 전체 10개 구단(AI 9개 구단 상시 + 사용자 구단 자동입찰 ON 시)이 모든 FA 선수를 평가하고 예산·필요도·능력치 기반 자동 입찰
     evaluateAiClubBidsForPlayerInPlace(career, state, neg, p, rankByTeam, dateStr, rng);
 
     // 해외 FA 자격 선수(사용자·AI 구단 동일 적용): 최상위권 위주 MLB 직접 제안 평가
@@ -993,7 +997,97 @@ export function syncFaCompetitionMarketInPlace(
     }
   }
 
+  // 2차 보정 패스: 입찰 참여가 0건인 구단이나 미입찰 FA가 남지 않도록 전 구단 현실적 수요 기반 자동 입찰 보강
+  ensureBroadClubFaParticipationInPlace(career, state, faPlayers, rankByTeam, dateStr, rng);
+
   return state;
+}
+
+function buildClubAutoBidOffer(
+  career: CareerSave,
+  p: Player,
+  tid: TeamId,
+  isOriginalClub: boolean,
+  need: number,
+  clubProfile: ReturnType<typeof getClubMarketProfile>,
+  comp: ReturnType<typeof evaluateFaGradeAndComp>,
+  rankByTeam: Map<TeamId, number>,
+  dateStr: string,
+  rng: SeededRng,
+  valueDiscount = 1.0
+): FaClubBid | null {
+  const isUserClub = tid === career.playerTeamId;
+  const needMult = 0.88 + (need / 100) * 0.22; // 0.91 ~ 1.10
+  const origMult = isOriginalClub ? 0.97 : 1.03;
+  const maxYears = getMaxRealisticFaYears(p.age, p.ability);
+  const offerYears = clamp(
+    valueDiscount < 0.92
+      ? Math.min(2, comp.fairYears)
+      : comp.fairYears + (need >= 80 && p.age <= 31 ? 1 : 0) - (p.age >= 35 ? 1 : 0),
+    1,
+    maxYears
+  );
+  const capCeilingTotal = Number(
+    Math.min(
+      clubProfile.budgetCapacityBillion,
+      clubProfile.maxAnnualBillion * offerYears * (isOriginalClub ? 1.18 : 1.02)
+    ).toFixed(1)
+  );
+  const maxWilling = Number(
+    Math.min(
+      capCeilingTotal,
+      comp.fairTotalBillion *
+        valueDiscount *
+        needMult *
+        origMult *
+        clubProfile.aggressiveness *
+        (0.94 + rng.next() * 0.14)
+    ).toFixed(1)
+  );
+  const minFloor = Number((Math.max(0.33, career.season >= 2027 ? 0.33 : 0.3) * offerYears).toFixed(1));
+  let offerTotal = Number(
+    Math.max(
+      minFloor,
+      Math.min(maxWilling, comp.fairTotalBillion * valueDiscount * (0.9 + rng.next() * 0.14))
+    ).toFixed(1)
+  );
+
+  // 사용자 구단 자동 입찰은 실제 보유 현금(계약금+C등급 보상금) 한도를 엄격히 준수
+  if (isUserClub && career.finances.cashBalanceBillion !== null) {
+    const preview = calculateExactFaContractBreakdown(offerTotal, offerYears, {
+      age: p.age,
+      injuryHistoryCount: p.injuryHistoryCount,
+      season: career.season,
+    });
+    const cComp = !isOriginalClub && comp.grade === 'C' ? comp.cashCompBillion : 0;
+    const reqCash = preview.signingBonusBillion + cComp;
+    if (reqCash > career.finances.cashBalanceBillion * 0.85) {
+      const scaled = Number(
+        Math.max(minFloor, (career.finances.cashBalanceBillion * 0.8 - cComp) * 2.1).toFixed(1)
+      );
+      if (scaled < comp.fairTotalBillion * 0.72) return null;
+      offerTotal = Math.min(offerTotal, scaled);
+    }
+  }
+
+  const annualBillion = Number((offerTotal / offerYears).toFixed(2));
+  const scored = scoreBidForPlayer(
+    career,
+    p,
+    { teamId: tid, years: offerYears, totalBillion: offerTotal, annualBillion, isOriginalClub, submittedDate: dateStr },
+    rankByTeam
+  );
+  return {
+    teamId: tid,
+    years: offerYears,
+    totalBillion: offerTotal,
+    annualBillion,
+    isOriginalClub,
+    submittedDate: dateStr,
+    score: scored.score,
+    note: scored.note,
+    isAutoBid: true,
+  };
 }
 
 function evaluateAiClubBidsForPlayerInPlace(
@@ -1007,12 +1101,15 @@ function evaluateAiClubBidsForPlayerInPlace(
 ): void {
   const comp = evaluateFaGradeAndComp(career, p);
   const existingTopTotal = neg.bids.reduce((m, b) => Math.max(m, b.totalBillion), 0);
+  const userAutoEnabled = state.autoBidForUserClub !== false;
 
   for (const tid of TEAM_IDS) {
-    // 사용자 구단은 절대 AI가 자동 입찰하지 않음 (단장 직접 입찰·승인 전용)
-    if (tid === career.playerTeamId) continue;
-
+    const isUserClub = tid === career.playerTeamId;
+    if (isUserClub && !userAutoEnabled) continue;
+    // 사용자 구단에 미제출 보호명단이 남아있으면 외부 FA 추가 자동 입찰 보류 (원소속 재계약은 허용)
     const isOriginalClub = tid === neg.formerTeamId;
+    if (isUserClub && !isOriginalClub && career.pendingFaProtection) continue;
+
     const extCount = state.externalSigningsByTeam[tid] ?? 0;
     // KBO 외부 FA 영입 상한 준수 (원소속 재계약은 예외)
     if (!isOriginalClub && extCount >= MAX_EXTERNAL_FA_PER_CLUB) continue;
@@ -1023,68 +1120,80 @@ function evaluateAiClubBidsForPlayerInPlace(
     // 구단별 관심도 계산: 능력치 + 포지션 필요도 + 원소속 우선권 + 재정·샐러리캡 여력
     const fairAav = comp.fairTotalBillion / Math.max(1, comp.fairYears);
     const budgetOk =
-      clubProfile.budgetCapacityBillion >= comp.fairTotalBillion * 0.8 &&
-      clubProfile.maxAnnualBillion >= fairAav * (isOriginalClub ? 0.72 : 0.88);
+      clubProfile.budgetCapacityBillion >= comp.fairTotalBillion * 0.72 &&
+      clubProfile.maxAnnualBillion >= fairAav * (isOriginalClub ? 0.68 : 0.8);
     if (!budgetOk && !isOriginalClub) continue;
-    // 2년 연속 샐러리캡 초과 구단은 외부 대형 FA(연평균 6억+) 입찰 원천 자제
-    if (!isOriginalClub && clubProfile.consecutiveExceedYears >= 2 && fairAav >= 6.0) continue;
+    // 2년 연속 샐러리캡 초과 구단은 외부 초대형 FA(연평균 8억+) 입찰 자제
+    if (!isOriginalClub && clubProfile.consecutiveExceedYears >= 2 && fairAav >= 8.0) continue;
 
-    // 이미 입찰이 과도하게 쏠린 구단은 자연스럽게 추가 대형 FA 추격 자제 (인위적 할당 X, 예산/로스터 현실 반영)
+    // 동시 다중 입찰 상한 완화: AI 구단은 최대 12건(과열 시 점진적 감점), 사용자 자동입찰은 최대 5건(핵심 보강 중심)
     const activeBidsByClub = Object.values(state.negotiations).filter(
-      (n) => n.status === '입찰중' && n.bids.some((b) => b.teamId === tid)
+      (n) => (n.status === '입찰중' || n.status === '단장승인대기') && n.bids.some((b) => b.teamId === tid)
     ).length;
-    if (!isOriginalClub && activeBidsByClub >= 4) continue;
+    const maxActiveBids = isUserClub ? 5 : 12;
+    const prevBidIdx = neg.bids.findIndex((b) => b.teamId === tid);
+    if (prevBidIdx < 0 && !isOriginalClub && activeBidsByClub >= maxActiveBids) continue;
 
     // 외부 A/B등급 FA는 보상선수 + 보상금 부담 반영
     const compBurdenPenalty =
       !isOriginalClub && comp.grade === 'A'
-        ? 8.5
+        ? 7.0
         : !isOriginalClub && comp.grade === 'B'
-        ? 4.0
+        ? 3.2
         : 0;
+    const crowdPenalty = Math.max(0, activeBidsByClub - 4) * 1.8;
     const interestScore =
-      p.ability * 0.45 +
-      need * 0.4 +
-      (isOriginalClub ? 16 : 0) +
-      (clubProfile.aggressiveness - 1) * 30 -
-      compBurdenPenalty +
+      p.ability * 0.46 +
+      need * 0.42 +
+      (isOriginalClub ? 18 : 0) +
+      (clubProfile.aggressiveness - 1) * 28 -
+      compBurdenPenalty -
+      crowdPenalty +
       (rng.next() * 14 - 7);
 
-    // 70점 이상이면 입찰 참여 (특급 FA는 여러 구단 동시 경합, C등급/중견도 복수 구단 관심)
-    const threshold = p.ability >= 81 ? 66 : p.ability >= 76 ? 70 : 73;
-    const prevBidIdx = neg.bids.findIndex((b) => b.teamId === tid);
+    // 전 등급 FA가 현실적으로 다수 구단의 입찰을 받도록 티어별 기준선 정교화
+    const baseThreshold =
+      p.ability >= 80 ? 60 : p.ability >= 74 ? 63 : p.ability >= 66 ? 66 : 68;
+    const threshold = isUserClub ? baseThreshold + 3 : baseThreshold;
 
     if (prevBidIdx < 0 && interestScore < threshold) continue;
 
-    // 입찰 금액 산정 (재정·샐러리캡 연간 한도 엄격 준수)
-    const needMult = 0.88 + (need / 100) * 0.22; // 0.91 ~ 1.10
-    const origMult = isOriginalClub ? 0.97 : 1.03;
-    const maxYears = getMaxRealisticFaYears(p.age, p.ability);
-    const offerYears = clamp(
-      comp.fairYears + (need >= 80 && p.age <= 31 ? 1 : 0) - (p.age >= 35 ? 1 : 0),
-      1,
-      maxYears
-    );
-    const capCeilingTotal = Number(
-      Math.min(
-        clubProfile.budgetCapacityBillion,
-        clubProfile.maxAnnualBillion * offerYears * (isOriginalClub ? 1.18 : 1.02)
-      ).toFixed(1)
-    );
-    const maxWilling = Number(
-      Math.min(
-        capCeilingTotal,
-        comp.fairTotalBillion * needMult * origMult * clubProfile.aggressiveness * (0.94 + rng.next() * 0.14)
-      ).toFixed(1)
-    );
-
+    // 이미 입찰 중인 구단의 경쟁 상향 재입찰 처리 (사용자 단장이 직접 입력한 수동 입찰은 자동 덮어쓰기 금지)
     if (prevBidIdx >= 0) {
       const prevBid = neg.bids[prevBidIdx];
-      // 경쟁 입찰이 더 높고 구단 캡·재정 상한 여유가 있으면 3~7% 상향 재입찰
-      if (existingTopTotal > prevBid.totalBillion && maxWilling > prevBid.totalBillion * 1.03) {
-        const raisedTotal = Number(
+      if (isUserClub && !prevBid.isAutoBid) continue;
+
+      const needMult = 0.88 + (need / 100) * 0.22;
+      const origMult = isOriginalClub ? 0.97 : 1.03;
+      const capCeilingTotal = Number(
+        Math.min(
+          clubProfile.budgetCapacityBillion,
+          clubProfile.maxAnnualBillion * prevBid.years * (isOriginalClub ? 1.18 : 1.02)
+        ).toFixed(1)
+      );
+      const maxWilling = Number(
+        Math.min(
+          capCeilingTotal,
+          comp.fairTotalBillion * needMult * origMult * clubProfile.aggressiveness * (0.96 + rng.next() * 0.14)
+        ).toFixed(1)
+      );
+
+      // 경쟁 입찰이 더 높고 구단 캡·재정 상한 여유가 있으면 2~7% 상향 재입찰
+      if (existingTopTotal > prevBid.totalBillion && maxWilling > prevBid.totalBillion * 1.02) {
+        let raisedTotal = Number(
           Math.min(maxWilling, existingTopTotal * (1.02 + rng.next() * 0.05)).toFixed(1)
         );
+        if (isUserClub && career.finances.cashBalanceBillion !== null) {
+          const preview = calculateExactFaContractBreakdown(raisedTotal, prevBid.years, {
+            age: p.age,
+            injuryHistoryCount: p.injuryHistoryCount,
+            season: career.season,
+          });
+          const cComp = !isOriginalClub && comp.grade === 'C' ? comp.cashCompBillion : 0;
+          if (preview.signingBonusBillion + cComp > career.finances.cashBalanceBillion * 0.85) {
+            continue;
+          }
+        }
         const years = prevBid.years;
         const annualBillion = Number((raisedTotal / years).toFixed(2));
         const scored = scoreBidForPlayer(
@@ -1102,35 +1211,160 @@ function evaluateAiClubBidsForPlayerInPlace(
           submittedDate: dateStr,
           score: scored.score,
           note: scored.note,
+          isAutoBid: true,
         };
       }
       continue;
     }
 
-    const minFloor = Number((Math.max(0.33, career.season >= 2027 ? 0.33 : 0.3) * offerYears).toFixed(1));
-    const offerTotal = Number(
-      Math.max(minFloor, Math.min(maxWilling, comp.fairTotalBillion * (0.9 + rng.next() * 0.14))).toFixed(1)
-    );
-    const annualBillion = Number((offerTotal / offerYears).toFixed(2));
-    const scored = scoreBidForPlayer(
+    const builtBid = buildClubAutoBidOffer(
       career,
       p,
-      { teamId: tid, years: offerYears, totalBillion: offerTotal, annualBillion, isOriginalClub, submittedDate: dateStr },
-      rankByTeam
-    );
-    neg.bids.push({
-      teamId: tid,
-      years: offerYears,
-      totalBillion: offerTotal,
-      annualBillion,
+      tid,
       isOriginalClub,
-      submittedDate: dateStr,
-      score: scored.score,
-      note: scored.note,
-    });
+      need,
+      clubProfile,
+      comp,
+      rankByTeam,
+      dateStr,
+      rng
+    );
+    if (builtBid) {
+      neg.bids.push(builtBid);
+    }
   }
 
   neg.bids.sort((a, b) => b.score - a.score || b.totalBillion - a.totalBillion);
+}
+
+/**
+ * 2차 자동 입찰 보강 패스:
+ * 1) 모든 참가 가능 구단(AI 9구단 + 자동입찰 ON 시 사용자 구단)이 최소 2건 이상의 현실적 수요 FA에 입찰하도록 보장
+ * 2) 1차 패스에서 아직 입찰이 0건인 FA 선수도 원소속팀 및 포지션 적합도가 가장 높은 구단이 실속형(단기/적정가) 자동 입찰 검토
+ */
+function ensureBroadClubFaParticipationInPlace(
+  career: CareerSave,
+  state: FaCompetitionState,
+  faPlayers: Player[],
+  rankByTeam: Map<TeamId, number>,
+  dateStr: string,
+  rng: SeededRng
+): void {
+  const openPlayers = faPlayers.filter((p) => {
+    const neg = state.negotiations[p.id];
+    return neg && neg.status === '입찰중' && p.signedAsFaSeason !== career.season;
+  });
+  if (openPlayers.length === 0) return;
+
+  const userAutoEnabled = state.autoBidForUserClub !== false;
+
+  // (A) 구단별 최소 입찰 참여 보장 (예산·외부FA 한도 허용 범위 내 가장 필요한 FA 타깃에 자동 입찰)
+  for (const tid of TEAM_IDS) {
+    const isUserClub = tid === career.playerTeamId;
+    if (isUserClub && !userAutoEnabled) continue;
+
+    const extCount = state.externalSigningsByTeam[tid] ?? 0;
+    const currentBids = Object.values(state.negotiations).filter(
+      (n) => (n.status === '입찰중' || n.status === '단장승인대기') && n.bids.some((b) => b.teamId === tid)
+    ).length;
+    const targetMinBids = isUserClub ? 2 : 3;
+    if (currentBids >= targetMinBids) continue;
+
+    const clubProfile = getClubMarketProfile(career, tid, rankByTeam);
+    const rankedCandidates = openPlayers
+      .filter((p) => {
+        const neg = state.negotiations[p.id];
+        if (!neg || neg.bids.some((b) => b.teamId === tid)) return false;
+        const isOrig = neg.formerTeamId === tid;
+        if (!isOrig && extCount >= MAX_EXTERNAL_FA_PER_CLUB) return false;
+        if (isUserClub && !isOrig && career.pendingFaProtection) return false;
+        return true;
+      })
+      .map((p) => {
+        const neg = state.negotiations[p.id];
+        const isOrig = neg.formerTeamId === tid;
+        const need = computeClubPositionalNeed(career, tid, p);
+        const comp = evaluateFaGradeAndComp(career, p);
+        const fitScore =
+          need * 0.55 +
+          p.ability * 0.45 +
+          (isOrig ? 22 : 0) -
+          (!isOrig && comp.grade === 'A' ? 8 : !isOrig && comp.grade === 'B' ? 3 : 0);
+        return { p, neg, isOrig, need, comp, fitScore };
+      })
+      .sort((a, b) => b.fitScore - a.fitScore);
+
+    let added = 0;
+    for (const c of rankedCandidates) {
+      if (currentBids + added >= targetMinBids) break;
+      const fairAav = c.comp.fairTotalBillion / Math.max(1, c.comp.fairYears);
+      if (!c.isOrig && clubProfile.maxAnnualBillion < fairAav * 0.72) continue;
+      const bid = buildClubAutoBidOffer(
+        career,
+        c.p,
+        tid,
+        c.isOrig,
+        c.need,
+        clubProfile,
+        c.comp,
+        rankByTeam,
+        dateStr,
+        rng,
+        0.95
+      );
+      if (bid) {
+        c.neg.bids.push(bid);
+        c.neg.bids.sort((a, b) => b.score - a.score || b.totalBillion - a.totalBillion);
+        added += 1;
+      }
+    }
+  }
+
+  // (B) 입찰이 0건인 미관심/중견·베테랑 FA에게 원소속팀 및 포지션 적합 구단의 실속형 오퍼 자동 생성
+  for (const p of openPlayers) {
+    const neg = state.negotiations[p.id];
+    if (!neg || neg.bids.length > 0) continue;
+
+    const comp = evaluateFaGradeAndComp(career, p);
+    const suitors = TEAM_IDS.filter((tid) => {
+      const isUserClub = tid === career.playerTeamId;
+      if (isUserClub && !userAutoEnabled) return false;
+      const isOrig = tid === neg.formerTeamId;
+      if (isUserClub && !isOrig && career.pendingFaProtection) return false;
+      const extCount = state.externalSigningsByTeam[tid] ?? 0;
+      if (!isOrig && extCount >= MAX_EXTERNAL_FA_PER_CLUB) return false;
+      return true;
+    })
+      .map((tid) => {
+        const isOrig = tid === neg.formerTeamId;
+        const need = computeClubPositionalNeed(career, tid, p);
+        const clubProfile = getClubMarketProfile(career, tid, rankByTeam);
+        const score = need + (isOrig ? 24 : 0) + (clubProfile.capHeadroomBillion > 0 ? 8 : -4);
+        return { tid, isOrig, need, clubProfile, score };
+      })
+      .sort((a, b) => b.score - a.score)
+      .slice(0, p.ability >= 72 ? 3 : 2);
+
+    for (const s of suitors) {
+      const bid = buildClubAutoBidOffer(
+        career,
+        p,
+        s.tid,
+        s.isOrig,
+        s.need,
+        s.clubProfile,
+        comp,
+        rankByTeam,
+        dateStr,
+        rng,
+        p.ability >= 72 ? 0.94 : 0.88
+      );
+      if (bid) {
+        neg.bids.push(bid);
+      }
+    }
+    neg.bids.sort((a, b) => b.score - a.score || b.totalBillion - a.totalBillion);
+  }
 }
 
 /**
@@ -1478,10 +1712,10 @@ export function advanceFaCompetitionRound(career: CareerSave): {
 } {
   const backupSnapshot = cloneCareer(career);
   const next = cloneCareer(career);
-  const state = syncFaCompetitionMarketInPlace(next, `${next.season}-11-21`);
+  const dateStr = getCurrentCareerDate(next).isoDate;
+  const state = syncFaCompetitionMarketInPlace(next, dateStr);
   state.round += 1;
 
-  const dateStr = `${next.season}-11-${String(Math.min(30, 18 + state.round)).padStart(2, '0')}`;
   const standings = computeStandings(next.gamesLedger);
   const rankByTeam = new Map<TeamId, number>();
   standings.forEach((row, idx) => rankByTeam.set(row.teamId, idx + 1));
@@ -1692,4 +1926,126 @@ export function resolveRemainingAiFaCompetitionInPlace(
     }
   }
   return summaries;
+}
+
+/**
+ * 전체 10개 구단 자동 입찰 즉시 동기화 (기존 세이브 진입·새로고침 공용)
+ */
+export function syncAllClubsAutoFaBids(career: CareerSave): {
+  nextCareer: CareerSave;
+  backupSnapshot: CareerSave;
+  totalBids: number;
+  activeClubCount: number;
+} {
+  const backupSnapshot = cloneCareer(career);
+  const next = cloneCareer(career);
+  const dateStr = getCurrentCareerDate(next).isoDate;
+  const state = syncFaCompetitionMarketInPlace(next, dateStr);
+
+  const clubsWithBids = new Set<TeamId>();
+  let totalBids = 0;
+  for (const neg of Object.values(state.negotiations)) {
+    if (neg.status === '계약완료') continue;
+    for (const b of neg.bids) {
+      clubsWithBids.add(b.teamId);
+      totalBids += 1;
+    }
+  }
+
+  next.updatedAt = new Date().toISOString();
+  return {
+    nextCareer: next,
+    backupSnapshot,
+    totalBids,
+    activeClubCount: clubsWithBids.size,
+  };
+}
+
+/**
+ * 사용자 구단의 FA 자동 입찰 참여 여부 토글
+ * - ON: 사용자 구단도 AI 9개 구단과 함께 자동 입찰 참여 (선수가 수락해도 단장 최종 승인 후 체결)
+ * - OFF: 자동 제출된 사용자 구단 입찰만 정리하고 수동 입찰은 보존
+ */
+export function setUserClubAutoFaBidEnabled(
+  career: CareerSave,
+  enabled: boolean
+): {
+  nextCareer: CareerSave;
+  backupSnapshot: CareerSave;
+} {
+  const backupSnapshot = cloneCareer(career);
+  const next = cloneCareer(career);
+  const dateStr = getCurrentCareerDate(next).isoDate;
+  if (!next.faCompetition || next.faCompetition.season !== next.season) {
+    next.faCompetition = {
+      season: next.season,
+      round: 1,
+      externalSigningsByTeam: {},
+      negotiations: {},
+      autoBidForUserClub: enabled,
+    };
+  } else {
+    next.faCompetition.autoBidForUserClub = enabled;
+  }
+
+  if (!enabled) {
+    for (const neg of Object.values(next.faCompetition.negotiations)) {
+      if (neg.status === '계약완료') continue;
+      const hadAutoUserBid = neg.bids.some(
+        (b) => b.teamId === next.playerTeamId && b.isAutoBid
+      );
+      if (hadAutoUserBid) {
+        neg.bids = neg.bids.filter(
+          (b) => !(b.teamId === next.playerTeamId && b.isAutoBid)
+        );
+        if (neg.status === '단장승인대기' && neg.pendingWinnerTeamId === next.playerTeamId) {
+          const stillHasManual = neg.bids.some((b) => b.teamId === next.playerTeamId);
+          if (!stillHasManual) {
+            neg.status = '입찰중';
+            neg.pendingWinnerTeamId = undefined;
+          }
+        }
+      }
+    }
+  }
+
+  syncFaCompetitionMarketInPlace(next, dateStr);
+  next.updatedAt = new Date().toISOString();
+  return { nextCareer: next, backupSnapshot };
+}
+
+export interface ClubFaBidSummaryItem {
+  teamId: TeamId;
+  activeBidCount: number;
+  externalSignings: number;
+  isUserClub: boolean;
+  autoBidActive: boolean;
+}
+
+/**
+ * KBO 10개 구단별 FA 자동 입찰 참여 현황 요약
+ */
+export function getClubFaBidSummary(career: CareerSave): ClubFaBidSummaryItem[] {
+  const state = career.faCompetition?.season === career.season ? career.faCompetition : undefined;
+  const userAuto = state?.autoBidForUserClub !== false;
+
+  return TEAM_IDS.map((tid) => {
+    let activeBidCount = 0;
+    if (state) {
+      for (const neg of Object.values(state.negotiations)) {
+        if (neg.status === '계약완료') continue;
+        if (neg.bids.some((b) => b.teamId === tid)) {
+          activeBidCount += 1;
+        }
+      }
+    }
+    const isUserClub = tid === career.playerTeamId;
+    return {
+      teamId: tid,
+      activeBidCount,
+      externalSignings: state?.externalSigningsByTeam?.[tid] ?? 0,
+      isUserClub,
+      autoBidActive: isUserClub ? userAuto : true,
+    };
+  });
 }

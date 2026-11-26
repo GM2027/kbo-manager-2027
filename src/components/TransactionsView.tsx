@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ArrowLeftRight,
   Clock,
@@ -58,10 +58,13 @@ import {
   advanceFaCompetitionRound,
   calculateExactFaContractBreakdown,
   declinePendingUserFaApproval,
+  getClubFaBidSummary,
   getTeamExternalFaSigningCount,
   isOverseasFaEligible,
   MAX_EXTERNAL_FA_PER_CLUB,
+  setUserClubAutoFaBidEnabled,
   submitUserClubFaBid,
+  syncAllClubsAutoFaBids,
 } from '../engine/faCompetitionEngine';
 import { buildTeamFaProtectionPool } from '../engine/faCompensationEngine';
 import { formatCompactPlayerPosition } from '../engine/positionEngine';
@@ -166,6 +169,27 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
   const salaryCap = computeSalaryCapSummary(career, career.playerTeamId);
   const myDepartedFa = getMyDepartedFaPlayers(career);
   const externalFaMarket = getExternalFaMarket(career);
+  const autoFaSyncKeyRef = useRef<string>('');
+
+  // FA 탭 진입 시 미초기화·미동기화 FA가 있으면 전 구단 자동 입찰을 즉시 실행 (기존 세이브 호환)
+  useEffect(() => {
+    if (subTab !== 'fa') return;
+    const allOpenFa = [...myDepartedFa, ...externalFaMarket];
+    if (allOpenFa.length === 0) return;
+    const faComp = career.faCompetition?.season === career.season ? career.faCompetition : undefined;
+    const hasMissingNeg =
+      !faComp ||
+      allOpenFa.some((item) => {
+        const neg = faComp.negotiations[item.player.id];
+        return !neg || (neg.status === '입찰중' && neg.bids.length === 0);
+      });
+    if (!hasMissingNeg) return;
+    const syncKey = `${career.careerId}-${career.season}-${allOpenFa.length}-${faComp?.round ?? 0}-${faComp?.autoBidForUserClub ?? 'u'}`;
+    if (autoFaSyncKeyRef.current === syncKey) return;
+    autoFaSyncKeyRef.current = syncKey;
+    const res = syncAllClubsAutoFaBids(career);
+    onUpdateCareer(res.nextCareer);
+  }, [subTab, career, myDepartedFa, externalFaMarket, onUpdateCareer]);
   const overseasReturnees = (career.overseasReturnPool ?? []).filter((r) => !r.signed);
   const pendingIncomingTrades = getPendingIncomingTradeOffers(career);
   const tradeWindow = getTradeWindowStatus(career);
@@ -627,6 +651,10 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
       {/* TAB: FA Market (A/B/C Grades + Agent Negotiation + 20/25 Protection Roster) & Overseas Returnees */}
       {subTab === 'fa' && (() => {
         const faComp = career.faCompetition?.season === career.season ? career.faCompetition : undefined;
+        const userAutoBidOn = faComp?.autoBidForUserClub !== false;
+        const clubBidSummaries = getClubFaBidSummary(career);
+        const activeBiddingClubCount = clubBidSummaries.filter((c) => c.activeBidCount > 0).length;
+        const totalOpenBids = clubBidSummaries.reduce((sum, c) => sum + c.activeBidCount, 0);
         const myExternalFaCount = getTeamExternalFaSigningCount(career, career.playerTeamId);
         const pendingUserApprovals = Object.values(faComp?.negotiations ?? {}).filter(
           (n) => n.status === '단장승인대기' && n.pendingWinnerTeamId === career.playerTeamId
@@ -637,17 +665,46 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
           <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-md p-4 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <div className="text-sm font-extrabold">
-                  KBO 10개 구단 FA 영입 경쟁 현황 (라운드 {faComp?.round ?? 1})
+                <div className="text-sm font-extrabold flex items-center gap-2 flex-wrap">
+                  <span>KBO 10개 구단 FA 자동 입찰 · 경쟁 현황 (라운드 {faComp?.round ?? 1})</span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-mono-stats">
+                    {activeBiddingClubCount}/10개 구단 입찰 중 · 총 {totalOpenBids}건
+                  </span>
                 </div>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                  전체 10개 구단이 모든 FA 선수를 검토하며 예산·부족 포지션·선수 능력치에 따라 동시 입찰합니다. 최상위권 해외 FA 자격 선수는 구단 승인 없이 MLB 제안과 KBO 제안을 직접 비교해 행선지를 결정하며, MLB 계약 실패 시 국내 FA 협상을 이어갑니다.
+                  KBO 전체 10개 구단이 예산·샐러리캡·포지션 필요도·능력치를 평가해 FA 선수에게 자동으로 입찰합니다. 우리 구단 자동 입찰이 낙찰되어도 단장 최종 승인 전에는 계약이 자동 체결되지 않습니다.
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="px-2.5 py-1 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 font-mono-stats text-[11px] font-bold">
                   외부 FA 한도 {myExternalFaCount}/{MAX_EXTERNAL_FA_PER_CLUB}명
                 </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    try {
+                      const nextEnabled = !userAutoBidOn;
+                      const res = setUserClubAutoFaBidEnabled(career, nextEnabled);
+                      onUpdateCareer(res.nextCareer, res.backupSnapshot);
+                      setNotice({
+                        type: 'ok',
+                        text: nextEnabled
+                          ? '우리 구단 FA 자동 입찰을 활성화했습니다. (10개 구단 전원 자동 입찰 참여 · 최종 체결은 단장 승인 필수)'
+                          : '우리 구단 FA 자동 입찰을 해제했습니다. (수동 입찰 유지 · AI 9개 구단 자동 입찰은 계속 작동)',
+                      });
+                    } catch (err) {
+                      setNotice({ type: 'err', text: err instanceof Error ? err.message : '자동 입찰 설정 오류' });
+                    }
+                  }}
+                  className={`px-2.5 py-1.5 rounded border font-bold text-[11px] cursor-pointer ${
+                    userAutoBidOn
+                      ? 'border-emerald-500/60 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20'
+                      : 'border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                  }`}
+                  title="우리 구단도 AI 9개 구단과 함께 자동 입찰에 참여할지 전환합니다"
+                >
+                  우리 구단 자동 입찰 {userAutoBidOn ? 'ON' : 'OFF'}
+                </button>
                 {onOpenLeagueAcquisitions && (
                   <button
                     type="button"
@@ -687,6 +744,36 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                   <span>10구단 FA 입찰 1라운드 진행</span>
                 </button>
               </div>
+            </div>
+
+            {/* 10개 구단 실시간 자동 입찰 참여 현황판 */}
+            <div className="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-10 gap-1.5 pt-1">
+              {clubBidSummaries.map((c) => (
+                <div
+                  key={c.teamId}
+                  className={`px-2 py-1.5 rounded border text-center space-y-0.5 ${
+                    c.isUserClub
+                      ? 'team-accent-border team-accent-soft'
+                      : c.activeBidCount > 0
+                      ? 'border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-950/60'
+                      : 'border-slate-200/70 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-950/30 opacity-70'
+                  }`}
+                >
+                  <div className="flex items-center justify-center gap-1">
+                    <TeamLogo teamId={c.teamId} size="xs" />
+                    <span className="text-[11px] font-extrabold text-slate-900 dark:text-white truncate">
+                      {KBO_TEAMS[c.teamId].shortName}
+                    </span>
+                  </div>
+                  <div className="text-[10px] font-mono-stats font-bold text-orange-600 dark:text-amber-400">
+                    입찰 {c.activeBidCount}건
+                  </div>
+                  <div className="text-[9px] font-mono-stats text-slate-500 dark:text-slate-400">
+                    외부 {c.externalSignings}/{MAX_EXTERNAL_FA_PER_CLUB}
+                    {c.isUserClub ? (c.autoBidActive ? ' · 자동' : ' · 수동') : ''}
+                  </div>
+                </div>
+              ))}
             </div>
 
             {/* 단장 최종 승인 대기 배너 (사용자 구단 자동 체결 금지 보장) */}
@@ -1021,6 +1108,49 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                         <div className="text-[10px] font-mono-stats text-slate-500 dark:text-slate-400">
                           제안 구성: 계약금 {exactOffer.signingBonusBillion.toFixed(2)}억 + 연봉 {exactOffer.annualSalaryBillion.toFixed(2)}억×{years}년 + 옵션 {exactOffer.optionTotalBillion.toFixed(2)}억 = 총 {formatBillionExactKorean(exactOffer.totalBillion)}
                         </div>
+                        {(() => {
+                          const neg = faComp?.negotiations[p.id];
+                          if (!neg || (neg.bids.length === 0 && !neg.mlbOffer && neg.mlbStatus !== 'MLB협상결렬')) {
+                            return null;
+                          }
+                          return (
+                            <div className="flex flex-wrap items-center gap-1.5 pt-0.5 text-[10px]">
+                              {neg.bids.length > 0 && (
+                                <>
+                                  <span className="font-bold text-orange-600 dark:text-amber-400">
+                                    경쟁 입찰 ({neg.bids.length}개 구단):
+                                  </span>
+                                  {neg.bids.map((b) => (
+                                    <span
+                                      key={b.teamId}
+                                      className={`px-1.5 py-0.5 rounded border font-mono-stats ${
+                                        b.teamId === career.playerTeamId
+                                          ? 'border-indigo-500 bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 font-bold'
+                                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/70 text-slate-600 dark:text-slate-300'
+                                      }`}
+                                    >
+                                      {KBO_TEAMS[b.teamId].shortName} {b.years}년 {b.totalBillion.toFixed(1)}억
+                                      {b.isOriginalClub ? ' (원소속)' : ''}
+                                      {b.teamId === career.playerTeamId && b.isAutoBid ? ' · 자동' : ''}
+                                    </span>
+                                  ))}
+                                </>
+                              )}
+                              {neg.mlbOffer && neg.mlbStatus === 'MLB제안접수' && (
+                                <span
+                                  title={neg.mlbOffer.evaluationNote}
+                                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-sky-500/60 bg-sky-500/15 text-sky-800 dark:text-sky-200 font-mono-stats font-bold"
+                                >
+                                  <MlbTeamLogo teamName={neg.mlbOffer.mlbTeam} size="xs" />
+                                  <span>
+                                    MLB {getMlbClubMeta(neg.mlbOffer.mlbTeam).koreanName} {neg.mlbOffer.years}년 $
+                                    {neg.mlbOffer.guaranteedUsdMillions}M
+                                  </span>
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })()}
                         <div className="text-[11px] font-mono-stats text-slate-600 dark:text-slate-300">
                           사전 샐러리캡 검사:{' '}
                           {livePreview.after.overCapBillion > 0 ? (
@@ -1225,6 +1355,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                                     >
                                       {KBO_TEAMS[b.teamId].shortName} {b.years}년 {b.totalBillion.toFixed(1)}억
                                       {b.isOriginalClub ? ' (원소속)' : ''}
+                                      {b.teamId === career.playerTeamId && b.isAutoBid ? ' · 자동' : ''}
                                     </span>
                                   ))}
                                 </>
