@@ -18,7 +18,10 @@ import {
   syncFaCompetitionMarketInPlace,
 } from './faCompetitionEngine';
 import { simulateRealisticBaseballGame } from './gamePlayEngine';
-import { optimizeBattingLineup } from './lineupOptimizer';
+import {
+  optimizeBattingLineup,
+  optimizeOrderForFixedNineStarters,
+} from './lineupOptimizer';
 import {
   applyPositionTrainingProgressInPlace,
   getPositionProficiency,
@@ -399,24 +402,20 @@ export function adjustAiLineupsAndRotationByFormInPlace(career: CareerSave): voi
         }
       }
 
-      // 2) 타순 재정렬: 성적·컨디션 좋은 상위 타자들을 1~5번 핵심 타순에 우선 배치 (수비 포지션 유지)
+      // 2) 타순 재정렬: 단순 OVR 순서가 아닌 OOTP 세부 능력치·실제 성적·상대 선발·감독 전술 기반 1~9번 적합도 최적화 (수비 포지션 유지)
       const current9 = t.lineupOrder
         .map((id) => career.players[id])
         .filter((p): p is Player => Boolean(p && p.teamId === tid));
       if (current9.length === 9) {
-        const byScore = [...current9].sort((a, b) => scoreBatter(b) - scoreBatter(a));
-        // 3번(최고), 4번(2위), 1번(3위), 2번(4위), 5번(5위), 6~9번(나머지)
-        t.lineupOrder = [
-          byScore[2].id,
-          byScore[3].id,
-          byScore[0].id,
-          byScore[1].id,
-          byScore[4].id,
-          byScore[5].id,
-          byScore[6].id,
-          byScore[7].id,
-          byScore[8].id,
-        ];
+        const fixedStarters = current9.map((p) => ({
+          player: p,
+          assignedPos: (t.lineupPositions[p.id] ?? p.position) as Player['position'],
+        }));
+        const reordered = optimizeOrderForFixedNineStarters(career, tid, fixedStarters);
+        if (reordered.lineupOrder.length === 9) {
+          t.lineupOrder = [...reordered.lineupOrder];
+          t.lineupPositions = { ...reordered.lineupPositions };
+        }
       }
     }
 

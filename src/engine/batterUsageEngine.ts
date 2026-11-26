@@ -14,6 +14,7 @@ import {
   getPositionProficiency,
 } from './positionEngine';
 import { reconcileGameStarterPositionsInPlace } from './lineupValidationEngine';
+import { optimizeOrderForFixedNineStarters } from './lineupOptimizer';
 import { SeededRng } from './rng';
 import { calcAVG, calcOPS } from './stats';
 
@@ -560,6 +561,34 @@ export function buildRealisticGameLineupAndBench(
 
   // 최종 경기 출전 직전 선발 9명 수비 포지션 중복 0건 보장
   reconcileGameStarterPositionsInPlace(starters);
+
+  // AI 구단만 당일 로테이션/플래툰 교체 반영 후 OOTP 세부 능력치·상대 선발·감독 전술 기준으로 1~9번 타순 현실적 재정렬
+  // (사용자가 직접 설정한 우리 구단 타순은 절대 임의로 변경하지 않음)
+  if (teamId !== career.playerTeamId && starters.length === 9) {
+    const slotById = new Map(starters.map((s) => [s.player.id, s]));
+    const optOrder = optimizeOrderForFixedNineStarters(
+      career,
+      teamId,
+      starters.map((s) => ({ player: s.player, assignedPos: s.position })),
+      { oppStarter }
+    );
+    if (optOrder.lineupOrder.length === 9) {
+      const reordered = optOrder.lineupOrder
+        .map((pid, idx) => {
+          const orig = slotById.get(pid);
+          if (!orig) return null;
+          return {
+            ...orig,
+            position: optOrder.lineupPositions[pid] ?? orig.position,
+            battingOrder: idx + 1,
+          };
+        })
+        .filter((x): x is GameStarterSlot => x !== null);
+      if (reordered.length === 9) {
+        starters.splice(0, starters.length, ...reordered);
+      }
+    }
+  }
 
   // Ensure bench only contains valid eligible non-starter 1군 hitters
   const starterIdSet = new Set(starters.map((s) => s.player.id));

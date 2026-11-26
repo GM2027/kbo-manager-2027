@@ -24,6 +24,8 @@ import {
 } from '../engine/deepFranchise';
 import {
   applyOptimizedBattingLineup,
+  evaluatePlayerSlotSuitability,
+  getBattingOrderTier,
   optimizeBattingLineup,
 } from '../engine/lineupOptimizer';
 import {
@@ -658,10 +660,27 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
 
               {showOptimizerPreview && (
                 <div className="border border-indigo-500/30 bg-indigo-50/40 dark:bg-indigo-950/20 rounded-md p-3 space-y-2 text-[11px]">
-                  <div className="flex flex-wrap items-center justify-between gap-1">
-                    <span className="font-extrabold text-indigo-800 dark:text-indigo-200">
-                      1~9번 타순 자동 최적화 분석표 (중복 포지션 불가 · 8수비+DH)
-                    </span>
+                  <div className="flex flex-wrap items-center justify-between gap-1.5">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="font-extrabold text-indigo-800 dark:text-indigo-200">
+                        1~9번 타순 적합도 분석표 (테이블세터 · 클린업 · 하위연결)
+                      </span>
+                      {optimizedLineupPreview.tacticalStyle && (
+                        <span className="px-1.5 py-0.5 rounded bg-indigo-600/15 text-indigo-700 dark:text-indigo-300 font-bold text-[10px]">
+                          감독 성향: {optimizedLineupPreview.tacticalStyle}
+                        </span>
+                      )}
+                      {optimizedLineupPreview.opponentStarterLabel && (
+                        <span className="px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-800 dark:text-amber-300 font-bold text-[10px]">
+                          vs {optimizedLineupPreview.opponentStarterLabel}
+                        </span>
+                      )}
+                      {typeof optimizedLineupPreview.lineupProductionScore === 'number' && (
+                        <span className="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-mono-stats font-bold text-[10px]">
+                          타선 생산력 {optimizedLineupPreview.lineupProductionScore}/100
+                        </span>
+                      )}
+                    </div>
                     <button
                       type="button"
                       onClick={() => {
@@ -684,7 +703,7 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                       <thead className="text-slate-500 border-b border-indigo-200 dark:border-indigo-900">
                         <tr>
                           <th className="py-1 px-1.5 text-left">타순</th>
-                          <th className="py-1 px-1.5 text-left">추천 유형 (평가 요소)</th>
+                          <th className="py-1 px-1.5 text-left">구간 · 역할</th>
                           <th className="py-1 px-1.5 text-left">추천 선수</th>
                           <th className="py-1 px-1.5 text-left">포지션</th>
                           <th className="py-1 px-1.5 text-right">적합도</th>
@@ -697,11 +716,29 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                               {slot.order}번
                             </td>
                             <td className="py-1 px-1.5">
-                              <div className="font-semibold text-slate-800 dark:text-slate-200">{slot.roleTitle}</div>
+                              <div className="flex items-center gap-1">
+                                <span
+                                  className={`px-1 py-px rounded text-[9px] font-bold ${
+                                    slot.order <= 2
+                                      ? 'bg-sky-500/15 text-sky-700 dark:text-sky-300'
+                                      : slot.order <= 5
+                                      ? 'bg-orange-500/15 text-orange-700 dark:text-orange-300'
+                                      : 'bg-slate-200/80 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+                                  }`}
+                                >
+                                  {slot.tierLabel ?? getBattingOrderTier(slot.order)}
+                                </span>
+                                <span className="font-semibold text-slate-800 dark:text-slate-200">{slot.roleTitle}</span>
+                              </div>
                               <div className="text-[10px] text-slate-500">{slot.keyFactors}</div>
                             </td>
                             <td className="py-1 px-1.5">
-                              <div className="font-bold text-slate-900 dark:text-white">{slot.playerName}</div>
+                              <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1">
+                                <span>{slot.playerName}</span>
+                                {slot.bats && (
+                                  <span className="text-[9px] font-normal text-slate-500">({slot.bats})</span>
+                                )}
+                              </div>
                               <div className="text-[10px] text-slate-500">{slot.reason}</div>
                             </td>
                             <td className="py-1 px-1.5 font-mono-stats font-semibold">
@@ -710,7 +747,7 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                                 : slot.assignedPosition}
                             </td>
                             <td className="py-1 px-1.5 text-right font-mono-stats font-bold text-indigo-700 dark:text-indigo-300">
-                              {slot.slotScore.toFixed(1)}
+                              {Math.round(slot.slotScore)}
                             </td>
                           </tr>
                         ))}
@@ -801,6 +838,8 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                   const isDhOverride = pos === 'DH' && p.position !== 'DH';
                   const isNonPrimaryField = pos !== 'DH' && pos !== p.position;
                   const slotEff = computeEffectiveFieldingAtPosition(p, pos);
+                  const slotFit = evaluatePlayerSlotSuitability(career, p, idx + 1, pos);
+                  const slotTierShort = idx < 2 ? '테이블' : idx < 5 ? '클린업' : idx === 8 ? '연결' : '하위';
                   const orderedPosOptions: Position[] = [
                     ...Array.from(
                       new Set<Position>([
@@ -839,6 +878,19 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                         <span className="font-mono-stats team-accent-text w-4 shrink-0">
                           {idx + 1}.
                         </span>
+                        <span
+                          className={`px-1 py-px rounded text-[9px] font-bold shrink-0 ${
+                            idx < 2
+                              ? 'bg-sky-500/15 text-sky-700 dark:text-sky-300'
+                              : idx < 5
+                              ? 'bg-orange-500/15 text-orange-700 dark:text-orange-300'
+                              : idx === 8
+                              ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                              : 'bg-slate-200/80 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                          }`}
+                        >
+                          {slotTierShort}
+                        </span>
                         {p.uniformNumber !== undefined && (
                           <span className="font-mono-stats text-[11px] text-slate-400 w-6 shrink-0">
                             #{p.uniformNumber}
@@ -847,6 +899,18 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                         <span className="truncate">{p.name}</span>
                         <FranchiseStarIcon active={isFranchiseStarPlayer(career, p)} />
                         <PlayerForeignFlag player={p} />
+                        <span
+                          title={`${idx + 1}번 타순 적합도 ${slotFit.score}/100 · ${slotFit.reason}`}
+                          className={`px-1.5 py-px rounded font-mono-stats text-[10px] font-bold shrink-0 ${
+                            slotFit.score >= 78
+                              ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                              : slotFit.score >= 65
+                              ? 'bg-sky-500/15 text-sky-700 dark:text-sky-300'
+                              : 'bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                          }`}
+                        >
+                          적합 {slotFit.score}
+                        </span>
                         <span
                           title={
                             isNonPrimaryField

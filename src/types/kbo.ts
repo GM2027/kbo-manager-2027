@@ -1227,17 +1227,21 @@ export interface UlsanWhalesState {
   transferHistory: UlsanWhalesTransferRecord[];
 }
 
+export type BattingOrderTier = '테이블 세터' | '클린업 트리오' | '하위 타선';
+
 export interface OptimizedLineupSlot {
   order: number; // 1..9
-  roleTitle: string; // e.g. '출루형 타자'
-  keyFactors: string; // e.g. '출루율, 주력, 선구안'
+  tierLabel?: BattingOrderTier;
+  roleTitle: string; // e.g. '출루·기동형 리드오프'
+  keyFactors: string; // e.g. '출루율, 선구안, 주력, 주루'
   playerId: string;
   playerName: string;
   naturalPosition: Position;
   assignedPosition: Position;
+  bats?: '좌타' | '우타' | '양타';
   ability: number;
   form: number;
-  slotScore: number;
+  slotScore: number; // 0..100 타순 적합도
   reason: string;
 }
 
@@ -1246,6 +1250,9 @@ export interface LineupOptimizationResult {
   slots: OptimizedLineupSlot[];
   lineupOrder: string[];
   lineupPositions: Record<string, Position>;
+  tacticalStyle?: string;
+  opponentStarterLabel?: string;
+  lineupProductionScore?: number; // 0..100 전체 타선 예상 득점 생산력
   summary: string;
 }
 

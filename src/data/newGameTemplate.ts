@@ -4,6 +4,7 @@ import { applyPreGameEditorStoreToNewCareerInPlace } from '../engine/editorEngin
 import { syncFaCompetitionMarketInPlace } from '../engine/faCompetitionEngine';
 import { ensureLeagueLifeStateInPlace } from '../engine/leagueLifeEngine';
 import { reconcileAllTeamsLineupPositionsInPlace } from '../engine/lineupValidationEngine';
+import { optimizeBattingLineup } from '../engine/lineupOptimizer';
 import { ensureGlobalPlayerRegistryInPlace } from '../engine/playerRegistry';
 import { generateRegularSeasonSchedule } from '../engine/schedule';
 import {
@@ -19,6 +20,7 @@ import {
   HISTORICAL_BASELINE_CHAMPIONS,
   INITIAL_VIRTUAL_DRAFT_ORDER_2028,
   KBO_TEAMS,
+  TEAM_IDS,
 } from './kboTeams';
 import { buildReal2026SeasonHistorySummary } from './real2026SeasonArchive';
 import { buildAll10TeamsFromV18Dataset, sanitizeCareerOvrPotInPlace } from './v18Importer';
@@ -166,8 +168,23 @@ export function createNewCareer(params: {
     }
   }
 
-  // 게임 시작 시점부터 KBO 10개 구단 전체 FA 자동 입찰 현황 즉시 활성화 + 10개 구단 선발 9포지션 중복 0건 보장
+  // 게임 시작 시점부터 KBO 10개 구단 전체 FA 자동 입찰 현황 즉시 활성화 + 10개 구단 현실적 1~9번 타순 & 9포지션 중복 0건 보장
   syncFaCompetitionMarketInPlace(created, '2027-01-01');
+  for (const tid of TEAM_IDS) {
+    const opt = optimizeBattingLineup(created, tid);
+    if (opt.lineupOrder.length === 9) {
+      const ts = created.teams[tid];
+      const preservedStarterIdx = ts.nextStarterIdx;
+      ts.lineupOrder = [...opt.lineupOrder];
+      ts.lineupPositions = { ...opt.lineupPositions };
+      ts.nextStarterIdx = preservedStarterIdx;
+      const starterSet = new Set(opt.lineupOrder);
+      ts.benchOrder = Object.values(created.players)
+        .filter((p) => p.teamId === tid && p.role === '타자' && p.rosterTier === '1군' && !starterSet.has(p.id))
+        .sort((a, b) => b.ability - a.ability)
+        .map((p) => p.id);
+    }
+  }
   reconcileAllTeamsLineupPositionsInPlace(created);
   return created;
 }

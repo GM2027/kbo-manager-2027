@@ -5568,13 +5568,23 @@ export function getManagerPreGameRecommendation(
     recommendedRotation.length !== tState.rotationOrder.length ||
     recommendedRotation.some((item, idx) => tState.rotationOrder[idx] !== item.playerId);
 
+  const tableSetters = recommendedLineup
+    .slice(0, 2)
+    .map((x) => x.playerName)
+    .join('-');
   const cleanupNames = recommendedLineup
     .slice(2, 5)
     .map((x) => `${x.playerName}${x.assignedPosition === 'DH' ? '(DH)' : ''}`)
     .join('·');
   const ace = recommendedRotation[0];
   const oppLabel = opponentTeamId ? `${KBO_TEAMS[opponentTeamId].shortName}전` : '다음 경기';
-  const briefing = `${managerName} 감독 경기 전 추천 (${oppLabel}): 컨디션·능력치 최상위 ${cleanupNames} 중심 타선 편성과 ${ace ? `1선발 ${ace.playerName}(OVR ${ace.ability}, 폼 ${ace.form >= 0 ? `+${ace.form}` : ace.form})` : '선발진'} 중심 로테이션을 권장합니다.`;
+  const styleLabel = optimized.tacticalStyle ?? manager?.tacticalStyle ?? '밸런스';
+  const oppSpNote = optimized.opponentStarterLabel ? ` · 상대 ${optimized.opponentStarterLabel}` : '';
+  const prodNote =
+    typeof optimized.lineupProductionScore === 'number'
+      ? ` (타선 생산력 ${optimized.lineupProductionScore}/100)`
+      : '';
+  const briefing = `${managerName} 감독 [${styleLabel}] 경기 전 추천 (${oppLabel}${oppSpNote}): 테이블세터 ${tableSetters} · 클린업 ${cleanupNames}${prodNote} 타순과 ${ace ? `1선발 ${ace.playerName}(OVR ${ace.ability}, 폼 ${ace.form >= 0 ? `+${ace.form}` : ace.form})` : '선발진'} 로테이션을 권장합니다.`;
 
   return {
     managerName,

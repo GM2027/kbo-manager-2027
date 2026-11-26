@@ -53,6 +53,7 @@ import {
   recordLeagueAcquisitionInPlace,
 } from './leagueAcquisitionsEngine';
 import { assignTeamBullpenRolesInPlace } from './pitchingUsageEngine';
+import { optimizeBattingLineup } from './lineupOptimizer';
 import {
   ensureCareerOotpRatingsInPlace,
   ensurePlayerOotpRatingsInPlace,
@@ -5024,6 +5025,20 @@ export function advanceToNextSeason(career: CareerSave): {
 
   for (const tid of TEAM_IDS) {
     assignTeamBullpenRolesInPlace(next, tid);
+    // AI 구단은 새 시즌 개막 시 OOTP 세부 능력치·감독 성향 기반 현실적 1~9번 타순 재편성 (사용자 수동 타순은 보존)
+    if (tid !== next.playerTeamId) {
+      const opt = optimizeBattingLineup(next, tid);
+      if (opt.lineupOrder.length === 9) {
+        const ts = next.teams[tid];
+        ts.lineupOrder = [...opt.lineupOrder];
+        ts.lineupPositions = { ...opt.lineupPositions };
+        const starterSet = new Set(opt.lineupOrder);
+        ts.benchOrder = Object.values(next.players)
+          .filter((p) => p.teamId === tid && p.role === '타자' && p.rosterTier === '1군' && !starterSet.has(p.id))
+          .sort((a, b) => b.ability - a.ability)
+          .map((p) => p.id);
+      }
+    }
   }
   ensureCareerOotpRatingsInPlace(next);
 
