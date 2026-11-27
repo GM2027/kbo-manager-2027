@@ -1972,7 +1972,7 @@ export function appendTeamDevelopmentalSquad(
  */
 export function applyRealPlayerMetadataAndNumbers(
   players: Record<string, Player>,
-  options: { preserveHanwhaMasterContracts: boolean }
+  options: { preserveHanwhaMasterContracts: boolean; preserveExistingContractsAndAges?: boolean }
 ): void {
   // 1) Append developmental squad for all 10 teams if not yet present
   for (const tid of TEAM_IDS) {
@@ -1984,7 +1984,8 @@ export function applyRealPlayerMetadataAndNumbers(
     }
   }
 
-  // 2) Apply realistic ages & realistic multi-year contracts
+  // 2) Apply realistic ages & realistic multi-year contracts (only during initial setup; never clobber in-game mutations)
+  if (!options.preserveExistingContractsAndAges) {
   for (const p of Object.values(players)) {
     const realAge = REAL_KBO_PLAYER_AGES[p.teamId]?.[p.name];
     if (realAge !== undefined && !(options.preserveHanwhaMasterContracts && p.teamId === '한화')) {
@@ -2014,12 +2015,30 @@ export function applyRealPlayerMetadataAndNumbers(
           }
         }
       } else {
+        const alreadySyncedOverride =
+          p.contract.years === contractOverride.years &&
+          p.contract.yearsRemaining === contractOverride.yearsRemaining &&
+          typeof p.contract.startSeason === 'number' &&
+          typeof p.contract.endSeason === 'number' &&
+          p.contract.endSeason - p.contract.startSeason + 1 === contractOverride.years;
+        const currentSeasonBase =
+          typeof p.contract.startSeason === 'number' && p.contract.startSeason >= 2026
+            ? p.contract.startSeason
+            : 2026;
+        const computedEndSeason = alreadySyncedOverride
+          ? p.contract.endSeason!
+          : currentSeasonBase + contractOverride.yearsRemaining - 1;
+        const computedStartSeason = alreadySyncedOverride
+          ? p.contract.startSeason!
+          : computedEndSeason - contractOverride.years + 1;
         p.contract = {
           ...p.contract,
           status: '확정',
           currency: contractOverride.currency,
           years: contractOverride.years,
           yearsRemaining: contractOverride.yearsRemaining,
+          startSeason: computedStartSeason,
+          endSeason: computedEndSeason,
           annualSalary: contractOverride.annualSalary,
           signingBonus: contractOverride.signingBonus,
           totalValue: contractOverride.totalValue,
@@ -2084,9 +2103,12 @@ export function applyRealPlayerMetadataAndNumbers(
       }
     }
   }
+  }
 
   // 2.5) 전 구단 국내 선수 나이·입단연도·1군 등록일수(145일=1시즌) 정합성 최종 검증
-  sanitizePlayerAgeAndServiceYearsInPlace(players, 2026);
+  if (!options.preserveExistingContractsAndAges) {
+    sanitizePlayerAgeAndServiceYearsInPlace(players, 2026);
+  }
 
   // 3) Assign unique uniform numbers per team (preferring real KBO numbers, avoiding retired numbers)
   for (const tid of TEAM_IDS) {

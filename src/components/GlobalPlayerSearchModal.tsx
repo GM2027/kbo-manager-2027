@@ -9,6 +9,7 @@ import {
 import { formatCompactPlayerPosition } from '../engine/positionEngine';
 import { CareerSave, PlayerRole, Position, TeamId } from '../types/kbo';
 import { CountryFlag } from './CountryFlag';
+import { PlayerPortrait } from './PlayerPortrait';
 import { FuturesTeamLogo, TeamLogo } from './TeamLogo';
 
 interface GlobalPlayerSearchModalProps {
@@ -273,31 +274,44 @@ export const GlobalPlayerSearchModal: React.FC<GlobalPlayerSearchModalProps> = (
                       } transition-colors`}
                     >
                       <td className="py-2 px-3">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <CountryFlag
-                            nationality={
-                              entry.kboPlayerId
-                                ? career.players[entry.kboPlayerId]?.nationality ?? '한국'
-                                : '한국'
-                            }
-                            size="xs"
-                          />
-                          {entry.uniformNumber !== undefined && (
-                            <span className="font-mono-stats text-[11px] text-slate-400">
-                              #{entry.uniformNumber}
-                            </span>
+                        <div className="flex items-center gap-2">
+                          {entry.kboPlayerId && career.players[entry.kboPlayerId] && (
+                            <PlayerPortrait
+                              player={career.players[entry.kboPlayerId]}
+                              season={career.season}
+                              size="xs"
+                              showTeamBadge={false}
+                              showSourceTag={false}
+                            />
                           )}
-                          <span className="font-bold text-slate-900 dark:text-white">
-                            {entry.name}
-                          </span>
-                          {entry.isNamesake && (
-                            <span className="px-1.5 py-0.5 rounded border border-amber-500/40 bg-amber-500/10 text-[10px] font-bold text-amber-700 dark:text-amber-300">
-                              동명이인 · {entry.birthYear}년생
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-[10px] font-mono-stats text-slate-500 dark:text-slate-400 mt-0.5">
-                          {entry.permanentId} · {entry.schoolOrOrigin}
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <CountryFlag
+                                nationality={
+                                  entry.kboPlayerId
+                                    ? career.players[entry.kboPlayerId]?.nationality ?? '한국'
+                                    : '한국'
+                                }
+                                size="xs"
+                              />
+                              {entry.uniformNumber !== undefined && (
+                                <span className="font-mono-stats text-[11px] text-slate-400">
+                                  #{entry.uniformNumber}
+                                </span>
+                              )}
+                              <span className="font-bold text-slate-900 dark:text-white">
+                                {entry.name}
+                              </span>
+                              {entry.isNamesake && (
+                                <span className="px-1.5 py-0.5 rounded border border-amber-500/40 bg-amber-500/10 text-[10px] font-bold text-amber-700 dark:text-amber-300">
+                                  동명이인 · {entry.birthYear}년생
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-[10px] font-mono-stats text-slate-500 dark:text-slate-400 mt-0.5">
+                              {entry.permanentId} · {entry.schoolOrOrigin}
+                            </div>
+                          </div>
                         </div>
                       </td>
 

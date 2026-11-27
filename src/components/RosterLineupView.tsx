@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowDown, ArrowUp, MessageSquare, Plane, ShieldAlert, Sparkles, TrendingUp, UserMinus, Users, X } from 'lucide-react';
+import { ArrowDown, ArrowUp, GripVertical, MessageSquare, Plane, ShieldAlert, Sparkles, TrendingUp, UserMinus, Users, X } from 'lucide-react';
 import { KBO_TEAMS } from '../data/kboTeams';
 import { getLiveCareerStats, getNationalityDisplay } from '../data/playerMetadata';
 import {
@@ -65,6 +65,7 @@ import {
   demotePlayer,
   releaseForeignPlayer,
   reorderBullpen,
+  reorderLineupOrder,
   reorderStartingRotation,
   setLineupSlot,
   swapLineupOrder,
@@ -143,6 +144,34 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [uniformDraft, setUniformDraft] = useState<string>('');
   const [showOptimizerPreview, setShowOptimizerPreview] = useState<boolean>(false);
+  const [dragItem, setDragItem] = useState<{
+    kind: 'lineup' | 'rotation' | 'bullpen';
+    fromIdx: number;
+  } | null>(null);
+  const [dragOverSlot, setDragOverSlot] = useState<{
+    kind: 'lineup' | 'rotation' | 'bullpen';
+    index: number;
+  } | null>(null);
+
+  const handleReorderList = (
+    kind: 'lineup' | 'rotation' | 'bullpen',
+    fromIdx: number,
+    toIdx: number
+  ) => {
+    if (fromIdx === toIdx || fromIdx < 0 || toIdx < 0) return;
+    try {
+      setNotice(null);
+      if (kind === 'lineup') {
+        onUpdateCareer(reorderLineupOrder(career, fromIdx, toIdx));
+      } else if (kind === 'rotation') {
+        onUpdateCareer(reorderStartingRotation(career, fromIdx, toIdx));
+      } else {
+        onUpdateCareer(reorderBullpen(career, fromIdx, toIdx));
+      }
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : '순번 변경 실패');
+    }
+  };
 
   const teamId = career.playerTeamId;
   const teamState = career.teams[teamId];
@@ -860,25 +889,78 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                     if (qualB !== qualA) return qualB - qualA;
                     return b.ability + profB * 0.2 - (a.ability + profA * 0.2);
                   });
+                  const isDraggingLineup = dragItem?.kind === 'lineup' && dragItem.fromIdx === idx;
+                  const isDragOverLineup =
+                    dragOverSlot?.kind === 'lineup' &&
+                    dragOverSlot.index === idx &&
+                    dragItem?.kind === 'lineup' &&
+                    dragItem.fromIdx !== idx;
                   return (
                     <div
                       key={`${p.id}-${idx}`}
-                      className={`px-3 py-2 flex flex-wrap items-center justify-between gap-2 text-xs hover:bg-slate-50 dark:hover:bg-slate-800/40 ${
-                        isDupPosRow
-                          ? 'bg-rose-500/10'
-                          : onNationalDuty
-                            ? 'bg-blue-500/5'
-                            : ''
+                      draggable
+                      onDragStart={(e) => {
+                        setDragItem({ kind: 'lineup', fromIdx: idx });
+                        e.dataTransfer.effectAllowed = 'move';
+                        try {
+                          e.dataTransfer.setData('text/plain', `lineup:${idx}`);
+                        } catch {
+                          // ignore restricted drag dataTransfer
+                        }
+                      }}
+                      onDragOver={(e) => {
+                        if (dragItem?.kind !== 'lineup') return;
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = 'move';
+                        if (dragOverSlot?.kind !== 'lineup' || dragOverSlot.index !== idx) {
+                          setDragOverSlot({ kind: 'lineup', index: idx });
+                        }
+                      }}
+                      onDragLeave={() => {
+                        if (dragOverSlot?.kind === 'lineup' && dragOverSlot.index === idx) {
+                          setDragOverSlot(null);
+                        }
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        if (dragItem?.kind === 'lineup') {
+                          handleReorderList('lineup', dragItem.fromIdx, idx);
+                        }
+                        setDragItem(null);
+                        setDragOverSlot(null);
+                      }}
+                      onDragEnd={() => {
+                        setDragItem(null);
+                        setDragOverSlot(null);
+                      }}
+                      className={`px-3 py-2 flex flex-wrap items-center justify-between gap-2 text-xs hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors ${
+                        isDraggingLineup ? 'opacity-50' : ''
+                      } ${
+                        isDragOverLineup
+                          ? 'ring-2 ring-inset ring-orange-500/80 bg-orange-500/10'
+                          : isDupPosRow
+                            ? 'bg-rose-500/10'
+                            : onNationalDuty
+                              ? 'bg-blue-500/5'
+                              : ''
                       }`}
                     >
-                      <button
-                        type="button"
-                        onClick={() => setSelectedPlayer(p)}
-                        className="text-left font-bold flex items-center gap-1.5 min-w-0 whitespace-nowrap"
-                      >
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span
+                          className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-grab active:cursor-grabbing shrink-0"
+                          title="드래그하여 타순 이동"
+                        >
+                          <GripVertical className="w-3.5 h-3.5" />
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedPlayer(p)}
+                          className="text-left font-bold flex items-center gap-1.5 min-w-0 whitespace-nowrap"
+                        >
                         <span className="font-mono-stats team-accent-text w-4 shrink-0">
                           {idx + 1}.
                         </span>
+                        <PlayerPortrait player={p} season={career.season} size="xs" showTeamBadge={false} showSourceTag={false} />
                         <span
                           className={`px-1 py-px rounded text-[9px] font-bold shrink-0 ${
                             idx < 2
@@ -935,7 +1017,8 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                               : pos}
                         </span>
                         <PlayerCompactTag career={career} player={p} />
-                      </button>
+                        </button>
+                      </div>
 
                       <div className="flex items-center gap-1 shrink-0">
                         <span
@@ -1027,11 +1110,24 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                             })}
                           </select>
                         )}
+                        <select
+                          value={idx}
+                          onChange={(e) => handleReorderList('lineup', idx, Number(e.target.value))}
+                          aria-label={`${p.name} 타순 순번 직접 선택`}
+                          title="타순 순번 직접 선택 (나머지 선수 자동 정렬)"
+                          className="px-1 py-0.5 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-[11px] font-mono-stats font-semibold"
+                        >
+                          {lineupPlayers.map((_, slotIdx) => (
+                            <option key={slotIdx} value={slotIdx}>
+                              {slotIdx + 1}번
+                            </option>
+                          ))}
+                        </select>
                         <button
                           type="button"
                           disabled={idx === 0}
-                          onClick={() => onUpdateCareer(swapLineupOrder(career, idx, idx - 1))}
-                          className="p-1 rounded border border-slate-200 dark:border-slate-700 disabled:opacity-30"
+                          onClick={() => handleReorderList('lineup', idx, idx - 1)}
+                          className="p-1 rounded border border-slate-200 dark:border-slate-700 disabled:opacity-30 hover:bg-slate-100 dark:hover:bg-slate-800"
                           title="타순 위로"
                         >
                           <ArrowUp className="w-3 h-3" />
@@ -1039,8 +1135,8 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                         <button
                           type="button"
                           disabled={idx === lineupPlayers.length - 1}
-                          onClick={() => onUpdateCareer(swapLineupOrder(career, idx, idx + 1))}
-                          className="p-1 rounded border border-slate-200 dark:border-slate-700 disabled:opacity-30"
+                          onClick={() => handleReorderList('lineup', idx, idx + 1)}
+                          className="p-1 rounded border border-slate-200 dark:border-slate-700 disabled:opacity-30 hover:bg-slate-100 dark:hover:bg-slate-800"
                           title="타순 아래로"
                         >
                           <ArrowDown className="w-3 h-3" />
@@ -1063,8 +1159,9 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                         key={bh.id}
                         type="button"
                         onClick={() => setSelectedPlayer(bh)}
-                        className="px-2.5 py-1 text-xs rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 inline-flex items-center gap-1 whitespace-nowrap"
+                        className="px-2 py-1 text-xs rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 inline-flex items-center gap-1.5 whitespace-nowrap"
                       >
+                        <PlayerPortrait player={bh} season={career.season} size="xs" showTeamBadge={false} showSourceTag={false} />
                         {bh.uniformNumber !== undefined && (
                           <span className="font-mono-stats text-[10px] text-slate-400">#{bh.uniformNumber}</span>
                         )}
@@ -1087,7 +1184,7 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
               <div>
                 <div className="flex flex-wrap items-center justify-between gap-1 mb-2">
                   <h3 className="text-sm font-bold">선발 로테이션 ({rotationPitchers.length}인 · 기본 4일 휴식)</h3>
-                  <span className="text-[11px] text-slate-500">불펜 1:1 교체 · ▲/▼ 순번 변경 · 등판/이닝/연투/최근등판일</span>
+                  <span className="text-[11px] text-slate-500">드래그 · 순번 선택 · 불펜 1:1 교체 · 다음 등판 차례 유지</span>
                 </div>
                 <div className="divide-y divide-slate-100 dark:divide-slate-800 border border-slate-200 dark:border-slate-800 rounded">
                   {rotationPitchers.map((p, i) => {
@@ -1099,15 +1196,68 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                     const lastDateLabel = p.lastPitchedDate
                       ? `${p.lastPitchedDate.slice(5)} (${restDays}일 휴식)`
                       : '등판 대기';
-                    const psIneligible = p.postseasonIneligibleSeason === career.season;
+                    const isDraggingRot = dragItem?.kind === 'rotation' && dragItem.fromIdx === i;
+                    const isDragOverRot =
+                      dragOverSlot?.kind === 'rotation' &&
+                      dragOverSlot.index === i &&
+                      dragItem?.kind === 'rotation' &&
+                      dragItem.fromIdx !== i;
                     return (
                       <div
                         key={p.id}
-                        className={`w-full px-3 py-2 flex flex-wrap items-center justify-between gap-2 text-xs hover:bg-slate-50 dark:hover:bg-slate-800/40 ${
-                          onNt ? 'bg-blue-500/5' : ''
+                        draggable
+                        onDragStart={(e) => {
+                          setDragItem({ kind: 'rotation', fromIdx: i });
+                          e.dataTransfer.effectAllowed = 'move';
+                          try {
+                            e.dataTransfer.setData('text/plain', `rotation:${i}`);
+                          } catch {
+                            // ignore
+                          }
+                        }}
+                        onDragOver={(e) => {
+                          if (dragItem?.kind !== 'rotation') return;
+                          e.preventDefault();
+                          e.dataTransfer.dropEffect = 'move';
+                          if (dragOverSlot?.kind !== 'rotation' || dragOverSlot.index !== i) {
+                            setDragOverSlot({ kind: 'rotation', index: i });
+                          }
+                        }}
+                        onDragLeave={() => {
+                          if (dragOverSlot?.kind === 'rotation' && dragOverSlot.index === i) {
+                            setDragOverSlot(null);
+                          }
+                        }}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          if (dragItem?.kind === 'rotation') {
+                            handleReorderList('rotation', dragItem.fromIdx, i);
+                          }
+                          setDragItem(null);
+                          setDragOverSlot(null);
+                        }}
+                        onDragEnd={() => {
+                          setDragItem(null);
+                          setDragOverSlot(null);
+                        }}
+                        className={`w-full px-3 py-2 flex flex-wrap items-center justify-between gap-2 text-xs hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors ${
+                          isDraggingRot ? 'opacity-50' : ''
+                        } ${
+                          isDragOverRot
+                            ? 'ring-2 ring-inset ring-orange-500/80 bg-orange-500/10'
+                            : onNt
+                              ? 'bg-blue-500/5'
+                              : ''
                         }`}
                       >
-                        <div className="min-w-0 flex-1">
+                        <div className="min-w-0 flex-1 flex items-start gap-1.5">
+                          <span
+                            className="mt-0.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-grab active:cursor-grabbing shrink-0"
+                            title="드래그하여 선발 로테이션 순번 이동"
+                          >
+                            <GripVertical className="w-3.5 h-3.5" />
+                          </span>
+                          <div className="min-w-0 flex-1">
                           <button
                             type="button"
                             onClick={() => setSelectedPlayer(p)}
@@ -1116,6 +1266,7 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                             <span className="font-mono-stats team-accent-text shrink-0">
                               {i + 1}선발
                             </span>
+                            <PlayerPortrait player={p} season={career.season} size="xs" showTeamBadge={false} showSourceTag={false} />
                             {p.uniformNumber !== undefined && (
                               <span className="font-mono-stats text-[11px] text-slate-400 shrink-0">
                                 #{p.uniformNumber}
@@ -1157,6 +1308,7 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                             )}
                             <span>최근등판 {lastDateLabel}</span>
                           </div>
+                          </div>
                         </div>
                         <div className="flex items-center gap-1 shrink-0">
                           <span className="font-mono-stats text-slate-500 mr-0.5">
@@ -1189,16 +1341,23 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                               ))}
                             </select>
                           )}
+                          <select
+                            value={i}
+                            onChange={(e) => handleReorderList('rotation', i, Number(e.target.value))}
+                            aria-label={`${p.name} 선발 순번 직접 선택`}
+                            title="선발 순번 직접 선택 (나머지 투수 자동 정렬 · 다음 등판 차례 유지)"
+                            className="px-1 py-0.5 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-[11px] font-mono-stats font-semibold"
+                          >
+                            {rotationPitchers.map((_, rotIdx) => (
+                              <option key={rotIdx} value={rotIdx}>
+                                {rotIdx + 1}선발
+                              </option>
+                            ))}
+                          </select>
                           <button
                             type="button"
                             disabled={i === 0}
-                            onClick={() => {
-                              try {
-                                onUpdateCareer(reorderStartingRotation(career, i, i - 1));
-                              } catch (err) {
-                                setNotice(err instanceof Error ? err.message : '로테이션 변경 실패');
-                              }
-                            }}
+                            onClick={() => handleReorderList('rotation', i, i - 1)}
                             className="p-1 rounded border border-slate-200 dark:border-slate-700 disabled:opacity-30 hover:bg-slate-100 dark:hover:bg-slate-800"
                             title="선발 순번 위로"
                           >
@@ -1207,13 +1366,7 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                           <button
                             type="button"
                             disabled={i === rotationPitchers.length - 1}
-                            onClick={() => {
-                              try {
-                                onUpdateCareer(reorderStartingRotation(career, i, i + 1));
-                              } catch (err) {
-                                setNotice(err instanceof Error ? err.message : '로테이션 변경 실패');
-                              }
-                            }}
+                            onClick={() => handleReorderList('rotation', i, i + 1)}
                             className="p-1 rounded border border-slate-200 dark:border-slate-700 disabled:opacity-30 hover:bg-slate-100 dark:hover:bg-slate-800"
                             title="선발 순번 아래로"
                           >
@@ -1244,11 +1397,10 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
               <div>
                 <div className="flex flex-wrap items-center justify-between gap-1 mb-2">
                   <h3 className="text-sm font-bold">1군 불펜 투수진 ({bullpenPitchers.length}명 · 6보직 운용)</h3>
-                  <span className="text-[11px] text-slate-500">보직 지정 · 등판/이닝/연투/피로도/최근등판일</span>
+                  <span className="text-[11px] text-slate-500">드래그 · 순번 선택 · 보직 지정 · 등판/이닝/연투/피로도</span>
                 </div>
                 <div className="divide-y divide-slate-100 dark:divide-slate-800 border border-slate-200 dark:border-slate-800 rounded max-h-80 overflow-y-auto">
                   {bullpenPitchers.map((p, bIdx) => {
-                    const onNt = isPlayerOnNationalTeamDuty(p, career.gamesPlayed);
                     const ps = p.stats as PitcherStats;
                     const normRole = normalizeBullpenRole(p.pitchRole);
                     const restDays = getPitcherRestDays(p, currentDateIso, career.gamesPlayed);
@@ -1256,18 +1408,73 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                     const lastDateLabel = p.lastPitchedDate
                       ? `${p.lastPitchedDate.slice(5)} (${restDays}일 휴식)`
                       : '등판 대기';
-                    const psIneligible = p.postseasonIneligibleSeason === career.season;
+                    const isDraggingBp = dragItem?.kind === 'bullpen' && dragItem.fromIdx === bIdx;
+                    const isDragOverBp =
+                      dragOverSlot?.kind === 'bullpen' &&
+                      dragOverSlot.index === bIdx &&
+                      dragItem?.kind === 'bullpen' &&
+                      dragItem.fromIdx !== bIdx;
                     return (
                       <div
                         key={p.id}
-                        className="w-full px-3 py-2 flex flex-wrap items-center justify-between gap-2 text-xs hover:bg-slate-50 dark:hover:bg-slate-800/40"
+                        draggable
+                        onDragStart={(e) => {
+                          setDragItem({ kind: 'bullpen', fromIdx: bIdx });
+                          e.dataTransfer.effectAllowed = 'move';
+                          try {
+                            e.dataTransfer.setData('text/plain', `bullpen:${bIdx}`);
+                          } catch {
+                            // ignore
+                          }
+                        }}
+                        onDragOver={(e) => {
+                          if (dragItem?.kind !== 'bullpen') return;
+                          e.preventDefault();
+                          e.dataTransfer.dropEffect = 'move';
+                          if (dragOverSlot?.kind !== 'bullpen' || dragOverSlot.index !== bIdx) {
+                            setDragOverSlot({ kind: 'bullpen', index: bIdx });
+                          }
+                        }}
+                        onDragLeave={() => {
+                          if (dragOverSlot?.kind === 'bullpen' && dragOverSlot.index === bIdx) {
+                            setDragOverSlot(null);
+                          }
+                        }}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          if (dragItem?.kind === 'bullpen') {
+                            handleReorderList('bullpen', dragItem.fromIdx, bIdx);
+                          }
+                          setDragItem(null);
+                          setDragOverSlot(null);
+                        }}
+                        onDragEnd={() => {
+                          setDragItem(null);
+                          setDragOverSlot(null);
+                        }}
+                        className={`w-full px-3 py-2 flex flex-wrap items-center justify-between gap-2 text-xs hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors ${
+                          isDraggingBp ? 'opacity-50' : ''
+                        } ${
+                          isDragOverBp ? 'ring-2 ring-inset ring-orange-500/80 bg-orange-500/10' : ''
+                        }`}
                       >
-                        <div className="min-w-0 flex-1">
-                          <button
-                            type="button"
-                            onClick={() => setSelectedPlayer(p)}
-                            className="font-medium flex items-center gap-1.5 min-w-0 text-left whitespace-nowrap"
+                        <div className="min-w-0 flex-1 flex items-start gap-1.5">
+                          <span
+                            className="mt-0.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-grab active:cursor-grabbing shrink-0"
+                            title="드래그하여 불펜 등판 순번 이동"
                           >
+                            <GripVertical className="w-3.5 h-3.5" />
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedPlayer(p)}
+                              className="font-medium flex items-center gap-1.5 min-w-0 text-left whitespace-nowrap"
+                            >
+                              <span className="font-mono-stats text-[11px] team-accent-text shrink-0">
+                                {bIdx + 1}.
+                              </span>
+                              <PlayerPortrait player={p} season={career.season} size="xs" showTeamBadge={false} showSourceTag={false} />
                             {p.uniformNumber !== undefined && (
                               <span className="font-mono-stats text-[11px] text-slate-400 shrink-0">
                                 #{p.uniformNumber}
@@ -1315,6 +1522,7 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                             </span>
                             <span>최근등판 {lastDateLabel}</span>
                           </div>
+                          </div>
                         </div>
                         <div className="flex items-center gap-1 shrink-0">
                           <span className="font-mono-stats text-slate-500 mr-0.5">
@@ -1340,11 +1548,24 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                               </option>
                             ))}
                           </select>
+                          <select
+                            value={bIdx}
+                            onChange={(e) => handleReorderList('bullpen', bIdx, Number(e.target.value))}
+                            aria-label={`${p.name} 불펜 순번 직접 선택`}
+                            title="불펜 등판 순번 직접 선택 (나머지 투수 자동 정렬)"
+                            className="px-1 py-0.5 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-[10px] font-mono-stats font-semibold"
+                          >
+                            {bullpenPitchers.map((_, bpSlotIdx) => (
+                              <option key={bpSlotIdx} value={bpSlotIdx}>
+                                {bpSlotIdx + 1}순위
+                              </option>
+                            ))}
+                          </select>
                           <button
                             type="button"
                             disabled={bIdx === 0}
-                            onClick={() => onUpdateCareer(reorderBullpen(career, bIdx, bIdx - 1))}
-                            className="p-0.5 rounded border border-slate-200 dark:border-slate-700 disabled:opacity-30"
+                            onClick={() => handleReorderList('bullpen', bIdx, bIdx - 1)}
+                            className="p-0.5 rounded border border-slate-200 dark:border-slate-700 disabled:opacity-30 hover:bg-slate-100 dark:hover:bg-slate-800"
                             title="불펜 등판 순위 위로"
                           >
                             <ArrowUp className="w-3 h-3" />
@@ -1352,8 +1573,8 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                           <button
                             type="button"
                             disabled={bIdx === bullpenPitchers.length - 1}
-                            onClick={() => onUpdateCareer(reorderBullpen(career, bIdx, bIdx + 1))}
-                            className="p-0.5 rounded border border-slate-200 dark:border-slate-700 disabled:opacity-30"
+                            onClick={() => handleReorderList('bullpen', bIdx, bIdx + 1)}
+                            className="p-0.5 rounded border border-slate-200 dark:border-slate-700 disabled:opacity-30 hover:bg-slate-100 dark:hover:bg-slate-800"
                             title="불펜 등판 순위 아래로"
                           >
                             <ArrowDown className="w-3 h-3" />
@@ -1442,7 +1663,9 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                     key={`${mv.action}-${mv.player.id}`}
                     className="p-2.5 rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between gap-2 text-xs"
                   >
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex items-center gap-2">
+                      <PlayerPortrait player={mv.player} season={career.season} size="xs" showTeamBadge={false} showSourceTag={false} />
+                      <div className="min-w-0">
                       <div className="font-bold flex items-center gap-1.5">
                         <span
                           className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
@@ -1462,6 +1685,7 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                       </div>
                       <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
                         {mv.reason}
+                      </div>
                       </div>
                     </div>
                     <button
@@ -1762,8 +1986,9 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                         <button
                           type="button"
                           onClick={() => setSelectedPlayer(p)}
-                          className="hover:text-orange-600 dark:hover:text-orange-400 text-left inline-flex items-center gap-1.5 whitespace-nowrap"
+                          className="hover:text-orange-600 dark:hover:text-orange-400 text-left inline-flex items-center gap-2 whitespace-nowrap"
                         >
+                          <PlayerPortrait player={p} season={career.season} size="xs" showTeamBadge={false} showSourceTag={false} />
                           <span>{p.name}</span>
                           <FranchiseStarIcon active={isFranchiseStarPlayer(career, p)} />
                           <PlayerForeignFlag player={p} />

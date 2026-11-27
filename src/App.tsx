@@ -11,12 +11,14 @@ import { TEAM_UI_THEMES } from './data/realKboHistories';
 import {
   archiveExistingCareersBeforeNewGame,
   deleteSavedCareer,
+  getLastSaveError,
   hydrateCareersFromIndexedDb,
   importCareerJson,
   listContinueOptions,
   loadCareerById,
   loadSettings,
   renameSavedCareer,
+  saveAutoCareer,
   saveCareer,
   saveCareerAsNewSlot,
   saveSettings,
@@ -150,8 +152,16 @@ export default function App() {
   };
 
   const handleUpdateCareer = (next: CareerSave, backup?: CareerSave) => {
-    saveCareer(next, backup);
-    setActiveCareer(next);
+    const { ok, savedCareer } = saveAutoCareer(next, backup);
+    if (!ok) {
+      setGlobalError(
+        getLastSaveError() ??
+          '자동 저장 중 오류가 발생했습니다. 기존 세이브 데이터는 안전하게 보호되었습니다.'
+      );
+    } else if (globalError) {
+      setGlobalError(null);
+    }
+    setActiveCareer(savedCareer);
     setRefreshTick((t) => t + 1);
   };
 

@@ -1775,7 +1775,7 @@ function runTenGameGrowthEvaluation(
 
 function simulateRegularGames(
   career: CareerSave,
-  maxGamesToRun: 1 | 3,
+  maxGamesToRun: number,
   options?: { lockedPlan?: LockedGameLineupPlan }
 ): {
   nextCareer: CareerSave;
@@ -1814,7 +1814,8 @@ function simulateRegularGames(
   }
 
   const series = next.schedule[next.currentSeriesIndex];
-  const remainingCount = 3 - series.completedRounds;
+  const seriesLength = Math.max(1, series.dates.length);
+  const remainingCount = seriesLength - series.completedRounds;
   if (remainingCount <= 0) {
     next.currentSeriesIndex += 1;
     return { nextCareer: next, backupSnapshot };
@@ -2055,7 +2056,7 @@ function simulateRegularGames(
   }
 
   ensureFranchiseState(next);
-  const completedWholeSeries = series.completedRounds >= 3;
+  const completedWholeSeries = series.completedRounds >= seriesLength;
   if (completedWholeSeries) {
     next.currentSeriesIndex += 1;
   }
@@ -2449,7 +2450,9 @@ export function simulateNextRegularSeries(
   nextCareer: CareerSave;
   backupSnapshot: CareerSave;
 } {
-  return simulateRegularGames(career, 3, options);
+  const curSeries = career.schedule[career.currentSeriesIndex];
+  const seriesLen = Math.max(1, curSeries?.dates.length ?? 3);
+  return simulateRegularGames(career, seriesLen, options);
 }
 
 /**

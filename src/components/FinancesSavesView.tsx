@@ -1,10 +1,11 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ArrowUpCircle,
   Building2,
   Check,
   CopyPlus,
   Download,
+  HardDrive,
   History,
   Pencil,
   RotateCcw,
@@ -53,9 +54,16 @@ import {
 import {
   CareerSummaryItem,
   exportCareerJson,
+  formatStorageBytes,
+  getLastSaveError,
+  getStorageUsageReport,
+  getSyncStorageUsageSnapshot,
   listBackupsForCareer,
+  listContinueOptions,
+  MAX_AUTO_SAVE_BACKUPS,
   restoreCareerFromBackup,
-  saveCareer,
+  saveManualCareer,
+  StorageUsageReport,
 } from '../storage/careerStorage';
 import { CareerSave, ClubInvestments, TicketPricePolicy } from '../types/kbo';
 import { SponsorLogo } from './SponsorLogo';
@@ -98,7 +106,27 @@ export const FinancesSavesView: React.FC<FinancesSavesViewProps> = ({
   );
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renamingText, setRenamingText] = useState('');
+  const [saveRefreshTick, setSaveRefreshTick] = useState(0);
+  const [storageUsage, setStorageUsage] = useState<StorageUsageReport>(() =>
+    getSyncStorageUsageSnapshot()
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let active = true;
+    void getStorageUsageReport().then((report) => {
+      if (active) setStorageUsage(report);
+    });
+    return () => {
+      active = false;
+    };
+  }, [career.updatedAt, savedCareers.length, saveRefreshTick]);
+
+  const displayedSavedCareers = (() => {
+    void saveRefreshTick;
+    const live = listContinueOptions().savedCareers;
+    return live.length >= savedCareers.length ? live : savedCareers;
+  })();
 
   const backups = listBackupsForCareer(career.careerId);
   const investments = career.finances.investments ?? DEFAULT_INVESTMENTS;
@@ -239,8 +267,22 @@ export const FinancesSavesView: React.FC<FinancesSavesViewProps> = ({
   };
 
   const handleManualSave = () => {
-    saveCareer(career);
-    setNotice({ type: 'ok', text: '현재 진행 상태를 브라우저 저장소에 즉시 저장했습니다.' });
+    const { ok, savedCareer } = saveManualCareer(career);
+    if (ok) {
+      setSaveRefreshTick((t) => t + 1);
+      setNotice({
+        type: 'ok',
+        text: `수동 저장 슬롯 [${savedCareer.label}]에 압축 저장했습니다. (자동 저장 슬롯과 분리 보관)`,
+      });
+      void getStorageUsageReport().then(setStorageUsage);
+    } else {
+      setNotice({
+        type: 'err',
+        text:
+          getLastSaveError() ??
+          '저장공간 부족으로 수동 저장에 실패했습니다. 기존 세이브 데이터는 안전하게 보호되었습니다.',
+      });
+    }
   };
 
   const tailoredSponsors = getTeamSponsorChoices(career.playerTeamId);
@@ -1525,16 +1567,18 @@ export const FinancesSavesView: React.FC<FinancesSavesViewProps> = ({
       {/* Save / Backup / JSON Export & Import */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-md p-4 space-y-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="text-sm font-bold flex items-center gap-1.5">
               <History className="w-4 h-4 text-orange-600" />
-              <span>세이브 관리 · 롤링 백업 ({backups.length}개)</span>
+              <span>
+                세이브 관리 · 자동 백업 ({backups.length}/{MAX_AUTO_SAVE_BACKUPS}개)
+              </span>
             </div>
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={handleManualSave}
-                className="px-3 py-1.5 text-xs font-semibold rounded border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="px-3 py-1.5 text-xs font-semibold rounded border border-emerald-500/60 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20"
               >
                 수동 저장
               </button>
@@ -1546,6 +1590,50 @@ export const FinancesSavesView: React.FC<FinancesSavesViewProps> = ({
                 <Download className="w-3.5 h-3.5" />
                 <span>JSON 내보내기</span>
               </button>
+            </div>
+          </div>
+
+          {/* Storage Usage Monitor (IndexedDB + Compression + Manual/Auto Slots) */}
+          <div className="p-3 rounded border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/60 space-y-1.5 text-xs">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="font-bold flex items-center gap-1.5 text-slate-800 dark:text-slate-100">
+                <HardDrive className="w-3.5 h-3.5 text-orange-600" />
+                <span>저장공간 사용량</span>
+                <span className="px-1.5 py-px rounded text-[10px] font-semibold bg-sky-500/15 text-sky-700 dark:text-sky-300">
+                  {storageUsage.storageBackend}
+                </span>
+              </div>
+              <span className="font-mono-stats text-[11px] font-bold text-slate-700 dark:text-slate-200">
+                세이브 {formatStorageBytes(storageUsage.indexedDbBytes)}
+                {storageUsage.browserQuotaBytes
+                  ? ` / 할당 ${formatStorageBytes(storageUsage.browserQuotaBytes)}`
+                  : ''}
+              </span>
+            </div>
+            <div className="w-full h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+              <div
+                className="h-full bg-orange-500 transition-all"
+                style={{
+                  width: `${Math.min(
+                    100,
+                    Math.max(
+                      2,
+                      storageUsage.browserQuotaBytes && storageUsage.browserUsageBytes !== null
+                        ? (storageUsage.browserUsageBytes / Math.max(1, storageUsage.browserQuotaBytes)) * 100
+                        : (storageUsage.localStorageBytes /
+                            Math.max(1, storageUsage.localStorageEstimatedLimitBytes)) *
+                            100
+                    )
+                  ).toFixed(1)}%`,
+                }}
+              />
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-0.5 text-[11px] text-slate-500 dark:text-slate-400 font-mono-stats">
+              <span>
+                수동 슬롯 {storageUsage.manualSlotCount}개 · 자동 슬롯 {storageUsage.autoSlotCount}개 · 자동 백업{' '}
+                {storageUsage.autoBackupCount}개 (최대 {MAX_AUTO_SAVE_BACKUPS}개 유지)
+              </span>
+              <span>LocalStorage 캐시 {formatStorageBytes(storageUsage.localStorageBytes)}</span>
             </div>
           </div>
 
@@ -1582,13 +1670,13 @@ export const FinancesSavesView: React.FC<FinancesSavesViewProps> = ({
           )}
 
           {/* Saved Slots Quick Switcher */}
-          {savedCareers.length > 0 && (
+          {displayedSavedCareers.length > 0 && (
             <div className="space-y-1.5 text-xs">
               <div className="font-bold text-slate-700 dark:text-slate-200">
-                저장된 커리어 슬롯 ({savedCareers.length}개) · 바로 전환/이름변경
+                저장된 커리어 슬롯 ({displayedSavedCareers.length}개) · 바로 전환/이름변경
               </div>
               <div className="divide-y divide-slate-100 dark:divide-slate-800 border border-slate-200 dark:border-slate-800 rounded max-h-48 overflow-y-auto">
-                {savedCareers.map((sc) => {
+                {displayedSavedCareers.map((sc) => {
                   const isCurrent = sc.careerId === career.careerId;
                   const isRenaming = renamingId === sc.careerId;
                   return (
@@ -1625,6 +1713,15 @@ export const FinancesSavesView: React.FC<FinancesSavesViewProps> = ({
                             </div>
                           ) : (
                             <div className="font-semibold truncate flex items-center gap-1.5">
+                              <span
+                                className={`px-1.5 py-px rounded text-[10px] font-bold shrink-0 ${
+                                  sc.slotKind === 'manual'
+                                    ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                                    : 'bg-sky-500/15 text-sky-700 dark:text-sky-300'
+                                }`}
+                              >
+                                {sc.slotKind === 'manual' ? '수동' : '자동'}
+                              </span>
                               <span className="truncate">{sc.label}</span>
                               {isCurrent && (
                                 <span className="text-[10px] font-bold text-orange-600 dark:text-orange-400 shrink-0">
@@ -1636,6 +1733,9 @@ export const FinancesSavesView: React.FC<FinancesSavesViewProps> = ({
                           <div className="text-[11px] text-slate-500 font-mono-stats">
                             {sc.season}시즌 · {sc.wins}승 {sc.losses}패 · {sc.gamesPlayed}/{sc.totalRegularGames}G ·{' '}
                             {sc.updatedAt.slice(5, 16).replace('T', ' ')}
+                            {typeof sc.compressedBytes === 'number' && sc.compressedBytes > 0
+                              ? ` · ${formatStorageBytes(sc.compressedBytes)}`
+                              : ''}
                           </div>
                         </div>
                       </div>

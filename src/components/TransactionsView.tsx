@@ -62,6 +62,7 @@ import {
   calculateExactFaContractBreakdown,
   declinePendingUserFaApproval,
   getClubFaBidSummary,
+  getFaMarketCycleSeason,
   getTeamExternalFaSigningCount,
   isOverseasFaEligible,
   MAX_EXTERNAL_FA_PER_CLUB,
@@ -708,7 +709,8 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
 
       {/* TAB: FA Market (A/B/C Grades + Agent Negotiation + 20/25 Protection Roster) & Overseas Returnees */}
       {subTab === 'fa' && (() => {
-        const faComp = career.faCompetition?.season === career.season ? career.faCompetition : undefined;
+        const faCycleSeason = getFaMarketCycleSeason(career);
+        const faComp = career.faCompetition?.season === faCycleSeason ? career.faCompetition : undefined;
         const userAutoBidOn = faComp?.autoBidForUserClub !== false;
         const clubBidSummaries = getClubFaBidSummary(career);
         const activeBiddingClubCount = clubBidSummaries.filter((c) => c.activeBidCount > 0).length;
@@ -724,7 +726,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <div className="text-sm font-extrabold flex items-center gap-2 flex-wrap">
-                  <span>KBO 10개 구단 FA 자동 입찰 · 경쟁 현황 (라운드 {faComp?.round ?? 1})</span>
+                  <span>{faCycleSeason} KBO 10개 구단 FA 자동 입찰 · 경쟁 현황 (라운드 {faComp?.round ?? 1})</span>
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-mono-stats">
                     {activeBiddingClubCount}/10개 구단 입찰 중 · 총 {totalOpenBids}건
                   </span>
@@ -735,7 +737,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="px-2.5 py-1 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 font-mono-stats text-[11px] font-bold">
-                  외부 FA 한도 {myExternalFaCount}/{MAX_EXTERNAL_FA_PER_CLUB}명
+                  외부 FA 한도 ({faCycleSeason}) {myExternalFaCount}/{MAX_EXTERNAL_FA_PER_CLUB}명
                 </span>
                 <button
                   type="button"

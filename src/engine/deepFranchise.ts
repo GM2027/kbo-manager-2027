@@ -2149,7 +2149,10 @@ export function getTradeWindowStatus(career: CareerSave, overrideIsoDate?: strin
   // 3) 정규시즌: 7월 31일까지 개방, 8월 1일부터 전면 금지
   //    (레거시 테스트 등에서 일정 인덱스 변경 없이 gamesPlayed만 수동 조작한 경우도 안전하게 차단)
   const expectedSeriesGames =
-    career.currentSeriesIndex * 3 + (career.schedule[career.currentSeriesIndex]?.completedRounds ?? 0);
+    career.schedule
+      .slice(0, career.currentSeriesIndex)
+      .reduce((acc, s) => acc + Math.max(1, s.dates.length), 0) +
+    (career.schedule[career.currentSeriesIndex]?.completedRounds ?? 0);
   const manualRoundOverrideClosed =
     !overrideIsoDate &&
     expectedSeriesGames !== career.gamesPlayed &&

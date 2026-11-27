@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { audioManager, AudioSettings } from '../audio/audioManager';
 import { KBO_TEAMS, TEAM_IDS } from '../data/kboTeams';
-import { CareerSummaryItem } from '../storage/careerStorage';
+import { CareerSummaryItem, formatStorageBytes } from '../storage/careerStorage';
 import { countPreGameEditorChanges, loadPreGameEditorStore } from '../storage/editorStorage';
 import { AppSettings, GamePhase } from '../types/kbo';
 import { TeamLogo } from './TeamLogo';
@@ -515,8 +515,22 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
                               </button>
                             </div>
                           ) : (
-                            <div className="font-bold text-sm text-slate-900 dark:text-white truncate">
-                              {slot.label}
+                            <div className="font-bold text-sm text-slate-900 dark:text-white truncate flex items-center gap-1.5">
+                              <span
+                                className={`px-1.5 py-px rounded text-[10px] font-bold shrink-0 ${
+                                  slot.slotKind === 'manual'
+                                    ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                                    : 'bg-sky-500/15 text-sky-700 dark:text-sky-300'
+                                }`}
+                              >
+                                {slot.slotKind === 'manual' ? '수동' : '자동'}
+                              </span>
+                              <span className="truncate">{slot.label}</span>
+                              {typeof slot.compressedBytes === 'number' && slot.compressedBytes > 0 && (
+                                <span className="text-[10px] font-mono-stats text-slate-400 shrink-0">
+                                  ({formatStorageBytes(slot.compressedBytes)})
+                                </span>
+                              )}
                             </div>
                           )}
                           <div className="text-xs text-slate-500 dark:text-slate-400 flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5 font-mono-stats">

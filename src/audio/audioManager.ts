@@ -1,5 +1,5 @@
 /**
- * KBO GM 2026 중앙 통합 사운드 시스템 (AudioManager)
+ * KBO GM 2027 중앙 통합 사운드 시스템 (AudioManager)
  * - Web Audio API 기반 절차적 효과음·팡파르·관중 함성·배경 선율 합성 (저작권 이슈 없음, Gemini API 미사용)
  * - MP3 / WAV / OGG 외부/로컬 음원 파일 등록 및 재생 확장 지원 (파일 미존재·디코딩 실패 시 Web Audio 합성음으로 자동 대체)
  * - 최초 사용자 인터랙션 이후 오디오 컨텍스트 자동 활성화

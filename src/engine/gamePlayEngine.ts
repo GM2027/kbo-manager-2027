@@ -201,7 +201,15 @@ interface SideRuntime {
   errors: number;
 }
 
-function createEmptyBatterLine(p: Player, pos: Position, orderSlot: number, isStarter: boolean, enteredInning: number, subRole?: BoxscoreBatterLine['subRole']): BoxscoreBatterLine {
+function createEmptyBatterLine(
+  p: Player,
+  pos: Position,
+  orderSlot: number,
+  isStarter: boolean,
+  enteredInning: number,
+  subRole?: BoxscoreBatterLine['subRole'],
+  replacedPlayer?: Player
+): BoxscoreBatterLine {
   return {
     playerId: p.id,
     name: p.name,
@@ -210,6 +218,8 @@ function createEmptyBatterLine(p: Player, pos: Position, orderSlot: number, isSt
     isSubstitute: !isStarter,
     subRole: isStarter ? undefined : subRole,
     enteredInning,
+    replacedPlayerId: !isStarter ? replacedPlayer?.id : undefined,
+    replacedPlayerName: !isStarter ? replacedPlayer?.name : undefined,
     PA: 0,
     AB: 0,
     H: 0,
@@ -476,7 +486,7 @@ function maybePinchHit(
     slotIndex: slotIdx,
   };
   if (!batSide.batterMap.has(sub.id)) {
-    const line = createEmptyBatterLine(sub, curSlot.pos, slotIdx + 1, false, inning, '대타');
+    const line = createEmptyBatterLine(sub, curSlot.pos, slotIdx + 1, false, inning, '대타', curPlayer);
     batSide.batterMap.set(sub.id, line);
     batSide.batterOrder.push(sub.id);
   }
@@ -532,7 +542,7 @@ function maybeDefensiveSub(
     slotIndex: weakSlot.slotIndex,
   };
   if (!defSide.batterMap.has(sub.id)) {
-    const line = createEmptyBatterLine(sub, weakSlot.pos, weakSlot.slotIndex + 1, false, inning, '대수비');
+    const line = createEmptyBatterLine(sub, weakSlot.pos, weakSlot.slotIndex + 1, false, inning, '대수비', weakSlot.player);
     defSide.batterMap.set(sub.id, line);
     defSide.batterOrder.push(sub.id);
   }

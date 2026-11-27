@@ -132,7 +132,13 @@ export const ClubIntroAnimation: React.FC<ClubIntroAnimationProps> = ({
   };
 
   const currentLogoUrl = info.logoUrls[urlIndex];
-  const gmLabel = gmName?.trim() ? `${gmName.trim()} 단장` : '신임 단장';
+  const trimmedGm = gmName?.trim();
+  const gmLabel =
+    trimmedGm && trimmedGm !== '단장'
+      ? trimmedGm.endsWith('단장')
+        ? trimmedGm
+        : `${trimmedGm} 단장`
+      : '신임 단장';
 
   return (
     <div

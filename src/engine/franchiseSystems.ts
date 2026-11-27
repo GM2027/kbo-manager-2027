@@ -279,6 +279,7 @@ export function buildInitialOwnerEval(teamId: TeamId, season: number): OwnerEval
 }
 
 export function ensureFranchiseState(career: CareerSave): void {
+  const isFirstFranchiseInit = !career.newsFeed;
   ensureDeepFranchiseState(career);
   ensureSpecialFuturesRosters(career);
   ensureGlobalPlayerRegistryInPlace(career);
@@ -507,7 +508,8 @@ export function ensureFranchiseState(career: CareerSave): void {
     }
   }
 
-  // Backfill uniform numbers and developmental players ONLY for legacy saves (real v20 players keep unverified jersey as undefined)
+  // Backfill uniform numbers and developmental players ONLY for legacy saves (real v20+ players keep unverified jersey as undefined)
+  const isModernDb = /^v(19|[2-9]\d)_/.test(career.databaseVersion ?? '');
   const needsNumberBackfill = Object.values(career.players).some(
     (p) =>
       p.originType !== 'real' &&
@@ -516,21 +518,14 @@ export function ensureFranchiseState(career: CareerSave): void {
       p.uniformNumber === undefined
   );
   const needsDevBackfill =
-    career.databaseVersion !== 'v27_unified_player_ratings' &&
-    career.databaseVersion !== 'v26_feedback_roles_military_fa' &&
-    career.databaseVersion !== 'v25_verified_positions_and_fa_compensation' &&
-    career.databaseVersion !== 'v24_recalibrated_prospect_potentials' &&
-    career.databaseVersion !== 'v23_go_woosuk_kbo_return' &&
-    career.databaseVersion !== 'v22_verified_birthdates' &&
-    career.databaseVersion !== 'v21_verified_career_histories' &&
-    career.databaseVersion !== 'v20_verified_player_db' &&
-    career.databaseVersion !== 'v19_unified_rebalance' &&
+    !isModernDb &&
     TEAM_IDS.some(
       (tid) => !Object.values(career.players).some((p) => p.teamId === tid && p.rosterTier === '육성')
     );
-  if (needsNumberBackfill || needsDevBackfill) {
+  if (isFirstFranchiseInit || needsNumberBackfill || needsDevBackfill) {
     applyRealPlayerMetadataAndNumbers(career.players, {
       preserveHanwhaMasterContracts: career.isPreservedMaster,
+      preserveExistingContractsAndAges: !isFirstFranchiseInit,
     });
   }
   void REAL_MILITARY_EXEMPT_PLAYERS;

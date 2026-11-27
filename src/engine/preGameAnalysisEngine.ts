@@ -1087,12 +1087,17 @@ export function buildPreGameAnalysis(career: CareerSave): PreGameAnalysisReport 
     }
     let seriesIdx = career.currentSeriesIndex;
     let series = career.schedule[seriesIdx];
-    if (series && series.completedRounds >= 3 && seriesIdx + 1 < career.schedule.length) {
+    if (
+      series &&
+      series.completedRounds >= Math.max(1, series.dates.length) &&
+      seriesIdx + 1 < career.schedule.length
+    ) {
       seriesIdx += 1;
       series = career.schedule[seriesIdx];
     }
     if (!series) return null;
-    startOffset = Math.min(2, Math.max(0, series.completedRounds));
+    const seriesLength = Math.max(1, series.dates.length);
+    startOffset = Math.min(seriesLength - 1, Math.max(0, series.completedRounds));
     const matchup = series.matchups.find((m) => m.away === myTeamId || m.home === myTeamId);
     if (!matchup) return null;
     awayTeam = matchup.away;
@@ -1100,7 +1105,7 @@ export function buildPreGameAnalysis(career: CareerSave): PreGameAnalysisReport 
     round = series.startRound + startOffset;
     date = series.dates[startOffset] ?? series.dates[series.dates.length - 1] ?? date;
     seriesGameNumber = startOffset + 1;
-    remainingSeriesGames = Math.max(1, 3 - startOffset);
+    remainingSeriesGames = Math.max(1, seriesLength - startOffset);
     hasMondayRestBefore = Boolean(series.hasMondayRestBefore);
     isAllStarBreakBefore = Boolean(series.isAllStarBreakBefore);
   } else if (career.phase === 'POSTSEASON' && career.postseason.currentSeries && !career.postseason.currentSeries.winnerTeam) {

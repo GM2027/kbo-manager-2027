@@ -1,20 +1,35 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# KBO GM 2027
 
-# Run and deploy your AI Studio app
+실제 KBO 10개 구단과 재보정 선수 DB를 기반으로 2027 시즌을 운영하는 한국 프로야구 단장 시뮬레이션 웹게임입니다.
 
-This contains everything you need to run your app locally.
+## 주요 기능
 
-View your app in AI Studio: https://ai.studio/apps/5c93c2b2-f833-4a4c-ae22-12db3d36e6aa
+- **타이틀 & 멀티 커리어 저장소**: 새 게임(10개 구단 선택 · 취임식 · 프리게임 에디터) 및 기존 커리어 이어하기, JSON 내보내기/가져오기, IndexedDB/localStorage 자동 백업
+- **정규시즌 & 포스트시즌 시뮬레이션**: 실제 KBO 144경기 일정(54시리즈: 개막 2연전 + 3연전 36회 + 후반기 2연전 17회), 1경기/시리즈 단위 진행, 우천 취소·더블헤더, 10경기 주기 성장·노쇠화 및 부상 판정
+- **구단 운영**: 1·2군 로스터 및 타순/로테이션/불펜 보직 관리, FA·외국인 선수·웨이버·트레이드·MLB 포스팅·신인 드래프트·상무/울산 퓨처스, 재정·스폰서·구단주 평가
+- **기록 및 시상식**: 10구단 순위, 14개 부문 개인 타이틀, KBO 정규시즌 MVP·신인상·골든글러브·수비상·최동원상·월간 MVP
 
-## Run Locally
+## 로컬 실행
 
-**Prerequisites:**  Node.js
+**요구 사항**: Node.js 24 이상 (권장)
 
+```bash
+# 의존성 설치
+npm install --legacy-peer-deps
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+# 개발 서버 실행 (http://localhost:3000)
+npm run dev
+```
+
+## 검증 및 빌드 스크립트
+
+```bash
+# TypeScript 타입 체크
+npm run lint
+
+# 엔진 무결성 테스트 (5,500+ lines)
+npm test
+
+# 프로덕션 빌드 (GitHub Pages: /kbo-manager-2027/)
+npm run build
+```

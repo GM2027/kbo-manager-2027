@@ -236,7 +236,10 @@ export const LICENSED_REAL_PLAYER_PORTRAITS: Record<string, LicensedRealPortrait
   BUNDLED_REAL_PLAYER_PORTRAITS;
 
 /**
- * 실존 선수의 사용 권한 확보된 공식 사진 URL 조회 (없으면 null 반환)
+ * 실존 선수의 사용 권한 확보된 공식/등록 프로필 사진 URL 조회 (없으면 null 반환)
+ * - 지원 식별자 우선순위: licensedPhotoUrl → permanentId → kboOfficialId → v18SourceId → id
+ * - 향후 public/portraits/kbo/{구단폴더}/{선수명}.png 파일을 추가/교체하고
+ *   licensedRealPortraits.ts의 선수 고유 ID 항목만 연결하면 선수단 명단·카드·상세 정보에 즉시 반영됩니다.
  * - GitHub Pages 및 로컬 개발 환경 모두에서 동작하도록 resolvePublicAssetUrl을 적용합니다.
  */
 export function resolveLicensedRealPlayerPhoto(player: Player): LicensedRealPortraitEntry | null {
@@ -247,17 +250,19 @@ export function resolveLicensedRealPlayerPhoto(player: Player): LicensedRealPort
       license: 'verified-custom',
     };
   }
-  if (player.permanentId && LICENSED_REAL_PLAYER_PORTRAITS[player.permanentId]) {
-    const entry = LICENSED_REAL_PLAYER_PORTRAITS[player.permanentId];
-    return {
-      ...entry,
-      url: resolvePublicAssetUrl(entry.url),
-    };
-  }
-  if (player.kboOfficialId) {
-    const mappedPid = KBO_OFFICIAL_ID_TO_PORTRAIT_PID[player.kboOfficialId];
+
+  const candidateIds = [
+    player.permanentId,
+    player.kboOfficialId,
+    player.v18SourceId,
+    player.id,
+  ].filter((v): v is string => typeof v === 'string' && v.trim().length > 0);
+
+  for (const rawKey of candidateIds) {
+    const key = rawKey.trim();
+    const mappedPid = KBO_OFFICIAL_ID_TO_PORTRAIT_PID[key];
     const entry =
-      LICENSED_REAL_PLAYER_PORTRAITS[player.kboOfficialId] ??
+      LICENSED_REAL_PLAYER_PORTRAITS[key] ??
       (mappedPid ? LICENSED_REAL_PLAYER_PORTRAITS[mappedPid] : undefined);
     if (entry) {
       return {

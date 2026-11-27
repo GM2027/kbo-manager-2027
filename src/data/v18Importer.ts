@@ -2301,18 +2301,31 @@ export function buildAll10TeamsFromV18Dataset(): {
         usedHitters.add(h.id);
       }
     }
+    // 나머지 야수는 2군 배치 (군복무 중인 선수는 '대기' 유지)
     for (const h of hitters) {
       if (isMilitaryServing(h.militaryStatus)) {
         h.rosterTier = '대기';
         h.gameDayActive = false;
+        continue;
       }
-    }
-
-    // 나머지 야수는 2군 배치
-    for (const h of hitters) {
       if (!usedHitters.has(h.id)) {
         h.rosterTier = '2군';
         h.gameDayActive = false;
+      }
+    }
+
+    // KBO 정식 등록 선수 정원(68명) 준수: 1군+2군이 68명을 초과하는 구단은 최하위 2군 국내 자원을 육성선수로 배치
+    const officialTeamPlayers = teamPlayers.filter(
+      (p) => p.rosterTier === '1군' || p.rosterTier === '2군'
+    );
+    if (officialTeamPlayers.length > 68) {
+      const overflowCount = officialTeamPlayers.length - 68;
+      const demoteToDevCandidates = officialTeamPlayers
+        .filter((p) => p.rosterTier === '2군' && p.category === '국내')
+        .sort((a, b) => a.ability - b.ability || a.potential - b.potential);
+      for (let i = 0; i < Math.min(overflowCount, demoteToDevCandidates.length); i++) {
+        demoteToDevCandidates[i].rosterTier = '육성';
+        demoteToDevCandidates[i].gameDayActive = false;
       }
     }
 

@@ -40,6 +40,7 @@ import {
   calculateExactFaContractBreakdown,
   evaluateFaGradeAndComp,
   FaContractBreakdown,
+  getFaMarketCycleSeason,
   getMaxRealisticFaYears,
   getTeamExternalFaSigningCount,
   markFaNegotiationSignedInPlace,
@@ -2651,6 +2652,8 @@ export function releaseDevelopmentalPlayer(
 
 /**
  * #3: 투수 선발진 로테이션 순번 변경 (1선발~5선발 순서 재배치)
+ * - 드래그/직접 순번 지정 시 나머지 투수 순번 자동 정렬
+ * - 기존 등판 기록·피로도 및 다음 등판 예정 투수 차례(nextStarterIdx) 보존
  */
 export function reorderStartingRotation(
   career: CareerSave,
@@ -2669,9 +2672,20 @@ export function reorderStartingRotation(
   ) {
     return next;
   }
+  const prevNormIdx =
+    rot.length > 0
+      ? (((team.nextStarterIdx ?? 0) % rot.length) + rot.length) % rot.length
+      : 0;
+  const prevNextStarterId = rot[prevNormIdx];
+
   const [moved] = rot.splice(fromIndex, 1);
   rot.splice(toIndex, 0, moved);
   team.rotationOrder = rot;
+
+  if (rot.length > 0) {
+    const keptIdx = prevNextStarterId ? rot.indexOf(prevNextStarterId) : -1;
+    team.nextStarterIdx = keptIdx >= 0 ? keptIdx : prevNormIdx % rot.length;
+  }
   next.updatedAt = new Date().toISOString();
   return next;
 }
@@ -2843,6 +2857,34 @@ export function swapLineupOrder(
   return next;
 }
 
+/**
+ * 타순 직접 이동 (드래그 앤 드롭 · 순번 직접 선택용)
+ * - fromIndex 타자를 toIndex로 배치하고 나머지 타순을 자동 정렬하며 포지션 매핑을 보존합니다.
+ */
+export function reorderLineupOrder(
+  career: CareerSave,
+  fromIndex: number,
+  toIndex: number
+): CareerSave {
+  const next = cloneCareer(career);
+  const team = next.teams[next.playerTeamId];
+  const lineup = [...team.lineupOrder];
+  if (
+    fromIndex < 0 ||
+    fromIndex >= lineup.length ||
+    toIndex < 0 ||
+    toIndex >= lineup.length ||
+    fromIndex === toIndex
+  ) {
+    return next;
+  }
+  const [moved] = lineup.splice(fromIndex, 1);
+  lineup.splice(toIndex, 0, moved);
+  team.lineupOrder = lineup;
+  next.updatedAt = new Date().toISOString();
+  return next;
+}
+
 export function setLineupSlot(
   career: CareerSave,
   slotIndex: number,
@@ -2985,10 +3027,20 @@ export function swapRotationWithBullpen(
 
   const existingRotIdx = team.rotationOrder.indexOf(bullpenPlayerId);
   if (existingRotIdx >= 0) {
+    const prevNormIdx =
+      team.rotationOrder.length > 0
+        ? (((team.nextStarterIdx ?? 0) % team.rotationOrder.length) + team.rotationOrder.length) %
+          team.rotationOrder.length
+        : 0;
+    const prevNextStarterId = team.rotationOrder[prevNormIdx];
     [team.rotationOrder[rotationIndex], team.rotationOrder[existingRotIdx]] = [
       team.rotationOrder[existingRotIdx],
       team.rotationOrder[rotationIndex],
     ];
+    if (prevNextStarterId) {
+      const keptIdx = team.rotationOrder.indexOf(prevNextStarterId);
+      if (keptIdx >= 0) team.nextStarterIdx = keptIdx;
+    }
   } else {
     team.rotationOrder[rotationIndex] = bullpenPlayerId;
     team.bullpenOrder = team.bullpenOrder.filter((id) => id !== bullpenPlayerId);
@@ -4280,7 +4332,7 @@ export function advanceToNextSeason(career: CareerSave): {
 
     // 나이는 syncAllAgesToDateInPlace(next, `${nextSeasonNum}-01-01`)에서 생년월일 기준으로 이미 정확 동기화됨 (중복 +1 방지)
     p.serviceYears += p.rosterTier === '1군' ? 1 : 0;
-    if (p.rosterTier === '1군' || p.rosterTier === '2군') {
+    if ((p.rosterTier === '1군' || p.rosterTier === '2군') && p.signedAsFaSeason !== nextSeasonNum) {
       p.clubTenureSeasons = getPlayerClubTenureSeasons(p) + 1;
     }
     p.seasonRatingDelta = 0;
@@ -4655,14 +4707,16 @@ export function advanceToNextSeason(career: CareerSave): {
         });
       }
 
-      // Move outgoing manager to FA market
-      next.faCoaches.push({
-        ...oldMgr,
-        teamId: 'FA',
-        confirmed: false,
-        isIncumbent: false,
-        careerNote: `FA · 전 ${KBO_TEAMS[targetClubId].shortName} 감독`,
-      });
+      // Move outgoing manager to FA market (deduplicated by id/name)
+      if (!next.faCoaches.some((c) => c.id === oldMgr.id || c.name === oldMgr.name)) {
+        next.faCoaches.push({
+          ...oldMgr,
+          teamId: 'FA',
+          confirmed: false,
+          isIncumbent: false,
+          careerNote: `FA · 전 ${KBO_TEAMS[targetClubId].shortName} 감독`,
+        });
+      }
 
       // Install promoted coach as new manager of targetClubId
       const promotedMgr: Coach = {
@@ -4701,11 +4755,50 @@ export function advanceToNextSeason(career: CareerSave): {
     });
   }
 
-  // Ensure every team starts the new season with a complete 9-man lineup and 5-man rotation
+  // Deduplicate FA coaches list to prevent multi-season duplicate accumulation
+  if (Array.isArray(next.faCoaches) && next.faCoaches.length > 0) {
+    const seenCoachKeys = new Set<string>();
+    next.faCoaches = next.faCoaches.filter((c) => {
+      const key = `${c.id}::${c.name}`;
+      if (seenCoachKeys.has(key)) return false;
+      seenCoachKeys.add(key);
+      return true;
+    });
+  }
+
+  // Ensure every team starts the new season with a complete 9-man lineup, 5-man rotation, and healthy bullpen (deduplicated)
+  const fallbackHitterPositions: Position[] = ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH'];
+  const minSalForRepl = getKboMinSalaryBillion(nextSeasonNum);
   for (const tid of TEAM_IDS) {
     const t = next.teams[tid];
     t.nextStarterIdx = 0;
 
+    // Deduplicate existing roster order arrays & remove retired/invalid player IDs
+    const isPlayableOnTeam = (id: string, expectedRole?: '타자' | '투수') => {
+      const pl = next.players[id];
+      if (!pl || pl.teamId !== tid) return false;
+      if (expectedRole && pl.role !== expectedRole) return false;
+      if (
+        pl.rosterTier === '은퇴' ||
+        pl.rosterTier === '해외이적' ||
+        pl.rosterTier === 'FA' ||
+        pl.rosterTier === '제외후보'
+      ) {
+        return false;
+      }
+      return !isMilitaryServing(pl.militaryStatus);
+    };
+
+    t.lineupOrder = Array.from(new Set(t.lineupOrder)).filter((id) => isPlayableOnTeam(id, '타자')).slice(0, 9);
+    t.benchOrder = Array.from(new Set(t.benchOrder)).filter(
+      (id) => isPlayableOnTeam(id, '타자') && !t.lineupOrder.includes(id)
+    );
+    t.rotationOrder = Array.from(new Set(t.rotationOrder)).filter((id) => isPlayableOnTeam(id, '투수')).slice(0, 6);
+    t.bullpenOrder = Array.from(new Set(t.bullpenOrder)).filter(
+      (id) => isPlayableOnTeam(id, '투수') && !t.rotationOrder.includes(id)
+    );
+
+    let replHitterIdx = 1;
     while (t.lineupOrder.length < 9) {
       const regularCand = Object.values(next.players)
         .filter(
@@ -4747,13 +4840,69 @@ export function advanceToNextSeason(career: CareerSave): {
           )
           .sort((a, b) => b.ability - a.ability)[0];
 
-      const candidate = faFallback;
-      if (!candidate) break;
+      let candidate = faFallback;
+      if (!candidate) {
+        // 다년제 커리어(10시즌+) 노쇠화/은퇴 누적 시 구단 로스터 붕괴 방지용 신인/육성 긴급 콜업 보충
+        const usedPos = new Set(t.lineupOrder.map((id) => t.lineupPositions[id] ?? next.players[id]?.position));
+        const pos = fallbackHitterPositions.find((hp) => !usedPos.has(hp)) ?? 'RF';
+        const replId = `auto_repl_h_${nextSeasonNum}_${tid}_${replHitterIdx++}`;
+        const createdHitter: Player = {
+          id: replId,
+          name: `${KBO_TEAMS[tid].shortName}유망타자${nextSeasonNum % 100}${replHitterIdx}`,
+          teamId: tid,
+          category: '국내',
+          role: '타자',
+          position: pos,
+          rosterTier: '1군',
+          gameDayActive: true,
+          age: 20,
+          birthDate: `${nextSeasonNum - 20}-05-12`,
+          serviceYears: 1,
+          clubTenureSeasons: 1,
+          ability: 67,
+          potential: 75,
+          abilityStatus: '확정',
+          form: 0,
+          fatigue: 0,
+          lastPitchedRound: -5,
+          consecutiveAppearances: 0,
+          seasonRatingDelta: 0,
+          lastEvaluatedAtTeamGames: 0,
+          morale: '보통',
+          dissatisfaction: 10,
+          injury: null,
+          rehabGamesLeft: 0,
+          militaryStatus: '미필',
+          trainingFocus: '타격',
+          contract: {
+            status: '확정',
+            currency: 'KRW',
+            years: 1,
+            yearsRemaining: 1,
+            annualSalary: minSalForRepl,
+            signingBonus: 0,
+            totalValue: minSalForRepl,
+            startSeason: nextSeasonNum,
+            endSeason: nextSeasonNum,
+            isFAEligible: false,
+            faGrade: null,
+            note: `${nextSeasonNum}시즌 육성군 정식 콜업`,
+          },
+          stats: emptyBatterStats(false),
+          postseasonStats: emptyBatterStats(false),
+          futuresStats: emptyFuturesStats(),
+        };
+        ensurePlayerOotpRatingsInPlace(createdHitter);
+        ensurePlayerPortraitProfileInPlace(createdHitter, nextSeasonNum);
+        next.players[replId] = createdHitter;
+        candidate = createdHitter;
+      }
       candidate.teamId = tid;
       candidate.rosterTier = '1군';
       candidate.gameDayActive = true;
       if (candidate.contract.yearsRemaining <= 0) {
         candidate.contract.yearsRemaining = 1;
+        candidate.contract.startSeason = nextSeasonNum;
         candidate.contract.endSeason = nextSeasonNum;
         candidate.contract.status = '확정';
       }
@@ -4763,6 +4912,7 @@ export function advanceToNextSeason(career: CareerSave): {
     }
     reconcileTeamLineupPositionsInPlace(next, tid);
 
+    let replPitcherIdx = 1;
     while (t.rotationOrder.length < 5) {
       const regularCand = Object.values(next.players)
         .filter(
@@ -4804,19 +4954,96 @@ export function advanceToNextSeason(career: CareerSave): {
           )
           .sort((a, b) => b.ability - a.ability)[0];
 
-      const candidate = faFallback;
-      if (!candidate) break;
+      let candidate = faFallback;
+      if (!candidate) {
+        const replId = `auto_repl_p_${nextSeasonNum}_${tid}_${replPitcherIdx++}`;
+        const createdPitcher: Player = {
+          id: replId,
+          name: `${KBO_TEAMS[tid].shortName}유망투수${nextSeasonNum % 100}${replPitcherIdx}`,
+          teamId: tid,
+          category: '국내',
+          role: '투수',
+          position: 'SP',
+          pitchRole: '선발',
+          rosterTier: '1군',
+          gameDayActive: true,
+          age: 20,
+          birthDate: `${nextSeasonNum - 20}-04-18`,
+          serviceYears: 1,
+          clubTenureSeasons: 1,
+          ability: 67,
+          potential: 75,
+          abilityStatus: '확정',
+          form: 0,
+          fatigue: 0,
+          lastPitchedRound: -5,
+          consecutiveAppearances: 0,
+          seasonRatingDelta: 0,
+          lastEvaluatedAtTeamGames: 0,
+          morale: '보통',
+          dissatisfaction: 10,
+          injury: null,
+          rehabGamesLeft: 0,
+          militaryStatus: '미필',
+          trainingFocus: '제구',
+          contract: {
+            status: '확정',
+            currency: 'KRW',
+            years: 1,
+            yearsRemaining: 1,
+            annualSalary: minSalForRepl,
+            signingBonus: 0,
+            totalValue: minSalForRepl,
+            startSeason: nextSeasonNum,
+            endSeason: nextSeasonNum,
+            isFAEligible: false,
+            faGrade: null,
+            note: `${nextSeasonNum}시즌 육성군 정식 콜업`,
+          },
+          stats: emptyPitcherStats(false),
+          postseasonStats: emptyPitcherStats(false),
+          futuresStats: emptyFuturesStats(),
+        };
+        ensurePlayerOotpRatingsInPlace(createdPitcher);
+        ensurePlayerPortraitProfileInPlace(createdPitcher, nextSeasonNum);
+        next.players[replId] = createdPitcher;
+        candidate = createdPitcher;
+      }
       candidate.teamId = tid;
       candidate.rosterTier = '1군';
       candidate.gameDayActive = true;
       candidate.pitchRole = '선발';
       if (candidate.contract.yearsRemaining <= 0) {
         candidate.contract.yearsRemaining = 1;
+        candidate.contract.startSeason = nextSeasonNum;
         candidate.contract.endSeason = nextSeasonNum;
         candidate.contract.status = '확정';
       }
       t.rotationOrder.push(candidate.id);
       t.bullpenOrder = t.bullpenOrder.filter((id) => id !== candidate.id);
+    }
+
+    // Ensure at least 4 bullpen pitchers on 1군 so multi-season simulations never run out of relievers
+    while (t.bullpenOrder.length < 4) {
+      const bpCand = Object.values(next.players)
+        .filter(
+          (p) =>
+            p.teamId === tid &&
+            p.role === '투수' &&
+            p.rosterTier !== '은퇴' &&
+            p.rosterTier !== '해외이적' &&
+            p.rosterTier !== 'FA' &&
+            p.rosterTier !== '제외후보' &&
+            !isMilitaryServing(p.militaryStatus) &&
+            !t.rotationOrder.includes(p.id) &&
+            !t.bullpenOrder.includes(p.id)
+        )
+        .sort((a, b) => b.ability - a.ability)[0];
+      if (!bpCand) break;
+      bpCand.rosterTier = '1군';
+      bpCand.gameDayActive = true;
+      if (bpCand.pitchRole === '선발') bpCand.pitchRole = '중간계투';
+      t.bullpenOrder.push(bpCand.id);
     }
   }
 
@@ -5011,6 +5238,7 @@ export function releaseExpiredFaPlayersToMarket(
 ): Player[] {
   if (career.faReleasedSeason === career.season) return [];
 
+  const faCycleSeason = getFaMarketCycleSeason(career);
   const departedAll: Player[] = [];
   const departedMyClub: Player[] = [];
 
@@ -5025,7 +5253,9 @@ export function releaseExpiredFaPlayersToMarket(
       continue;
     }
     if (isMilitaryServing(p.militaryStatus)) continue;
-    if (p.signedAsFaSeason === career.season) continue;
+    if (p.signedAsFaSeason === faCycleSeason) continue;
+    // 차기 시즌(career.season + 1 이상)까지 이미 다년·연장 계약이 남아 있는 선수는 만료 FA로 오분류하지 않음
+    if (p.contract.status === '확정' && (p.contract.endSeason ?? 0) > career.season) continue;
 
     // 시즌 종료 시점에 잔여 계약이 1년 이하(해당 시즌 만료)이며 FA 자격을 충족한 경우
     if (p.contract.yearsRemaining > 1) continue;
@@ -5113,12 +5343,13 @@ export function releaseExpiredFaPlayersToMarket(
  * 우리 구단 소속이었다가 FA 자격 취득으로 자동 이탈해 FA 시장에 나와 있는 선수 목록 (원소속 재계약 대상 · 보상 없음)
  */
 export function getMyDepartedFaPlayers(career: CareerSave): ExternalFaListing[] {
+  const faCycleSeason = getFaMarketCycleSeason(career);
   return Object.values(career.players)
     .filter(
       (p) =>
         p.rosterTier === 'FA' &&
         (p.formerTeamId ?? p.teamId) === career.playerTeamId &&
-        p.signedAsFaSeason !== career.season
+        p.signedAsFaSeason !== faCycleSeason
     )
     .map((p) => buildFaListing(career, p))
     .filter((x): x is ExternalFaListing => x !== null)
@@ -5126,10 +5357,11 @@ export function getMyDepartedFaPlayers(career: CareerSave): ExternalFaListing[] 
 }
 
 export function getExternalFaMarket(career: CareerSave): ExternalFaListing[] {
+  const faCycleSeason = getFaMarketCycleSeason(career);
   const allExternal = Object.values(career.players).filter((p) => {
     if (p.category !== '국내') return false;
     if (isMilitaryServing(p.militaryStatus)) return false;
-    if (p.signedAsFaSeason === career.season) return false;
+    if (p.signedAsFaSeason === faCycleSeason) return false;
     const originTeam = p.formerTeamId ?? p.teamId;
     if (originTeam === career.playerTeamId) return false;
     return true;
@@ -5185,7 +5417,11 @@ export function signExternalFaPlayer(
     const p = next.players[playerId];
     if (!p) throw new Error('대상 FA 선수를 찾을 수 없습니다.');
 
-    const pendingNeg = next.faCompetition?.negotiations[playerId];
+    const faCycleSeason = getFaMarketCycleSeason(next);
+    const pendingNeg =
+      next.faCompetition?.season === faCycleSeason
+        ? next.faCompetition.negotiations[playerId]
+        : undefined;
     const pendingUserBid =
       pendingNeg?.status === '단장승인대기' && pendingNeg.pendingWinnerTeamId === next.playerTeamId
         ? pendingNeg.bids.find((b) => b.teamId === next.playerTeamId)
@@ -5203,7 +5439,7 @@ export function signExternalFaPlayer(
     if (!isOwnFormerFa && p.teamId === next.playerTeamId && p.rosterTier !== 'FA') {
       throw new Error('이미 우리 구단과 계약되어 있는 선수입니다 (중복 계약 방지).');
     }
-    if (p.signedAsFaSeason === next.season) {
+    if (p.signedAsFaSeason === faCycleSeason) {
       throw new Error('이미 올 시즌 FA 계약을 체결한 선수입니다 (중복 계약 방지).');
     }
     if (
@@ -5212,7 +5448,7 @@ export function signExternalFaPlayer(
       getTeamExternalFaSigningCount(next, next.playerTeamId) >= MAX_EXTERNAL_FA_PER_CLUB
     ) {
       throw new Error(
-        `KBO 규정상 단일 시즌 외부 FA 영입은 최대 ${MAX_EXTERNAL_FA_PER_CLUB}명까지 가능합니다. (원소속팀 FA 재계약은 제한 없음)`
+        `KBO 규정상 단일 시즌(${faCycleSeason}시즌) 외부 FA 영입은 최대 ${MAX_EXTERNAL_FA_PER_CLUB}명까지 가능합니다. (원소속팀 FA 재계약은 제한 없음)`
       );
     }
 
@@ -5243,7 +5479,7 @@ export function signExternalFaPlayer(
     const exactBreakdown = calculateExactFaContractBreakdown(offerTotalBillion, offerYears, {
       age: p.age,
       injuryHistoryCount: p.injuryHistoryCount,
-      season: next.season,
+      season: faCycleSeason,
     });
     const signingBonus = exactBreakdown.signingBonusBillion;
     const cComp = !isOwnFormerFa && !isReleasedFreeAgent && listing.grade === 'C' ? listing.cashCompBillion : 0;
@@ -5293,8 +5529,8 @@ export function signExternalFaPlayer(
     }
     p.rosterTier = '1군';
     p.gameDayActive = true;
-    p.signedAsFaSeason = next.season;
-    p.faQualificationCount = getPriorFaQualificationCount(p, next.season) + 1;
+    p.signedAsFaSeason = faCycleSeason;
+    p.faQualificationCount = getPriorFaQualificationCount(p, faCycleSeason) + 1;
     p.morale = '만족';
     p.contract = {
       status: '확정',
@@ -5304,14 +5540,14 @@ export function signExternalFaPlayer(
       annualSalary: exactBreakdown.annualSalaryBillion,
       signingBonus: exactBreakdown.signingBonusBillion,
       totalValue: exactBreakdown.totalBillion,
-      startSeason: next.season,
-      endSeason: next.season + exactBreakdown.years - 1,
+      startSeason: faCycleSeason,
+      endSeason: faCycleSeason + exactBreakdown.years - 1,
       isFAEligible: false,
       faGrade: listing.grade,
       optionBonusPaidBillion: 0,
       note: isOwnFormerFa
-        ? `${next.season} 원소속팀 FA 잔류 재계약 (${exactBreakdown.years}년 총액 ${exactBreakdown.totalBillion.toFixed(1)}억 · 계약금 ${exactBreakdown.signingBonusBillion.toFixed(2)}억/연봉 ${exactBreakdown.annualSalaryBillion.toFixed(2)}억/옵션 ${exactBreakdown.optionTotalBillion.toFixed(2)}억)`
-        : `${next.season} 외부 FA ${listing.grade}등급 영입 (${exactBreakdown.years}년 총액 ${exactBreakdown.totalBillion.toFixed(1)}억 · 계약금 ${exactBreakdown.signingBonusBillion.toFixed(2)}억/연봉 ${exactBreakdown.annualSalaryBillion.toFixed(2)}억/옵션 ${exactBreakdown.optionTotalBillion.toFixed(2)}억)`,
+        ? `${faCycleSeason} 원소속팀 FA 잔류 재계약 (${exactBreakdown.years}년 총액 ${exactBreakdown.totalBillion.toFixed(1)}억 · 계약금 ${exactBreakdown.signingBonusBillion.toFixed(2)}억/연봉 ${exactBreakdown.annualSalaryBillion.toFixed(2)}억/옵션 ${exactBreakdown.optionTotalBillion.toFixed(2)}억)`
+        : `${faCycleSeason} 외부 FA ${listing.grade}등급 영입 (${exactBreakdown.years}년 총액 ${exactBreakdown.totalBillion.toFixed(1)}억 · 계약금 ${exactBreakdown.signingBonusBillion.toFixed(2)}억/연봉 ${exactBreakdown.annualSalaryBillion.toFixed(2)}억/옵션 ${exactBreakdown.optionTotalBillion.toFixed(2)}억)`,
     };
     reassignNonConflictingUniformNumber(next, p, next.playerTeamId);
 
@@ -5334,7 +5570,7 @@ export function signExternalFaPlayer(
     }
 
     const today = getCurrentCareerDate(next).isoDate || `${next.season}-11-24`;
-    const faSeasonRule = getKboFaCompensationRuleForSeason(next.season, listing.grade);
+    const faSeasonRule = getKboFaCompensationRuleForSeason(faCycleSeason, listing.grade);
     let needsProtectionList = false;
     if (
       !isOwnFormerFa &&
@@ -5398,8 +5634,8 @@ export function signExternalFaPlayer(
     recordLeagueAcquisitionInPlace(
       next,
       {
-        dedupeKey: `fa-${next.season}-${p.id}-${next.playerTeamId}`,
-        season: next.season,
+        dedupeKey: `fa-${faCycleSeason}-${p.id}-${next.playerTeamId}`,
+        season: faCycleSeason,
         date: today,
         category: 'FA',
         playerId: p.id,

@@ -126,7 +126,8 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                   {career.season} KBO 단장 취임식
                 </div>
                 <h2 className="text-xl sm:text-2xl font-extrabold text-white mt-1.5 tracking-tight">
-                  {teamInfo.name} · {career.gmName} 단장 취임
+                  {teamInfo.name} ·{' '}
+                  {career.gmName.endsWith('단장') ? `${career.gmName} 취임` : `${career.gmName} 단장 취임`}
                 </h2>
                 <p className="text-xs text-white/85 mt-1">
                   홈 구장: {teamInfo.stadium} ({teamInfo.capacity.toLocaleString()}석) · {career.season} 시즌 0승 0패(0/144경기)

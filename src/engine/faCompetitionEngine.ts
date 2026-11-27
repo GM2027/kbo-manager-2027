@@ -848,9 +848,22 @@ export function scoreBidForPlayer(
   };
 }
 
+/**
+ * 현재 FA 시장이 대상으로 하는 차기(또는 개막) 시즌 연도를 반환합니다.
+ * - OFFSEASON(예: 2027시즌 종료 후 스토브리그): 차기 시즌(2028) FA 시장으로 구분하여
+ *   2027 개막 전 영입 기록이 2028 스토브리그 외부 FA 한도('단일 시즌 초과')로 잘못 이월되는 오류를 원천 차단합니다.
+ * - 개막 준비(INTRO~OPENING_ROSTER) / 정규시즌: 당해 시즌(career.season) FA 시장.
+ */
+export function getFaMarketCycleSeason(
+  career: Pick<CareerSave, 'season' | 'phase'>
+): number {
+  return career.phase === 'OFFSEASON' ? career.season + 1 : career.season;
+}
+
 export function getTeamExternalFaSigningCount(career: CareerSave, teamId: TeamId): number {
   const state = career.faCompetition;
-  if (!state || state.season !== career.season) return 0;
+  const faCycleSeason = getFaMarketCycleSeason(career);
+  if (!state || state.season !== faCycleSeason) return 0;
   return state.externalSigningsByTeam[teamId] ?? 0;
 }
 
@@ -858,11 +871,12 @@ export function getTeamExternalFaSigningCount(career: CareerSave, teamId: TeamId
  * 전체 10개 구단 대상 FA 시장 대상 선수 목록 조회
  */
 export function getAllMarketFaPlayers(career: CareerSave): Player[] {
+  const faCycleSeason = getFaMarketCycleSeason(career);
   return Object.values(career.players)
     .filter((p) => {
       if (p.category !== '국내') return false;
       if (isMilitaryServing(p.militaryStatus)) return false;
-      if (p.signedAsFaSeason === career.season) return false;
+      if (p.signedAsFaSeason === faCycleSeason) return false;
       // 실제 FA 신분(rosterTier === 'FA' 또는 contract.status === 'FA')만 시장 대상 — 계약 유지 중인 현역 1·2군 선수 오인 방지
       if (p.rosterTier === 'FA' || p.contract.status === 'FA') return true;
       return (
@@ -1009,7 +1023,8 @@ function finalizeOverseasFaMlbSigningInPlace(
   offer: MlbOverseasFaOffer,
   dateStr: string
 ): void {
-  if (p.signedAsFaSeason === career.season || neg.status === '계약완료') return;
+  const faCycleSeason = getFaMarketCycleSeason(career);
+  if (p.signedAsFaSeason === faCycleSeason || neg.status === '계약완료') return;
 
   const fromTeamId = neg.formerTeamId ?? p.formerTeamId ?? p.teamId;
   if (career.teams[fromTeamId]) {
@@ -1022,7 +1037,7 @@ function finalizeOverseasFaMlbSigningInPlace(
   p.formerTeamId = fromTeamId;
   p.rosterTier = '해외이적';
   p.gameDayActive = false;
-  p.signedAsFaSeason = career.season;
+  p.signedAsFaSeason = faCycleSeason;
   p.contract = {
     ...p.contract,
     status: '확정',
@@ -1031,10 +1046,10 @@ function finalizeOverseasFaMlbSigningInPlace(
     yearsRemaining: offer.years,
     annualSalary: Number((offer.guaranteedUsdMillions / Math.max(1, offer.years)).toFixed(2)),
     totalValue: offer.guaranteedUsdMillions,
-    startSeason: career.season,
-    endSeason: career.season + offer.years - 1,
+    startSeason: faCycleSeason,
+    endSeason: faCycleSeason + offer.years - 1,
     isFAEligible: false,
-    note: `${career.season} 해외 FA MLB 진출 (${offer.mlbTeam} ${offer.years}년 $${offer.guaranteedUsdMillions}M)`,
+    note: `${faCycleSeason} 해외 FA MLB 진출 (${offer.mlbTeam} ${offer.years}년 $${offer.guaranteedUsdMillions}M)`,
   };
 
   neg.status = '계약완료';
@@ -1088,9 +1103,10 @@ export function syncFaCompetitionMarketInPlace(
   career: CareerSave,
   dateStr = getCurrentCareerDate(career).isoDate
 ): FaCompetitionState {
-  if (!career.faCompetition || career.faCompetition.season !== career.season) {
+  const faCycleSeason = getFaMarketCycleSeason(career);
+  if (!career.faCompetition || career.faCompetition.season !== faCycleSeason) {
     career.faCompetition = {
-      season: career.season,
+      season: faCycleSeason,
       round: 1,
       externalSigningsByTeam: {},
       negotiations: {},
@@ -1106,7 +1122,7 @@ export function syncFaCompetitionMarketInPlace(
   standings.forEach((row, idx) => rankByTeam.set(row.teamId, idx + 1));
 
   const faPlayers = getAllMarketFaPlayers(career);
-  const rng = new SeededRng((career.season * 9973 + state.round * 131 + 77) >>> 0);
+  const rng = new SeededRng((faCycleSeason * 9973 + state.round * 131 + 77) >>> 0);
 
   for (const p of faPlayers) {
     const formerTeamId = p.formerTeamId ?? p.teamId;
@@ -1131,7 +1147,7 @@ export function syncFaCompetitionMarketInPlace(
       neg.mlbOverseasFaEligible = overseasEligible;
     }
 
-    if (neg.status === '계약완료' || p.signedAsFaSeason === career.season) {
+    if (neg.status === '계약완료' || p.signedAsFaSeason === faCycleSeason) {
       neg.status = '계약완료';
       continue;
     }
@@ -1473,9 +1489,10 @@ function ensureBroadClubFaParticipationInPlace(
   dateStr: string,
   rng: SeededRng
 ): void {
+  const faCycleSeason = getFaMarketCycleSeason(career);
   const openPlayers = faPlayers.filter((p) => {
     const neg = state.negotiations[p.id];
-    return neg && neg.status === '입찰중' && p.signedAsFaSeason !== career.season;
+    return neg && neg.status === '입찰중' && p.signedAsFaSeason !== faCycleSeason;
   });
   if (openPlayers.length === 0) return;
 
@@ -1601,7 +1618,8 @@ function finalizeAiClubFaSigningInPlace(
   winningBid: FaClubBid,
   dateStr: string
 ): void {
-  if (p.signedAsFaSeason === career.season || neg.status === '계약완료') return;
+  const faCycleSeason = getFaMarketCycleSeason(career);
+  if (p.signedAsFaSeason === faCycleSeason || neg.status === '계약완료') return;
 
   const newTeamId = winningBid.teamId;
   const fromTeamId = neg.formerTeamId;
@@ -1619,7 +1637,7 @@ function finalizeAiClubFaSigningInPlace(
   const exactBreakdown = calculateExactFaContractBreakdown(winningBid.totalBillion, winningBid.years, {
     age: p.age,
     injuryHistoryCount: p.injuryHistoryCount,
-    season: career.season,
+    season: faCycleSeason,
   });
   const signingBonus = exactBreakdown.signingBonusBillion;
   const annualSalary = exactBreakdown.annualSalaryBillion;
@@ -1631,13 +1649,13 @@ function finalizeAiClubFaSigningInPlace(
   p.formerTeamId = undefined;
   p.rosterTier = '1군';
   p.gameDayActive = true;
-  p.signedAsFaSeason = career.season;
+  p.signedAsFaSeason = faCycleSeason;
   p.morale = '만족';
   p.dissatisfaction = Math.min(p.dissatisfaction ?? 15, 18);
   const signDateIso = getCurrentCareerDate(career).isoDate;
   if (!isOriginalClub) {
     p.clubTenureSeasons = 1;
-    appendPlayerTeamHistoryInPlace(p, newTeamId, career.season, `${career.season} FA 이적`, {
+    appendPlayerTeamHistoryInPlace(p, newTeamId, faCycleSeason, `${faCycleSeason} FA 이적`, {
       transferDate: signDateIso,
       moveType: 'FA 이적',
       fromTeamId,
@@ -1657,14 +1675,14 @@ function finalizeAiClubFaSigningInPlace(
     annualSalary,
     signingBonus,
     totalValue: exactBreakdown.totalBillion,
-    startSeason: career.season,
-    endSeason: career.season + winningBid.years - 1,
+    startSeason: faCycleSeason,
+    endSeason: faCycleSeason + winningBid.years - 1,
     isFAEligible: false,
     faGrade: comp.grade,
     optionBonusPaidBillion: 0,
     note: isOriginalClub
-      ? `${career.season} 원소속팀 FA 잔류 (${winningBid.years}년 총액 ${exactBreakdown.totalBillion.toFixed(1)}억 · 계약금 ${signingBonus.toFixed(2)}억/연봉 ${annualSalary.toFixed(2)}억/옵션 ${optionTotal.toFixed(2)}억)`
-      : `${career.season} 외부 FA ${comp.grade}등급 계약 (${winningBid.years}년 총액 ${exactBreakdown.totalBillion.toFixed(1)}억 · 계약금 ${signingBonus.toFixed(2)}억/연봉 ${annualSalary.toFixed(2)}억/옵션 ${optionTotal.toFixed(2)}억)`,
+      ? `${faCycleSeason} 원소속팀 FA 잔류 (${winningBid.years}년 총액 ${exactBreakdown.totalBillion.toFixed(1)}억 · 계약금 ${signingBonus.toFixed(2)}억/연봉 ${annualSalary.toFixed(2)}억/옵션 ${optionTotal.toFixed(2)}억)`
+      : `${faCycleSeason} 외부 FA ${comp.grade}등급 계약 (${winningBid.years}년 총액 ${exactBreakdown.totalBillion.toFixed(1)}억 · 계약금 ${signingBonus.toFixed(2)}억/연봉 ${annualSalary.toFixed(2)}억/옵션 ${optionTotal.toFixed(2)}억)`,
   };
 
   if (career.teams[newTeamId]) {
@@ -1684,15 +1702,15 @@ function finalizeAiClubFaSigningInPlace(
   // - B등급: 25인 보호 외 1명 + 연봉 100% (또는 연봉 200%)
   // - C등급: 보상선수 없음 · 연봉 150% 금전 보상만 처리
   // - 자동 제외 대상(당해 FA 선수·신인·외국인/아시아쿼터·군보류·FA 보상 이적자)은 보호 인원 외 자동 보호
-  p.faQualificationCount = getPriorFaQualificationCount(p, career.season) + 1;
+  p.faQualificationCount = getPriorFaQualificationCount(p, faCycleSeason) + 1;
   let compSummary = '원소속팀 잔류 (보상 없음)';
   if (!isOriginalClub) {
     const prevAnnualSal = prevAnnualSalBeforeAiSign;
     if ((comp.grade === 'A' || comp.grade === 'B') && fromTeamId === career.playerTeamId) {
       // 사용자 구단 FA 이탈 시: 영입 AI 구단이 20인(A)/25인(B) 보호명단 제출 → 사용자 단장이 3일 내 직접 보상선수 또는 금전 보상 선택!
-      const rule = getKboFaCompensationRuleForSeason(career.season, comp.grade);
+      const rule = getKboFaCompensationRuleForSeason(faCycleSeason, comp.grade);
       const pool = buildTeamFaProtectionPool(career, newTeamId, {
-        faSeason: career.season,
+        faSeason: faCycleSeason,
         signedPlayerId: p.id,
         grade: comp.grade,
       });
@@ -1707,7 +1725,7 @@ function finalizeAiClubFaSigningInPlace(
 
       if (!career.pendingFaCompensationPicks) career.pendingFaCompensationPicks = [];
       career.pendingFaCompensationPicks.unshift({
-        id: `facomp-pick-${career.season}-${p.id}-${newTeamId}`,
+        id: `facomp-pick-${faCycleSeason}-${p.id}-${newTeamId}`,
         signedPlayerId: p.id,
         signedPlayerName: p.name,
         acquiringTeamId: newTeamId,
@@ -1728,7 +1746,7 @@ function finalizeAiClubFaSigningInPlace(
       compSummary = `${comp.grade}등급 보상 명단 수령 (${KBO_TEAMS[newTeamId].shortName} 보호 ${rule.protectionLimit}인 외 ${unprotectedCandidateIds.length}명 · ${pickDeadlineDate}까지 단장 직접 지명 대기)`;
     } else {
       const compRes = resolveFaProtectionAndCompensationSelection(career, newTeamId, fromTeamId, {
-        faSeason: career.season,
+        faSeason: faCycleSeason,
         signedPlayerId: p.id,
         grade: comp.grade,
         previousAnnualSalaryBillion: prevAnnualSal,
@@ -1747,8 +1765,8 @@ function finalizeAiClubFaSigningInPlace(
           compPlayer.rosterTier = compPlayer.ability >= 71 ? '1군' : '2군';
           compPlayer.gameDayActive = compPlayer.rosterTier === '1군';
           compPlayer.clubTenureSeasons = 1;
-          compPlayer.faCompensationTransferredSeason = career.season;
-          appendPlayerTeamHistoryInPlace(compPlayer, fromTeamId, career.season, `${p.name} FA 보상선수`, {
+          compPlayer.faCompensationTransferredSeason = faCycleSeason;
+          appendPlayerTeamHistoryInPlace(compPlayer, fromTeamId, faCycleSeason, `${p.name} FA 보상선수`, {
             transferDate: signDateIso,
             moveType: 'FA 보상선수',
             fromTeamId: newTeamId,
@@ -1756,8 +1774,8 @@ function finalizeAiClubFaSigningInPlace(
           recordLeagueAcquisitionInPlace(
             career,
             {
-              dedupeKey: `fa-comp-ai-${career.season}-${p.id}-${compPlayer.id}`,
-              season: career.season,
+              dedupeKey: `fa-comp-ai-${faCycleSeason}-${p.id}-${compPlayer.id}`,
+              season: faCycleSeason,
               date: signDateIso,
               category: 'FA',
               playerId: compPlayer.id,
@@ -1773,7 +1791,7 @@ function finalizeAiClubFaSigningInPlace(
         }
         compSummary = compRes.summary;
       } else {
-        const cRule = getKboFaCompensationRuleForSeason(career.season, 'C');
+        const cRule = getKboFaCompensationRuleForSeason(faCycleSeason, 'C');
         const cCash = Number((prevAnnualSal * cRule.cashOnlyRatio).toFixed(2));
         compSummary = `C등급 보상금 ${cCash.toFixed(1)}억 정산 (보상선수 없음)`;
         if (fromTeamId === career.playerTeamId && career.finances.cashBalanceBillion !== null) {
@@ -1805,8 +1823,8 @@ function finalizeAiClubFaSigningInPlace(
   // 리그 전체 뉴스 발행 (오프시즌 스토브리그 뉴스는 다음 시즌으로 분류)
   if (!career.newsFeed) career.newsFeed = [];
   career.newsFeed.unshift({
-    id: `news-fa-comp-${career.season}-${p.id}-${newTeamId}`,
-    season: career.phase === 'OFFSEASON' ? career.season + 1 : career.season,
+    id: `news-fa-comp-${faCycleSeason}-${p.id}-${newTeamId}`,
+    season: faCycleSeason,
     date: dateStr,
     category: '이적·계약',
     headline: isOriginalClub
@@ -1821,8 +1839,8 @@ function finalizeAiClubFaSigningInPlace(
   recordLeagueAcquisitionInPlace(
     career,
     {
-      dedupeKey: `fa-${career.season}-${p.id}-${newTeamId}`,
-      season: career.season,
+      dedupeKey: `fa-${faCycleSeason}-${p.id}-${newTeamId}`,
+      season: faCycleSeason,
       date: dateStr,
       category: 'FA',
       playerId: p.id,
@@ -1858,11 +1876,12 @@ export function submitUserClubFaBid(
 
   const backupSnapshot = cloneCareer(career);
   const next = cloneCareer(career);
+  const faCycleSeason = getFaMarketCycleSeason(next);
   const dateStr = getCurrentCareerDate(next).isoDate;
   const state = syncFaCompetitionMarketInPlace(next, dateStr);
   const p = next.players[playerId];
   if (!p) throw new Error('대상 FA 선수를 찾을 수 없습니다.');
-  if (p.signedAsFaSeason === next.season) {
+  if (p.signedAsFaSeason === faCycleSeason) {
     throw new Error('이미 올 시즌 FA 계약을 완료한 선수입니다 (중복 계약 방지).');
   }
 
@@ -1875,7 +1894,7 @@ export function submitUserClubFaBid(
   const extCount = state.externalSigningsByTeam[next.playerTeamId] ?? 0;
   if (!isOriginalClub && extCount >= MAX_EXTERNAL_FA_PER_CLUB) {
     throw new Error(
-      `KBO 규정상 단일 시즌 외부 FA 영입은 최대 ${MAX_EXTERNAL_FA_PER_CLUB}명까지 가능합니다. (현재 ${extCount}명 영입 완료 · 원소속 재계약은 제한 없음)`
+      `KBO 규정상 단일 시즌(${faCycleSeason}시즌) 외부 FA 영입은 최대 ${MAX_EXTERNAL_FA_PER_CLUB}명까지 가능합니다. (현재 ${extCount}명 영입 완료 · 원소속 재계약은 제한 없음)`
     );
   }
 
@@ -1883,7 +1902,7 @@ export function submitUserClubFaBid(
   const previewBreakdown = calculateExactFaContractBreakdown(offerTotalBillion, offerYears, {
     age: p.age,
     injuryHistoryCount: p.injuryHistoryCount,
-    season: next.season,
+    season: faCycleSeason,
   });
   const signingBonus = previewBreakdown.signingBonusBillion;
   const cComp = !isOriginalClub && comp.grade === 'C' ? comp.cashCompBillion : 0;
@@ -2019,10 +2038,11 @@ export function advanceFaCompetitionRound(career: CareerSave): {
   const signedSummaries: string[] = [];
   const pendingUserApprovals: string[] = [];
 
+  const faCycleSeason = getFaMarketCycleSeason(next);
   for (const neg of Object.values(state.negotiations)) {
     if (neg.status !== '입찰중') continue;
     const p = next.players[neg.playerId];
-    if (!p || p.signedAsFaSeason === next.season) {
+    if (!p || p.signedAsFaSeason === faCycleSeason) {
       neg.status = '계약완료';
       continue;
     }
@@ -2156,9 +2176,10 @@ export function markFaNegotiationSignedInPlace(
   isOriginalClub: boolean,
   dateStr: string
 ): void {
-  if (!career.faCompetition || career.faCompetition.season !== career.season) {
+  const faCycleSeason = getFaMarketCycleSeason(career);
+  if (!career.faCompetition || career.faCompetition.season !== faCycleSeason) {
     career.faCompetition = {
-      season: career.season,
+      season: faCycleSeason,
       round: 1,
       externalSigningsByTeam: {},
       negotiations: {},
@@ -2210,10 +2231,11 @@ export function resolveRemainingAiFaCompetitionInPlace(
   const rng = new SeededRng((career.season * 61333 + 19) >>> 0);
   const summaries: string[] = [];
 
+  const faCycleSeason = getFaMarketCycleSeason(career);
   for (const neg of Object.values(state.negotiations)) {
     if (neg.status === '계약완료') continue;
     const p = career.players[neg.playerId];
-    if (!p || p.rosterTier !== 'FA' || p.signedAsFaSeason === career.season) continue;
+    if (!p || p.rosterTier !== 'FA' || p.signedAsFaSeason === faCycleSeason) continue;
 
     evaluateAiClubBidsForPlayerInPlace(career, state, neg, p, rankByTeam, dateStr, rng);
     const activeMlbOffer = neg.mlbStatus === 'MLB제안접수' ? neg.mlbOffer : undefined;
@@ -2291,10 +2313,11 @@ export function setUserClubAutoFaBidEnabled(
 } {
   const backupSnapshot = cloneCareer(career);
   const next = cloneCareer(career);
+  const faCycleSeason = getFaMarketCycleSeason(next);
   const dateStr = getCurrentCareerDate(next).isoDate;
-  if (!next.faCompetition || next.faCompetition.season !== next.season) {
+  if (!next.faCompetition || next.faCompetition.season !== faCycleSeason) {
     next.faCompetition = {
-      season: next.season,
+      season: faCycleSeason,
       round: 1,
       externalSigningsByTeam: {},
       negotiations: {},
@@ -2342,7 +2365,8 @@ export interface ClubFaBidSummaryItem {
  * KBO 10개 구단별 FA 자동 입찰 참여 현황 요약
  */
 export function getClubFaBidSummary(career: CareerSave): ClubFaBidSummaryItem[] {
-  const state = career.faCompetition?.season === career.season ? career.faCompetition : undefined;
+  const faCycleSeason = getFaMarketCycleSeason(career);
+  const state = career.faCompetition?.season === faCycleSeason ? career.faCompetition : undefined;
   const userAuto = state?.autoBidForUserClub !== false;
 
   return TEAM_IDS.map((tid) => {

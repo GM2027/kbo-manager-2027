@@ -65,7 +65,7 @@ import { computeStandings } from '../engine/stats';
 import { acknowledgeChampionEvent } from '../engine/transactions';
 import { getRookieDraftScheduleInfo } from '../engine/calendarEngine';
 import { getCurrentCareerDate, getDraftPickingTeamForSlot } from '../engine/salaryCapEngine';
-import { CareerSummaryItem, saveCareer } from '../storage/careerStorage';
+import { CareerSummaryItem, getLastSaveError, saveManualCareer } from '../storage/careerStorage';
 import { AppSettings, CareerSave, GameRecord, LockedGameLineupPlan, OffseasonStep, TeamId } from '../types/kbo';
 import { AnalyticsCenterView } from './AnalyticsCenterView';
 import { GameEventAnimationPayload, GameEventAnimations } from './GameEventAnimations';
@@ -1082,7 +1082,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 className="px-3.5 py-1.5 text-xs font-bold rounded team-accent-bg flex items-center gap-1.5"
               >
                 <Play className="w-3.5 h-3.5" />
-                <span>다음 3연전 진행</span>
+                <span>다음 {nextSeries?.dates.length ?? 3}연전 진행</span>
               </button>
             </div>
           )}
@@ -1164,7 +1164,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <button
             type="button"
             onClick={() => {
-              const ok = saveCareer(career);
+              const { ok, savedCareer } = saveManualCareer(career);
               const now = new Date();
               const hhmm = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
               if (ok) {
@@ -1173,8 +1173,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
               }
               handleNotify(
                 ok
-                  ? `현재 커리어 [${career.label}]를 즉시 저장했습니다 (${hhmm}).`
-                  : '브라우저 저장 공간이 부족합니다. 오래된 슬롯을 정리해 주세요.',
+                  ? `수동 저장 슬롯 [${savedCareer.label}]에 즉시 저장했습니다 (${hhmm}).`
+                  : getLastSaveError() ??
+                      '브라우저 저장 공간이 부족합니다. 기존 세이브 데이터는 안전하게 보호되었습니다.',
                 ok ? 'success' : 'error'
               );
             }}
@@ -1609,7 +1610,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                             <span className="px-2 py-0.5 rounded-full bg-black/25 backdrop-blur-xs">
                               {career.season} KBO 리그 · {currentCalendarDate.phaseLabel}
                             </span>
-                            <span>{career.gmName} 단장실</span>
+                            <span>{career.gmName.endsWith('단장') ? `${career.gmName}실` : `${career.gmName} 단장실`}</span>
                             <span>·</span>
                             <span className="font-mono-stats">난이도 {career.difficulty ?? '어려움'}</span>
                           </div>
@@ -1756,7 +1757,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                             : career.phase === 'OFFSEASON'
                             ? '시즌 종료 · 시상식/차기시즌 대기'
                             : nextOpponent
-                            ? `${nextOpponent} 3연전`
+                            ? `${nextOpponent} ${nextSeries?.dates.length ?? 3}연전`
                             : '정규시즌 완료'}
                         </div>
                         {career.phase === 'REGULAR_SEASON' && myNextStarter && oppNextStarter && (
@@ -1794,7 +1795,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                             className="py-1.5 rounded-lg team-accent-btn text-xs font-bold flex items-center justify-center gap-1"
                           >
                             <CalendarDays className="w-3.5 h-3.5" />
-                            <span>3연전 진행</span>
+                            <span>{nextSeries?.dates.length ?? 3}연전 진행</span>
                           </button>
                         </div>
                       )}

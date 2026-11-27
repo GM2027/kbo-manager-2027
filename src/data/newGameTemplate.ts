@@ -2,6 +2,7 @@ import { ensureAmateurAndOverseasStateInPlace } from '../engine/amateurOverseasE
 import { ensureDeepFranchiseState } from '../engine/deepFranchise';
 import { applyPreGameEditorStoreToNewCareerInPlace } from '../engine/editorEngine';
 import { syncFaCompetitionMarketInPlace } from '../engine/faCompetitionEngine';
+import { ensureFranchiseState } from '../engine/franchiseSystems';
 import { syncSeasonRookieEligibilityInPlace } from '../engine/kboAwardsEngine';
 import { ensureLeagueLifeStateInPlace } from '../engine/leagueLifeEngine';
 import { reconcileAllTeamsLineupPositionsInPlace } from '../engine/lineupValidationEngine';
@@ -147,6 +148,7 @@ export function createNewCareer(params: {
     lastSeriesReport: null,
     warnings: [],
   };
+  ensureFranchiseState(created);
   ensureDeepFranchiseState(created);
   ensureSpecialFuturesRosters(created);
   ensureGlobalPlayerRegistryInPlace(created);

@@ -286,7 +286,7 @@ export const StandingsAndScheduleView: React.FC<StandingsAndScheduleViewProps> =
             <div className="space-y-1">
               <div className="flex flex-wrap items-center gap-1.5 text-xs font-semibold team-accent-text">
                 <span>
-                  다음 예정 3연전 프리뷰 · 제{nextSeries.seriesIndex}시리즈 ({nextSeries.startRound}~{nextSeries.endRound}G · {nextSeries.dates[0]}~{nextSeries.dates[2]})
+                  다음 예정 {nextSeries.dates.length}연전 프리뷰 · 제{nextSeries.seriesIndex}시리즈 ({nextSeries.startRound}~{nextSeries.endRound}G · {nextSeries.dates[0]}~{nextSeries.dates[nextSeries.dates.length - 1]})
                 </span>
                 {nextSeries.hasMondayRestBefore && (
                   <span className="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold">

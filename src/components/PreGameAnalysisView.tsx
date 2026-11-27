@@ -474,7 +474,7 @@ export const PreGameAnalysisView: React.FC<PreGameAnalysisViewProps> = ({
             <span className="px-2 py-0.5 rounded bg-white/15 text-amber-300 font-mono-stats">
               {analysis.isPostseason
                 ? analysis.postseasonLabel
-                : `${analysis.season} 정규시즌 · 3연전 ${analysis.seriesGameNumber}차전`}
+                : `${analysis.season} 정규시즌 · ${analysis.seriesGameNumber + analysis.remainingSeriesGames - 1}연전 ${analysis.seriesGameNumber}차전`}
             </span>
             <span className="inline-flex items-center gap-1 font-mono-stats">
               <CalendarDays className="w-3.5 h-3.5 text-sky-300" />
