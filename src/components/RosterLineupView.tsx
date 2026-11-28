@@ -70,6 +70,7 @@ import {
   setLineupSlot,
   swapLineupOrder,
   swapRotationWithBullpen,
+  switchTwoWayPlayerRole,
   togglePitcherRotationSpot,
   updateRosterPlacement,
 } from '../engine/transactions';
@@ -2560,6 +2561,25 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
                   </div>
                   <h3 className="text-lg font-extrabold tracking-tight flex items-center gap-1.5 flex-wrap">
                     <span>{selectedPlayer.name}</span>
+                    {selectedPlayer.isTwoWay && (
+                      <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-gradient-to-r from-violet-500 to-amber-400 text-white shadow-sm">
+                        투타겸업
+                      </span>
+                    )}
+                    {selectedPlayer.isTwoWay && selectedPlayer.teamId === career.playerTeamId && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const next = switchTwoWayPlayerRole(career, selectedPlayer.id);
+                          onUpdateCareer(next);
+                          setSelectedPlayer(next.players[selectedPlayer.id] ?? null);
+                        }}
+                        className="text-[10px] font-bold px-2 py-0.5 rounded bg-white/20 hover:bg-white/30 text-white border border-white/40 transition-colors"
+                        title="투수 운용과 타자(외야수) 운용을 전환합니다 (양면 기록 보존)"
+                      >
+                        {selectedPlayer.role === '투수' ? '타자(RF) 전환' : '투수(SP) 전환'}
+                      </button>
+                    )}
                     {(() => {
                       const fTier = evaluateFranchiseStar(career, selectedPlayer).tier;
                       if (fTier === '일반') return null;

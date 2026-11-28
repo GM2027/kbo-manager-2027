@@ -355,6 +355,12 @@ export interface Player {
   category: PlayerCategory;
   role: PlayerRole;
   position: Position;
+  /** 투타겸업(Two-Way Player) 선수 여부 (예: 키움 하현승) */
+  isTwoWay?: boolean;
+  /** 투타겸업 선수의 보조 역할 포지션 (투수 운용 시 야수 포지션, 야수 운용 시 투수 포지션) */
+  twoWaySecondaryPosition?: Position;
+  /** 투타겸업 선수의 비활성 역할 시즌 성적 보존 */
+  twoWayAltStats?: BatterStats | PitcherStats;
   pitchRole?: '선발' | '마무리' | '셋업맨' | '필승조' | '중간계투' | '중간' | '추격조' | '롱릴리프' | '예비';
   /** 사용자가 수동 지정한 투수 보직 유지 여부 */
   pitchRoleLockedByUser?: boolean;

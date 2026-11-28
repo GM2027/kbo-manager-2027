@@ -152,6 +152,11 @@ export const OotpRatingsPanel: React.FC<OotpRatingsPanelProps> = ({
             <span className="font-extrabold text-xs text-slate-900 dark:text-white">
               세부능력치 분석 (1~100 · 현재 / 잠재)
             </span>
+            {player.isTwoWay && (
+              <span className="px-1.5 py-0.5 rounded bg-gradient-to-r from-violet-600 to-amber-500 text-white text-[10px] font-extrabold">
+                투타겸업 · 투구/타격 동시 보유
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-1.5 text-[10px]">
             <span
@@ -385,7 +390,7 @@ export const OotpRatingsPanel: React.FC<OotpRatingsPanelProps> = ({
               </div>
             </div>
 
-            {player.role === '타자' && (
+            {(player.role === '타자' || player.isTwoWay) && (
               <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-1.5">
                 <div className="flex flex-wrap items-center justify-between gap-1 text-[11px]">
                   <span className="font-bold text-slate-800 dark:text-slate-200">

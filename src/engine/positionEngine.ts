@@ -152,6 +152,10 @@ export function getMajorSecondaryPositions(p: Player, maxCount = 2): Position[] 
  * 예: '3B (1B)', 'SS (2B·3B)', 'CF (LF·RF)', 'SP'
  */
 export function formatCompactPlayerPosition(p: Player, maxSecondary = 2): string {
+  if (p.isTwoWay) {
+    const secPos = p.twoWaySecondaryPosition ?? (p.role === '투수' ? 'RF' : 'SP');
+    return `투타 (${p.position}·${secPos})`;
+  }
   if (p.role !== '타자') return p.position;
   const majors = getMajorSecondaryPositions(p, maxSecondary);
   if (majors.length === 0) return p.position;

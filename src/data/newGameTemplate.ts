@@ -61,7 +61,7 @@ export function createNewCareer(params: {
     careerId: `career_${teamId}_${Date.now()}`,
     label: `${teamInfo.name} 2027 · 새 커리어`,
     version: 'v21.2027',
-    databaseVersion: 'v33_hanwha_park_junyoung_name_labels',
+    databaseVersion: 'v34_ha_hyeonseung_two_way',
     lockedHistoricalSeasons: [2026],
     isPreservedMaster: false,
     isArchived: false,

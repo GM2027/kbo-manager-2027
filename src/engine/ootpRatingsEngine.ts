@@ -633,14 +633,24 @@ export function buildOotpRatingsForPlayer(p: Player): OotpPlayerRatings {
   };
 
   // 3) 주루 (Baserunning — 주력 / 도루 시도 성향 / 도루 능력 / 주루 판단력 구분)
-  const batSig = p.role === '타자' ? extractBatterRecentSignals(p) : null;
+  const isTwoWay = Boolean(p.isTwoWay);
+  const canBat = p.role === '타자' || isTwoWay;
+  const canPitch = p.role === '투수' || isTwoWay;
+  const batPos: Position =
+    p.role === '타자'
+      ? p.position
+      : p.twoWaySecondaryPosition && !['SP', 'RP', 'CL'].includes(p.twoWaySecondaryPosition)
+      ? p.twoWaySecondaryPosition
+      : 'RF';
+
+  const batSig = canBat ? extractBatterRecentSignals(p) : null;
   const rawSpeed =
     p.v18Ratings?.batting?.speed ??
-    (p.role === '투수'
+    (!canBat
       ? 38 + hashOffset(hKey + 'spd', 10)
-      : p.position === 'CF' || p.position === 'SS' || p.position === '2B'
+      : batPos === 'CF' || batPos === 'SS' || batPos === '2B'
       ? rookieToolBase + 5
-      : p.position === 'C' || p.position === '1B' || p.position === 'DH'
+      : batPos === 'C' || batPos === '1B' || batPos === 'DH'
       ? Math.max(28, rookieToolBase - 16)
       : rookieToolBase - 3);
   const speed = rInt(
@@ -649,7 +659,7 @@ export function buildOotpRatingsForPlayer(p: Player): OotpPlayerRatings {
     98
   );
   const stealAbility =
-    p.role === '투수'
+    !canBat
       ? 22
       : rInt(
           speed * 0.65 +
@@ -660,7 +670,7 @@ export function buildOotpRatingsForPlayer(p: Player): OotpPlayerRatings {
           98
         );
   const stealTendency =
-    p.role === '투수'
+    !canBat
       ? 15
       : rInt(
           stealAbility * 0.62 +
@@ -672,7 +682,7 @@ export function buildOotpRatingsForPlayer(p: Player): OotpPlayerRatings {
           98
         );
   const baserunning =
-    p.role === '투수'
+    !canBat
       ? 30
       : rInt(speed * 0.55 + personality.professionalism * 0.25 + targetOvr * 0.20 + hashOffset(hKey + 'bsr', 6), 22, 97);
 
@@ -683,8 +693,9 @@ export function buildOotpRatingsForPlayer(p: Player): OotpPlayerRatings {
     baserunning,
   };
 
-  // 4A) 타자 세부 능력치
-  if (p.role === '타자') {
+  // 4A) 타자 세부 능력치 (순수 타자 및 투타겸업 선수)
+  let builtBatting: OotpBatterRatings | null = null;
+  if (canBat) {
     const legacyB = p.v18Ratings?.batting;
     const realBat = REAL_KBO_BATTER_PROFILES[p.name];
     const sig = batSig!;
@@ -696,7 +707,7 @@ export function buildOotpRatingsForPlayer(p: Player): OotpPlayerRatings {
     const babipCur = rInt(baseContact + sig.babipDelta * 0.65 + hashOffset(hKey + 'babip', 4), 25, 98);
     const avoidKCur = rInt(baseAvoidK + sig.avoidKDelta * 0.65 + hashOffset(hKey + 'avk', 4), 25, 98);
     const hrPowerCur = rInt(
-      basePower + sig.hrDelta * 0.65 + (p.position === '1B' || p.position === '3B' || p.position === 'DH' ? 3 : -1) + hashOffset(hKey + 'hrp', 4),
+      basePower + sig.hrDelta * 0.65 + (batPos === '1B' || batPos === '3B' || batPos === 'DH' ? 3 : -1) + hashOffset(hKey + 'hrp', 4),
       20,
       99
     );
@@ -722,10 +733,10 @@ export function buildOotpRatingsForPlayer(p: Player): OotpPlayerRatings {
     );
 
     const isContactSpeedType = baseContact >= basePower || speed >= 66;
-    const sacBunt = rInt((isContactSpeedType ? 64 : 44) + (p.position === 'C' || p.position === '2B' || p.position === 'SS' ? 8 : 0) + hashOffset(hKey + 'sb', 10), 20, 95);
+    const sacBunt = rInt((isContactSpeedType ? 64 : 44) + (batPos === 'C' || batPos === '2B' || batPos === 'SS' ? 8 : 0) + hashOffset(hKey + 'sb', 10), 20, 95);
     const buntForHit = rInt(speed * 0.55 + sacBunt * 0.30 + hashOffset(hKey + 'bfh', 8), 15, 94);
 
-    const batting: OotpBatterRatings = {
+    builtBatting = {
       babip: makePair(babipCur, potGap, hashOffset(hKey + 'pb1', 2)),
       avoidK: makePair(avoidKCur, potGap, hashOffset(hKey + 'pb2', 2)),
       gapPower: makePair(gapPowerCur, potGap, hashOffset(hKey + 'pb3', 2)),
@@ -739,21 +750,23 @@ export function buildOotpRatingsForPlayer(p: Player): OotpPlayerRatings {
     };
 
     // 포지션 가중치 공식으로 계산한 OVR/POT가 기존 v27 OVR/POT와 정확히 일치하도록 미세 정렬 (개성 편차 보존)
-    alignOotpBatterToTarget(batting, defense, baserunningRatings, p.position, targetOvr, targetPot, getPositionProficiency(p, p.position));
+    alignOotpBatterToTarget(builtBatting, defense, baserunningRatings, batPos, targetOvr, targetPot, getPositionProficiency(p, batPos));
 
-    return {
-      version: 1,
-      batting,
-      pitching: null,
-      defense,
-      baserunning: baserunningRatings,
-      personality,
-      growthHistory: p.ootpRatings?.growthHistory ?? [],
-    };
+    if (!canPitch) {
+      return {
+        version: 1,
+        batting: builtBatting,
+        pitching: null,
+        defense,
+        baserunning: baserunningRatings,
+        personality,
+        growthHistory: p.ootpRatings?.growthHistory ?? [],
+      };
+    }
   }
 
-  // 4B) 투수 세부 능력치 + 구종 + 구속 + 보직 적합도
-  const isStarter = p.position === 'SP' || p.pitchRole === '선발';
+  // 4B) 투수 세부 능력치 + 구종 + 구속 + 보직 적합도 (순수 투수 및 투타겸업 선수)
+  const isStarter = p.position === 'SP' || p.pitchRole === '선발' || (isTwoWay && (p.twoWaySecondaryPosition === 'SP' || !p.pitchRole));
   const legacyP = p.v18Ratings?.pitching;
   const realPitch = REAL_KBO_PITCHER_PROFILES[p.name];
   const sigP = extractPitcherRecentSignals(p);
@@ -903,6 +916,20 @@ export function buildOotpRatingsForPlayer(p: Player): OotpPlayerRatings {
     dataSource: realPitch ? 'verified' : 'estimated',
   };
 
+  // 하현승 등 실존 투타겸업 1라운더 구속·4구종 보정 (고교 최고 153km/h 좌완 선발)
+  if (isTwoWay && (p.id === 'D2027-001' || p.name === '하현승')) {
+    pitching.avgVelocityKmh = 147.5;
+    pitching.maxVelocityKmh = 153.0;
+    pitching.stamina = Math.max(pitching.stamina, 64);
+    pitching.pitches = [
+      { name: '포심', cur: 63, pot: 92, usagePct: 48, source: 'verified' },
+      { name: '슬라이더', cur: 58, pot: 88, usagePct: 24, source: 'verified' },
+      { name: '커브', cur: 54, pot: 84, usagePct: 16, source: 'verified' },
+      { name: '체인지업', cur: 52, pot: 84, usagePct: 12, source: 'verified' },
+    ];
+    pitching.dataSource = 'verified';
+  }
+
   alignOotpPitcherToTarget(pitching, isStarter, targetOvr, targetPot);
   const fit = evaluatePitcherRoleFit(pitching);
   pitching.starterFit = fit.starterFit;
@@ -910,7 +937,7 @@ export function buildOotpRatingsForPlayer(p: Player): OotpPlayerRatings {
 
   return {
     version: 1,
-    batting: null,
+    batting: builtBatting,
     pitching,
     defense,
     baserunning: baserunningRatings,
@@ -1072,12 +1099,13 @@ function alignOotpPitcherToTarget(
  * 단일 선수 OOTP 세부 능력치 보장 (없으면 생성 후 기존 레거시 필드와 동기화)
  */
 export function ensurePlayerOotpRatingsInPlace(p: Player): OotpPlayerRatings {
-  if (!p.ootpRatings || p.ootpRatings.version !== 1) {
+  const missingTwoWayHalf = Boolean(p.isTwoWay && (!p.ootpRatings?.batting || !p.ootpRatings?.pitching));
+  if (!p.ootpRatings || p.ootpRatings.version !== 1 || missingTwoWayHalf) {
     p.ootpRatings = buildOotpRatingsForPlayer(p);
     syncLegacyRatingsFromOotpInPlace(p, true);
   } else {
     // 보직 적합도 최신화 및 cur <= pot 불변식 검증
-    if (p.role === '투수' && p.ootpRatings.pitching) {
+    if (p.ootpRatings.pitching) {
       const pt = p.ootpRatings.pitching;
       for (const k of ['stuff', 'movement', 'control', 'hrPrevent', 'hitPrevent', 'vsLHB', 'vsRHB'] as const) {
         pt[k].cur = rInt(pt[k].cur, 1, 100);
@@ -1090,7 +1118,8 @@ export function ensurePlayerOotpRatingsInPlace(p: Player): OotpPlayerRatings {
       const fit = evaluatePitcherRoleFit(pt);
       pt.starterFit = fit.starterFit;
       pt.relieverFit = fit.relieverFit;
-    } else if (p.role === '타자' && p.ootpRatings.batting) {
+    }
+    if (p.ootpRatings.batting) {
       const b = p.ootpRatings.batting;
       for (const k of ['babip', 'avoidK', 'gapPower', 'hrPower', 'eye', 'vsLHP', 'vsRHP'] as const) {
         b[k].cur = rInt(b[k].cur, 1, 100);

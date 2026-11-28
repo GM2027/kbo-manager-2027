@@ -480,6 +480,36 @@ function inferConcretePosition(
     ? ({ ...raw.position_proficiency } as Partial<Record<Position, number>>)
     : undefined;
 
+  if (posRaw === 'TWP') {
+    // 투타겸업(TWP): 투구/타격 양면 능력치와 야수 보조 포지션을 모두 유지하면서 주 역할 결정
+    const off = raw.game_ratings?.batting?.overall_offense ?? 0;
+    const pit = raw.game_ratings?.pitching?.overall_pitching ?? 0;
+    const fielderPrimary: Position =
+      explicitPrimary && (ALL_FIELD_POSITIONS.includes(explicitPrimary) || explicitPrimary === 'DH')
+        ? explicitPrimary
+        : 'RF';
+    const fielderSec = Array.from(
+      new Set<Position>([
+        fielderPrimary,
+        ...(validSec ?? (['LF', '1B'] as Position[])),
+      ])
+    );
+    if (pit >= off) {
+      return {
+        role: '투수',
+        position: 'SP',
+        secondaryPositions: fielderSec,
+        positionProficiency: explicitProf,
+      };
+    }
+    return {
+      role: '타자',
+      position: fielderPrimary,
+      secondaryPositions: validSec?.filter((sp) => sp !== fielderPrimary) ?? ['LF', '1B'],
+      positionProficiency: explicitProf,
+    };
+  }
+
   if (explicitPrimary && (ALL_FIELD_POSITIONS.includes(explicitPrimary) || explicitPrimary === 'DH')) {
     return {
       role: '타자',
@@ -487,14 +517,6 @@ function inferConcretePosition(
       secondaryPositions: validSec?.filter((sp) => sp !== explicitPrimary),
       positionProficiency: explicitProf,
     };
-  }
-
-  if (posRaw === 'TWP') {
-    // 투타겸업(TWP): 세부 능력치 비교로 주포지션 결정
-    const off = raw.game_ratings?.batting?.overall_offense ?? 0;
-    const pit = raw.game_ratings?.pitching?.overall_pitching ?? 0;
-    if (pit >= off) return { role: '투수', position: 'SP' };
-    return { role: '타자', position: 'RF', secondaryPositions: ['LF', '1B'], positionProficiency: explicitProf };
   }
   if (posRaw === 'C') {
     return { role: '타자', position: 'C', secondaryPositions: validSec, positionProficiency: explicitProf };
@@ -699,6 +721,8 @@ export function computeRealisticServiceYears2027(
 
 function getDatabaseVersionRank(ver?: string): number {
   switch (ver) {
+    case 'v34_ha_hyeonseung_two_way':
+      return 34;
     case 'v33_hanwha_park_junyoung_name_labels':
       return 33;
     case 'v32_verified_2026_kbo_uniform_numbers':
@@ -1684,6 +1708,65 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
       career.databaseVersion = 'v33_hanwha_park_junyoung_name_labels';
     }
 
+    // v34: 키움 하현승(D2027-001) 투타겸업(TWP) 공식 반영 (좌투좌타 · 194cm/88kg · 투구/타격 세부능력치 동시 보유)
+    if (getDatabaseVersionRank(career.databaseVersion) < 34) {
+      for (const p of Object.values(career.players)) {
+        if (
+          p.id === 'D2027-001' ||
+          p.v18SourceId === 'D2027-001' ||
+          (p.name === '하현승' && (p.birthDate === '2008-03-09' || p.school === '부산고'))
+        ) {
+          p.isTwoWay = true;
+          p.throws = 'L';
+          p.bats = 'L';
+          p.heightCm = p.heightCm ?? 194;
+          p.weightKg = p.weightKg ?? 88;
+          p.twoWaySecondaryPosition = p.role === '투수' ? 'RF' : 'SP';
+          if (!p.twoWayAltStats) {
+            p.twoWayAltStats = p.role === '투수' ? emptyBatterStats(false) : emptyPitcherStats(false);
+          }
+          p.secondaryPositions = Array.from(new Set<Position>([...(p.secondaryPositions ?? []), 'RF', 'LF', '1B']));
+          p.positionProficiency = {
+            ...(p.positionProficiency ?? {}),
+            RF: Math.max(p.positionProficiency?.RF ?? 0, 82),
+            LF: Math.max(p.positionProficiency?.LF ?? 0, 66),
+            '1B': Math.max(p.positionProficiency?.['1B'] ?? 0, 62),
+          };
+          p.v18Ratings = {
+            overall: p.v18Ratings?.overall ?? p.ability,
+            potential: p.v18Ratings?.potential ?? p.potential,
+            batting: p.v18Ratings?.batting ?? {
+              contact: 58,
+              power: 57,
+              discipline: 58,
+              avoid_k: 58,
+              steal_production: 40,
+              availability: 59,
+              fielding: 54,
+              arm: 51,
+              speed: 45,
+              injury_resistance: 45,
+              overall_offense: 55,
+            },
+            pitching: p.v18Ratings?.pitching ?? {
+              stuff: 62,
+              control: 51,
+              hr_prevention: 56,
+              stamina_proxy: 64,
+              run_prevention: 55,
+              traffic_control: 53,
+              clutch: 56,
+              injury_resistance: 48,
+              overall_pitching: 56,
+            },
+          };
+          p.ootpRatings = undefined;
+          ensurePlayerOotpRatingsInPlace(p);
+        }
+      }
+      career.databaseVersion = 'v34_ha_hyeonseung_two_way';
+    }
+
     // KBO 현역 선수단과 해외파 목록 간 중복 등록 상시 방지
     if (career.amateurAndOverseas?.overseasPlayers) {
       const activeKboKey = new Set<string>();
@@ -2208,6 +2291,19 @@ export function buildAll10TeamsFromV18Dataset(): {
       seasonRatingDelta: 0,
       lastEvaluatedAtTeamGames: 0,
       // 2027시즌 개인 성적은 반드시 0부터 시작 (기존 통산·연도별 기록은 historicalSeasons & careerStats로 보존)
+      isTwoWay: raw.position === 'TWP' || pid === 'D2027-001' ? true : undefined,
+      twoWaySecondaryPosition:
+        raw.position === 'TWP' || pid === 'D2027-001'
+          ? role === '투수'
+            ? 'RF'
+            : 'SP'
+          : undefined,
+      twoWayAltStats:
+        raw.position === 'TWP' || pid === 'D2027-001'
+          ? role === '투수'
+            ? emptyBatterStats(false)
+            : emptyPitcherStats(false)
+          : undefined,
       stats: role === '타자' ? emptyBatterStats(false) : emptyPitcherStats(false),
       postseasonStats: role === '타자' ? emptyBatterStats(false) : emptyPitcherStats(false),
       v18Ratings: {
@@ -2288,7 +2384,7 @@ export function buildAll10TeamsFromV18Dataset(): {
               : '표준',
     };
 
-    if (role === '타자') {
+    if (role === '타자' || player.isTwoWay) {
       ensurePlayerPositionProficiencyInPlace(player);
     }
     if (

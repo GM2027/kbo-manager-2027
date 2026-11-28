@@ -5675,3 +5675,60 @@ export function signExternalFaPlayer(
   };
 }
 
+/**
+ * 투타겸업(Two-Way) 선수의 현재 운용 역할(투수 ↔ 타자)을 전환합니다.
+ * - 투구/타격 양면 시즌 성적과 세부 능력치를 모두 보존하며, 로테이션·라인업 충돌을 자동 정리합니다.
+ */
+export function switchTwoWayPlayerRole(career: CareerSave, playerId: string): CareerSave {
+  const next = structuredClone(career);
+  const p = next.players[playerId];
+  if (!p || !p.isTwoWay) return career;
+
+  const team = next.teams[p.teamId];
+  const prevRole = p.role;
+  const prevPos = p.position;
+  const nextRole = prevRole === '투수' ? '타자' : '투수';
+  const nextPos: Position =
+    p.twoWaySecondaryPosition ?? (nextRole === '투수' ? 'SP' : 'RF');
+
+  const prevStats = p.stats;
+  const nextStats =
+    p.twoWayAltStats ??
+    (nextRole === '타자' ? emptyBatterStats(false) : emptyPitcherStats(false));
+
+  p.role = nextRole;
+  p.position = nextPos;
+  p.twoWaySecondaryPosition = prevPos;
+  p.twoWayAltStats = prevStats;
+  p.stats = nextStats;
+
+  if (nextRole === '투수') {
+    p.pitchRole = nextPos === 'SP' ? '선발' : p.pitchRole ?? '선발';
+    if (team) {
+      team.lineupOrder = team.lineupOrder.filter((id) => id !== playerId);
+      team.benchOrder = team.benchOrder.filter((id) => id !== playerId);
+      delete team.lineupPositions[playerId];
+      if (p.rosterTier === '1군' && !team.rotationOrder.includes(playerId) && !team.bullpenOrder.includes(playerId)) {
+        team.bullpenOrder.push(playerId);
+      }
+      reconcileTeamLineupPositionsInPlace(next, p.teamId);
+    }
+  } else {
+    p.pitchRole = undefined;
+    if (team) {
+      team.rotationOrder = team.rotationOrder.filter((id) => id !== playerId);
+      team.bullpenOrder = team.bullpenOrder.filter((id) => id !== playerId);
+      if (p.rosterTier === '1군' && !team.lineupOrder.includes(playerId) && !team.benchOrder.includes(playerId)) {
+        team.benchOrder.push(playerId);
+      }
+      reconcileTeamLineupPositionsInPlace(next, p.teamId);
+    }
+  }
+
+  ensurePlayerOotpRatingsInPlace(p);
+  next.version = bumpVersion(next.version);
+  next.updatedAt = new Date().toISOString();
+  return next;
+}
+
+

@@ -160376,10 +160376,10 @@
       "draft_round": 1,
       "draft_pick": 1,
       "birth_date": "2008-03-09",
-      "bats": null,
-      "throws": null,
-      "height_cm": null,
-      "weight_kg": null,
+      "bats": "L",
+      "throws": "L",
+      "height_cm": 194,
+      "weight_kg": 88,
       "salary_krw": null,
       "contract_end_year": null,
       "game_ratings": {
@@ -160398,7 +160398,17 @@
           "injury_resistance": 45,
           "overall_offense": 55
         },
-        "pitching": null,
+        "pitching": {
+          "stuff": 62,
+          "control": 51,
+          "hr_prevention": 56,
+          "stamina_proxy": 64,
+          "run_prevention": 55,
+          "traffic_control": 53,
+          "clutch": 56,
+          "injury_resistance": 48,
+          "overall_pitching": 56
+        },
         "fitness": 100,
         "morale": 70
       },

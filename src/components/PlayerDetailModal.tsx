@@ -67,6 +67,7 @@ import {
 import {
   formatCompactPlayerPosition,
 } from '../engine/positionEngine';
+import { switchTwoWayPlayerRole } from '../engine/transactions';
 import { BatterStats, CareerSave, PitcherStats, Player } from '../types/kbo';
 import { CountryFlag, NationalityBadge } from './CountryFlag';
 import { MlbTeamLogo } from './MlbTeamLogo';
@@ -79,12 +80,14 @@ interface PlayerDetailModalProps {
   career: CareerSave;
   playerId: string | null;
   onClose: () => void;
+  onUpdateCareer?: (next: CareerSave) => void;
 }
 
 export const PlayerDetailModal: React.FC<PlayerDetailModalProps> = ({
   career,
   playerId,
   onClose,
+  onUpdateCareer,
 }) => {
   useEffect(() => {
     if (!playerId) return;
@@ -204,6 +207,21 @@ export const PlayerDetailModal: React.FC<PlayerDetailModalProps> = ({
                   <span className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-indigo-600 text-white">
                     육성선수
                   </span>
+                )}
+                {player.isTwoWay && (
+                  <span className="text-[11px] font-extrabold px-2 py-0.5 rounded bg-gradient-to-r from-violet-600 to-amber-500 text-white shadow-sm">
+                    투타겸업
+                  </span>
+                )}
+                {player.isTwoWay && onUpdateCareer && player.teamId === career.playerTeamId && player.rosterTier !== '은퇴' && (
+                  <button
+                    type="button"
+                    onClick={() => onUpdateCareer(switchTwoWayPlayerRole(career, player.id))}
+                    className="text-[11px] font-bold px-2 py-0.5 rounded border border-violet-500/50 bg-violet-500/10 hover:bg-violet-500/20 text-violet-700 dark:text-violet-300 transition-colors"
+                    title="투수 운용과 타자(외야수) 운용을 자유롭게 전환합니다 (양면 기록 보존)"
+                  >
+                    {player.role === '투수' ? '타자(RF)로 전환' : '투수(SP)로 전환'}
+                  </button>
                 )}
                 {player.rosterTier === '은퇴' && (
                   <span className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-slate-600 text-white">

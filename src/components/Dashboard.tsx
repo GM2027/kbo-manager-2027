@@ -3011,6 +3011,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         career={career}
         playerId={selectedPlayerId}
         onClose={() => setSelectedPlayerId(null)}
+        onUpdateCareer={onUpdateCareer}
       />
 
       {/* Global League-Wide Player Search Modal (#5 & #6) */}
