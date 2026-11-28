@@ -80,6 +80,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/NC/홍종표.png",
     "teamFolder": "NC"
   },
+  "KBO-PL-115499": {
+    "url": "/portraits/kbo/KIA/이준영.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/이준영.png",
+    "teamFolder": "KIA"
+  },
   "KBO-PL-116199": {
     "url": "/portraits/kbo/KT/박영현.png",
     "credit": "사용자 등록 공식 프로필",
@@ -108,6 +115,20 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/LG/우명현.png",
     "teamFolder": "LG"
   },
+  "KBO-PL-120263": {
+    "url": "/portraits/kbo/KIA/성영탁.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/성영탁.png",
+    "teamFolder": "KIA"
+  },
+  "KBO-PL-120354": {
+    "url": "/portraits/kbo/KIA/윤중현.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/윤중현.png",
+    "teamFolder": "KIA"
+  },
   "KBO-PL-120796": {
     "url": "/portraits/kbo/HH/최인호.png",
     "credit": "사용자 등록 공식 프로필",
@@ -121,6 +142,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/SS/김민훈.png",
     "teamFolder": "SS"
+  },
+  "KBO-PL-130816": {
+    "url": "/portraits/kbo/KIA/김민주.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/김민주.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-133374": {
     "url": "/portraits/kbo/LT/김진욱.png",
@@ -142,6 +170,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/SSG/이율예.png",
     "teamFolder": "SSG"
+  },
+  "KBO-PL-136662": {
+    "url": "/portraits/kbo/KIA/황대인.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/황대인.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-137611": {
     "url": "/portraits/kbo/KT/오서진.png",
@@ -255,6 +290,20 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/SSG/오태곤.png",
     "teamFolder": "SSG"
   },
+  "KBO-PL-153896": {
+    "url": "/portraits/kbo/KIA/박재현.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/박재현.png",
+    "teamFolder": "KIA"
+  },
+  "KBO-PL-155090": {
+    "url": "/portraits/kbo/KIA/김현수_60.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/김현수_60.png",
+    "teamFolder": "KIA"
+  },
   "KBO-PL-156423": {
     "url": "/portraits/kbo/SS/양우현.png",
     "credit": "사용자 등록 공식 프로필",
@@ -332,6 +381,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/HH/최재훈.png",
     "teamFolder": "HH"
   },
+  "KBO-PL-167621": {
+    "url": "/portraits/kbo/KIA/박정우.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/박정우.png",
+    "teamFolder": "KIA"
+  },
   "KBO-PL-170144": {
     "url": "/portraits/kbo/LT/김동현.png",
     "credit": "사용자 등록 공식 프로필",
@@ -352,6 +408,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/NC/권희동.png",
     "teamFolder": "NC"
+  },
+  "KBO-PL-179077": {
+    "url": "/portraits/kbo/KIA/김석환.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/김석환.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-179562": {
     "url": "/portraits/kbo/SSG/윤태현.png",
@@ -472,6 +535,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/LT/구승민.png",
     "teamFolder": "LT"
   },
+  "KBO-PL-215077": {
+    "url": "/portraits/kbo/KIA/홍건희.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/홍건희.png",
+    "teamFolder": "KIA"
+  },
   "KBO-PL-215143": {
     "url": "/portraits/kbo/KT/류현인.png",
     "credit": "사용자 등록 공식 프로필",
@@ -485,6 +555,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "CC BY 3.0",
     "sourceUrl": "https://commons.wikimedia.org/wiki/File:%EA%B9%80%ED%83%9D%EC%97%B0_%EC%84%A0%EC%88%98.jpg",
     "teamFolder": "OB"
+  },
+  "KBO-PL-216193": {
+    "url": "/portraits/kbo/KIA/박상준.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/박상준.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-217510": {
     "url": "/portraits/kbo/OB/잭로그_KBO-PL-217510.jpg",
@@ -513,6 +590,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/SSG/홍대인.png",
     "teamFolder": "SSG"
+  },
+  "KBO-PL-225462": {
+    "url": "/portraits/kbo/KIA/정찬화.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/정찬화.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-225487": {
     "url": "/portraits/kbo/KT/조이현.png",
@@ -585,10 +669,10 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "teamFolder": "SS"
   },
   "KBO-PL-242475": {
-    "url": "/portraits/kbo/KIA/변우혁_KBO-PL-242475.jpg",
-    "credit": "OSEN SPORTS",
-    "license": "CC BY 3.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:%EB%B3%80%EC%9A%B0%ED%98%81_%EC%84%A0%EC%88%98.jpg",
+    "url": "/portraits/kbo/KIA/변우혁.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/변우혁.png",
     "teamFolder": "KIA"
   },
   "KBO-PL-243362": {
@@ -611,6 +695,20 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "CC BY-SA 4.0",
     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Japanese_baseball_player_tamura_ichiro.jpg",
     "teamFolder": "OB"
+  },
+  "KBO-PL-251312": {
+    "url": "/portraits/kbo/KIA/황동하.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/황동하.png",
+    "teamFolder": "KIA"
+  },
+  "KBO-PL-251911": {
+    "url": "/portraits/kbo/KIA/정해원.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/정해원.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-252763": {
     "url": "/portraits/kbo/NC/허윤.png",
@@ -696,6 +794,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/LT/쿄야마.png",
     "teamFolder": "LT"
   },
+  "KBO-PL-277444": {
+    "url": "/portraits/kbo/KIA/한준수.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/한준수.png",
+    "teamFolder": "KIA"
+  },
   "KBO-PL-278234": {
     "url": "/portraits/kbo/LG/조건희.png",
     "credit": "사용자 등록 공식 프로필",
@@ -746,10 +851,10 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "teamFolder": "KT"
   },
   "KBO-PL-292879": {
-    "url": "/portraits/kbo/KIA/조상우_KBO-PL-292879.jpg",
-    "credit": "야구채널HB",
-    "license": "CC BY 3.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Cho_Sang-woo.jpg",
+    "url": "/portraits/kbo/KIA/조상우.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/조상우.png",
     "teamFolder": "KIA"
   },
   "KBO-PL-294230": {
@@ -857,6 +962,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/NC/신재인.png",
     "teamFolder": "NC"
   },
+  "KBO-PL-325486": {
+    "url": "/portraits/kbo/KIA/네일.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/네일.png",
+    "teamFolder": "KIA"
+  },
   "KBO-PL-327328": {
     "url": "/portraits/kbo/LT/김영준.png",
     "credit": "사용자 등록 공식 프로필",
@@ -955,6 +1067,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "https://commons.wikimedia.org/wiki/File:%EA%B6%8C%EA%B4%91%EB%AF%BC_%EC%95%BC%EA%B5%AC_%EC%84%A0%EC%88%98.jpg",
     "teamFolder": "HH"
   },
+  "KBO-PL-343754": {
+    "url": "/portraits/kbo/KIA/윤영철.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/윤영철.png",
+    "teamFolder": "KIA"
+  },
   "KBO-PL-348644": {
     "url": "/portraits/kbo/NC/신민우.png",
     "credit": "사용자 등록 공식 프로필",
@@ -989,6 +1108,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/NC/최성영.png",
     "teamFolder": "NC"
+  },
+  "KBO-PL-358736": {
+    "url": "/portraits/kbo/KIA/김태군.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/김태군.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-359506": {
     "url": "/portraits/kbo/SSG/장지훈.png",
@@ -1040,10 +1166,10 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "teamFolder": "HH"
   },
   "KBO-PL-375346": {
-    "url": "/portraits/kbo/KIA/곽도규_KBO-PL-375346.jpg",
-    "credit": "찬란할 너의 순간에",
-    "license": "CC BY 3.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:%EA%B3%BD%EB%8F%84%EA%B7%9C_%EC%84%A0%EC%88%98_%EC%B2%AB_%EC%9D%B8%EC%82%AC.jpg",
+    "url": "/portraits/kbo/KIA/곽도규.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/곽도규.png",
     "teamFolder": "KIA"
   },
   "KBO-PL-375926": {
@@ -1157,6 +1283,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/SS/김태훈(투).png",
     "teamFolder": "SS"
+  },
+  "KBO-PL-411799": {
+    "url": "/portraits/kbo/KIA/이의리.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/이의리.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-412046": {
     "url": "/portraits/kbo/SS/김무신.png",
@@ -1348,10 +1481,10 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "teamFolder": "LG"
   },
   "KBO-PL-450573": {
-    "url": "/portraits/kbo/KIA/데일_KBO-PL-450573.jpg",
-    "credit": "Orixbaseballclub",
-    "license": "CC BY-SA 4.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Jarryd_Dale_Buffaloes_20250412.jpg",
+    "url": "/portraits/kbo/KIA/데일.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/데일.png",
     "teamFolder": "KIA"
   },
   "KBO-PL-451113": {
@@ -1437,6 +1570,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/LG/임호윤.png",
     "teamFolder": "LG"
+  },
+  "KBO-PL-474142": {
+    "url": "/portraits/kbo/KIA/한승연.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/한승연.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-474952": {
     "url": "/portraits/kbo/NC/전사민.png",
@@ -1557,6 +1697,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/NC/김영규.png",
     "teamFolder": "NC"
   },
+  "KBO-PL-503584": {
+    "url": "/portraits/kbo/KIA/이호민_투수.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/이호민_투수.png",
+    "teamFolder": "KIA"
+  },
   "KBO-PL-505207": {
     "url": "/portraits/kbo/SSG/노경은.png",
     "credit": "사용자 등록 공식 프로필",
@@ -1570,6 +1717,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/LT/박승욱.png",
     "teamFolder": "LT"
+  },
+  "KBO-PL-507223": {
+    "url": "/portraits/kbo/KIA/김기훈.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/김기훈.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-509713": {
     "url": "/portraits/kbo/LT/이호준.png",
@@ -1598,6 +1752,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/NC/김진호.png",
     "teamFolder": "NC"
+  },
+  "KBO-PL-516096": {
+    "url": "/portraits/kbo/KIA/장재혁.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/장재혁.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-516571": {
     "url": "/portraits/kbo/SS/박용재.png",
@@ -1633,6 +1794,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/HH/페라자.png",
     "teamFolder": "HH"
+  },
+  "KBO-PL-523422": {
+    "url": "/portraits/kbo/KIA/김범수.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/김범수.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-525206": {
     "url": "/portraits/kbo/HH/류현진.png",
@@ -1682,6 +1850,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/NC/최정원.png",
     "teamFolder": "NC"
+  },
+  "KBO-PL-535963": {
+    "url": "/portraits/kbo/KIA/김선빈.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/김선빈.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-537232": {
     "url": "/portraits/kbo/SS/김현준.png",
@@ -1739,6 +1914,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/SS/이병헌.png",
     "teamFolder": "SS"
   },
+  "KBO-PL-557788": {
+    "url": "/portraits/kbo/KIA/올러.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/올러.png",
+    "teamFolder": "KIA"
+  },
   "KBO-PL-558882": {
     "url": "/portraits/kbo/LG/고우석.png",
     "credit": "사용자 등록 공식 프로필",
@@ -1794,6 +1976,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/KT/장진혁.png",
     "teamFolder": "KT"
+  },
+  "KBO-PL-569312": {
+    "url": "/portraits/kbo/KIA/하주석.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/하주석.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-569353": {
     "url": "/portraits/kbo/SS/구자욱.png",
@@ -1859,10 +2048,10 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "teamFolder": "LT"
   },
   "KBO-PL-584309": {
-    "url": "/portraits/kbo/KIA/김건국_KBO-PL-584309.jpg",
-    "credit": "OSEN SPORTS",
-    "license": "CC BY 3.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:%EA%B9%80%EA%B1%B4%EA%B5%AD_%EC%95%BC%EA%B5%AC_%EC%84%A0%EC%88%98.jpg",
+    "url": "/portraits/kbo/KIA/김건국.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/김건국.png",
     "teamFolder": "KIA"
   },
   "KBO-PL-584325": {
@@ -1894,10 +2083,24 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "teamFolder": "SS"
   },
   "KBO-PL-590732": {
-    "url": "/portraits/kbo/KIA/최지민_KBO-PL-590732.jpg",
-    "credit": "OSEN SPORTS",
-    "license": "CC BY 3.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:%EC%B5%9C%EC%A7%80%EB%AF%BC_%EC%84%A0%EC%88%98.jpg",
+    "url": "/portraits/kbo/KIA/최지민.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/최지민.png",
+    "teamFolder": "KIA"
+  },
+  "KBO-PL-591485": {
+    "url": "/portraits/kbo/KIA/한재승.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/한재승.png",
+    "teamFolder": "KIA"
+  },
+  "KBO-PL-593916": {
+    "url": "/portraits/kbo/KIA/이호민_타자.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/이호민_타자.png",
     "teamFolder": "KIA"
   },
   "KBO-PL-595255": {
@@ -1913,6 +2116,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/HH/김범준.png",
     "teamFolder": "HH"
+  },
+  "KBO-PL-598770": {
+    "url": "/portraits/kbo/KIA/이창진.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/이창진.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-603484": {
     "url": "/portraits/kbo/OB/정수빈_KBO-PL-603484.jpg",
@@ -1948,6 +2158,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/HH/엄상백.png",
     "teamFolder": "HH"
+  },
+  "KBO-PL-612394": {
+    "url": "/portraits/kbo/KIA/이도현.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/이도현.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-613083": {
     "url": "/portraits/kbo/LT/정보근.png",
@@ -2055,10 +2272,10 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "teamFolder": "SSG"
   },
   "KBO-PL-635424": {
-    "url": "/portraits/kbo/KIA/주효상_KBO-PL-635424.jpg",
-    "credit": "Trainholic",
-    "license": "CC BY-SA 3.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Nexen_Heroes_Joo_Hyo-Sang_20180802.jpg",
+    "url": "/portraits/kbo/KIA/주효상.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/주효상.png",
     "teamFolder": "KIA"
   },
   "KBO-PL-641003": {
@@ -2081,6 +2298,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/SS/함수호.png",
     "teamFolder": "SS"
+  },
+  "KBO-PL-647123": {
+    "url": "/portraits/kbo/KIA/유지성.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/유지성.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-647995": {
     "url": "/portraits/kbo/SSG/석정우.png",
@@ -2137,6 +2361,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/KT/김정운.png",
     "teamFolder": "KT"
+  },
+  "KBO-PL-662711": {
+    "url": "/portraits/kbo/KIA/전상현.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/전상현.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-663498": {
     "url": "/portraits/kbo/LT/한현희.png",
@@ -2201,12 +2432,40 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/SSG/김태윤.png",
     "teamFolder": "SSG"
   },
+  "KBO-PL-672719": {
+    "url": "/portraits/kbo/KIA/이성원.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/이성원.png",
+    "teamFolder": "KIA"
+  },
   "KBO-PL-675788": {
     "url": "/portraits/kbo/KT/장준원.png",
     "credit": "사용자 등록 공식 프로필",
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/KT/장준원.png",
     "teamFolder": "KT"
+  },
+  "KBO-PL-677435": {
+    "url": "/portraits/kbo/KIA/윤도현.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/윤도현.png",
+    "teamFolder": "KIA"
+  },
+  "KBO-PL-683669": {
+    "url": "/portraits/kbo/KIA/김사윤.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/김사윤.png",
+    "teamFolder": "KIA"
+  },
+  "KBO-PL-683908": {
+    "url": "/portraits/kbo/KIA/김시훈.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/김시훈.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-689222": {
     "url": "/portraits/kbo/SS/장승현.png",
@@ -2216,10 +2475,10 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "teamFolder": "SS"
   },
   "KBO-PL-689777": {
-    "url": "/portraits/kbo/KIA/고종욱_KBO-PL-689777.jpg",
-    "credit": "찬란할 너의 순간에",
-    "license": "CC BY 3.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:%EA%B3%A0%EC%A2%85%EC%9A%B1_%EC%95%BC%EA%B5%AC_%EC%84%A0%EC%88%98.jpg",
+    "url": "/portraits/kbo/KIA/고종욱.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/고종욱.png",
     "teamFolder": "KIA"
   },
   "KBO-PL-690207": {
@@ -2256,6 +2515,20 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/SS/김재혁.png",
     "teamFolder": "SS"
+  },
+  "KBO-PL-699797": {
+    "url": "/portraits/kbo/KIA/홍민규.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/홍민규.png",
+    "teamFolder": "KIA"
+  },
+  "KBO-PL-702561": {
+    "url": "/portraits/kbo/KIA/박민.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/박민.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-703524": {
     "url": "/portraits/kbo/LT/박세웅.png",
@@ -2305,6 +2578,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/SS/박승규.png",
     "teamFolder": "SS"
+  },
+  "KBO-PL-720124": {
+    "url": "/portraits/kbo/KIA/김대유.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/김대유.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-720886": {
     "url": "/portraits/kbo/LG/김진성.png",
@@ -2391,10 +2671,17 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "teamFolder": "LG"
   },
   "KBO-PL-756230": {
-    "url": "/portraits/kbo/KIA/김호령_KBO-PL-756230.jpg",
-    "credit": "OSEN SPORTS",
-    "license": "CC BY 3.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:%EA%B9%80%ED%98%B8%EB%A0%B9_%EC%84%A0%EC%88%98.jpg",
+    "url": "/portraits/kbo/KIA/김호령.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/김호령.png",
+    "teamFolder": "KIA"
+  },
+  "KBO-PL-760342": {
+    "url": "/portraits/kbo/KIA/정현창.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/정현창.png",
     "teamFolder": "KIA"
   },
   "KBO-PL-764098": {
@@ -2510,10 +2797,10 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "teamFolder": "LT"
   },
   "KBO-PL-809134": {
-    "url": "/portraits/kbo/KIA/나성범_KBO-PL-809134.jpg",
-    "credit": "OSEN SPORTS",
-    "license": "CC BY 3.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:%EB%82%98%EC%84%B1%EB%B2%94_%EC%84%A0%EC%88%98.jpg",
+    "url": "/portraits/kbo/KIA/나성범.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/나성범.png",
     "teamFolder": "KIA"
   },
   "KBO-PL-812457": {
@@ -2733,6 +3020,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/SS/이승민.png",
     "teamFolder": "SS"
   },
+  "KBO-PL-864739": {
+    "url": "/portraits/kbo/KIA/김태형.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/김태형.png",
+    "teamFolder": "KIA"
+  },
   "KBO-PL-866179": {
     "url": "/portraits/kbo/SSG/한유섬.png",
     "credit": "사용자 등록 공식 프로필",
@@ -2789,6 +3083,20 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/HH/장규현.png",
     "teamFolder": "HH"
   },
+  "KBO-PL-878706": {
+    "url": "/portraits/kbo/KIA/정해영.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/정해영.png",
+    "teamFolder": "KIA"
+  },
+  "KBO-PL-880166": {
+    "url": "/portraits/kbo/KIA/김도영.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/김도영.png",
+    "teamFolder": "KIA"
+  },
   "KBO-PL-881924": {
     "url": "/portraits/kbo/SSG/박시후.png",
     "credit": "사용자 등록 공식 프로필",
@@ -2816,6 +3124,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/KT/소형준.png",
     "teamFolder": "KT"
+  },
+  "KBO-PL-896391": {
+    "url": "/portraits/kbo/KIA/김정엽.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/김정엽.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-896853": {
     "url": "/portraits/kbo/LT/황성빈.png",
@@ -2866,6 +3181,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/SS/정재훈.png",
     "teamFolder": "SS"
   },
+  "KBO-PL-903115": {
+    "url": "/portraits/kbo/KIA/김규성.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/김규성.png",
+    "teamFolder": "KIA"
+  },
   "KBO-PL-903938": {
     "url": "/portraits/kbo/SS/김재윤.png",
     "credit": "사용자 등록 공식 프로필",
@@ -2880,6 +3202,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/SS/디아즈.png",
     "teamFolder": "SS"
   },
+  "KBO-PL-911899": {
+    "url": "/portraits/kbo/KIA/오선우.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/오선우.png",
+    "teamFolder": "KIA"
+  },
   "KBO-PL-912837": {
     "url": "/portraits/kbo/LG/톨허스트.png",
     "credit": "사용자 등록 공식 프로필",
@@ -2893,6 +3222,20 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/KT/장성우.png",
     "teamFolder": "KT"
+  },
+  "KBO-PL-915629": {
+    "url": "/portraits/kbo/KIA/김현수_17.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/김현수_17.png",
+    "teamFolder": "KIA"
+  },
+  "KBO-PL-915777": {
+    "url": "/portraits/kbo/KIA/이태양.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/이태양.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-916440": {
     "url": "/portraits/kbo/KT/안치영.png",
@@ -2922,6 +3265,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/KT/이정범.png",
     "teamFolder": "KT"
   },
+  "KBO-PL-925250": {
+    "url": "/portraits/kbo/KIA/김민규.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/김민규.png",
+    "teamFolder": "KIA"
+  },
   "KBO-PL-926375": {
     "url": "/portraits/kbo/NC/원종해.png",
     "credit": "사용자 등록 공식 프로필",
@@ -2930,10 +3280,10 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "teamFolder": "NC"
   },
   "KBO-PL-928998": {
-    "url": "/portraits/kbo/KIA/양현종_KBO-PL-928998.jpg",
-    "credit": "한국문화예술위원회 ARKO",
-    "license": "CC BY 3.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:(2016_%EB%AC%B8%ED%99%94%EB%88%84%EB%A6%AC%EC%B9%B4%EB%93%9C)%EC%95%BC%EA%B5%AC%EC%84%A0%EC%88%98_%EC%96%91%ED%98%84%EC%A2%85_%EC%84%A0%EC%88%98_%EC%9D%B8%ED%84%B0%EB%B7%B0_0s.jpg",
+    "url": "/portraits/kbo/KIA/양현종.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/양현종.png",
     "teamFolder": "KIA"
   },
   "KBO-PL-930277": {
@@ -2986,10 +3336,10 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "teamFolder": "LT"
   },
   "KBO-PL-938703": {
-    "url": "/portraits/kbo/KIA/카스트로_KBO-PL-938703.jpg",
-    "credit": "Minda Haas Kuhlmann",
-    "license": "CC BY 2.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Harold_Castro_2025.jpg",
+    "url": "/portraits/kbo/KIA/카스트로.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/카스트로.png",
     "teamFolder": "KIA"
   },
   "KBO-PL-939902": {
@@ -3019,6 +3369,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/HH/주현상.png",
     "teamFolder": "HH"
+  },
+  "KBO-PL-946243": {
+    "url": "/portraits/kbo/KIA/최정용.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/최정용.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-949902": {
     "url": "/portraits/kbo/KT/배제성.png",
@@ -3063,10 +3420,10 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "teamFolder": "NC"
   },
   "KBO-PL-957269": {
-    "url": "/portraits/kbo/KIA/김도현_KBO-PL-957269.jpg",
-    "credit": "최강기아타이거즈",
-    "license": "CC0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:%EA%B8%B0%EC%95%84%ED%83%80%EC%9D%B4%EA%B1%B0%EC%A6%88_%EA%B9%80%EB%8F%84%ED%98%84.jpg",
+    "url": "/portraits/kbo/KIA/김도현.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/김도현.png",
     "teamFolder": "KIA"
   },
   "KBO-PL-962239": {
@@ -3082,6 +3439,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/HH/조동욱.png",
     "teamFolder": "HH"
+  },
+  "KBO-PL-966204": {
+    "url": "/portraits/kbo/KIA/이호연.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/이호연.png",
+    "teamFolder": "KIA"
   },
   "KBO-PL-968060": {
     "url": "/portraits/kbo/KT/오윤석.png",
@@ -3132,6 +3496,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/KT/유준규.png",
     "teamFolder": "KT"
   },
+  "KBO-PL-982367": {
+    "url": "/portraits/kbo/KIA/곽병진.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/KIA/곽병진.png",
+    "teamFolder": "KIA"
+  },
   "KBO-PL-992131": {
     "url": "/portraits/kbo/KT/김민석.png",
     "credit": "사용자 등록 공식 프로필",
@@ -3164,6 +3535,10 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "50556": "KBO-PL-475626",
   "50596": "KBO-PL-195326",
   "50600": "KBO-PL-113909",
+  "50604": "KBO-PL-647123",
+  "50641": "KBO-PL-516096",
+  "50657": "KBO-PL-702561",
+  "50662": "KBO-PL-878706",
   "50705": "KBO-PL-851974",
   "50707": "KBO-PL-120796",
   "50710": "KBO-PL-596053",
@@ -3192,6 +3567,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "51528": "KBO-PL-817170",
   "51551": "KBO-PL-150291",
   "51594": "KBO-PL-850419",
+  "51648": "KBO-PL-411799",
   "51762": "KBO-PL-877843",
   "51809": "KBO-PL-851465",
   "51865": "KBO-PL-463403",
@@ -3202,6 +3578,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "51903": "KBO-PL-492982",
   "51907": "KBO-PL-361507",
   "51991": "KBO-PL-309701",
+  "51994": "KBO-PL-591485",
   "51996": "KBO-PL-567417",
   "52001": "KBO-PL-430270",
   "52060": "KBO-PL-116199",
@@ -3217,7 +3594,12 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "52530": "KBO-PL-899004",
   "52568": "KBO-PL-796929",
   "52591": "KBO-PL-595255",
+  "52605": "KBO-PL-880166",
+  "52628": "KBO-PL-474142",
+  "52634": "KBO-PL-216193",
   "52639": "KBO-PL-590732",
+  "52641": "KBO-PL-251312",
+  "52667": "KBO-PL-677435",
   "52701": "KBO-PL-151852",
   "52764": "KBO-PL-404638",
   "52765": "KBO-PL-492769",
@@ -3243,6 +3625,9 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "53455": "KBO-PL-138435",
   "53562": "KBO-PL-315335",
   "53609": "KBO-PL-375346",
+  "53613": "KBO-PL-343754",
+  "53615": "KBO-PL-612394",
+  "53659": "KBO-PL-251911",
   "53706": "KBO-PL-331312",
   "53754": "KBO-PL-857759",
   "53764": "KBO-PL-969429",
@@ -3265,6 +3650,8 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "54537": "KBO-PL-252994",
   "54551": "KBO-PL-468333",
   "54598": "KBO-PL-509713",
+  "54610": "KBO-PL-120263",
+  "54640": "KBO-PL-325486",
   "54702": "KBO-PL-734000",
   "54705": "KBO-PL-620424",
   "54729": "KBO-PL-328484",
@@ -3287,6 +3674,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "55146": "KBO-PL-582655",
   "55167": "KBO-PL-117813",
   "55239": "KBO-PL-217510",
+  "55267": "KBO-PL-699797",
   "55268": "KBO-PL-901495",
   "55348": "KBO-PL-669487",
   "55435": "KBO-PL-338742",
@@ -3297,6 +3685,12 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "55503": "KBO-PL-145488",
   "55530": "KBO-PL-323821",
   "55563": "KBO-PL-584325",
+  "55610": "KBO-PL-864739",
+  "55632": "KBO-PL-672719",
+  "55633": "KBO-PL-557788",
+  "55636": "KBO-PL-153896",
+  "55646": "KBO-PL-896391",
+  "55663": "KBO-PL-503584",
   "55743": "KBO-PL-137717",
   "55764": "KBO-PL-802990",
   "55832": "KBO-PL-136544",
@@ -3304,6 +3698,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "55860": "KBO-PL-703910",
   "55897": "KBO-PL-225016",
   "55903": "KBO-PL-939902",
+  "55926": "KBO-PL-760342",
   "55995": "KBO-PL-730443",
   "56005": "KBO-PL-814489",
   "56006": "KBO-PL-431934",
@@ -3330,6 +3725,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "56595": "KBO-PL-583503",
   "56626": "KBO-PL-938703",
   "56632": "KBO-PL-450573",
+  "56637": "KBO-PL-925250",
   "56712": "KBO-PL-888290",
   "56719": "KBO-PL-812457",
   "56724": "KBO-PL-189157",
@@ -3346,8 +3742,10 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "56966": "KBO-PL-327552",
   "56967": "KBO-PL-795634",
   "60263": "KBO-PL-415200",
+  "60337": "KBO-PL-720124",
   "60558": "KBO-PL-152942",
   "60559": "KBO-PL-431894",
+  "60768": "KBO-PL-915777",
   "60841": "KBO-PL-931128",
   "61101": "KBO-PL-422006",
   "61102": "KBO-PL-164060",
@@ -3355,6 +3753,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "61268": "KBO-PL-241076",
   "61353": "KBO-PL-689777",
   "61404": "KBO-PL-235172",
+  "61643": "KBO-PL-215077",
   "61666": "KBO-PL-160064",
   "61895": "KBO-PL-919095",
   "62234": "KBO-PL-337194",
@@ -3365,6 +3764,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "62415": "KBO-PL-861856",
   "62528": "KBO-PL-149209",
   "62558": "KBO-PL-868736",
+  "62700": "KBO-PL-569312",
   "62754": "KBO-PL-228561",
   "62802": "KBO-PL-507069",
   "62864": "KBO-PL-330045",
@@ -3386,6 +3786,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "63543": "KBO-PL-213229",
   "63722": "KBO-PL-413836",
   "63765": "KBO-PL-375926",
+  "63894": "KBO-PL-683669",
   "63950": "KBO-PL-363907",
   "63959": "KBO-PL-491541",
   "63963": "KBO-PL-172325",
@@ -3400,6 +3801,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "64340": "KBO-PL-449270",
   "64468": "KBO-PL-721587",
   "64504": "KBO-PL-968060",
+  "64560": "KBO-PL-598770",
   "64580": "KBO-PL-768718",
   "64596": "KBO-PL-405250",
   "64768": "KBO-PL-225487",
@@ -3417,14 +3819,18 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "65320": "KBO-PL-102584",
   "65343": "KBO-PL-255764",
   "65411": "KBO-PL-708648",
+  "65464": "KBO-PL-946243",
   "65516": "KBO-PL-949902",
   "65522": "KBO-PL-256993",
   "65586": "KBO-PL-105932",
+  "65610": "KBO-PL-136662",
   "65616": "KBO-PL-330720",
   "65653": "KBO-PL-756230",
+  "65665": "KBO-PL-115499",
   "65703": "KBO-PL-145123",
   "65707": "KBO-PL-944959",
   "65764": "KBO-PL-520076",
+  "65769": "KBO-PL-523422",
   "65933": "KBO-PL-434763",
   "65949": "KBO-PL-898925",
   "66047": "KBO-PL-541047",
@@ -3435,6 +3841,8 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "66409": "KBO-PL-550120",
   "66451": "KBO-PL-936389",
   "66606": "KBO-PL-166427",
+  "66609": "KBO-PL-662711",
+  "66614": "KBO-PL-903115",
   "66657": "KBO-PL-620631",
   "66704": "KBO-PL-220690",
   "66706": "KBO-PL-568356",
@@ -3454,6 +3862,8 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "67449": "KBO-PL-818350",
   "67539": "KBO-PL-532959",
   "67588": "KBO-PL-323242",
+  "67609": "KBO-PL-167621",
+  "67610": "KBO-PL-179077",
   "67644": "KBO-PL-786606",
   "67703": "KBO-PL-348664",
   "67807": "KBO-PL-919900",
@@ -3478,11 +3888,14 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "68419": "KBO-PL-626651",
   "68463": "KBO-PL-540694",
   "68501": "KBO-PL-481580",
+  "68504": "KBO-PL-966204",
   "68507": "KBO-PL-426762",
   "68518": "KBO-PL-613083",
   "68525": "KBO-PL-807209",
   "68556": "KBO-PL-931419",
+  "68619": "KBO-PL-120354",
   "68639": "KBO-PL-709998",
+  "68646": "KBO-PL-277444",
   "68743": "KBO-PL-845047",
   "68856": "KBO-PL-141899",
   "68896": "KBO-PL-525586",
@@ -3490,6 +3903,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "68902": "KBO-PL-554197",
   "68904": "KBO-PL-489044",
   "68912": "KBO-PL-609760",
+  "68928": "KBO-PL-683908",
   "69041": "KBO-PL-980747",
   "69045": "KBO-PL-976222",
   "69047": "KBO-PL-944731",
@@ -3509,8 +3923,11 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "69442": "KBO-PL-396829",
   "69446": "KBO-PL-491252",
   "69508": "KBO-PL-577831",
+  "69516": "KBO-PL-915629",
   "69517": "KBO-PL-866186",
   "69594": "KBO-PL-234823",
+  "69620": "KBO-PL-507223",
+  "69636": "KBO-PL-911899",
   "69727": "KBO-PL-242475",
   "69737": "KBO-PL-307229",
   "69745": "KBO-PL-957269",
@@ -3538,11 +3955,13 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "77564": "KBO-PL-545861",
   "77637": "KBO-PL-928998",
   "77829": "KBO-PL-445665",
+  "78122": "KBO-PL-358736",
   "78168": "KBO-PL-629695",
   "78224": "KBO-PL-633697",
   "78288": "KBO-PL-167366",
   "78513": "KBO-PL-768021",
   "78548": "KBO-PL-914931",
+  "78603": "KBO-PL-535963",
   "79109": "KBO-PL-833790",
   "79140": "KBO-PL-306559",
   "79192": "KBO-PL-104592",
@@ -3583,6 +4002,46 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "2026-HH-8": "KBO-PL-307229",
   "2026-HH-95": "KBO-PL-694130",
   "2026-HH-PJY-2002": "KBO-PL-820603",
+  "2026-HT-0": "KBO-PL-375346",
+  "2026-HT-1": "KBO-PL-167621",
+  "2026-HT-10": "KBO-PL-864739",
+  "2026-HT-11": "KBO-PL-292879",
+  "2026-HT-12": "KBO-PL-760342",
+  "2026-HT-14": "KBO-PL-903115",
+  "2026-HT-15": "KBO-PL-153896",
+  "2026-HT-19": "KBO-PL-120354",
+  "2026-HT-2": "KBO-PL-702561",
+  "2026-HT-21": "KBO-PL-683669",
+  "2026-HT-22": "KBO-PL-635424",
+  "2026-HT-23": "KBO-PL-946243",
+  "2026-HT-25": "KBO-PL-277444",
+  "2026-HT-26": "KBO-PL-938703",
+  "2026-HT-27": "KBO-PL-756230",
+  "2026-HT-29": "KBO-PL-242475",
+  "2026-HT-3": "KBO-PL-535963",
+  "2026-HT-33": "KBO-PL-557788",
+  "2026-HT-34": "KBO-PL-136662",
+  "2026-HT-36": "KBO-PL-966204",
+  "2026-HT-37": "KBO-PL-925250",
+  "2026-HT-39": "KBO-PL-590732",
+  "2026-HT-41": "KBO-PL-251312",
+  "2026-HT-42": "KBO-PL-358736",
+  "2026-HT-44": "KBO-PL-915777",
+  "2026-HT-47": "KBO-PL-809134",
+  "2026-HT-48": "KBO-PL-411799",
+  "2026-HT-49": "KBO-PL-523422",
+  "2026-HT-5": "KBO-PL-880166",
+  "2026-HT-50": "KBO-PL-216193",
+  "2026-HT-51": "KBO-PL-662711",
+  "2026-HT-54": "KBO-PL-928998",
+  "2026-HT-55": "KBO-PL-591485",
+  "2026-HT-56": "KBO-PL-911899",
+  "2026-HT-58": "KBO-PL-672719",
+  "2026-HT-62": "KBO-PL-878706",
+  "2026-HT-65": "KBO-PL-120263",
+  "2026-HT-66": "KBO-PL-612394",
+  "2026-HT-67": "KBO-PL-699797",
+  "2026-HT-8": "KBO-PL-598770",
   "2026-KT-1": "KBO-PL-496534",
   "2026-KT-10": "KBO-PL-428249",
   "2026-KT-11": "KBO-PL-820976",
@@ -3784,10 +4243,12 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "2026-SSG-60": "KBO-PL-703910",
   "2026-SSG-92": "KBO-PL-772789",
   "2026-SSG-97": "KBO-PL-225016",
+  "D2027-003": "KBO-PL-593916",
   "D2027-004": "KBO-PL-806270",
   "D2027-007": "KBO-PL-129324",
   "D2027-009": "KBO-PL-816805",
   "D2027-010": "KBO-PL-338549",
+  "D2027-013": "KBO-PL-982367",
   "D2027-015": "KBO-PL-198483",
   "D2027-020": "KBO-PL-470837",
   "D2027-024": "KBO-PL-383837",
@@ -3798,6 +4259,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "FA2027-KT-한승혁": "KBO-PL-160064",
   "FA2027-SS-구자욱": "KBO-PL-569353",
   "KBO-OVR-0004": "KBO-PL-558882",
+  "KIA-육성-2-김민주": "KBO-PL-130816",
   "KT-육성-4-이용현": "KBO-PL-200420",
   "sangmu-real-KT-13": "KBO-PL-877044",
   "sangmu-real-NC-7": "KBO-PL-243362",
@@ -3835,6 +4297,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "v15-0083": "KBO-PL-648167",
   "v15-0090": "KBO-PL-373739",
   "v15-0109": "KBO-PL-104592",
+  "v15-0112": "KBO-PL-569312",
   "v15-0118": "KBO-PL-658691",
   "v15-0128": "KBO-PL-934445",
   "v15-0129": "KBO-PL-445665",
@@ -3956,7 +4419,29 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "v15-0425": "KBO-PL-106713",
   "v15-0432": "KBO-PL-628819",
   "v15-0433": "KBO-PL-577831",
+  "v15-0440": "KBO-PL-584309",
+  "v15-0441": "KBO-PL-507223",
+  "v15-0442": "KBO-PL-720124",
+  "v15-0443": "KBO-PL-957269",
+  "v15-0446": "KBO-PL-683908",
+  "v15-0447": "KBO-PL-896391",
+  "v15-0449": "KBO-PL-915629",
+  "v15-0450": "KBO-PL-155090",
+  "v15-0451": "KBO-PL-325486",
+  "v15-0455": "KBO-PL-647123",
+  "v15-0456": "KBO-PL-343754",
+  "v15-0461": "KBO-PL-115499",
   "v15-0463": "KBO-PL-182997",
+  "v15-0464": "KBO-PL-503584",
+  "v15-0465": "KBO-PL-516096",
+  "v15-0467": "KBO-PL-225462",
+  "v15-0472": "KBO-PL-215077",
+  "v15-0481": "KBO-PL-450573",
+  "v15-0486": "KBO-PL-677435",
+  "v15-0491": "KBO-PL-689777",
+  "v15-0493": "KBO-PL-179077",
+  "v15-0499": "KBO-PL-251911",
+  "v15-0501": "KBO-PL-474142",
   "v15-0517": "KBO-PL-641003",
   "v15-0542": "KBO-PL-721587",
   "v15-0619": "KBO-PL-449270",
