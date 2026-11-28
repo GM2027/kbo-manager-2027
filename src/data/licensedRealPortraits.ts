@@ -1242,6 +1242,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/SS/류지혁.png",
     "teamFolder": "SS"
   },
+  "KBO-PL-338135": {
+    "url": "/portraits/kbo/HH/한지윤.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/HH/한지윤.png",
+    "teamFolder": "HH"
+  },
   "KBO-PL-338549": {
     "url": "/portraits/kbo/LG/윤예성.png",
     "credit": "사용자 등록 공식 프로필",
@@ -2193,6 +2200,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "verified-custom",
     "sourceUrl": "local://portraits/kbo/LT/나균안.png",
     "teamFolder": "LT"
+  },
+  "KBO-PL-533127": {
+    "url": "/portraits/kbo/HH/박정현.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/HH/박정현.png",
+    "teamFolder": "HH"
   },
   "KBO-PL-534182": {
     "url": "/portraits/kbo/NC/최정원.png",
@@ -4296,6 +4310,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "50662": "KBO-PL-878706",
   "50705": "KBO-PL-851974",
   "50707": "KBO-PL-120796",
+  "50709": "KBO-PL-533127",
   "50710": "KBO-PL-596053",
   "50812": "KBO-PL-881924",
   "50854": "KBO-PL-732157",
@@ -4485,6 +4500,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "55663": "KBO-PL-503584",
   "55743": "KBO-PL-137717",
   "55764": "KBO-PL-802990",
+  "55767": "KBO-PL-338135",
   "55832": "KBO-PL-136544",
   "55855": "KBO-PL-362888",
   "55860": "KBO-PL-703910",
@@ -4831,6 +4847,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "2026-HH-57": "KBO-PL-964267",
   "2026-HH-59": "KBO-PL-404638",
   "2026-HH-61": "KBO-PL-137717",
+  "2026-HH-63": "KBO-PL-533127",
   "2026-HH-65": "KBO-PL-492769",
   "2026-HH-66": "KBO-PL-944959",
   "2026-HH-69": "KBO-PL-265990",
@@ -5211,6 +5228,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "v15-0090": "KBO-PL-373739",
   "v15-0109": "KBO-PL-104592",
   "v15-0112": "KBO-PL-569312",
+  "v15-0113": "KBO-PL-338135",
   "v15-0118": "KBO-PL-658691",
   "v15-0128": "KBO-PL-934445",
   "v15-0129": "KBO-PL-445665",
