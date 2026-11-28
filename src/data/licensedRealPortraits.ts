@@ -3237,6 +3237,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/KIA/김호령.png",
     "teamFolder": "KIA"
   },
+  "KBO-PL-757217": {
+    "url": "/portraits/kbo/HH/오재원.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/HH/오재원.png",
+    "teamFolder": "HH"
+  },
   "KBO-PL-760342": {
     "url": "/portraits/kbo/KIA/정현창.png",
     "credit": "사용자 등록 공식 프로필",
@@ -4524,6 +4531,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "56712": "KBO-PL-888290",
   "56719": "KBO-PL-812457",
   "56724": "KBO-PL-189157",
+  "56754": "KBO-PL-757217",
   "56769": "KBO-PL-265990",
   "56797": "KBO-PL-373739",
   "56823": "KBO-PL-954611",
@@ -4818,6 +4826,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "2026-HH-5": "KBO-PL-145123",
   "2026-HH-50": "KBO-PL-134486",
   "2026-HH-51": "KBO-PL-969429",
+  "2026-HH-54": "KBO-PL-757217",
   "2026-HH-55": "KBO-PL-851974",
   "2026-HH-57": "KBO-PL-964267",
   "2026-HH-59": "KBO-PL-404638",
