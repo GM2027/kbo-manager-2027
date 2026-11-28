@@ -273,3 +273,22 @@ export function resolveLicensedRealPlayerPhoto(player: Player): LicensedRealPort
   }
   return null;
 }
+
+/**
+ * 영구 ID(permanentId)만으로 등록된 실존/해외파 프로필 사진 조회 (해외파 현황 · 통합 검색 공용)
+ */
+export function resolveLicensedPortraitByPermanentId(
+  permanentId?: string | null
+): LicensedRealPortraitEntry | null {
+  if (!permanentId || !permanentId.trim()) return null;
+  const key = permanentId.trim();
+  const mappedPid = KBO_OFFICIAL_ID_TO_PORTRAIT_PID[key];
+  const entry =
+    LICENSED_REAL_PLAYER_PORTRAITS[key] ??
+    (mappedPid ? LICENSED_REAL_PLAYER_PORTRAITS[mappedPid] : undefined);
+  if (!entry) return null;
+  return {
+    ...entry,
+    url: resolvePublicAssetUrl(entry.url),
+  };
+}

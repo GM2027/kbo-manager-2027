@@ -16,6 +16,7 @@ import {
   UserCheck,
 } from 'lucide-react';
 import { KBO_TEAMS } from '../data/kboTeams';
+import { resolveLicensedPortraitByPermanentId } from '../data/playerPortraitRegistry';
 import {
   applyOverseasPlayerForDraft,
   evaluateOverseasReturnEligibility,
@@ -822,34 +823,51 @@ export const AmateurAndOverseasView: React.FC<AmateurAndOverseasViewProps> = ({
                         }`}
                       >
                         <td className="py-2 px-3">
-                          <div className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5 flex-wrap">
-                            <span>{ov.name}</span>
-                            <span className="font-mono-stats text-[11px] font-semibold text-slate-500">
-                              {ov.position}
-                            </span>
-                            {ov.militaryStatus && (
-                              <span
-                                className={`px-1 py-0.5 rounded text-[9px] font-bold ${
-                                  ov.militaryStatus === '면제'
-                                    ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
-                                    : ov.militaryStatus === '군필'
-                                    ? 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
-                                    : ov.militaryStatus === '복무중'
-                                    ? 'bg-blue-500/15 text-blue-700 dark:text-blue-300'
-                                    : 'bg-amber-500/15 text-amber-700 dark:text-amber-300'
-                                }`}
-                              >
-                                {ov.militaryStatus}
-                              </span>
-                            )}
-                            {(ov.injuryDaysRemaining ?? 0) > 0 && (
-                              <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400">
-                                IL({ov.injuryDaysRemaining}일)
-                              </span>
-                            )}
-                          </div>
-                          <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono-stats">
-                            {ov.permanentId} · 만 {ov.status === '은퇴' ? ov.age : resolveAgeAtDate(ov, getCareerCurrentIsoDate(career))}세 · {ov.originCategory}
+                          <div className="flex items-center gap-2">
+                            {(() => {
+                              const ovPhoto = resolveLicensedPortraitByPermanentId(ov.permanentId);
+                              if (!ovPhoto) return null;
+                              return (
+                                <img
+                                  src={ovPhoto.url}
+                                  alt={`${ov.name} 프로필`}
+                                  loading="lazy"
+                                  decoding="async"
+                                  className="w-7 h-8 shrink-0 object-contain object-bottom bg-transparent select-none"
+                                />
+                              );
+                            })()}
+                            <div className="min-w-0">
+                              <div className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5 flex-wrap">
+                                <span>{ov.name}</span>
+                                <span className="font-mono-stats text-[11px] font-semibold text-slate-500">
+                                  {ov.position}
+                                </span>
+                                {ov.militaryStatus && (
+                                  <span
+                                    className={`px-1 py-0.5 rounded text-[9px] font-bold ${
+                                      ov.militaryStatus === '면제'
+                                        ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                                        : ov.militaryStatus === '군필'
+                                        ? 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+                                        : ov.militaryStatus === '복무중'
+                                        ? 'bg-blue-500/15 text-blue-700 dark:text-blue-300'
+                                        : 'bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                                    }`}
+                                  >
+                                    {ov.militaryStatus}
+                                  </span>
+                                )}
+                                {(ov.injuryDaysRemaining ?? 0) > 0 && (
+                                  <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400">
+                                    IL({ov.injuryDaysRemaining}일)
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono-stats">
+                                {ov.permanentId} · 만 {ov.status === '은퇴' ? ov.age : resolveAgeAtDate(ov, getCareerCurrentIsoDate(career))}세 · {ov.originCategory}
+                              </div>
+                            </div>
                           </div>
                         </td>
                         <td className="py-2 px-2">
@@ -896,7 +914,21 @@ export const AmateurAndOverseasView: React.FC<AmateurAndOverseasViewProps> = ({
             ) : (
               <>
                 <div className="flex items-start justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800">
-                  <div>
+                  <div className="flex items-start gap-3 min-w-0">
+                    {(() => {
+                      const ovPhoto = resolveLicensedPortraitByPermanentId(selectedOverseas.permanentId);
+                      if (!ovPhoto) return null;
+                      return (
+                        <div className="w-[74px] h-[92px] shrink-0 rounded-lg border border-slate-200/70 dark:border-slate-700/60 bg-transparent overflow-hidden select-none">
+                          <img
+                            src={ovPhoto.url}
+                            alt={`${selectedOverseas.name} 선수 프로필`}
+                            className="w-full h-full object-contain object-bottom"
+                          />
+                        </div>
+                      );
+                    })()}
+                    <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <MlbTeamLogo teamName={selectedOverseas.clubName} size="sm" />
                       <div>
@@ -965,6 +997,7 @@ export const AmateurAndOverseasView: React.FC<AmateurAndOverseasViewProps> = ({
                         {selectedOverseas.militaryNote ? ` · ${selectedOverseas.militaryNote}` : ''}
                       </div>
                     </div>
+                  </div>
                   </div>
                 </div>
 

@@ -10,6 +10,41 @@ export interface BundledRealPortraitEntry {
 }
 
 export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEntry> = {
+  "KBO-OVR-0001": {
+    "url": "/portraits/kbo/OVERSEAS/이정후.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/OVERSEAS/이정후.png",
+    "teamFolder": "OVERSEAS"
+  },
+  "KBO-OVR-0002": {
+    "url": "/portraits/kbo/OVERSEAS/김하성.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/OVERSEAS/김하성.png",
+    "teamFolder": "OVERSEAS"
+  },
+  "KBO-OVR-0003": {
+    "url": "/portraits/kbo/OVERSEAS/김혜성.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/OVERSEAS/김혜성.png",
+    "teamFolder": "OVERSEAS"
+  },
+  "KBO-OVR-0005": {
+    "url": "/portraits/kbo/OVERSEAS/배지환.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/OVERSEAS/배지환.png",
+    "teamFolder": "OVERSEAS"
+  },
+  "KBO-OVR-0009": {
+    "url": "/portraits/kbo/OVERSEAS/송성문.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/OVERSEAS/송성문.png",
+    "teamFolder": "OVERSEAS"
+  },
   "KBO-PL-100850": {
     "url": "/portraits/kbo/LG/이민호.png",
     "credit": "사용자 등록 공식 프로필",

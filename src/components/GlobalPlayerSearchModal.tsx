@@ -10,6 +10,7 @@ import { formatCompactPlayerPosition } from '../engine/positionEngine';
 import { CareerSave, PlayerRole, Position, TeamId } from '../types/kbo';
 import { CountryFlag } from './CountryFlag';
 import { PlayerPortrait } from './PlayerPortrait';
+import { resolveLicensedPortraitByPermanentId } from '../data/playerPortraitRegistry';
 import { FuturesTeamLogo, TeamLogo } from './TeamLogo';
 
 interface GlobalPlayerSearchModalProps {
@@ -275,7 +276,7 @@ export const GlobalPlayerSearchModal: React.FC<GlobalPlayerSearchModalProps> = (
                     >
                       <td className="py-2 px-3">
                         <div className="flex items-center gap-2">
-                          {entry.kboPlayerId && career.players[entry.kboPlayerId] && (
+                          {entry.kboPlayerId && career.players[entry.kboPlayerId] ? (
                             <PlayerPortrait
                               player={career.players[entry.kboPlayerId]}
                               season={career.season}
@@ -283,7 +284,19 @@ export const GlobalPlayerSearchModal: React.FC<GlobalPlayerSearchModalProps> = (
                               showTeamBadge={false}
                               showSourceTag={false}
                             />
-                          )}
+                          ) : (() => {
+                            const ovPhoto = resolveLicensedPortraitByPermanentId(entry.permanentId);
+                            if (!ovPhoto) return null;
+                            return (
+                              <img
+                                src={ovPhoto.url}
+                                alt={`${entry.name} 프로필`}
+                                loading="lazy"
+                                decoding="async"
+                                className="w-7 h-8 shrink-0 object-contain object-bottom bg-transparent select-none"
+                              />
+                            );
+                          })()}
                           <div className="min-w-0">
                             <div className="flex items-center gap-1.5 flex-wrap">
                               <CountryFlag
