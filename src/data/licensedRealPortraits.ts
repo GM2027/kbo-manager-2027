@@ -620,10 +620,10 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "teamFolder": "SSG"
   },
   "KBO-PL-401128": {
-    "url": "/portraits/kbo/SSG/하재훈_KBO-PL-401128.jpg",
-    "credit": "https://www.flickr.com/people/mindahaas/",
-    "license": "CC BY 2.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ha_Jae-Hoon_in_Iowa_Cubs.jpg",
+    "url": "/portraits/kbo/SSG/하재훈.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/SSG/하재훈.png",
     "teamFolder": "SSG"
   },
   "KBO-PL-404114": {
@@ -2119,6 +2119,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "v15-0179": "KBO-PL-630577",
   "v15-0181": "KBO-PL-183934",
   "v15-0183": "KBO-PL-323992",
+  "v15-0193": "KBO-PL-401128",
   "v15-0463": "KBO-PL-182997",
   "v15-0517": "KBO-PL-641003"
 };
