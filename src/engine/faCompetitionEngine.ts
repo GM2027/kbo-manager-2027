@@ -656,28 +656,125 @@ export function evaluateFaGradeAndComp(
   };
 }
 
+interface ClubMarketProfileResult {
+  contentionScore: number;
+  budgetCapacityBillion: number;
+  maxAnnualBillion: number;
+  aggressiveness: number;
+  payrollBillion: number;
+  capHeadroomBillion: number;
+  consecutiveExceedYears: number;
+}
+
+interface FaMarketPassContext {
+  activeRosterByTeam: Map<TeamId, Player[]>;
+  clubProfileByTeam: Map<TeamId, ClubMarketProfileResult>;
+  compByPlayerId: Map<string, RealisticFaValuation>;
+}
+
+function buildFaMarketPassContext(
+  career: CareerSave,
+  rankByTeam: Map<TeamId, number>
+): FaMarketPassContext {
+  const activeRosterByTeam = new Map<TeamId, Player[]>();
+  const payrollSalariesByTeam = new Map<TeamId, number[]>();
+  for (const tid of TEAM_IDS) {
+    activeRosterByTeam.set(tid, []);
+    payrollSalariesByTeam.set(tid, []);
+  }
+
+  for (const p of Object.values(career.players)) {
+    if (
+      p.rosterTier === '은퇴' ||
+      p.rosterTier === '해외이적' ||
+      p.rosterTier === 'FA' ||
+      isMilitaryServing(p.militaryStatus)
+    ) {
+      continue;
+    }
+    const teamSalaries = payrollSalariesByTeam.get(p.teamId);
+    if (teamSalaries) {
+      const sal =
+        p.contract.currency === 'USD'
+          ? ((p.contract.annualSalary + (p.contract.signingBonus ?? 0)) * 1350) / 100_000_000
+          : (p.contract.annualSalary || 0) +
+            ((p.contract.years ?? 1) > 1
+              ? (p.contract.signingBonus ?? 0) / Math.max(1, p.contract.years)
+              : p.contract.signingBonus ?? 0);
+      teamSalaries.push(sal);
+    }
+    if (p.rosterTier === '1군' || p.rosterTier === '2군') {
+      activeRosterByTeam.get(p.teamId)?.push(p);
+    }
+  }
+
+  const clubProfileByTeam = new Map<TeamId, ClubMarketProfileResult>();
+  for (const tid of TEAM_IDS) {
+    clubProfileByTeam.set(
+      tid,
+      getClubMarketProfile(career, tid, rankByTeam, payrollSalariesByTeam.get(tid))
+    );
+  }
+
+  return {
+    activeRosterByTeam,
+    clubProfileByTeam,
+    compByPlayerId: new Map<string, RealisticFaValuation>(),
+  };
+}
+
+function getCachedFaValuation(
+  career: CareerSave,
+  p: Player,
+  ctx?: FaMarketPassContext
+): RealisticFaValuation {
+  if (!ctx) return evaluateFaGradeAndComp(career, p);
+  let v = ctx.compByPlayerId.get(p.id);
+  if (!v) {
+    v = evaluateFaGradeAndComp(career, p);
+    ctx.compByPlayerId.set(p.id, v);
+  }
+  return v;
+}
+
 /**
  * 구단별 포지션 전력 보강 필요도 (0..100) 및 예상 출전 기회 점수 산출
  */
-function computeClubPositionalNeed(career: CareerSave, teamId: TeamId, target: Player): number {
-  const roster = Object.values(career.players).filter(
-    (p) =>
-      p.teamId === teamId &&
-      p.id !== target.id &&
-      (p.rosterTier === '1군' || p.rosterTier === '2군') &&
-      !isMilitaryServing(p.militaryStatus)
-  );
+function computeClubPositionalNeed(
+  career: CareerSave,
+  teamId: TeamId,
+  target: Player,
+  ctx?: FaMarketPassContext
+): number {
+  const baseRoster = ctx
+    ? (ctx.activeRosterByTeam.get(teamId) ?? [])
+    : Object.values(career.players).filter(
+        (p) =>
+          p.teamId === teamId &&
+          (p.rosterTier === '1군' || p.rosterTier === '2군') &&
+          !isMilitaryServing(p.militaryStatus)
+      );
 
   if (target.role === '투수') {
-    const sameRole = roster
-      .filter((p) => p.role === '투수' && (target.pitchRole === '선발' ? p.pitchRole === '선발' : p.pitchRole !== '선발'))
+    const sameRole = baseRoster
+      .filter(
+        (p) =>
+          p.id !== target.id &&
+          p.role === '투수' &&
+          (target.pitchRole === '선발' ? p.pitchRole === '선발' : p.pitchRole !== '선발')
+      )
       .sort((a, b) => b.ability - a.ability);
     const benchmark = target.pitchRole === '선발' ? sameRole[3]?.ability ?? 68 : sameRole[4]?.ability ?? 68;
     return clamp(55 + (target.ability - benchmark) * 3.8, 15, 98);
   }
 
-  const samePos = roster
-    .filter((p) => p.role === '타자' && (p.position === target.position || (target.position === 'DH' && p.position === '1B')))
+  const samePos = baseRoster
+    .filter(
+      (p) =>
+        p.id !== target.id &&
+        p.role === '타자' &&
+        (p.position === target.position || (target.position === 'DH' && p.position === '1B'))
+    )
     .sort((a, b) => b.ability - a.ability);
   const incumbent = samePos[0]?.ability ?? 66;
   return clamp(56 + (target.ability - incumbent) * 4.2, 15, 98);
@@ -690,38 +787,32 @@ function computeClubPositionalNeed(career: CareerSave, teamId: TeamId, target: P
 function getClubMarketProfile(
   career: CareerSave,
   teamId: TeamId,
-  rankByTeam: Map<TeamId, number>
-): {
-  contentionScore: number;
-  budgetCapacityBillion: number;
-  maxAnnualBillion: number;
-  aggressiveness: number;
-  payrollBillion: number;
-  capHeadroomBillion: number;
-  consecutiveExceedYears: number;
-} {
+  rankByTeam: Map<TeamId, number>,
+  precomputedTeamSalaries?: number[]
+): ClubMarketProfileResult {
   const rank = rankByTeam.get(teamId) ?? 5;
   const teamMeta = KBO_TEAMS[teamId];
   // KBO 경쟁균형세 기준 상위 40인 보수 총액(억 원) 산출
-  const top40Salaries = Object.values(career.players)
-    .filter(
-      (p) =>
-        p.teamId === teamId &&
-        p.rosterTier !== '은퇴' &&
-        p.rosterTier !== '해외이적' &&
-        p.rosterTier !== 'FA' &&
-        !isMilitaryServing(p.militaryStatus)
-    )
-    .map((p) =>
-      p.contract.currency === 'USD'
-        ? ((p.contract.annualSalary + (p.contract.signingBonus ?? 0)) * 1350) / 100_000_000
-        : (p.contract.annualSalary || 0) +
-          ((p.contract.years ?? 1) > 1
-            ? (p.contract.signingBonus ?? 0) / Math.max(1, p.contract.years)
-            : p.contract.signingBonus ?? 0)
-    )
-    .sort((a, b) => b - a)
-    .slice(0, 40);
+  const salaries = precomputedTeamSalaries
+    ? [...precomputedTeamSalaries]
+    : Object.values(career.players)
+        .filter(
+          (p) =>
+            p.teamId === teamId &&
+            p.rosterTier !== '은퇴' &&
+            p.rosterTier !== '해외이적' &&
+            p.rosterTier !== 'FA' &&
+            !isMilitaryServing(p.militaryStatus)
+        )
+        .map((p) =>
+          p.contract.currency === 'USD'
+            ? ((p.contract.annualSalary + (p.contract.signingBonus ?? 0)) * 1350) / 100_000_000
+            : (p.contract.annualSalary || 0) +
+              ((p.contract.years ?? 1) > 1
+                ? (p.contract.signingBonus ?? 0) / Math.max(1, p.contract.years)
+                : p.contract.signingBonus ?? 0)
+        );
+  const top40Salaries = salaries.sort((a, b) => b - a).slice(0, 40);
   const payrollBillion = top40Salaries.reduce((s, v) => s + v, 0);
 
   const softCap = getAnnualKboCapBillion(career.season);
@@ -788,12 +879,18 @@ export function scoreBidForPlayer(
   career: CareerSave,
   p: Player,
   bid: Omit<FaClubBid, 'score' | 'note'>,
-  rankByTeam: Map<TeamId, number>
+  rankByTeam: Map<TeamId, number>,
+  precomputed?: {
+    comp?: RealisticFaValuation;
+    need?: number;
+    clubProfile?: ClubMarketProfileResult;
+  }
 ): { score: number; note: string } {
   const { fairTotalBillion, fairYears, isMegaFranchise, franchiseScore } =
-    evaluateFaGradeAndComp(career, p);
-  const need = computeClubPositionalNeed(career, bid.teamId, p);
-  const clubProfile = getClubMarketProfile(career, bid.teamId, rankByTeam);
+    precomputed?.comp ?? evaluateFaGradeAndComp(career, p);
+  const need = precomputed?.need ?? computeClubPositionalNeed(career, bid.teamId, p);
+  const clubProfile =
+    precomputed?.clubProfile ?? getClubMarketProfile(career, bid.teamId, rankByTeam);
 
   const moneyRatio = bid.totalBillion / Math.max(1, fairTotalBillion);
   const aavRatio = bid.annualBillion / Math.max(0.5, fairTotalBillion / Math.max(1, fairYears));
@@ -1123,10 +1220,11 @@ export function syncFaCompetitionMarketInPlace(
 
   const faPlayers = getAllMarketFaPlayers(career);
   const rng = new SeededRng((faCycleSeason * 9973 + state.round * 131 + 77) >>> 0);
+  const passCtx = buildFaMarketPassContext(career, rankByTeam);
 
   for (const p of faPlayers) {
     const formerTeamId = p.formerTeamId ?? p.teamId;
-    const comp = evaluateFaGradeAndComp(career, p);
+    const comp = getCachedFaValuation(career, p, passCtx);
     const overseasEligible = isOverseasFaEligible(p);
 
     let neg = state.negotiations[p.id];
@@ -1153,7 +1251,7 @@ export function syncFaCompetitionMarketInPlace(
     }
 
     // 전체 10개 구단(AI 9개 구단 상시 + 사용자 구단 자동입찰 ON 시)이 모든 FA 선수를 평가하고 예산·필요도·능력치 기반 자동 입찰
-    evaluateAiClubBidsForPlayerInPlace(career, state, neg, p, rankByTeam, dateStr, rng);
+    evaluateAiClubBidsForPlayerInPlace(career, state, neg, p, rankByTeam, dateStr, rng, passCtx);
 
     // 해외 FA 자격 선수(사용자·AI 구단 동일 적용): 최상위권 위주 MLB 직접 제안 평가
     if (
@@ -1172,7 +1270,7 @@ export function syncFaCompetitionMarketInPlace(
   }
 
   // 2차 보정 패스: 입찰 참여가 0건인 구단이나 미입찰 FA가 남지 않도록 전 구단 현실적 수요 기반 자동 입찰 보강
-  ensureBroadClubFaParticipationInPlace(career, state, faPlayers, rankByTeam, dateStr, rng);
+  ensureBroadClubFaParticipationInPlace(career, state, faPlayers, rankByTeam, dateStr, rng, passCtx);
 
   return state;
 }
@@ -1281,7 +1379,8 @@ function buildClubAutoBidOffer(
     career,
     p,
     { teamId: tid, years: offerYears, totalBillion: offerTotal, annualBillion, isOriginalClub, submittedDate: dateStr },
-    rankByTeam
+    rankByTeam,
+    { comp, need, clubProfile }
   );
   return {
     teamId: tid,
@@ -1303,9 +1402,10 @@ function evaluateAiClubBidsForPlayerInPlace(
   p: Player,
   rankByTeam: Map<TeamId, number>,
   dateStr: string,
-  rng: SeededRng
+  rng: SeededRng,
+  ctx?: FaMarketPassContext
 ): void {
-  const comp = evaluateFaGradeAndComp(career, p);
+  const comp = getCachedFaValuation(career, p, ctx);
   const isMega = comp.isMegaFranchise;
   const existingTopTotal = neg.bids.reduce((m, b) => Math.max(m, b.totalBillion), 0);
   const userAutoEnabled = state.autoBidForUserClub !== false;
@@ -1321,8 +1421,9 @@ function evaluateAiClubBidsForPlayerInPlace(
     // KBO 외부 FA 영입 상한 준수 (원소속 재계약은 예외)
     if (!isOriginalClub && extCount >= MAX_EXTERNAL_FA_PER_CLUB) continue;
 
-    const need = computeClubPositionalNeed(career, tid, p);
-    const clubProfile = getClubMarketProfile(career, tid, rankByTeam);
+    const need = computeClubPositionalNeed(career, tid, p, ctx);
+    const clubProfile =
+      ctx?.clubProfileByTeam.get(tid) ?? getClubMarketProfile(career, tid, rankByTeam);
 
     // 구단별 관심도 계산: 능력치 + 포지션 필요도 + 원소속 우선권 + 재정·샐러리캡 여력
     const fairAav = comp.fairTotalBillion / Math.max(1, comp.fairYears);
@@ -1439,7 +1540,8 @@ function evaluateAiClubBidsForPlayerInPlace(
           career,
           p,
           { teamId: tid, years, totalBillion: raisedTotal, annualBillion, isOriginalClub, submittedDate: dateStr },
-          rankByTeam
+          rankByTeam,
+          { comp, need, clubProfile }
         );
         neg.bids[prevBidIdx] = {
           teamId: tid,
@@ -1487,7 +1589,8 @@ function ensureBroadClubFaParticipationInPlace(
   faPlayers: Player[],
   rankByTeam: Map<TeamId, number>,
   dateStr: string,
-  rng: SeededRng
+  rng: SeededRng,
+  ctx?: FaMarketPassContext
 ): void {
   const faCycleSeason = getFaMarketCycleSeason(career);
   const openPlayers = faPlayers.filter((p) => {
@@ -1510,7 +1613,8 @@ function ensureBroadClubFaParticipationInPlace(
     const targetMinBids = isUserClub ? 2 : 3;
     if (currentBids >= targetMinBids) continue;
 
-    const clubProfile = getClubMarketProfile(career, tid, rankByTeam);
+    const clubProfile =
+      ctx?.clubProfileByTeam.get(tid) ?? getClubMarketProfile(career, tid, rankByTeam);
     const rankedCandidates = openPlayers
       .filter((p) => {
         const neg = state.negotiations[p.id];
@@ -1523,8 +1627,8 @@ function ensureBroadClubFaParticipationInPlace(
       .map((p) => {
         const neg = state.negotiations[p.id];
         const isOrig = neg.formerTeamId === tid;
-        const need = computeClubPositionalNeed(career, tid, p);
-        const comp = evaluateFaGradeAndComp(career, p);
+        const need = computeClubPositionalNeed(career, tid, p, ctx);
+        const comp = getCachedFaValuation(career, p, ctx);
         const fitScore =
           need * 0.55 +
           p.ability * 0.45 +
@@ -1565,7 +1669,7 @@ function ensureBroadClubFaParticipationInPlace(
     const neg = state.negotiations[p.id];
     if (!neg || neg.bids.length > 0) continue;
 
-    const comp = evaluateFaGradeAndComp(career, p);
+    const comp = getCachedFaValuation(career, p, ctx);
     const suitors = TEAM_IDS.filter((tid) => {
       const isUserClub = tid === career.playerTeamId;
       if (isUserClub && !userAutoEnabled) return false;
@@ -1577,8 +1681,9 @@ function ensureBroadClubFaParticipationInPlace(
     })
       .map((tid) => {
         const isOrig = tid === neg.formerTeamId;
-        const need = computeClubPositionalNeed(career, tid, p);
-        const clubProfile = getClubMarketProfile(career, tid, rankByTeam);
+        const need = computeClubPositionalNeed(career, tid, p, ctx);
+        const clubProfile =
+          ctx?.clubProfileByTeam.get(tid) ?? getClubMarketProfile(career, tid, rankByTeam);
         const score = need + (isOrig ? 24 : 0) + (clubProfile.capHeadroomBillion > 0 ? 8 : -4);
         return { tid, isOrig, need, clubProfile, score };
       })
@@ -2018,15 +2123,16 @@ export function submitUserClubFaBid(
  * - AI 승리 건은 즉시 계약 확정 + 타 입찰 마감 + 뉴스 + 영입 현황 기록
  * - 사용자 구단이 1순위인 건은 절대 자동 체결하지 않고 '단장승인대기' 상태로 보고
  */
-export function advanceFaCompetitionRound(career: CareerSave): {
-  nextCareer: CareerSave;
-  backupSnapshot: CareerSave;
+/**
+ * 10개 구단 FA 경쟁 1라운드 인플레이스 진행 (시뮬레이터 등 이미 클론된 상태 전용 · 중복 딥클론 제거)
+ */
+export function advanceFaCompetitionRoundInPlace(
+  next: CareerSave,
+  dateStr = getCurrentCareerDate(next).isoDate
+): {
   signedSummaries: string[];
   pendingUserApprovals: string[];
 } {
-  const backupSnapshot = cloneCareer(career);
-  const next = cloneCareer(career);
-  const dateStr = getCurrentCareerDate(next).isoDate;
   const state = syncFaCompetitionMarketInPlace(next, dateStr);
   state.round += 1;
 
@@ -2034,6 +2140,7 @@ export function advanceFaCompetitionRound(career: CareerSave): {
   const rankByTeam = new Map<TeamId, number>();
   standings.forEach((row, idx) => rankByTeam.set(row.teamId, idx + 1));
   const rng = new SeededRng((next.season * 19997 + state.round * 419) >>> 0);
+  const passCtx = buildFaMarketPassContext(next, rankByTeam);
 
   const signedSummaries: string[] = [];
   const pendingUserApprovals: string[] = [];
@@ -2047,7 +2154,7 @@ export function advanceFaCompetitionRound(career: CareerSave): {
       continue;
     }
 
-    evaluateAiClubBidsForPlayerInPlace(next, state, neg, p, rankByTeam, dateStr, rng);
+    evaluateAiClubBidsForPlayerInPlace(next, state, neg, p, rankByTeam, dateStr, rng, passCtx);
     neg.roundCount += 1;
 
     const topBid = neg.bids[0];
@@ -2057,11 +2164,9 @@ export function advanceFaCompetitionRound(career: CareerSave): {
     if (activeMlbOffer) {
       const kboTopScore = topBid?.score ?? 0;
       if (activeMlbOffer.score > kboTopScore) {
-        // 1라운드에서는 더 좋은 MLB 제안을 검토하며 KBO 구단의 추가 대응 입찰을 1라운드 대기
         if (neg.roundCount < 2) {
           continue;
         }
-        // 경계선 규모 MLB 계약은 메디컬·세부 조건 이견으로 결렬될 수 있음 -> 실패 시 KBO 잔류/국내 FA 협상 지속
         const failChance = activeMlbOffer.guaranteedUsdMillions < 18 ? 0.24 : 0.08;
         if (rng.next() < failChance) {
           neg.mlbStatus = 'MLB협상결렬';
@@ -2088,9 +2193,8 @@ export function advanceFaCompetitionRound(career: CareerSave): {
     }
 
     if (!topBid) continue;
-    const comp = evaluateFaGradeAndComp(next, p);
+    const comp = getCachedFaValuation(next, p, passCtx);
 
-    // 라운드가 진행될수록 선수가 최종 행선지 결정 (초특급/정상급 선수는 후기 라운드에도 비현실적 저가 수락 방지)
     const decideThreshold = comp.isMegaFranchise
       ? neg.roundCount >= 3
         ? comp.fairTotalBillion * 0.92
@@ -2112,12 +2216,10 @@ export function advanceFaCompetitionRound(career: CareerSave): {
     if (topBid.totalBillion < decideThreshold) continue;
 
     if (topBid.teamId === next.playerTeamId) {
-      // 사용자 구단은 단장 최종 승인 없이 자동 체결 금지!
       neg.status = '단장승인대기';
       neg.pendingWinnerTeamId = next.playerTeamId;
       pendingUserApprovals.push(`${p.name} (${topBid.years}년 ${topBid.totalBillion.toFixed(1)}억)`);
     } else {
-      // AI 구단 외부 FA 상한 재확인
       const isOrig = topBid.teamId === neg.formerTeamId;
       const extCnt = state.externalSigningsByTeam[topBid.teamId] ?? 0;
       if (!isOrig && extCnt >= MAX_EXTERNAL_FA_PER_CLUB) {
@@ -2131,7 +2233,6 @@ export function advanceFaCompetitionRound(career: CareerSave): {
     }
   }
 
-  // 타 구단(AI 9개 구단)의 해외 복귀 선수 시장 영입 경쟁도 FA 라운드와 함께 진행
   const ovRes = runAiClubsOverseasReturneeMarketInPlace(next, {
     dateStr,
     maxSignings: 1,
@@ -2141,6 +2242,19 @@ export function advanceFaCompetitionRound(career: CareerSave): {
     signedSummaries.push(...ovRes.signedSummaries);
   }
 
+  return { signedSummaries, pendingUserApprovals };
+}
+
+export function advanceFaCompetitionRound(career: CareerSave): {
+  nextCareer: CareerSave;
+  backupSnapshot: CareerSave;
+  signedSummaries: string[];
+  pendingUserApprovals: string[];
+} {
+  const backupSnapshot = career;
+  const next = cloneCareer(career);
+  const dateStr = getCurrentCareerDate(next).isoDate;
+  const { signedSummaries, pendingUserApprovals } = advanceFaCompetitionRoundInPlace(next, dateStr);
   next.updatedAt = new Date().toISOString();
   return { nextCareer: next, backupSnapshot, signedSummaries, pendingUserApprovals };
 }

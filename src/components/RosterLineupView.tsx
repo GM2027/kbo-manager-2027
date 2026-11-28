@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ArrowDown, ArrowUp, GripVertical, MessageSquare, Plane, ShieldAlert, Sparkles, TrendingUp, UserMinus, Users, X } from 'lucide-react';
 import { KBO_TEAMS } from '../data/kboTeams';
 import { getLiveCareerStats, getNationalityDisplay } from '../data/playerMetadata';
@@ -176,60 +176,90 @@ export const RosterLineupView: React.FC<RosterLineupViewProps> = ({
 
   const teamId = career.playerTeamId;
   const teamState = career.teams[teamId];
-  const currentDateIso = getCurrentCareerDate(career).isoDate;
-  const myPlayers = Object.values(career.players).filter(
-    (p) =>
-      p.teamId === teamId &&
-      p.rosterTier !== 'FA' &&
-      p.rosterTier !== '은퇴' &&
-      p.rosterTier !== '해외이적'
-  );
-  const departedFaPlayers = Object.values(career.players).filter(
-    (p) => p.rosterTier === 'FA' && (p.formerTeamId ?? p.teamId) === teamId
-  );
+  const currentDateIso = useMemo(() => getCurrentCareerDate(career).isoDate, [career]);
+  const { myPlayers, departedFaPlayers } = useMemo(() => {
+    const mine: Player[] = [];
+    const departed: Player[] = [];
+    for (const p of Object.values(career.players)) {
+      if (p.rosterTier === 'FA') {
+        if ((p.formerTeamId ?? p.teamId) === teamId) departed.push(p);
+      } else if (
+        p.teamId === teamId &&
+        p.rosterTier !== '은퇴' &&
+        p.rosterTier !== '해외이적'
+      ) {
+        mine.push(p);
+      }
+    }
+    return { myPlayers: mine, departedFaPlayers: departed };
+  }, [career.players, teamId]);
 
-  const firstTeamCount = myPlayers.filter((p) => p.rosterTier === '1군').length;
-  const futuresCount = myPlayers.filter((p) => p.rosterTier === '2군').length;
-  const devCount = myPlayers.filter((p) => p.rosterTier === '육성').length;
-  const activeCount = myPlayers.filter((p) => p.rosterTier === '1군' && p.gameDayActive).length;
-  const injuredPlayers = myPlayers.filter((p) => Boolean(p.injury));
-  const recommendedMoves = getRecommendedRosterMoves(career);
-  const releaseRecommendations = getRecommendedReleaseCandidates(career, 6);
-  const trainingPendingCount = myPlayers.filter((p) => {
-    if (p.rosterTier === '제외후보') return false;
-    return p.trainingFocus !== computeRecommendedTrainingFocus(p).focus;
-  }).length;
+  const { firstTeamCount, futuresCount, devCount, activeCount, injuredPlayers, trainingPendingCount } =
+    useMemo(() => {
+      let first = 0;
+      let futures = 0;
+      let dev = 0;
+      let active = 0;
+      let pendingTrain = 0;
+      const injured: Player[] = [];
+      for (const p of myPlayers) {
+        if (p.rosterTier === '1군') {
+          first++;
+          if (p.gameDayActive) active++;
+        } else if (p.rosterTier === '2군') {
+          futures++;
+        } else if (p.rosterTier === '육성') {
+          dev++;
+        }
+        if (p.injury) injured.push(p);
+        if (p.rosterTier !== '제외후보' && p.trainingFocus !== computeRecommendedTrainingFocus(p).focus) {
+          pendingTrain++;
+        }
+      }
+      return {
+        firstTeamCount: first,
+        futuresCount: futures,
+        devCount: dev,
+        activeCount: active,
+        injuredPlayers: injured,
+        trainingPendingCount: pendingTrain,
+      };
+    }, [myPlayers]);
 
-  const lineupPlayers = teamState.lineupOrder
-    .map((id) => career.players[id])
-    .filter((p): p is Player => Boolean(p));
+  const recommendedMoves = useMemo(() => getRecommendedRosterMoves(career), [career]);
+  const releaseRecommendations = useMemo(() => getRecommendedReleaseCandidates(career, 6), [career]);
 
-  const benchHitters = myPlayers.filter(
-    (p) =>
-      p.role === '타자' &&
-      p.rosterTier === '1군' &&
-      !teamState.lineupOrder.includes(p.id)
-  );
+  const { lineupPlayers, benchHitters, rotationPitchers, bullpenPitchers } = useMemo(() => {
+    const lineupSet = new Set(teamState.lineupOrder);
+    const rotationSet = new Set(teamState.rotationOrder);
+    const lineup = teamState.lineupOrder
+      .map((id) => career.players[id])
+      .filter((p): p is Player => Boolean(p));
+    const bench = myPlayers.filter(
+      (p) => p.role === '타자' && p.rosterTier === '1군' && !lineupSet.has(p.id)
+    );
+    const rotation = teamState.rotationOrder
+      .map((id) => career.players[id])
+      .filter((p): p is Player => Boolean(p));
+    const rawBp = myPlayers.filter(
+      (p) => p.role === '투수' && p.rosterTier === '1군' && !rotationSet.has(p.id)
+    );
+    const bpOrderIdx = new Map(teamState.bullpenOrder.map((id, i) => [id, i]));
+    const bp = [...rawBp].sort(
+      (a, b) => (bpOrderIdx.get(a.id) ?? 999) - (bpOrderIdx.get(b.id) ?? 999)
+    );
+    return {
+      lineupPlayers: lineup,
+      benchHitters: bench,
+      rotationPitchers: rotation,
+      bullpenPitchers: bp,
+    };
+  }, [career.players, myPlayers, teamState.lineupOrder, teamState.rotationOrder, teamState.bullpenOrder]);
 
-  const rotationPitchers = teamState.rotationOrder
-    .map((id) => career.players[id])
-    .filter((p): p is Player => Boolean(p));
-
-  const rawBullpen = myPlayers.filter(
-    (p) =>
-      p.role === '투수' &&
-      p.rosterTier === '1군' &&
-      !teamState.rotationOrder.includes(p.id)
-  );
-  const bullpenOrderIdx = new Map(teamState.bullpenOrder.map((id, i) => [id, i]));
-  const bullpenPitchers = [...rawBullpen].sort(
-    (a, b) => (bullpenOrderIdx.get(a.id) ?? 999) - (bullpenOrderIdx.get(b.id) ?? 999)
-  );
-
-  const managerPreGameRec = getManagerPreGameRecommendation(career);
-  const optimizedLineupPreview = optimizeBattingLineup(career, teamId);
-  const coachFormRecs = getCoachFormLineupRecommendations(career);
-  const coachDevAdvice = getCoachDevelopmentalRecommendations(career);
+  const managerPreGameRec = useMemo(() => getManagerPreGameRecommendation(career), [career]);
+  const optimizedLineupPreview = useMemo(() => optimizeBattingLineup(career, teamId), [career, teamId]);
+  const coachFormRecs = useMemo(() => getCoachFormLineupRecommendations(career), [career]);
+  const coachDevAdvice = useMemo(() => getCoachDevelopmentalRecommendations(career), [career]);
 
   const handleRosterAction = (
     playerId: string,

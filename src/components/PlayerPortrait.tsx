@@ -28,7 +28,7 @@ const SIZE_CLASSES: Record<'xs' | 'sm' | 'md' | 'lg', string> = {
  * - 미등록 선수 · 가상 신인 · 외국인 · 생성 선수 · 로딩 실패 시: 배경 없는 구단 유니폼 기본 실루엣 표시
  * - 트레이드·FA 이적·군입대 시 실루엣 모자와 유니폼 자동 전환
  */
-export const PlayerPortrait: React.FC<PlayerPortraitProps> = ({
+export const PlayerPortrait: React.FC<PlayerPortraitProps> = React.memo(({
   player,
   size = 'md',
   showTeamBadge = size !== 'xs',
@@ -103,4 +103,15 @@ export const PlayerPortrait: React.FC<PlayerPortraitProps> = ({
       )}
     </div>
   );
-};
+}, (prev, next) =>
+  prev.size === next.size &&
+  prev.showTeamBadge === next.showTeamBadge &&
+  prev.showSourceTag === next.showSourceTag &&
+  prev.player.id === next.player.id &&
+  prev.player.permanentId === next.player.permanentId &&
+  prev.player.teamId === next.player.teamId &&
+  prev.player.rosterTier === next.player.rosterTier &&
+  prev.player.uniformNumber === next.player.uniformNumber &&
+  prev.player.licensedPhotoUrl === next.player.licensedPhotoUrl &&
+  prev.player.militaryStatus === next.player.militaryStatus
+);

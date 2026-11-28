@@ -14,8 +14,7 @@ import {
   evolvePlayerOotpSubRatingsInPlace,
 } from './ootpRatingsEngine';
 import {
-  advanceFaCompetitionRound,
-  syncFaCompetitionMarketInPlace,
+  advanceFaCompetitionRoundInPlace,
 } from './faCompetitionEngine';
 import { simulateRealisticBaseballGame } from './gamePlayEngine';
 import {
@@ -1798,7 +1797,7 @@ function simulateRegularGames(
     throw new Error('모든 정규시즌 144경기가 이미 완료되었습니다.');
   }
 
-  const backupSnapshot = cloneCareer(career);
+  const backupSnapshot = career;
   const next = cloneCareer(career);
   ensureSeasonPlayerArcsInPlace(next);
   const rng = new SeededRng(next.rngState);
@@ -2353,20 +2352,7 @@ function simulateRegularGames(
       (p) => (p.rosterTier === 'FA' || p.contract.status === 'FA') && p.signedAsFaSeason !== next.season
     );
     if (hasOpenFreeAgents) {
-      syncFaCompetitionMarketInPlace(next, seriesDate);
-      const stillActive = Object.values(next.faCompetition?.negotiations ?? {}).some(
-        (n) => n.status === '입찰중'
-      );
-      if (stillActive) {
-        const autoFa = advanceFaCompetitionRound(next);
-        next.players = autoFa.nextCareer.players;
-        next.teams = autoFa.nextCareer.teams;
-        next.finances = autoFa.nextCareer.finances;
-        next.faCompetition = autoFa.nextCareer.faCompetition;
-        next.newsFeed = autoFa.nextCareer.newsFeed;
-        next.leagueAcquisitions = autoFa.nextCareer.leagueAcquisitions;
-        next.transactionLogs = autoFa.nextCareer.transactionLogs;
-      }
+      advanceFaCompetitionRoundInPlace(next, seriesDate);
       next.lastAutoFaDate = seriesDate;
     }
   }
@@ -2482,7 +2468,7 @@ export function simulateNextPostseasonGame(
     throw new Error('진행 가능한 포스트시즌 경기가 없습니다.');
   }
 
-  const backupSnapshot = cloneCareer(career);
+  const backupSnapshot = career;
   const next = cloneCareer(career);
   const rng = new SeededRng(next.rngState);
   const ps = next.postseason;

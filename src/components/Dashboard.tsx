@@ -682,29 +682,56 @@ export const Dashboard: React.FC<DashboardProps> = ({
     setToast({ text: msg, tone });
   };
 
-  const pendingNewsBadge =
-    (career.clubEvents ?? []).filter((e) => !e.resolved).length +
-    (career.complaints ?? []).filter((c) => !c.resolved).length +
-    (career.coachSwapReports ?? []).filter((r) => !r.applied).length;
-  const pendingIncomingTrades = getPendingIncomingTradeOffers(career);
-  const activeCoachSwap = (career.coachSwapReports ?? []).find((r) => !r.applied);
-  const ownerEval =
-    career.ownerEval ?? buildInitialOwnerEval(career.playerTeamId, career.season);
+  const pendingNewsBadge = useMemo(
+    () =>
+      (career.clubEvents ?? []).filter((e) => !e.resolved).length +
+      (career.complaints ?? []).filter((c) => !c.resolved).length +
+      (career.coachSwapReports ?? []).filter((r) => !r.applied).length,
+    [career.clubEvents, career.complaints, career.coachSwapReports]
+  );
+  const pendingIncomingTrades = useMemo(() => getPendingIncomingTradeOffers(career), [career]);
+  const activeCoachSwap = useMemo(
+    () => (career.coachSwapReports ?? []).find((r) => !r.applied),
+    [career.coachSwapReports]
+  );
+  const ownerEval = useMemo(
+    () => career.ownerEval ?? buildInitialOwnerEval(career.playerTeamId, career.season),
+    [career.ownerEval, career.playerTeamId, career.season]
+  );
   const liveOwnerReport = useMemo(() => computeLiveOwnerEvaluationReport(career), [career]);
   const fanSentiment = career.teams[career.playerTeamId]?.fanSentiment ?? 65;
 
   const teamInfo = KBO_TEAMS[career.playerTeamId];
-  const standings = computeStandings(career.gamesLedger);
-  const myStanding = standings.find((r) => r.teamId === career.playerTeamId);
+  const standings = useMemo(() => computeStandings(career.gamesLedger), [career.gamesLedger]);
+  const myStanding = useMemo(
+    () => standings.find((r) => r.teamId === career.playerTeamId),
+    [standings, career.playerTeamId]
+  );
   const teamState = career.teams[career.playerTeamId];
 
-  const myPlayers = Object.values(career.players).filter(
-    (p) => p.teamId === career.playerTeamId && p.rosterTier !== '은퇴' && p.rosterTier !== '해외이적'
+  const myPlayers = useMemo(
+    () =>
+      Object.values(career.players).filter(
+        (p) => p.teamId === career.playerTeamId && p.rosterTier !== '은퇴' && p.rosterTier !== '해외이적'
+      ),
+    [career.players, career.playerTeamId]
   );
-  const firstCount = myPlayers.filter((p) => p.rosterTier === '1군').length;
-  const futuresCount = myPlayers.filter((p) => p.rosterTier === '2군').length;
-  const activeCount = myPlayers.filter((p) => p.rosterTier === '1군' && p.gameDayActive).length;
-  const injuredList = myPlayers.filter((p) => Boolean(p.injury));
+  const { firstCount, futuresCount, activeCount, injuredList } = useMemo(() => {
+    let first = 0;
+    let futures = 0;
+    let active = 0;
+    const injured: typeof myPlayers = [];
+    for (const p of myPlayers) {
+      if (p.rosterTier === '1군') {
+        first++;
+        if (p.gameDayActive) active++;
+      } else if (p.rosterTier === '2군') {
+        futures++;
+      }
+      if (p.injury) injured.push(p);
+    }
+    return { firstCount: first, futuresCount: futures, activeCount: active, injuredList: injured };
+  }, [myPlayers]);
 
   const isOnboarding = [
     'INTRO',
@@ -967,29 +994,52 @@ export const Dashboard: React.FC<DashboardProps> = ({
       : null;
   const myNextStarter = myNextStarterId ? career.players[myNextStarterId] : null;
   const oppNextStarter = oppNextStarterId ? career.players[oppNextStarterId] : null;
-  const nextRivalryProfile =
-    career.phase === 'REGULAR_SEASON' && nextOpponentTeamId
-      ? getRivalryEffectProfile(career, career.playerTeamId, nextOpponentTeamId)
-      : null;
-  const myRivalries = getTeamRivalries(career, career.playerTeamId);
-
-  const gmRecommendations = !isOnboarding ? getClubGmRecommendations(career) : [];
-  const nationalDutyMyPlayers = myPlayers.filter((p) =>
-    isPlayerOnNationalTeamDuty(p, career.gamesPlayed)
+  const nextRivalryProfile = useMemo(
+    () =>
+      career.phase === 'REGULAR_SEASON' && nextOpponentTeamId
+        ? getRivalryEffectProfile(career, career.playerTeamId, nextOpponentTeamId)
+        : null,
+    [career, nextOpponentTeamId]
   );
-  const managerPreGameRec =
-    !isOnboarding && career.phase === 'REGULAR_SEASON' && career.gamesPlayed < career.totalRegularGames
-      ? getManagerPreGameRecommendation(career)
-      : null;
-  const coachFormRecs =
-    !isOnboarding && career.phase === 'REGULAR_SEASON'
-      ? getCoachFormLineupRecommendations(career)
-      : [];
-  const coachDevAdvice =
-    !isOnboarding && (career.gamesPlayed <= 12 || career.phase === 'OFFSEASON')
-      ? getCoachDevelopmentalRecommendations(career)
-      : null;
-  const championHistory = normalizeChampionHistory(career.championHistory);
+  const isHomeTab = activeTab === 'home';
+  const myRivalries = useMemo(
+    () => (isHomeTab ? getTeamRivalries(career, career.playerTeamId) : []),
+    [career, isHomeTab]
+  );
+
+  const gmRecommendations = useMemo(
+    () => (isHomeTab && !isOnboarding ? getClubGmRecommendations(career) : []),
+    [career, isHomeTab, isOnboarding]
+  );
+  const nationalDutyMyPlayers = useMemo(
+    () => myPlayers.filter((p) => isPlayerOnNationalTeamDuty(p, career.gamesPlayed)),
+    [myPlayers, career.gamesPlayed]
+  );
+  const managerPreGameRec = useMemo(
+    () =>
+      isHomeTab && !isOnboarding && career.phase === 'REGULAR_SEASON' && career.gamesPlayed < career.totalRegularGames
+        ? getManagerPreGameRecommendation(career)
+        : null,
+    [career, isHomeTab, isOnboarding]
+  );
+  const coachFormRecs = useMemo(
+    () =>
+      isHomeTab && !isOnboarding && career.phase === 'REGULAR_SEASON'
+        ? getCoachFormLineupRecommendations(career)
+        : [],
+    [career, isHomeTab, isOnboarding]
+  );
+  const coachDevAdvice = useMemo(
+    () =>
+      isHomeTab && !isOnboarding && (career.gamesPlayed <= 12 || career.phase === 'OFFSEASON')
+        ? getCoachDevelopmentalRecommendations(career)
+        : null,
+    [career, isHomeTab, isOnboarding]
+  );
+  const championHistory = useMemo(
+    () => normalizeChampionHistory(career.championHistory),
+    [career.championHistory]
+  );
   const latestSimulatedChampion = championHistory.find((c) => !c.isHistoricalBaseline);
   const defendingBaselineChampion = championHistory.find((c) => c.isHistoricalBaseline);
   const activeChampionEvent =
@@ -997,7 +1047,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       ? career.postseason.championEvent
       : null;
 
-  const currentCalendarDate = getCurrentCareerDate(career);
+  const currentCalendarDate = useMemo(() => getCurrentCareerDate(career), [career]);
   const tradeWindow = useMemo(() => getTradeWindowStatus(career), [career]);
   const myTeamObj = career.teams[career.playerTeamId];
   const actingCaptainPlayer = myTeamObj?.leadership?.actingCaptainPlayerId
@@ -1012,7 +1062,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {/* Club Color Identity Accent Stripe (#4) */}
       <div className="h-1 w-full team-banner-grad shrink-0" />
       {/* 3-Zone Top Bar */}
-      <header className="sticky top-0 z-30 h-15 border-b border-slate-200/90 dark:border-slate-800/90 bg-white/92 dark:bg-slate-900/92 backdrop-blur-md shadow-[0_1px_8px_rgba(15,23,42,0.04)] dark:shadow-[0_1px_12px_rgba(0,0,0,0.35)] px-4 flex items-center justify-between gap-3">
+      <header className="sticky top-0 z-30 h-15 border-b border-slate-200/90 dark:border-slate-800/90 bg-white/98 dark:bg-slate-900/98 shadow-[0_1px_8px_rgba(15,23,42,0.04)] dark:shadow-[0_1px_12px_rgba(0,0,0,0.35)] px-4 flex items-center justify-between gap-3">
         {/* Left: In-Game Date + Team & Save Identity */}
         <div className="flex items-center gap-3 min-w-0">
           <div

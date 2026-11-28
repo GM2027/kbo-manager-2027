@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { audioManager } from './audio/audioManager';
 import { ClubIntroAnimation } from './components/ClubIntroAnimation';
@@ -81,9 +81,10 @@ export default function App() {
     root.dataset.clubTheme = teamId;
   }, [screen, activeCareer?.playerTeamId, previewTeamId, settings.theme]);
 
-  const continueOptions = listContinueOptions();
-  // refreshTick triggers fresh read from localStorage after save/delete/import
-  void refreshTick;
+  const continueOptions = useMemo(() => {
+    void refreshTick;
+    return listContinueOptions();
+  }, [refreshTick]);
 
   const handleUpdateSettings = (next: AppSettings) => {
     setSettings(next);
@@ -151,19 +152,19 @@ export default function App() {
     setGlobalError(null);
   };
 
-  const handleUpdateCareer = (next: CareerSave, backup?: CareerSave) => {
+  const handleUpdateCareer = useCallback((next: CareerSave, backup?: CareerSave) => {
     const { ok, savedCareer } = saveAutoCareer(next, backup);
     if (!ok) {
       setGlobalError(
         getLastSaveError() ??
           '자동 저장 중 오류가 발생했습니다. 기존 세이브 데이터는 안전하게 보호되었습니다.'
       );
-    } else if (globalError) {
-      setGlobalError(null);
+    } else {
+      setGlobalError((prev) => (prev ? null : prev));
     }
     setActiveCareer(savedCareer);
     setRefreshTick((t) => t + 1);
-  };
+  }, []);
 
   return (
     <>
