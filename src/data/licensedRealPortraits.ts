@@ -1130,6 +1130,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/LT/이진하.png",
     "teamFolder": "LT"
   },
+  "KBO-PL-315517": {
+    "url": "/portraits/kbo/HH/김기중.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/HH/김기중.png",
+    "teamFolder": "HH"
+  },
   "KBO-PL-317482": {
     "url": "/portraits/kbo/OB/박지호.png",
     "credit": "사용자 등록 공식 프로필",
@@ -5197,6 +5204,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "sangmu-real-삼성-2": "KBO-PL-453856",
   "sangmu-real-키움-11": "KBO-PL-483693",
   "sangmu-real-키움-24": "KBO-PL-864284",
+  "sangmu-real-한화-3": "KBO-PL-315517",
   "v15-0006": "KBO-PL-405250",
   "v15-0007": "KBO-PL-708648",
   "v15-0008": "KBO-PL-720886",
