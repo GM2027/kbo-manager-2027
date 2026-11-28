@@ -3552,18 +3552,18 @@ export function processLeagueManagerFiringsAndOtherClubGms(
     }
   }
 
-  // 4. Other 9 Clubs Inter-Club Autonomous Trade (Contender vs Rebuilder — 현실 KBO 트레이드 기간·마감일 임박 활발화·드래프트 지명권 포함) (#10)
+  // 4. Other 9 Clubs Inter-Club Autonomous Trade (현실 KBO 시즌당 4~7건 수준 · 7/31 마감 직전 활발화) (#10)
   const aiTradeWindow = getTradeWindowStatus(next, dateStr);
   const aiDaysLeft = aiTradeWindow.daysUntilDeadline ?? 99;
   const aiTradeChance = !aiTradeWindow.isOpen
     ? 0
     : aiDaysLeft <= 3
-    ? 0.88
+    ? 0.58
     : aiDaysLeft <= 7
-    ? 0.72
+    ? 0.42
     : aiDaysLeft <= 14
-    ? 0.54
-    : 0.34;
+    ? 0.26
+    : 0.12;
   const aiMaxDeals = aiDaysLeft <= 3 ? 2 : 1;
 
   if (aiTradeWindow.isOpen && next.gamesPlayed >= 36 && rng.next() < aiTradeChance) {
@@ -3660,13 +3660,14 @@ export function processLeagueManagerFiringsAndOtherClubGms(
                 p.rosterTier !== '2군' ||
                 p.age > 24 ||
                 p.potential < 75 ||
+                p.potential >= 85 ||
                 p.injury ||
                 isMilitaryServing(p.militaryStatus)
               ) {
                 return false;
               }
-              const val = evaluatePlayerTradeValuationDetailed(next, p).marketClubValue + 12 + pickBonusVal;
-              return val >= vetVal * 0.72 && val <= vetVal * 1.42;
+              const val = evaluatePlayerTradeValuationDetailed(next, p).marketClubValue + 10 + pickBonusVal;
+              return val >= vetVal * 0.78 && val <= vetVal * 1.28;
             })
             .sort((a, b) => b.potential - a.potential)[0]
         : undefined;

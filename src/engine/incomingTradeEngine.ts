@@ -2,7 +2,6 @@ import { isMilitaryServing } from './militaryEngine';
 import { KBO_TEAMS, TEAM_IDS } from '../data/kboTeams';
 import { CareerSave, IncomingTradeOffer, Player, TeamId } from '../types/kbo';
 import {
-  computePlayerTradeValue,
   ensureDeepFranchiseState,
   getTradeWindowStatus,
   reassignNonConflictingUniformNumber,
@@ -56,9 +55,10 @@ function isPlayerTradeable(career: CareerSave, p: Player): boolean {
   if (p.nationalTeamDuty) return false;
   if (p.signedAsFaSeason === career.season) return false;
   if (p.injury) return false;
-  // 모든 10개 구단 프랜차이즈 스타(지수 95+ 포함)는 자동 트레이드 및 AI 제안 대상에서 절대 제외
+  // 모든 10개 구단 프랜차이즈 스타(지수 95+ 포함) 및 차세대 코어(만 23세 이하 & POT 85+)는 자동/AI 제안에서 제외
   const franAssess = evaluateFranchiseStar(career, p);
   if (franAssess.score >= 95 && !p.tradeRequested) return false;
+  if (p.age <= 23 && p.potential >= 85 && !p.tradeRequested) return false;
   const legendGate = evaluateLegendTradeAvailability(career, p);
   if (legendGate.isLegend && !legendGate.available) return false;
   return true;
@@ -156,43 +156,60 @@ function craftSingleIncomingOffer(
   if (targetCandidates.length === 0) return null;
 
   const requestedPlayer = targetCandidates[rng.int(0, targetCandidates.length - 1)];
-  const reqVal = Math.max(
-    computePlayerTradeValue(requestedPlayer).index,
-    evaluatePlayerTradeValuationDetailed(career, requestedPlayer).homeClubValue
-  );
+  const reqVal = evaluatePlayerTradeValuationDetailed(career, requestedPlayer).homeClubValue;
 
-  // Build balanced counter-package from rivalPool (1:1 or 2:1 + optional cash) using detailed valuation (OVR, POT, age, salary, yearsRemaining)
+  // Build realistic balanced counter-package from rivalPool (using unified detailed valuation + user club need)
+  const myActiveFirst = Object.values(career.players).filter(
+    (p) => p.teamId === career.playerTeamId && p.rosterTier === '1군' && !p.injury
+  );
+  const fitsUserNeed = (cand: Player): boolean => {
+    if (cand.role === '투수') {
+      const isSp = cand.position === 'SP' || cand.pitchRole === '선발';
+      const same = myActiveFirst
+        .filter((p) => p.role === '투수' && (isSp ? p.position === 'SP' || p.pitchRole === '선발' : p.position !== 'SP' && p.pitchRole !== '선발'))
+        .sort((a, b) => b.ability - a.ability);
+      const benchMark = same[Math.min(same.length - 1, isSp ? 4 : 5)]?.ability ?? 67;
+      return same.length < (isSp ? 4 : 5) || cand.ability >= benchMark + 1 || (cand.age <= 23 && cand.potential >= 80);
+    }
+    const isOf = cand.position === 'LF' || cand.position === 'CF' || cand.position === 'RF';
+    const same = myActiveFirst
+      .filter((p) => p.role === '타자' && (p.position === cand.position || (isOf && (p.position === 'LF' || p.position === 'CF' || p.position === 'RF'))))
+      .sort((a, b) => b.ability - a.ability);
+    const benchMark = same[(isOf ? 3 : 1) - 1]?.ability ?? 66;
+    return same.length < (isOf ? 3 : 1) || cand.ability >= benchMark + 1 || (cand.age <= 23 && cand.potential >= 80);
+  };
+
   const rivalSorted = rivalPool
     .map((p) => ({
       p,
-      val: Math.max(
-        computePlayerTradeValue(p).index,
-        evaluatePlayerTradeValuationDetailed(career, p).homeClubValue
-      ),
+      val: evaluatePlayerTradeValuationDetailed(career, p).marketClubValue,
+      fitsUser: fitsUserNeed(p),
     }))
     .filter(({ p }) => p.id !== requestedPlayer.id);
 
-  // Try 1:1 close match first, else 2:1 package
-  const closeOneToOne = rivalSorted.filter(
-    ({ val }) => val >= reqVal * 0.88 && val <= reqVal * 1.18
+  // Try 1:1 close match first (preferring mutual positional fit), else realistic 2:1 package
+  const closeOneToOneAll = rivalSorted.filter(
+    ({ val }) => val >= reqVal * 0.86 && val <= reqVal * 1.18
   );
+  const closeOneToOneFit = closeOneToOneAll.filter((x) => x.fitsUser);
+  const closeOneToOne = closeOneToOneFit.length > 0 ? closeOneToOneFit : closeOneToOneAll;
 
   let offerPlayers: Player[] = [];
   let offerCash = 0;
 
-  if (closeOneToOne.length > 0 && rng.next() < 0.58) {
+  if (closeOneToOne.length > 0 && rng.next() < 0.64) {
     const pick = closeOneToOne[rng.int(0, closeOneToOne.length - 1)];
     offerPlayers = [pick.p];
     if (pick.val < reqVal) {
-      offerCash = Math.min(8, Math.max(0.5, Number(((reqVal - pick.val) * 0.22).toFixed(1))));
+      offerCash = Math.min(4, Math.max(0.5, Number(((reqVal - pick.val) * 0.18).toFixed(1))));
     }
   } else {
-    // 2:1 package: 1 core piece (~60-78% of reqVal) + 1 prospect/depth (~25-45% of reqVal)
+    // Realistic 2:1 package: 1 strong centerpiece (>=62% of reqVal) + 1 meaningful prospect/depth (~22-50% of reqVal)
     const primaryCands = rivalSorted.filter(
-      ({ val }) => val >= reqVal * 0.52 && val <= reqVal * 0.85
+      ({ val }) => val >= reqVal * 0.62 && val <= reqVal * 0.92
     );
     const secondaryCands = rivalSorted.filter(
-      ({ val }) => val >= reqVal * 0.2 && val <= reqVal * 0.55
+      ({ val, p }) => val >= reqVal * 0.22 && val <= reqVal * 0.54 && (p.age <= 25 || p.ability >= 70)
     );
     if (primaryCands.length > 0 && secondaryCands.length > 0) {
       const p1 = primaryCands[rng.int(0, primaryCands.length - 1)];
@@ -200,21 +217,23 @@ function craftSingleIncomingOffer(
       if (secFiltered.length > 0) {
         const p2 = secFiltered[rng.int(0, secFiltered.length - 1)];
         offerPlayers = [p1.p, p2.p];
-        const sumVal = p1.val + p2.val;
+        const sumVal = p1.val + Math.round(p2.val * 0.65);
         if (sumVal < reqVal) {
-          offerCash = Math.min(6, Math.max(0.5, Number(((reqVal - sumVal) * 0.2).toFixed(1))));
+          offerCash = Math.min(5, Math.max(0.5, Number(((reqVal - sumVal) * 0.16).toFixed(1))));
         }
       }
     }
   }
 
   if (offerPlayers.length === 0) {
-    // Fallback nearest-value 1:1 + cash
+    // Only fall back to nearest-value 1:1 if within realistic 78%..126% range (no absurd mismatch offers!)
     rivalSorted.sort((a, b) => Math.abs(a.val - reqVal) - Math.abs(b.val - reqVal));
-    if (rivalSorted.length === 0) return null;
+    if (rivalSorted.length === 0 || rivalSorted[0].val < reqVal * 0.78 || rivalSorted[0].val > reqVal * 1.26) {
+      return null;
+    }
     offerPlayers = [rivalSorted[0].p];
     if (rivalSorted[0].val < reqVal) {
-      offerCash = Math.min(10, Math.max(0.5, Number(((reqVal - rivalSorted[0].val) * 0.22).toFixed(1))));
+      offerCash = Math.min(5, Math.max(0.5, Number(((reqVal - rivalSorted[0].val) * 0.18).toFixed(1))));
     }
   }
 
@@ -310,18 +329,18 @@ export function refreshIncomingTradeOffers(
   const hasTradeRequester = Object.values(career.players).some(
     (p) => p.teamId === career.playerTeamId && p.tradeRequested && isPlayerTradeable(career, p)
   );
-  // 마감일이 가까워질수록 AI 구단 트레이드 문의 빈도 대폭 증가
+  // 현실 KBO 트레이드 문의 빈도 (마감 임박·오프시즌 위주로 의미 있는 제안만 수신)
   const baseProb =
     career.phase === 'OFFSEASON'
-      ? 0.65
+      ? 0.45
       : tradeWin.isDeadlineUrgent
-      ? 0.85
+      ? 0.58
       : tradeWin.isDeadlineWeek
-      ? 0.68
+      ? 0.44
       : tradeWin.isDeadlineApproaching
-      ? 0.48
-      : 0.28;
-  const triggerProb = hasTradeRequester ? Math.max(baseProb, 0.56) : baseProb;
+      ? 0.28
+      : 0.14;
+  const triggerProb = hasTradeRequester ? Math.max(baseProb, 0.46) : baseProb;
   if (rng.next() > triggerProb) return null;
 
   const activeTeams = new Set<TeamId>(activePending.map((o) => o.fromTeamId));
@@ -381,7 +400,8 @@ export function solicitIncomingTradeOffers(career: CareerSave): {
 
   const newOffers: IncomingTradeOffer[] = [];
   const targetCount = Math.max(1, 2 - existingTeams.size);
-  for (let i = 0; i < targetCount; i++) {
+  // 여러 구단·선수 조합을 탐색해 실제로 균형 잡힌 현실적 제안만 생성
+  for (let attempt = 0; attempt < 12 && newOffers.length < targetCount; attempt++) {
     const offer = craftSingleIncomingOffer(next, rng, dateStr, existingTeams);
     if (offer) {
       existingTeams.add(offer.fromTeamId);

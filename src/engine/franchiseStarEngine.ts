@@ -875,10 +875,19 @@ export function evaluatePlayerTradeValuationDetailed(
 ): TradePlayerValuationBreakdown {
   const assess = evaluateFranchiseStar(career, player);
 
-  // (1) 순수 실력·잠재력·최근 성적 기본 점수 (10..115 스케일)
+  // (1) 순수 실력·잠재력·최근 성적 비선형(볼록) 가치 곡선 (스타/핵심 주전 vs 백업 격차 현실화)
+  // - 대체수준 백업(60~68)은 낮은 가치, 주전(74~78)은 중상위, 올스타(79~84)·초특급(85+)은 급격히 상승
   const upside = Math.max(0, player.potential - player.ability);
   const youthUpsideWeight =
-    player.age <= 22 ? 0.82 : player.age <= 25 ? 0.58 : player.age <= 28 ? 0.3 : 0.12;
+    player.age <= 21
+      ? 1.15
+      : player.age <= 23
+      ? 0.98
+      : player.age <= 25
+      ? 0.72
+      : player.age <= 27
+      ? 0.36
+      : 0.12;
   const multiYearRecentAdj = Math.round(((player.recent3YrScore ?? player.ability) - player.ability) * 0.25);
 
   // 당해 시즌 최근 성적(타자 OPS / 투수 ERA + 최근 컨디션) 반영 (표본 충족 시)
@@ -905,43 +914,62 @@ export function evaluatePlayerTradeValuationDetailed(
   }
   const formRecentAdj = Math.max(-9, Math.min(10, multiYearRecentAdj + livePerfAdj));
   const posScarcity =
-    player.position === 'SP' || player.position === 'C' || player.position === 'SS' || player.position === 'CF'
+    player.position === 'SP' || player.position === 'C' || player.position === 'SS'
+      ? 6
+      : player.position === 'CF' || player.position === 'CL'
       ? 4
       : 0;
+
+  // 비선형 기량 점수: 백업(65 -> 20pt), 준주전(71 -> 37pt), 주전(76 -> 58pt), 올스타(82 -> 89pt), 초특급(88 -> 127pt)
+  const overBase = Math.max(0, player.ability - 55);
+  const convexAbilityScore = Math.round(Math.pow(overBase, 1.38) * 1.02);
+
+  // KBO 특급 젊은 유망주·차세대 코어(만 24세 이하 + 잠재력 82+) 미래 통제권 프리미엄
+  const youngCoreFutureBonus =
+    player.age <= 22 && player.potential >= 86
+      ? 26
+      : player.age <= 24 && player.potential >= 85
+      ? 20
+      : player.age <= 24 && player.potential >= 82
+      ? 12
+      : player.age <= 25 && player.potential >= 84
+      ? 10
+      : 0;
+
   const baseSkillScore = Math.max(
-    18,
-    Math.round((player.ability - 50) * 2.15 + upside * youthUpsideWeight + formRecentAdj + posScarcity)
+    10,
+    Math.round(convexAbilityScore + upside * youthUpsideWeight + youngCoreFutureBonus + formRecentAdj + posScarcity)
   );
 
-  // (2) 나이 노쇠화 가치 하락 정상 반영
+  // (2) 나이 노쇠화 가치 하락 (단, 현역 1군 핵심 주전·에이스(OVR 76+)의 즉시전력 가치가 백업 이하로 붕괴하지 않도록 현실 보정)
   let ageAdjustment = 0;
   if (player.age <= 23) ageAdjustment = 10;
   else if (player.age <= 27) ageAdjustment = 5;
   else if (player.age <= 30) ageAdjustment = 0;
-  else if (player.age <= 32) ageAdjustment = -7;
-  else if (player.age <= 34) ageAdjustment = -15;
-  else if (player.age <= 36) ageAdjustment = -23;
-  else ageAdjustment = -32;
+  else if (player.age <= 32) ageAdjustment = -6;
+  else if (player.age <= 34) ageAdjustment = player.ability >= 80 ? -11 : -14;
+  else if (player.age <= 36) ageAdjustment = player.ability >= 82 ? -15 : player.ability >= 76 ? -18 : -22;
+  else ageAdjustment = player.ability >= 80 ? -20 : -28;
 
   // (3) 연봉·잔여 총액 부담에 따른 가치 하락 정상 반영
   const yrsRem = Math.max(1, player.contract.yearsRemaining || 1);
   const annSal = player.contract.annualSalary || 0;
-  const fairAnnualForAbility = Math.max(0.5, (player.ability - 68) * 0.52);
+  const fairAnnualForAbility = Math.max(0.5, (player.ability - 68) * 0.55);
   const excessAnnual = Math.max(0, annSal - fairAnnualForAbility);
   let salaryAdjustment = 0;
-  if (annSal >= 18) salaryAdjustment = -Math.round(10 + excessAnnual * 1.15);
-  else if (annSal >= 10) salaryAdjustment = -Math.round(5 + excessAnnual * 0.95);
-  else if (annSal >= 5 && excessAnnual > 2.5) salaryAdjustment = -Math.round(excessAnnual * 0.85);
-  else if (annSal <= 1.2 && player.ability >= 74 && player.age <= 28) salaryAdjustment = 7; // 저연봉 가성비
+  if (annSal >= 18) salaryAdjustment = -Math.round(9 + excessAnnual * 1.0);
+  else if (annSal >= 10) salaryAdjustment = -Math.round(4 + excessAnnual * 0.85);
+  else if (annSal >= 5 && excessAnnual > 2.5) salaryAdjustment = -Math.round(excessAnnual * 0.75);
+  else if (annSal <= 1.5 && player.ability >= 73 && player.age <= 26) salaryAdjustment = 8; // 저연봉 팀 통제권 가성비
 
   // (4) 잔여 계약 기간 / 통제권 보정
   let contractTermAdjustment = 0;
   if (player.contract.status === '만료' || yrsRem <= 1) {
-    contractTermAdjustment = player.contract.isFAEligible ? -9 : -4;
+    contractTermAdjustment = player.contract.isFAEligible ? -9 : -3;
   } else if (yrsRem >= 4 && annSal >= 12 && player.age >= 33) {
     contractTermAdjustment = -8; // 고령 장기 고액 잔여 계약 리스크
   } else if (yrsRem >= 3 && player.age <= 29 && excessAnnual <= 2) {
-    contractTermAdjustment = 4; // 전성기 안정적 통제권
+    contractTermAdjustment = 5; // 전성기 안정적 통제권
   }
 
   // (5) 부상 이력 / 현재 부상 감점
@@ -958,21 +986,37 @@ export function evaluatePlayerTradeValuationDetailed(
   const awardVal = getAwardTradeValueMultiplier(player);
   const rawMarket =
     baseSkillScore + ageAdjustment + salaryAdjustment + contractTermAdjustment + injuryAdjustment;
+  // 현역 1군 핵심 주전·에이스(OVR 77+)는 고령이어도 2군 백업 이하로 가치가 추락하지 않도록 즉시전력 하한선 보호
+  const activeStarterFloor =
+    player.rosterTier === '1군' && !player.injury && player.ability >= 84
+      ? 68
+      : player.rosterTier === '1군' && !player.injury && player.ability >= 78
+      ? 44
+      : player.rosterTier === '1군' && !player.injury && player.ability >= 75
+      ? 34
+      : 8;
   const skillMarketIndex = Math.max(
-    8,
-    Math.min(125, Math.round(rawMarket * awardVal.multiplier))
+    activeStarterFloor,
+    Math.min(180, Math.round(rawMarket * awardVal.multiplier))
   );
 
-  // (6) 전체 구단 팀 내 레전드 트레이드 고난도 보호 (#3) + 프랜차이즈 상징성 프리미엄
-  // 레전드 등급 선수는 타 구단이 영입하기 매우 어렵도록 초고강도 내부 상징 프리미엄(68) 부여
+  // (6) 전체 구단 팀 내 레전드·프랜차이즈 + 차세대 특급 코어(만 24세 이하 & OVR 82+ 또는 POT 85+) 내부 보호 프리미엄
+  const youngUntouchableBonus =
+    player.age <= 23 && (player.ability >= 84 || player.potential >= 90)
+      ? 46
+      : player.age <= 24 && player.potential >= 85
+      ? 24
+      : player.age <= 24 && player.potential >= 83
+      ? 14
+      : 0;
   const rawHomeSymbolic =
     assess.tier === '레전드'
-      ? 68
+      ? Math.max(68, 68 + Math.round(youngUntouchableBonus * 0.3))
       : assess.tier === '핵심 프랜차이즈'
-      ? 28
+      ? Math.max(32, 28 + Math.round(youngUntouchableBonus * 0.6))
       : assess.tier === '준프랜차이즈'
-      ? 12
-      : 0;
+      ? Math.max(14, 12 + youngUntouchableBonus)
+      : youngUntouchableBonus;
 
   // (7) 선수 트레이드 요청 시 소속 구단의 매각 저항 대폭 감소
   const tradeRequestRelief = player.tradeRequested

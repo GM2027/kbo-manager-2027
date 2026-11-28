@@ -3205,16 +3205,16 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
           <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-200 dark:border-slate-800 text-xs">
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center gap-2">
-                <span>추가 현금 포함 (억 원):</span>
+                <span>추가 현금 포함 (최대 10억):</span>
                 <input
                   type="number"
                   min={0}
-                  max={30}
+                  max={10}
                   step={0.5}
                   value={cashInclude}
                   onChange={(e) => {
                     setTradeEval(null);
-                    setCashInclude(Math.max(0, Number(e.target.value) || 0));
+                    setCashInclude(Math.min(10, Math.max(0, Number(e.target.value) || 0)));
                   }}
                   className="w-20 px-2 py-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-mono-stats"
                 />
@@ -3230,9 +3230,9 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                   className="px-2 py-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-semibold"
                 >
                   <option value="">포함 안 함</option>
-                  <option value="1">차기 1라운드 지명권 (+48pt)</option>
-                  <option value="2">차기 2라운드 지명권 (+28pt)</option>
-                  <option value="3">차기 3라운드 지명권 (+16pt)</option>
+                  <option value="1">차기 1라운드 지명권 (최상위 가치)</option>
+                  <option value="2">차기 2라운드 지명권 (중상위 가치)</option>
+                  <option value="3">차기 3라운드 지명권 (보조 가치)</option>
                 </select>
               </div>
             </div>
@@ -3352,7 +3352,9 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                       onClick={() => {
                         const co = tradeEval.counterOffer!;
                         if (co.extraCashBillion) {
-                          setCashInclude((prev) => Number((prev + co.extraCashBillion!).toFixed(1)));
+                          setCashInclude((prev) =>
+                            Math.min(10, Number((prev + co.extraCashBillion!).toFixed(1)))
+                          );
                         }
                         if (co.requestedPickRound) {
                           setDraftPickRound(co.requestedPickRound);

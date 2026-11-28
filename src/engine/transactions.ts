@@ -62,7 +62,7 @@ import {
 } from './ootpRatingsEngine';
 import { reconcileTeamLineupPositionsInPlace } from './lineupValidationEngine';
 import { unlockUnclaimedFreeAgentsForNewSeasonInPlace } from './waiverEngine';
-import { resetRivalriesForNewSeason } from './rivalryEngine';
+import { getRivalryEffectProfile, resetRivalriesForNewSeason } from './rivalryEngine';
 import {
   AwardEntry,
   BatterStats,
@@ -1260,10 +1260,23 @@ function scorePlayerTradeValue(p: Player, preferYouth: boolean): number {
 }
 
 const DRAFT_PICK_TRADE_VALUE: Record<1 | 2 | 3, number> = {
-  1: 38,
+  1: 42,
   2: 24,
-  3: 14,
+  3: 13,
 };
+
+/** KBO 현실적 단일 트레이드 현금 포함 상한 (억 원) */
+export const MAX_KBO_TRADE_CASH_BILLION = 10;
+
+function computeDiminishingCashTradeValue(cashBillion: number, isRebuilder: boolean): number {
+  const clamped = Math.max(0, Math.min(MAX_KBO_TRADE_CASH_BILLION, cashBillion));
+  if (clamped <= 0) return 0;
+  // KBO 트레이드에서 현금은 보조 균형 카드(체감 효용): 3억 이하 4.0~4.8pt/억, 3~10억은 1.8~2.4pt/억
+  const tier1 = Math.min(3, clamped);
+  const tier2 = Math.max(0, clamped - 3);
+  const val = tier1 * (isRebuilder ? 4.8 : 3.8) + tier2 * (isRebuilder ? 2.4 : 1.7);
+  return Math.round(val);
+}
 
 export interface PositionalNeedAssessment {
   needScore: number; // -10 (심각한 포지션 중복) ~ +14 (핵심 취약 포지션 보강)
@@ -1375,7 +1388,9 @@ export function evaluateTradeProposal(
 ): TradeEvaluationResult {
   const standings = computeStandings(career.gamesLedger);
   const aiRank = standings.find((r) => r.teamId === targetTeamId)?.rank ?? KBO_TEAMS[targetTeamId].prevRank2025;
+  const myRank = standings.find((r) => r.teamId === career.playerTeamId)?.rank ?? KBO_TEAMS[career.playerTeamId].prevRank2025;
   const isContender = aiRank <= 4;
+  const isUserContender = myRank <= 5;
   const preferYouth = aiRank >= 7;
   const aiStance: TradeEvaluationResult['aiStance'] =
     aiRank <= 3 ? '우승도전 (즉시전력 선호)' : aiRank >= 7 ? '리빌딩 (유망주·지명권 선호)' : '중위권 균형';
@@ -1409,12 +1424,11 @@ export function evaluateTradeProposal(
     };
   }
 
-  // #6 & #7 + 현실적 트레이드 개선:
-  // - 선수 능력치·나이·최근 성적·잠재력·연봉 기반 시장 지수
-  // - AI 구단 부족 포지션 가중치 및 잉여 포지션 감점
-  // - 우승 경쟁 팀(즉시전력 선호) vs 리빌딩 팀(유망주·지명권 선호)
-  // - 프랜차이즈 스타 및 핵심 주전 보호 프리미엄
-  // - 낮은 가치 선수 다수 묶음으로 스타 1명 영입 차단 (체감 가중치 + 핵심 대가 검증)
+  // 현실적 KBO 트레이드 평가 엔진:
+  // - 비선형(볼록) 스타·유망주 가치 곡선 (백업 다수 묶음·현금 위주 영입 원천 차단)
+  // - 우승 경쟁 구단(즉시전력 보호) vs 리빌딩 구단(차세대 코어 유망주 보호)
+  // - 직접 순위 경쟁 구단 및 라이벌 구단 프리미엄
+  // - 포지션 필요도·대체 자원 부재·프랜차이즈 상징성 보호
   const giveBreakdowns = givePlayers.map((p) => evaluatePlayerTradeValuationDetailed(career, p));
   const receiveBreakdowns = receivePlayers.map((p) => evaluatePlayerTradeValuationDetailed(career, p));
   const givePosNeeds = givePlayers.map((p) => computeTradePositionalNeed(career, targetTeamId, p));
@@ -1422,10 +1436,10 @@ export function evaluateTradeProposal(
   const pickVal = draftPickRound
     ? Math.round(
         DRAFT_PICK_TRADE_VALUE[draftPickRound] *
-          (preferYouth ? 1.3 : isContender ? 0.82 : 0.95)
+          (preferYouth ? 1.28 : isContender ? 0.78 : 0.95)
       )
     : 0;
-  const cashVal = Math.round(cashIncludeBillion * (aiRank >= 6 ? 7.0 : 4.8));
+  const cashVal = computeDiminishingCashTradeValue(cashIncludeBillion, preferYouth);
 
   const giveMarketScore = giveBreakdowns.reduce((s, b) => s + b.skillMarketIndex, 0);
   const receiveMarketScore = receiveBreakdowns.reduce((s, b) => s + b.skillMarketIndex, 0);
@@ -1437,44 +1451,61 @@ export function evaluateTradeProposal(
     const need = givePosNeeds[idx];
     let stanceAdj = 0;
     if (preferYouth) {
-      if (p.age <= 24 && p.potential >= 77) stanceAdj += 13;
-      else if (p.age <= 24) stanceAdj += 6;
-      else if (p.age >= 32) stanceAdj -= 10;
+      if (p.age <= 24 && p.potential >= 82) stanceAdj += 14;
+      else if (p.age <= 24 && p.potential >= 77) stanceAdj += 7;
+      else if (p.age >= 32) stanceAdj -= 14;
     } else if (isContender) {
-      if (p.rosterTier === '1군' && p.ability >= 79) stanceAdj += 11;
-      else if (p.ability >= 75) stanceAdj += 5;
-      else if (p.ability < 69 && p.age <= 23) stanceAdj -= 7;
+      if (p.rosterTier === '1군' && p.ability >= 79) stanceAdj += 12;
+      else if (p.rosterTier === '1군' && p.ability >= 75) stanceAdj += 5;
+      else if (p.ability < 70 && p.age <= 23) stanceAdj -= 9;
     }
-    const legacyBlend = Math.round(scorePlayerTradeValue(p, preferYouth) * 0.2 + computePlayerTradeValue(p).index * 0.08);
-    // AI 구단은 부족 포지션 선수만 적극 평가, 잉여 포지션은 가치 절하
     const needAdj = need.needScore;
-    return Math.max(4, Math.round(bd.marketClubValue * 0.85 + legacyBlend * 0.52 + stanceAdj + needAdj));
+    return Math.max(4, Math.round(bd.marketClubValue * 1.05 + stanceAdj + needAdj));
   });
 
-  // 다수 선수 묶음 체감 가중치 (낮은 가치 여러 명으로 스타 1명 교환 악용 방지)
-  const sortedGivePieces = [...givePieceScores].sort((a, b) => b - a);
-  const bundleWeights = [1.0, 0.78, 0.52, 0.35, 0.25];
+  // 다수 선수 묶음 강한 체감 가중치 (잡선수·백업 여러 명으로 주전/유망주 1명 교환 악용 원천 차단)
+  const giveEntries = givePlayers
+    .map((p, idx) => ({ p, score: givePieceScores[idx], market: giveBreakdowns[idx].skillMarketIndex }))
+    .sort((a, b) => b.score - a.score);
+  const bundleWeights = [1.0, 0.58, 0.28, 0.14];
   const extraPieceCount = Math.max(0, givePlayers.length - receivePlayers.length);
-  const weightedGivePlayerScore = sortedGivePieces.reduce((sum, val, idx) => {
-    const w = extraPieceCount > 0 ? (bundleWeights[idx] ?? 0.25) : 1.0;
-    return sum + Math.round(val * w);
+  const weightedGivePlayerScore = giveEntries.reduce((sum, entry, idx) => {
+    let w = extraPieceCount > 0 ? (bundleWeights[idx] ?? 0.12) : 1.0;
+    // 2번째 이후 카드가 1군 비주전·저잠재력 백업(OVR<=69 & POT<=76)이면 실질 기여도 대폭 축소
+    if (idx >= 1 && extraPieceCount > 0 && entry.p.ability <= 69 && entry.p.potential <= 76) {
+      w *= 0.45;
+    }
+    return sum + Math.round(entry.score * w);
   }, 0);
   const giveScore = weightedGivePlayerScore + cashVal + pickVal;
+
+  const isYoungCorePlayer = (p: Player): boolean =>
+    p.age <= 24 && (p.potential >= 83 || (p.ability >= 77 && p.potential >= 80));
 
   const receiveScore = receivePlayers.reduce((s, p, idx) => {
     const bd = receiveBreakdowns[idx];
     let stanceAdj = 0;
     if (preferYouth) {
-      if (p.age <= 24 && p.potential >= 78) stanceAdj += 14;
-      else if (p.age >= 32) stanceAdj -= 4;
+      if (isYoungCorePlayer(p)) stanceAdj += 22;
+      else if (p.age <= 24 && p.potential >= 78) stanceAdj += 12;
+      else if (p.age >= 32) stanceAdj -= 5;
     } else if (isContender) {
-      if (p.rosterTier === '1군' && p.ability >= 78) stanceAdj += 12;
+      if (p.rosterTier === '1군' && p.ability >= 78) stanceAdj += 16;
+      else if (p.rosterTier === '1군' && p.ability >= 75) stanceAdj += 9;
     }
-    // 핵심 주전 보호 프리미엄 (트레이드 요청 시 완화)
+    // 핵심 주전 및 차세대 코어 보호 프리미엄 (트레이드 요청 시 완화)
     const isCore = isTeamCoreStarter(career, targetTeamId, p);
-    const coreProtection = isCore && !p.tradeRequested ? (p.ability >= 83 ? 16 : 10) : 0;
-    const legacyBlend = Math.round(scorePlayerTradeValue(p, preferYouth) * 0.2 + computePlayerTradeValue(p).index * 0.08);
-    return s + Math.round(bd.homeClubValue * 0.85 + legacyBlend * 0.52 + stanceAdj + coreProtection);
+    const coreProtection =
+      !p.tradeRequested
+        ? isCore
+          ? p.ability >= 83
+            ? 22
+            : 14
+          : isYoungCorePlayer(p)
+          ? 18
+          : 0
+        : 0;
+    return s + Math.round(bd.homeClubValue * 1.05 + stanceAdj + coreProtection);
   }, 0);
 
   // 과도한 인원 묶음(한쪽 4명 초과) 거래 방지
@@ -1512,6 +1543,22 @@ export function evaluateTradeProposal(
     }
   }
 
+  // KBO 현실 현금 트레이드 상한 검증 (단일 트레이드 현금 10억 초과 차단)
+  if (cashIncludeBillion > MAX_KBO_TRADE_CASH_BILLION) {
+    return {
+      decision: '거절',
+      giveScore,
+      receiveScore,
+      giveMarketScore,
+      receiveMarketScore,
+      franchiseSymbolicGap,
+      giveBreakdowns,
+      receiveBreakdowns,
+      aiStance,
+      reason: `KBO 현실 트레이드 기준상 단일 트레이드 현금 포함 한도는 최대 ${MAX_KBO_TRADE_CASH_BILLION}억 원입니다. 선수·유망주·지명권 중심으로 패키지를 구성하세요.`,
+    };
+  }
+
   // 상대 구단 대체 선수 확보 여부 검사 (핵심 포지션 주전을 내보낼 때 대체 선수 부재 시 거래 거절)
   const receiveIdSet = new Set(receivePlayers.map((rp) => rp.id));
   for (const p of receivePlayers) {
@@ -1533,7 +1580,7 @@ export function evaluateTradeProposal(
       (gp) => gp.position === p.position && gp.ability >= p.ability - 6
     );
     if (!incomingSamePos && (!bestBackup || bestBackup.ability < p.ability - 10) && ['C', 'SS', 'SP', 'CL'].includes(p.position)) {
-      if (giveScore < receiveScore * 1.18) {
+      if (giveScore < receiveScore * 1.22) {
         return {
           decision: '거절',
           giveScore,
@@ -1554,27 +1601,34 @@ export function evaluateTradeProposal(
     .filter((b) => b.homeClubSymbolicPremium > 0)
     .map((b) => `${b.playerName}(${b.franchiseTier} +${b.homeClubSymbolicPremium})`);
   const coreNamesReceiving = receivePlayers
-    .filter((p) => isTeamCoreStarter(career, targetTeamId, p) && !p.tradeRequested)
+    .filter((p) => (isTeamCoreStarter(career, targetTeamId, p) || isYoungCorePlayer(p)) && !p.tradeRequested)
     .map((p) => p.name);
   const requestedReliefNotes = receiveBreakdowns
     .filter((b) => b.tradeRequestRelief > 0)
     .map((b) => `${b.playerName} 트레이드 요청으로 매각 저항 완화(-${b.tradeRequestRelief})`);
 
-  // 구조적 거래 불가 조건 검사 (트레이드 지수가 높아도 무조건 수락하지 않음)
+  // 구조적 거래 불가 조건 검사 (트레이드 지수가 높아도 현실 KBO 기준에 어긋나면 거절)
   const maxReceiveMarket = Math.max(...receiveBreakdowns.map((b) => b.skillMarketIndex));
   const maxGiveMarket = Math.max(...giveBreakdowns.map((b) => b.skillMarketIndex));
-  const targetHasStar = receivePlayers.some(
+  const targetHasStarOrYoungCore = receivePlayers.some(
     (p, idx) =>
-      (p.ability >= 81 || receiveBreakdowns[idx].skillMarketIndex >= 74 || receiveBreakdowns[idx].homeClubSymbolicPremium >= 20) &&
+      (p.ability >= 79 ||
+        isYoungCorePlayer(p) ||
+        receiveBreakdowns[idx].skillMarketIndex >= 76 ||
+        receiveBreakdowns[idx].homeClubSymbolicPremium >= 18) &&
       !p.tradeRequested
   );
-  const isLowValueQuantityBundle =
-    targetHasStar &&
-    givePlayers.length > receivePlayers.length &&
-    maxGiveMarket < maxReceiveMarket * 0.68 &&
-    draftPickRound !== 1;
+  const targetHasStarter = receivePlayers.some(
+    (p) => p.rosterTier === '1군' && p.ability >= 74 && !p.tradeRequested
+  );
 
-  if (isLowValueQuantityBundle) {
+  // (1) 현금 위주 매수 차단: 핵심 주전·차세대 코어 유망주를 현금 비중이 과도한 패키지로 영입 불가
+  if (
+    (targetHasStarOrYoungCore || targetHasStarter) &&
+    cashVal > 0 &&
+    cashVal >= Math.max(12, Math.round(giveScore * 0.25)) &&
+    maxGiveMarket < maxReceiveMarket * 0.8
+  ) {
     return {
       decision: '거절',
       giveScore,
@@ -1585,19 +1639,102 @@ export function evaluateTradeProposal(
       giveBreakdowns,
       receiveBreakdowns,
       aiStance,
-      reason: `${KBO_TEAMS[targetTeamId].shortName} 프런트[${aiStance}]는 핵심 스타 선수 1명을 낮은 가치 선수 여러 명(${givePlayers.length}명 묶음)으로 교환하는 제안을 거절했습니다. 핵심 즉시전력 또는 최상위 유망주·1라운드 지명권을 중심으로 재구성하세요.`,
+      reason: `${KBO_TEAMS[targetTeamId].shortName} 프런트[${aiStance}]는 주전·핵심 유망주를 현금(${cashIncludeBillion}억) 위주의 카드로 매각할 의사가 없다며 단호히 거절했습니다. 동급 선수나 핵심 유망주를 중심에 두세요.`,
     };
   }
 
-  const targetLosesStarter = receivePlayers.some(
-    (p) => p.rosterTier === '1군' && p.ability >= 76 && !p.tradeRequested
-  );
+  // (2) 품질 우선 원칙 (Quality over Quantity): 스타·차세대 코어 유망주 영입 시 최소 동급 핵심 카드 필수
+  const minCenterpieceRatio = preferYouth && draftPickRound === 1 ? 0.58 : 0.72;
+  if (
+    targetHasStarOrYoungCore &&
+    maxGiveMarket < maxReceiveMarket * minCenterpieceRatio &&
+    !(givePlayers.length === 1 && receivePlayers.length === 1 && giveScore >= receiveScore * 1.15)
+  ) {
+    return {
+      decision: '거절',
+      giveScore,
+      receiveScore,
+      giveMarketScore,
+      receiveMarketScore,
+      franchiseSymbolicGap,
+      giveBreakdowns,
+      receiveBreakdowns,
+      aiStance,
+      reason: `${KBO_TEAMS[targetTeamId].shortName} 프런트[${aiStance}]는 핵심 스타·차세대 주축 선수(${coreNamesReceiving.join(', ') || receivePlayers[0].name})의 대가로 그에 준하는 핵심 카드가 빠져 있다며 거절했습니다. 백업 묶음이나 현금 대신 1군 핵심 주전·최상위 유망주를 중심으로 제안하세요.`,
+    };
+  }
+
+  // (3) 일반 1군 주전 대상 백업 다수 묶음 차단
+  if (
+    targetHasStarter &&
+    givePlayers.length > receivePlayers.length &&
+    maxGiveMarket < maxReceiveMarket * 0.62 &&
+    !(preferYouth && draftPickRound === 1)
+  ) {
+    return {
+      decision: '거절',
+      giveScore,
+      receiveScore,
+      giveMarketScore,
+      receiveMarketScore,
+      franchiseSymbolicGap,
+      giveBreakdowns,
+      receiveBreakdowns,
+      aiStance,
+      reason: `${KBO_TEAMS[targetTeamId].shortName} 프런트[${aiStance}]는 1군 주전 선수를 하위 자원 여러 명(${givePlayers.length}명 묶음)으로 교환할 수 없다며 거절했습니다.`,
+    };
+  }
+
+  // (4) 구단 기조 불일치 차단:
+  // - 리빌딩 구단이 차세대 코어(24세 이하·POT 83+)를 30대 노장 위주로 매각하는 비현실 거래 차단
+  if (
+    preferYouth &&
+    receivePlayers.some((p) => isYoungCorePlayer(p) && !p.tradeRequested) &&
+    givePlayers.every((p) => p.age >= 30) &&
+    draftPickRound !== 1
+  ) {
+    return {
+      decision: '거절',
+      giveScore,
+      receiveScore,
+      giveMarketScore,
+      receiveMarketScore,
+      franchiseSymbolicGap,
+      giveBreakdowns,
+      receiveBreakdowns,
+      aiStance,
+      reason: `${KBO_TEAMS[targetTeamId].shortName}[리빌딩]은 미래 핵심 자원(만 24세 이하 유망주)을 30대 베테랑 선수 대가로 내줄 수 없다며 거절했습니다.`,
+    };
+  }
+
+  // - 우승 도전 구단이 시즌 중 핵심 1군 주전(OVR 77+)을 즉시전력 없는 2군 유망주만으로 매각하는 비현실 거래 차단
+  if (
+    isContender &&
+    career.phase === 'REGULAR_SEASON' &&
+    career.gamesPlayed >= 15 &&
+    receivePlayers.some((p) => p.rosterTier === '1군' && p.ability >= 77 && !p.tradeRequested) &&
+    givePlayers.every((p) => p.rosterTier !== '1군' || p.ability < 72)
+  ) {
+    return {
+      decision: '거절',
+      giveScore,
+      receiveScore,
+      giveMarketScore,
+      receiveMarketScore,
+      franchiseSymbolicGap,
+      giveBreakdowns,
+      receiveBreakdowns,
+      aiStance,
+      reason: `${KBO_TEAMS[targetTeamId].shortName}[우승도전]은 순위 경쟁 중 1군 주축 전력을 즉시 전력감 없이 유망주·2군 자원으로만 트레이드할 수 없다며 거절했습니다.`,
+    };
+  }
+
   const allGiveAreSurplusNonStars =
     givePosNeeds.every((n) => n.isSurplus) &&
     givePlayers.every((p) => p.ability < 83) &&
     draftPickRound !== 1;
 
-  if (targetLosesStarter && allGiveAreSurplusNonStars) {
+  if (targetHasStarter && allGiveAreSurplusNonStars) {
     return {
       decision: '거절',
       giveScore,
@@ -1612,8 +1749,29 @@ export function evaluateTradeProposal(
     };
   }
 
+  // (5) 직접 순위 경쟁(우승 경쟁팀 간) 및 라이벌 구단 할증
+  let rivalryAndContenderTax = 0;
+  const taxReasons: string[] = [];
+  if (
+    isContender &&
+    isUserContender &&
+    career.phase === 'REGULAR_SEASON' &&
+    career.gamesPlayed >= 20 &&
+    receivePlayers.some((p) => p.rosterTier === '1군' && p.ability >= 75 && !p.tradeRequested)
+  ) {
+    rivalryAndContenderTax += 0.14;
+    taxReasons.push('우승 경쟁팀 직접 거래 부담');
+  }
+  const hasHistoricRivalry = Boolean(
+    getRivalryEffectProfile(career, career.playerTeamId, targetTeamId)
+  );
+  if (hasHistoricRivalry && (targetHasStarOrYoungCore || targetHasStarter)) {
+    rivalryAndContenderTax += 0.08;
+    taxReasons.push('라이벌 구단 이적 부담');
+  }
+
   const diffTol = DIFFICULTY_CONFIG[career.difficulty ?? '어려움'].tradeFairnessTolerance;
-  const acceptThreshold = Number((1.06 / diffTol).toFixed(2));
+  const acceptThreshold = Number(((1.08 + rivalryAndContenderTax) / diffTol).toFixed(2));
   const ratio = giveScore / Math.max(1, receiveScore);
 
   // 트레이드 지수가 수락 기준선을 근소하게 넘더라도, 핵심 주전/프랜차이즈 매각 시 구단 내부 신중 검토(역제안 전환)
@@ -1623,8 +1781,8 @@ export function evaluateTradeProposal(
   const borderlineCoreHoldback =
     hasProtectedCore &&
     ratio >= Math.max(1.0, acceptThreshold) &&
-    ratio < acceptThreshold + 0.14 &&
-    reluctanceRoll < 0.42;
+    ratio < acceptThreshold + 0.12 &&
+    reluctanceRoll < 0.45;
 
   if (ratio >= Math.max(1.0, acceptThreshold) && !borderlineCoreHoldback) {
     const needHit = givePosNeeds.find((n) => n.needScore >= 4);
@@ -1646,11 +1804,12 @@ export function evaluateTradeProposal(
     };
   }
 
-  // 재협상 역제안 구간 (0.70 이상이거나 핵심 주전 보류 전환 시 구체적 AI 역제안 제공)
-  if (ratio >= 0.7 || borderlineCoreHoldback) {
-    const gap = Math.max(8, Math.round(receiveScore * (borderlineCoreHoldback ? 1.12 : 1.04) - giveScore));
-    const extraCash = Number(Math.min(18, Math.max(1.5, Math.ceil(gap / 5.5))).toFixed(1));
-    const suggestedPick: 1 | 2 | 3 = gap >= 28 ? 1 : gap >= 16 ? 2 : 3;
+  // 재협상 역제안 구간 (0.78 이상이거나 핵심 주전 보류 전환 시 구체적 AI 역제안 제공 — 현금은 KBO 10억 상한 내로 제한)
+  if (ratio >= 0.78 || borderlineCoreHoldback) {
+    const gap = Math.max(8, Math.round(receiveScore * (borderlineCoreHoldback ? acceptThreshold + 0.08 : acceptThreshold) - giveScore));
+    const remainingCashRoom = Math.max(0, Number((MAX_KBO_TRADE_CASH_BILLION - cashIncludeBillion).toFixed(1)));
+    const extraCash = Number(Math.min(remainingCashRoom, Math.max(1.0, Math.ceil(gap / 4.5))).toFixed(1));
+    const suggestedPick: 1 | 2 | 3 = gap >= 32 ? 1 : gap >= 18 ? 2 : 3;
 
     const extraProspect = Object.values(career.players)
       .filter(
@@ -1658,39 +1817,53 @@ export function evaluateTradeProposal(
           p.teamId === career.playerTeamId &&
           p.category === '국내' &&
           !givePlayerIds.includes(p.id) &&
+          !p.injury &&
+          !isMilitaryServing(p.militaryStatus) &&
           p.age <= 24 &&
+          p.potential >= 76 &&
           (p.rosterTier === '2군' || p.rosterTier === '1군')
       )
       .sort((a, b) => b.potential - a.potential)[0];
 
     const symbolicPrefix =
       starNamesReceiving.length > 0
-        ? `프랜차이즈 상징성(${starNamesReceiving.join(', ')})을 고려해 `
+        ? `프랜차이즈·핵심 가치(${starNamesReceiving.join(', ')})를 고려해 `
         : coreNamesReceiving.length > 0
-        ? `핵심 주전(${coreNamesReceiving.join(', ')}) 이탈 부담을 고려해 `
+        ? `핵심 주전·유망주(${coreNamesReceiving.join(', ')}) 이탈 부담을 고려해 `
+        : taxReasons.length > 0
+        ? `${taxReasons.join('·')}을 고려해 `
         : '';
 
     const counterOffer: TradeCounterOffer =
-      preferYouth && !draftPickRound
+      (preferYouth || targetHasStarOrYoungCore) && !draftPickRound
         ? {
-            description: `${symbolicPrefix}신인 드래프트 ${suggestedPick}라운드 지명권을 추가 포함하면 즉시 트레이드를 수락하겠습니다.`,
+            description: `${symbolicPrefix}신인 드래프트 ${suggestedPick}라운드 지명권${
+              extraProspect && gap >= 34 ? ` 및 유망주 ${extraProspect.name}(${extraProspect.position})` : ''
+            }을 추가 포함하면 트레이드를 수락하겠습니다.`,
             requestedPickRound: suggestedPick,
-            extraCashBillion: gap >= 36 ? Math.min(8, Math.ceil((gap - 26) / 5)) : undefined,
-            negotiationTip: '역제안 조건을 자동 반영한 뒤 현금·선수를 조정해 재협상하거나 바로 승인할 수 있습니다.',
+            requestedPlayerId: extraProspect && gap >= 34 ? extraProspect.id : undefined,
+            requestedPlayerName: extraProspect && gap >= 34 ? extraProspect.name : undefined,
+            negotiationTip: '역제안 조건을 반영하거나 동급 선수 카드를 추가해 재협상할 수 있습니다.',
           }
-        : extraProspect && gap >= 18
+        : extraProspect && (gap >= 14 || remainingCashRoom < 1)
         ? {
-            description: `${symbolicPrefix}유망주 ${extraProspect.name}(${extraProspect.position}·잠재 ${extraProspect.potential}) 추가 또는 현금 +${extraCash}억 보강을 역제안합니다.`,
-            extraCashBillion: extraCash,
+            description: `${symbolicPrefix}유망주 ${extraProspect.name}(${extraProspect.position}·잠재 ${extraProspect.potential}) 추가${
+              extraCash >= 1 && !targetHasStarOrYoungCore ? ` (또는 현금 +${extraCash}억)` : ''
+            }를 역제안합니다.`,
+            extraCashBillion: extraCash >= 1 && !targetHasStarOrYoungCore ? extraCash : undefined,
             requestedPlayerId: extraProspect.id,
             requestedPlayerName: extraProspect.name,
             requestedPickRound: !draftPickRound && gap >= 34 ? suggestedPick : undefined,
-            negotiationTip: '역제안 유망주·현금 조건을 트레이드 구성에 자동 반영해 재협상할 수 있습니다.',
+            negotiationTip: '역제안 유망주·지명권 조건을 트레이드 구성에 반영해 재협상할 수 있습니다.',
           }
         : {
-            description: `${symbolicPrefix}현금 +${extraCash}억 원을 추가 포함하면 트레이드를 최종 승인하겠습니다.`,
-            extraCashBillion: extraCash,
-            negotiationTip: '역제안 현금을 반영하거나 다른 유망주/지명권으로 대체해 재협상할 수 있습니다.',
+            description:
+              extraCash >= 1
+                ? `${symbolicPrefix}현금 +${extraCash}억 원을 추가 포함하면 트레이드를 최종 승인하겠습니다.`
+                : `${symbolicPrefix}1군 즉시전력 또는 상위 지명권을 추가 보강해 주세요.`,
+            extraCashBillion: extraCash >= 1 ? extraCash : undefined,
+            requestedPickRound: extraCash < 1 && !draftPickRound ? suggestedPick : undefined,
+            negotiationTip: '역제안 조건을 반영하거나 다른 유망주/지명권으로 보강해 재협상할 수 있습니다.',
           };
 
     return {
@@ -1704,10 +1877,12 @@ export function evaluateTradeProposal(
       receiveBreakdowns,
       aiStance,
       reason: borderlineCoreHoldback
-        ? `${KBO_TEAMS[targetTeamId].shortName}[${aiStance}]는 트레이드 지수는 근접했으나 핵심 주전/상징 자원 보호 방침에 따라 추가 조건을 역제안했습니다.`
+        ? `${KBO_TEAMS[targetTeamId].shortName}[${aiStance}]는 조건이 근접했으나 핵심 자원 보호${
+            taxReasons.length > 0 ? `(${taxReasons.join('·')})` : ''
+          } 방침에 따라 추가 조건을 역제안했습니다.`
         : `${KBO_TEAMS[targetTeamId].shortName}[${aiStance}]가 역제안을 보냈습니다 (제시 ${giveScore} vs 요구 ${receiveScore}${
-            franchiseSymbolicGap > 0 ? ` · 프랜차이즈 상징성 +${franchiseSymbolicGap} 반영` : ''
-          }).`,
+            franchiseSymbolicGap > 0 ? ` · 구단 보호 가치 +${franchiseSymbolicGap} 반영` : ''
+          }${taxReasons.length > 0 ? ` · ${taxReasons.join(', ')}` : ''}).`,
       counterOffer,
     };
   }
@@ -1724,7 +1899,7 @@ export function evaluateTradeProposal(
     aiStance,
     reason: `${KBO_TEAMS[targetTeamId].name}[${aiStance}]가 전력·포지션 필요도 및 핵심 자원 가치 대비 대가 부족(제시 ${giveScore} vs 요구 ${receiveScore}${
       starNamesReceiving.length > 0 ? ` · ${starNamesReceiving.join(', ')}` : ''
-    })으로 협상을 거절했습니다.`,
+    }${taxReasons.length > 0 ? ` · ${taxReasons.join(', ')}` : ''})으로 협상을 거절했습니다.`,
   };
 }
 
