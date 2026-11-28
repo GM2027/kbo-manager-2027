@@ -48,6 +48,7 @@ import {
 import {
   REAL_KBO_HITTER_POSITIONS,
   REAL_PLAYER_DRAFT_INFO,
+  reassignVerifiedUniformNumbersInPlace,
   resolveRealForeignNationality,
   sanitizePlayerAgeAndServiceYearsInPlace,
 } from './playerMetadata';
@@ -698,6 +699,8 @@ export function computeRealisticServiceYears2027(
 
 function getDatabaseVersionRank(ver?: string): number {
   switch (ver) {
+    case 'v32_verified_2026_kbo_uniform_numbers':
+      return 32;
     case 'v31_hanwha_park_junyoung_2002':
       return 31;
     case 'v30_hilliard_of_and_dh_position':
@@ -1645,6 +1648,13 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
         career.players[pjy2002.id] = pjy2002;
       }
       career.databaseVersion = 'v31_hanwha_park_junyoung_2002';
+    }
+
+    // v32: KBO 10개 구단 전체 선수 등번호를 공식 2026 KBO 등록 등번호 기준으로 일괄 교정 (사용자 에디터 편집 선수는 보존)
+    if (getDatabaseVersionRank(career.databaseVersion) < 32) {
+      const editorTouchedIds = new Set(Object.keys(career.editorOriginals?.players ?? {}));
+      reassignVerifiedUniformNumbersInPlace(career.players, { editorTouchedIds });
+      career.databaseVersion = 'v32_verified_2026_kbo_uniform_numbers';
     }
 
     // KBO 현역 선수단과 해외파 목록 간 중복 등록 상시 방지
