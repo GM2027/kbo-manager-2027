@@ -698,6 +698,8 @@ export function computeRealisticServiceYears2027(
 
 function getDatabaseVersionRank(ver?: string): number {
   switch (ver) {
+    case 'v31_hanwha_park_junyoung_2002':
+      return 31;
     case 'v30_hilliard_of_and_dh_position':
       return 30;
     case 'v29_realistic_service_years':
@@ -1612,6 +1614,39 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
       career.databaseVersion = 'v30_hilliard_of_and_dh_position';
     }
 
+    // v31: 한화 이글스 동명이인 투수 박준영(2002-06-03생 · 청운대 · 육성선수) 추가 및 기존 박준영(2003-03-02생 · 세광고) 출신교 구분 보완
+    if (career.season >= 2027 && getDatabaseVersionRank(career.databaseVersion) < 31) {
+      // 기존 2003년생 박준영(세광고) 출신교 보완
+      for (const p of Object.values(career.players)) {
+        if (p.name === '박준영' && (p.birthYear === 2003 || p.birthDate === '2003-03-02')) {
+          if (!p.school) p.school = '세광고';
+          if (!p.draftYear) p.draftYear = 2022;
+        }
+      }
+      const hasParkJunyoung2002 = Object.values(career.players).some(
+        (p) =>
+          p.id === '2026-HH-PJY-2002' ||
+          p.permanentId === 'KBO-PL-820603' ||
+          (p.name === '박준영' && (p.birthYear === 2002 || p.birthDate === '2002-06-03'))
+      );
+      if (!hasParkJunyoung2002) {
+        const usedHhNums = new Set(
+          Object.values(career.players)
+            .filter((p) => p.teamId === '한화' && typeof p.uniformNumber === 'number')
+            .map((p) => p.uniformNumber!)
+        );
+        let devNum = 105;
+        while (usedHhNums.has(devNum) && devNum < 139) devNum++;
+        const pjy2002 = buildHanwhaParkJunyoung2002Player(
+          career.currentDate ?? `${career.season}-01-01`,
+          career.season,
+          devNum
+        );
+        career.players[pjy2002.id] = pjy2002;
+      }
+      career.databaseVersion = 'v31_hanwha_park_junyoung_2002';
+    }
+
     // KBO 현역 선수단과 해외파 목록 간 중복 등록 상시 방지
     if (career.amateurAndOverseas?.overseasPlayers) {
       const activeKboKey = new Set<string>();
@@ -1724,6 +1759,94 @@ function mergeVerifiedTeamHistory(
  * - 2024~2026 성적은 historicalSeasons & careerStats로 보존, 2027시즌 stats는 0부터 시작
  * - 2027 개정 최저연봉 3,300만 원(0.33억) 반영
  */
+/**
+ * 한화 이글스 동명이인 투수 박준영(2002-06-03생 · 청운대 · 2025.09 육성선수 입단) 생성 헬퍼
+ * - 기존 박준영(2003-03-02생 · 세광고 · v15-0076 / KBO-PL-162914)과 고유 ID·생년월일·출신교로 명확히 구분됩니다.
+ */
+function buildHanwhaParkJunyoung2002Player(
+  asOfDate = '2027-01-01',
+  season = 2027,
+  uniformNumber = 105
+): Player {
+  const age = calculateKoreanFullAge('2002-06-03', asOfDate) ?? 24;
+  const p: Player = {
+    id: '2026-HH-PJY-2002',
+    originType: 'real',
+    v18SourceId: '2026-HH-PJY-2002',
+    permanentId: 'KBO-PL-820603',
+    name: '박준영',
+    teamId: '한화',
+    category: '국내',
+    nationality: '한국',
+    role: '투수',
+    position: 'RP',
+    pitchRole: '중간',
+    age,
+    birthYear: 2002,
+    birthDate: '2002-06-03',
+    heightCm: 185,
+    weightKg: 88,
+    bats: 'R',
+    throws: 'R',
+    school: '청운대',
+    debutYear: 2026,
+    draftYear: null,
+    uniformNumber,
+    militaryStatus: '미필',
+    ability: 46,
+    potential: 70,
+    abilityStatus: '확정',
+    form: 0,
+    fatigue: 0,
+    lastPitchedRound: 0,
+    consecutiveAppearances: 0,
+    rosterTier: '육성',
+    gameDayActive: false,
+    contract: {
+      status: '확정',
+      currency: 'KRW',
+      years: 1,
+      yearsRemaining: 1,
+      annualSalary: 0.33,
+      signingBonus: 0,
+      totalValue: 0.33,
+      startSeason: season,
+      endSeason: season,
+      note: '2025.09 한화 이글스 육성선수 입단 (청운대)',
+    },
+    injury: null,
+    morale: '보통',
+    trainingFocus: null,
+    serviceYears: 0,
+    registrationDays: 0,
+    clubTenureSeasons: 1,
+    careerSeasons: 1,
+    isOneClubMan: true,
+    careerTeamHistory: [
+      {
+        teamId: '한화',
+        teamLabel: '한화 이글스',
+        league: 'KBO',
+        fromSeason: 2026,
+        note: '2025.09 육성선수 입단 (청운대)',
+      },
+    ],
+    acquisitionInfo: {
+      type: '육성선수',
+      label: '2025.09 육성선수 입단 (청운대)',
+    },
+    previousAnnualSalary: 0.33,
+    recent3YrScore: 48,
+    seasonRatingDelta: 0,
+    lastEvaluatedAtTeamGames: 0,
+    stats: emptyPitcherStats(false),
+    postseasonStats: emptyPitcherStats(false),
+    growthCurveProfile: '대기만성',
+  };
+  ensurePlayerOotpRatingsInPlace(p);
+  return p;
+}
+
 export function buildAll10TeamsFromV18Dataset(): {
   players: Record<string, Player>;
   teams: Record<TeamId, TeamState>;
@@ -2131,6 +2254,10 @@ export function buildAll10TeamsFromV18Dataset(): {
     if (role === '타자') {
       ensurePlayerPositionProficiencyInPlace(player);
     }
+    if (player.name === '박준영' && player.teamId === '한화' && (player.birthYear === 2003 || player.birthDate === '2003-03-02')) {
+      if (!player.school) player.school = '세광고';
+      if (!player.draftYear) player.draftYear = 2022;
+    }
     players[pid] = player;
   }
 
@@ -2345,6 +2472,19 @@ export function buildAll10TeamsFromV18Dataset(): {
       fanSentiment: 65,
       clubReputation: 70,
     };
+  }
+
+  // 한화 이글스 동명이인 투수 박준영(2002-06-03생 · 청운대 · 육성선수) 신규 등록 (기존 2003년생 세광고 박준영과 구분)
+  if (!players['2026-HH-PJY-2002']) {
+    const usedHhNums = new Set(
+      Object.values(players)
+        .filter((p) => p.teamId === '한화' && typeof p.uniformNumber === 'number')
+        .map((p) => p.uniformNumber!)
+    );
+    let devNum = 105;
+    while (usedHhNums.has(devNum) && devNum < 139) devNum++;
+    const pjy2002 = buildHanwhaParkJunyoung2002Player('2027-01-01', 2027, devNum);
+    players[pjy2002.id] = pjy2002;
   }
 
   enforceOvrPotInvariantInPlace(players);
