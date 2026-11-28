@@ -1271,10 +1271,10 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "teamFolder": "KT"
   },
   "KBO-PL-342210": {
-    "url": "/portraits/kbo/HH/권광민_KBO-PL-342210.jpg",
-    "credit": "OSEN SPORTS",
-    "license": "CC BY 3.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:%EA%B6%8C%EA%B4%91%EB%AF%BC_%EC%95%BC%EA%B5%AC_%EC%84%A0%EC%88%98.jpg",
+    "url": "/portraits/kbo/HH/권광민.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/HH/권광민.png",
     "teamFolder": "HH"
   },
   "KBO-PL-343754": {
