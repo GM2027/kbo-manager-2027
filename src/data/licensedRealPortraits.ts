@@ -857,6 +857,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/LG/문정빈.png",
     "teamFolder": "LG"
   },
+  "KBO-PL-257947": {
+    "url": "/portraits/kbo/WO/하현승.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/WO/하현승.png",
+    "teamFolder": "WO"
+  },
   "KBO-PL-258454": {
     "url": "/portraits/kbo/KT/고준혁.png",
     "credit": "사용자 등록 공식 프로필",
@@ -5099,6 +5106,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "2026-WO-93": "KBO-PL-431350",
   "2026-WO-94": "KBO-PL-168580",
   "2026-WO-95": "KBO-PL-974397",
+  "D2027-001": "KBO-PL-257947",
   "D2027-002": "KBO-PL-734613",
   "D2027-003": "KBO-PL-593916",
   "D2027-004": "KBO-PL-806270",
