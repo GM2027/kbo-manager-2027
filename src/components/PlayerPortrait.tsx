@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { resolveLicensedRealPlayerPhoto } from '../data/playerPortraitRegistry';
 import {
   getPlayerPortraitIdentityKey,
   getPlayerUniformKey,
-  renderPlayerSilhouetteDataUrl,
-  ResolvedPlayerPortrait,
-  resolvePlayerPortraitAsync,
+  resolvePlayerPortraitSync,
 } from '../engine/playerPortraitEngine';
 import { Player } from '../types/kbo';
 import { TeamLogo } from './TeamLogo';
@@ -27,114 +24,50 @@ const SIZE_CLASSES: Record<'xs' | 'sm' | 'md' | 'lg', string> = {
 
 /**
  * 선수 프로필 사진 컴포넌트 (선수단 명단 · 선수 카드 · 선수 상세 정보 공용)
- * - 실존 선수: 선수 고유 ID에 연결된 프로필 사진 최우선 적용 (미등록/로딩 실패 시 구단 유니폼 실루엣 폴백)
- * - 가상 신인·가상 외국인·생성 선수: 최초 1회 생성 후 영구 캐싱된 AI 프로필 이미지 표시
- * - 트레이드·FA 이적·군입대 시 소속 구단 모자와 유니폼 자동 변경 (선수 고유 ID 기준 동일 얼굴 유지)
+ * - 등록된 실존 선수: 선수 고유 ID에 연결된 투명 PNG 프로필 사진 최우선 적용
+ * - 미등록 선수 · 가상 신인 · 외국인 · 생성 선수 · 로딩 실패 시: 배경 없는 구단 유니폼 기본 실루엣 표시
+ * - 트레이드·FA 이적·군입대 시 실루엣 모자와 유니폼 자동 전환
  */
 export const PlayerPortrait: React.FC<PlayerPortraitProps> = ({
   player,
-  season,
   size = 'md',
   showTeamBadge = size !== 'xs',
   showSourceTag = size !== 'xs',
 }) => {
   const identityKey = getPlayerPortraitIdentityKey(player);
   const uniformKey = getPlayerUniformKey(player);
-  const defaultSilhouette = renderPlayerSilhouetteDataUrl(uniformKey, player.uniformNumber);
-  const syncLicensed = resolveLicensedRealPlayerPhoto(player);
-
-  const [resolved, setResolved] = useState<ResolvedPlayerPortrait | null>(() =>
-    syncLicensed
-      ? {
-          src: syncLicensed.url,
-          fallbackSilhouetteSrc: defaultSilhouette,
-          sourceType: 'licensed_real',
-          uniformKey,
-          cacheKey: `${identityKey}::licensed`,
-          fromCache: true,
-          badgeLabel: '실제 프로필',
-          credit: syncLicensed.credit,
-          license: syncLicensed.license,
-        }
-      : null
-  );
+  const resolved = resolvePlayerPortraitSync(player);
   const [imgFailed, setImgFailed] = useState(false);
 
-  // 외형 속성 변경(에디터 수정)이나 이적(uniformKey) 시 자동 재조회 (캐시 히트 시 즉시 반환)
-  const appearanceSig = player.portraitProfile
-    ? `${player.portraitProfile.faceSeed}-${player.portraitProfile.hairStyle}-${player.portraitProfile.hairColor}-${player.portraitProfile.facialHair}-${player.portraitProfile.glasses}-${player.portraitProfile.eyeBlack}-${player.portraitProfile.skinToneIndex}`
-    : 'none';
-
   useEffect(() => {
-    let active = true;
     setImgFailed(false);
-    if (syncLicensed) {
-      setResolved({
-        src: syncLicensed.url,
-        fallbackSilhouetteSrc: defaultSilhouette,
-        sourceType: 'licensed_real',
-        uniformKey,
-        cacheKey: `${identityKey}::licensed`,
-        fromCache: true,
-        badgeLabel: '실제 프로필',
-        credit: syncLicensed.credit,
-        license: syncLicensed.license,
-      });
-      return () => {
-        active = false;
-      };
-    }
-    void resolvePlayerPortraitAsync(player, season).then((res) => {
-      if (!active) return;
-      setResolved(res);
-    });
-    return () => {
-      active = false;
-    };
-  }, [
-    identityKey,
-    uniformKey,
-    player.uniformNumber,
-    player.licensedPhotoUrl,
-    syncLicensed?.url,
-    appearanceSig,
-    season,
-  ]);
+  }, [identityKey, uniformKey, player.uniformNumber, player.licensedPhotoUrl, resolved.src]);
 
-  const activeSrc =
-    imgFailed || !resolved
-      ? resolved?.fallbackSilhouetteSrc ?? defaultSilhouette
-      : resolved.src;
+  const activeSrc = imgFailed ? resolved.fallbackSilhouetteSrc : resolved.src;
+  const isSilhouette = imgFailed || resolved.sourceType === 'silhouette';
+  const isTransparentPortrait =
+    isSilhouette ||
+    (resolved.sourceType === 'licensed_real' &&
+      !imgFailed &&
+      /\.png(\?.*)?$/i.test(resolved.src));
 
-  const isSilhouetteFallback =
-    imgFailed || !resolved || resolved.sourceType === 'silhouette_real';
-
-  const isTransparentPngReal =
-    resolved?.sourceType === 'licensed_real' &&
-    !imgFailed &&
-    /\.png(\?.*)?$/i.test(resolved.src);
-
-  const badgeText = imgFailed
-    ? '기본 실루엣'
-    : resolved?.badgeLabel ?? '프로필';
+  const badgeText = imgFailed ? '기본 실루엣' : resolved.badgeLabel;
 
   return (
     <div
       data-testid={size === 'xs' ? 'player-list-portrait' : 'player-detail-portrait'}
-      data-portrait-source={imgFailed ? 'error_silhouette' : resolved?.sourceType ?? 'loading'}
+      data-portrait-source={imgFailed ? 'error_silhouette' : resolved.sourceType}
       data-portrait-uniform={uniformKey}
       className={`relative shrink-0 ${SIZE_CLASSES[size]} overflow-hidden select-none ${
-        isTransparentPngReal
+        isTransparentPortrait
           ? size === 'xs'
             ? 'bg-transparent border-0 shadow-none'
             : 'bg-transparent border border-slate-200/70 dark:border-slate-700/60'
           : 'border border-slate-300/90 dark:border-slate-700 bg-slate-900 shadow-sm'
       }`}
       title={
-        resolved?.sourceType === 'licensed_real' && !imgFailed
-          ? `${player.name} 실존 선수 프로필 (${resolved.license ?? 'CC'} · ${resolved.credit ?? 'Wikimedia Commons'})`
-          : resolved?.sourceType === 'ai_virtual' && !imgFailed
-          ? `${player.name} AI 프로필 (${uniformKey} 유니폼 · 고유 ID 영구 연결)`
+        !isSilhouette
+          ? `${player.name} 실존 선수 프로필 (${resolved.license ?? 'CC'} · ${resolved.credit ?? '공식 프로필'})`
           : `${player.name} 기본 선수 실루엣 (${uniformKey} 유니폼)`
       }
     >
@@ -147,18 +80,16 @@ export const PlayerPortrait: React.FC<PlayerPortraitProps> = ({
           if (!imgFailed) setImgFailed(true);
         }}
         className={`w-full h-full ${
-          isTransparentPngReal ? 'object-contain object-bottom' : 'object-cover object-top'
-        } ${isSilhouetteFallback ? 'opacity-95' : ''}`}
+          isTransparentPortrait ? 'object-contain object-bottom' : 'object-cover object-top'
+        }`}
       />
 
       {showSourceTag && (
         <div
           className={`absolute bottom-0 inset-x-0 px-1 py-0.5 text-[9px] font-bold text-center tracking-tight truncate ${
-            resolved?.sourceType === 'licensed_real' && !imgFailed
+            !isSilhouette
               ? 'bg-emerald-950/80 text-emerald-200'
-              : resolved?.sourceType === 'ai_virtual' && !imgFailed
-              ? 'bg-indigo-950/80 text-indigo-200'
-              : 'bg-slate-950/75 text-slate-300'
+              : 'bg-slate-900/70 text-slate-100'
           }`}
         >
           {badgeText}

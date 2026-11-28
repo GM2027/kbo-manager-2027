@@ -60,7 +60,6 @@ import {
   ensurePlayerOotpRatingsInPlace,
   evolvePlayerOotpSubRatingsInPlace,
 } from './ootpRatingsEngine';
-import { ensurePlayerPortraitProfileInPlace } from './playerPortraitEngine';
 import { reconcileTeamLineupPositionsInPlace } from './lineupValidationEngine';
 import { unlockUnclaimedFreeAgentsForNewSeasonInPlace } from './waiverEngine';
 import { resetRivalriesForNewSeason } from './rivalryEngine';
@@ -1125,7 +1124,6 @@ export function signForeignCandidate(
     ensurePlayerRichMetadata(next.players[newId]);
     if ('isVirtual' in candidate && candidate.isVirtual) {
       next.players[newId].originType = 'virtual';
-      ensurePlayerPortraitProfileInPlace(next.players[newId], next.season);
     }
     const builtHist = buildInitialPlayerTeamHistory(next.players[newId], next.season);
     next.players[newId].careerTeamHistory = builtHist.history;
@@ -2058,7 +2056,6 @@ function addDraftedCandidateToCareer(
   ensurePlayerOotpRatingsInPlace(next.players[pid]);
   if (!cand.isOverseasReturnee) {
     next.players[pid].originType = 'virtual';
-    ensurePlayerPortraitProfileInPlace(next.players[pid], ds.season);
   }
   markUlsanPlayerDrafted(next, cand.name, teamId, `${ds.season}-09-15`);
   markAmateurOrOverseasDraftedInPlace(next, permId, teamId, ds.season);
@@ -4893,7 +4890,6 @@ export function advanceToNextSeason(career: CareerSave): {
           futuresStats: emptyFuturesStats(),
         };
         ensurePlayerOotpRatingsInPlace(createdHitter);
-        ensurePlayerPortraitProfileInPlace(createdHitter, nextSeasonNum);
         next.players[replId] = createdHitter;
         candidate = createdHitter;
       }
@@ -5005,7 +5001,6 @@ export function advanceToNextSeason(career: CareerSave): {
           futuresStats: emptyFuturesStats(),
         };
         ensurePlayerOotpRatingsInPlace(createdPitcher);
-        ensurePlayerPortraitProfileInPlace(createdPitcher, nextSeasonNum);
         next.players[replId] = createdPitcher;
         candidate = createdPitcher;
       }

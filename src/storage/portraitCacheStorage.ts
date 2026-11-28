@@ -1,10 +1,11 @@
 /**
  * 선수 프로필 이미지 전용 영구 캐시 스토리지 (In-Memory LRU + IndexedDB)
- * - 동일 선수의 AI 프로필 이미지 중복 생성을 원천 차단하고, CareerSave JSON 용량 증가를 0으로 유지합니다.
- * - 키 형식: `${permanentIdentityKey}::${uniformKey}::v1` (이적 시 유니폼 키만 변경되어 동일 얼굴 + 새 유니폼 캐싱)
+ * - 기본 실루엣 SVG 캐시를 경량으로 유지하고, CareerSave JSON 용량 증가를 0으로 유지합니다.
+ * - 레거시 AI 프로필 캐시 DB(v1)는 자동으로 정리합니다.
  */
 
-const IDB_NAME = 'kbo_gm_2027_portraits_idb_v1';
+const LEGACY_IDB_NAME = 'kbo_gm_2027_portraits_idb_v1';
+const IDB_NAME = 'kbo_gm_2027_portraits_idb_v2';
 const IDB_STORE = 'portraits';
 const MAX_MEMORY_ENTRIES = 250;
 
@@ -12,9 +13,21 @@ const memoryCache = new Map<string, string>();
 const inFlightCache = new Map<string, Promise<string>>();
 
 let dbPromise: Promise<IDBDatabase | null> | null = null;
+let legacyCleaned = false;
+
+function cleanupLegacyPortraitDbOnce(): void {
+  if (legacyCleaned || typeof indexedDB === 'undefined') return;
+  legacyCleaned = true;
+  try {
+    indexedDB.deleteDatabase(LEGACY_IDB_NAME);
+  } catch {
+    // Ignore restricted storage environments
+  }
+}
 
 function openPortraitDb(): Promise<IDBDatabase | null> {
   if (typeof indexedDB === 'undefined') return Promise.resolve(null);
+  cleanupLegacyPortraitDbOnce();
   if (dbPromise) return dbPromise;
   dbPromise = new Promise((resolve) => {
     try {
