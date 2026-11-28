@@ -178,6 +178,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/LG/김정율.png",
     "teamFolder": "LG"
   },
+  "KBO-PL-162914": {
+    "url": "/portraits/kbo/HH/박준영(2003).png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/HH/박준영(2003).png",
+    "teamFolder": "HH"
+  },
   "KBO-PL-165093": {
     "url": "/portraits/kbo/WO/김성민_KBO-PL-165093.jpg",
     "credit": "Trainholic",
@@ -193,10 +200,10 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "teamFolder": "LT"
   },
   "KBO-PL-167366": {
-    "url": "/portraits/kbo/HH/최재훈_KBO-PL-167366.jpg",
-    "credit": "Seohae1999",
-    "license": "CC BY-SA 4.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Choi_Jaehoon_2025.jpg",
+    "url": "/portraits/kbo/HH/최재훈.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/HH/최재훈.png",
     "teamFolder": "HH"
   },
   "KBO-PL-179562": {
@@ -254,6 +261,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "license": "CC BY 3.0",
     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Kim_Jae-Woong.png",
     "teamFolder": "WO"
+  },
+  "KBO-PL-206628": {
+    "url": "/portraits/kbo/HH/박준영(2003).png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/HH/박준영(2003).png",
+    "teamFolder": "HH"
   },
   "KBO-PL-210117": {
     "url": "/portraits/kbo/LG/천성호.png",
@@ -512,6 +526,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "credit": "OSEN SPORTS",
     "license": "CC BY 3.0",
     "sourceUrl": "https://commons.wikimedia.org/wiki/File:%EA%B6%8C%EA%B4%91%EB%AF%BC_%EC%95%BC%EA%B5%AC_%EC%84%A0%EC%88%98.jpg",
+    "teamFolder": "HH"
+  },
+  "KBO-PL-348664": {
+    "url": "/portraits/kbo/HH/박상원.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/HH/박상원.png",
     "teamFolder": "HH"
   },
   "KBO-PL-348860": {
@@ -1403,6 +1424,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "https://commons.wikimedia.org/wiki/File:%EC%96%91%EC%B0%BD%EC%84%AD_%EC%84%A0%EC%88%98.jpg",
     "teamFolder": "SS"
   },
+  "KBO-PL-820603": {
+    "url": "/portraits/kbo/HH/박준영(2002).png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/HH/박준영(2002).png",
+    "teamFolder": "HH"
+  },
   "KBO-PL-825553": {
     "url": "/portraits/kbo/LG/이재원.png",
     "credit": "사용자 등록 공식 프로필",
@@ -1863,6 +1891,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "67263": "KBO-PL-564247",
   "67391": "KBO-PL-203439",
   "67539": "KBO-PL-532959",
+  "67703": "KBO-PL-348664",
   "67828": "KBO-PL-165093",
   "67893": "KBO-PL-143567",
   "68043": "KBO-PL-511406",
@@ -1924,6 +1953,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "79456": "KBO-PL-393424",
   "79608": "KBO-PL-564444",
   "2026-HH-10": "KBO-PL-620631",
+  "2026-HH-13": "KBO-PL-167366",
   "2026-HH-18": "KBO-PL-666266",
   "2026-HH-24": "KBO-PL-189157",
   "2026-HH-25": "KBO-PL-220690",
@@ -1951,6 +1981,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "2026-HH-7": "KBO-PL-256030",
   "2026-HH-8": "KBO-PL-307229",
   "2026-HH-95": "KBO-PL-694130",
+  "2026-HH-PJY-2002": "KBO-PL-820603",
   "2026-LG-1": "KBO-PL-422006",
   "2026-LG-10": "KBO-PL-833790",
   "2026-LG-11": "KBO-PL-645335",
@@ -2018,6 +2049,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "D2027-030": "KBO-PL-196621",
   "D2027-060": "KBO-PL-449649",
   "D2027-090": "KBO-PL-397757",
+  "FA2027-HH-박상원": "KBO-PL-348664",
   "KBO-OVR-0004": "KBO-PL-558882",
   "sangmu-real-SSG-5": "KBO-PL-832003",
   "sangmu-real-SSG-6": "KBO-PL-146845",
@@ -2043,6 +2075,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "v15-0072": "KBO-PL-525206",
   "v15-0073": "KBO-PL-151852",
   "v15-0075": "KBO-PL-331312",
+  "v15-0076": "KBO-PL-206628",
   "v15-0077": "KBO-PL-431192",
   "v15-0078": "KBO-PL-610100",
   "v15-0079": "KBO-PL-888290",
