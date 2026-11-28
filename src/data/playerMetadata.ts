@@ -1271,6 +1271,7 @@ export const REAL_KBO_UNIFORM_NUMBERS: Record<TeamId, Record<string, number>> = 
     최유빈: 93,
     권현규: 94,
     황영묵: 95,
+    '박준영(2003)': 96,
     박준영: 96,
     하동준: 97,
     배승수: 98,

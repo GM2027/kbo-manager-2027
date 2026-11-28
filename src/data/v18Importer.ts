@@ -699,6 +699,8 @@ export function computeRealisticServiceYears2027(
 
 function getDatabaseVersionRank(ver?: string): number {
   switch (ver) {
+    case 'v33_hanwha_park_junyoung_name_labels':
+      return 33;
     case 'v32_verified_2026_kbo_uniform_numbers':
       return 32;
     case 'v31_hanwha_park_junyoung_2002':
@@ -1657,6 +1659,31 @@ export function sanitizeCareerOvrPotInPlace(career: CareerSave): void {
       career.databaseVersion = 'v32_verified_2026_kbo_uniform_numbers';
     }
 
+    // v33: 한화 동명이인 투수 표기 구분 -> 박준영(2002) / 박준영(2003)
+    if (getDatabaseVersionRank(career.databaseVersion) < 33) {
+      for (const p of Object.values(career.players)) {
+        if (
+          p.id === '2026-HH-PJY-2002' ||
+          p.permanentId === 'KBO-PL-820603' ||
+          ((p.name === '박준영' || p.name === '박준영(2002)') &&
+            (p.birthYear === 2002 || p.birthDate === '2002-06-03'))
+        ) {
+          p.name = '박준영(2002)';
+        } else if (
+          p.id === 'v15-0076' ||
+          p.v18SourceId === 'v15-0076' ||
+          p.permanentId === 'KBO-PL-162914' ||
+          ((p.name === '박준영' || p.name === '박준영(2003)') &&
+            (p.birthYear === 2003 || p.birthDate === '2003-03-02'))
+        ) {
+          p.name = '박준영(2003)';
+          if (!p.school) p.school = '세광고';
+          if (!p.draftYear) p.draftYear = 2022;
+        }
+      }
+      career.databaseVersion = 'v33_hanwha_park_junyoung_name_labels';
+    }
+
     // KBO 현역 선수단과 해외파 목록 간 중복 등록 상시 방지
     if (career.amateurAndOverseas?.overseasPlayers) {
       const activeKboKey = new Set<string>();
@@ -1784,7 +1811,7 @@ function buildHanwhaParkJunyoung2002Player(
     originType: 'real',
     v18SourceId: '2026-HH-PJY-2002',
     permanentId: 'KBO-PL-820603',
-    name: '박준영',
+    name: '박준영(2002)',
     teamId: '한화',
     category: '국내',
     nationality: '한국',
@@ -2264,7 +2291,12 @@ export function buildAll10TeamsFromV18Dataset(): {
     if (role === '타자') {
       ensurePlayerPositionProficiencyInPlace(player);
     }
-    if (player.name === '박준영' && player.teamId === '한화' && (player.birthYear === 2003 || player.birthDate === '2003-03-02')) {
+    if (
+      (player.name === '박준영' || player.name === '박준영(2003)') &&
+      player.teamId === '한화' &&
+      (player.birthYear === 2003 || player.birthDate === '2003-03-02')
+    ) {
+      player.name = '박준영(2003)';
       if (!player.school) player.school = '세광고';
       if (!player.draftYear) player.draftYear = 2022;
     }
