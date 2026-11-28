@@ -976,6 +976,13 @@ export const BUNDLED_REAL_PLAYER_PORTRAITS: Record<string, BundledRealPortraitEn
     "sourceUrl": "local://portraits/kbo/SSG/박기호.png",
     "teamFolder": "SSG"
   },
+  "KBO-PL-566473": {
+    "url": "/portraits/kbo/SSG/조병현.png",
+    "credit": "사용자 등록 공식 프로필",
+    "license": "verified-custom",
+    "sourceUrl": "local://portraits/kbo/SSG/조병현.png",
+    "teamFolder": "SSG"
+  },
   "KBO-PL-568009": {
     "url": "/portraits/kbo/SSG/백승건.png",
     "credit": "사용자 등록 공식 프로필",
@@ -1750,6 +1757,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "51867": "KBO-PL-934445",
   "51868": "KBO-PL-157408",
   "51895": "KBO-PL-359506",
+  "51897": "KBO-PL-566473",
   "52103": "KBO-PL-416761",
   "52121": "KBO-PL-257153",
   "52149": "KBO-PL-765496",
@@ -2023,6 +2031,7 @@ export const KBO_OFFICIAL_ID_TO_PORTRAIT_PID: Record<string, string> = {
   "2026-SSG-10": "KBO-PL-289798",
   "2026-SSG-16": "KBO-PL-399100",
   "2026-SSG-18": "KBO-PL-157408",
+  "2026-SSG-19": "KBO-PL-566473",
   "2026-SSG-2": "KBO-PL-143567",
   "2026-SSG-20": "KBO-PL-463403",
   "2026-SSG-27": "KBO-PL-231913",
